@@ -2,13 +2,49 @@
 
 apply plugin: 'com.android.application'
 
-String key_alias = 'app'
-String key_password = 'angcyo'
-String key_file = '../lib/angcyo.jks'
-String password = 'angcyo'
-
 println("项目根路径:" + rootDir.getAbsolutePath())
 println("脚本路径:" + new File("").getAbsolutePath())
+
+ext.maxDepth = 2
+//查找默认的jks文件路径
+ext.angcyoJksFile = "未找到默认的angcyo.jks文件"
+
+listPath(getRootDir())
+
+/**枚举所有文件夹*/
+def listPath(filePath, depth = 0 /*当前枚举的路径深度, 深度大于maxDepth停止枚举*/, parent = "") {
+    //println filePath.getAbsolutePath() + " " + depth
+    if (depth > maxDepth) {
+        return
+    }
+
+    if (filePath.isDirectory()) {
+
+        filePath.listFiles()?.each {
+            if (it.isDirectory()) {
+                includePath(it, parent)
+
+                listPath(it, depth + 1, ":" + it.getName())
+            }
+        }
+    }
+}
+
+/**查找目标*/
+def includePath(filePath, parent) {
+    if (filePath.isDirectory()) {
+        def targetFile = new File(filePath, "angcyo.jks")
+        if (targetFile.exists()) {
+            angcyoJksFile = targetFile.getAbsolutePath()
+        }
+    }
+}
+
+
+String key_alias = 'app'
+String key_password = 'angcyo'
+String key_file = angcyoJksFile
+String password = 'angcyo'
 
 //读取key文件
 Properties props = new Properties()
@@ -67,7 +103,7 @@ ext.signConfig = [
 println(
         "\nkey.alias:" + signConfig.key_alias +
                 "\nkey.password:" + signConfig.key_password +
-                "\nkey.file:" + signConfig.key_file + " ->" + jksFile.getAbsolutePath() +
+                "\nkey.file:" + signConfig.key_file +
                 "\npassword:" + signConfig.password + "\n"
 )
 
@@ -82,4 +118,8 @@ android {
     }
 }
 
-apply from: '../lib/app.gradle'
+if (getRootProject().hasProperty("allGradle")) {
+    apply from: allGradle.app
+} else {
+    apply from: '../lib/app.gradle'
+}
