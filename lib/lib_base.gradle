@@ -8,6 +8,9 @@ def V_NAME = "1.0"
 
 def _kotlin_version = hasProperty("kotlin_version") ? ext.kotlin_version : '1.3.10'
 
+def _use_proguard = hasProperty("use_proguard") ? (ext.use_proguard == "true") : false
+def _minify_enabled = hasProperty("minify_enabled") ? (ext.minify_enabled == "true") : false
+
 //println "kotlin版本:" + _kotlin_version
 //println project.getName()
 //println project.getDisplayName()
@@ -51,11 +54,14 @@ android {
         targetSdkVersion T_SDK
         versionCode V_CODE
         versionName V_NAME
+
+        consumerProguardFiles 'proguard-rules.pro'
     }
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled _minify_enabled
+            useProguard _use_proguard
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }

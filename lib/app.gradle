@@ -23,6 +23,9 @@ def _V_CODE = hasProperty("V_CODE") ? ext.V_CODE : '1'
 def _V_NAME = hasProperty("V_NAME") ? ext.V_NAME : '1.0'
 def application_id = hasProperty("application_id") ? ext.application_id : 'com.angcyo.app'
 
+def _use_proguard = hasProperty("use_proguard") ? (ext.use_proguard == "true") : false
+def _minify_enabled = hasProperty("minify_enabled") ? (ext.minify_enabled == "true") : false
+
 android {
 
     compileSdkVersion Integer.parseInt(_C_SDK)
@@ -79,8 +82,8 @@ android {
             //applicationIdSuffix ".release"
             zipAlignEnabled true
             shrinkResources false
-            minifyEnabled false
-            useProguard false
+            minifyEnabled _minify_enabled
+            useProguard _use_proguard
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.angcyo
         }
