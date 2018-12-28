@@ -1,0 +1,138 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+//apply plugin: 'com.getkeepsafe.dexcount'
+//apply from: 'build_time.gradle'
+apply from: '../lib/android.gradle'
+
+def apkTime() {
+    return new Date().format("yyyy-MM-dd", TimeZone.getTimeZone("Asia/Shanghai"))
+}
+
+def apk_time = apkTime()
+
+def _C_SDK = hasProperty("C_SDK") ? ext.C_SDK : '28'
+def _M_SDK = hasProperty("M_SDK") ? ext.M_SDK : '21'
+def _T_SDK = hasProperty("T_SDK") ? ext.T_SDK : '28'
+def _V_CODE = hasProperty("V_CODE") ? ext.V_CODE : '1'
+def _V_NAME = hasProperty("V_NAME") ? ext.V_NAME : '1.0'
+def application_id = hasProperty("application_id") ? ext.application_id : 'com.angcyo.app'
+
+android {
+
+    compileSdkVersion Integer.parseInt(_C_SDK)
+    //buildToolsVersion rootProject.B_TOOLS
+    defaultConfig {
+        applicationId "$application_id"
+        minSdkVersion Integer.parseInt(_M_SDK)
+        targetSdkVersion Integer.parseInt(_T_SDK)
+        versionCode Integer.parseInt(_V_CODE)
+        versionName "$_V_NAME"
+        multiDexEnabled true
+
+        manifestPlaceholders = [
+                PACKAGE_NAME: "$application_id"
+        ]
+
+//        ndk {
+//            // 设置支持的SO库架构
+//            abiFilters 'armeabi', 'armeabi-v7a', 'x86', 'x86_64'//, 'arm64-v8a'
+//            //, 'x86', 'armeabi-v7a', 'x86_64', 'arm64-v8a'
+//        }
+    }
+//    sourceSets {
+//        main {
+//            res.srcDirs = [
+//                    'src/main/res/'
+//            ]
+//        }
+//    }
+
+    flavorDimensions "type"
+    productFlavors {
+        //develop
+        _dev {
+            dimension "type"
+            minSdkVersion Math.max(Integer.parseInt(_M_SDK), 21)
+            buildConfigField "boolean", "SHOW_DEBUG", "true"
+        }
+        //preview
+        pre {
+            dimension "type"
+            minSdkVersion Integer.parseInt(_M_SDK)
+            buildConfigField "boolean", "SHOW_DEBUG", "true"
+        }
+        //apk
+        apk {
+            dimension "type"
+            minSdkVersion Integer.parseInt(_M_SDK)
+            buildConfigField "boolean", "SHOW_DEBUG", "false"
+        }
+    }
+    buildTypes {
+        release {
+            //applicationIdSuffix ".release"
+            zipAlignEnabled true
+            shrinkResources false
+            minifyEnabled false
+            useProguard false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.angcyo
+        }
+        debug {
+            //applicationIdSuffix ".debug"
+            zipAlignEnabled true
+            shrinkResources false
+            minifyEnabled false
+            useProguard false
+            signingConfig signingConfigs.angcyo
+        }
+    }
+    lintOptions {
+        abortOnError false
+        //https://www.jianshu.com/p/93678f8b3421
+        disable 'GoogleAppIndexingWarning'
+    }
+    /*Gradle3.0 以下的方法*/
+//    getApplicationVariants().all { variant ->
+//        variant.outputs.each { output ->
+//            def appName = "UIViewDemo-${variant.buildType.name}-${variant.versionName}"
+//            def time = ""
+//            if (variant.buildType.name.equalsIgnoreCase("release")) {
+//                time = "_${new Date().format("yyyy-MM-dd_HH-mm")}"
+//            }
+//            output.outputFile = new File(output.outputFile.parent, "${appName}${time}.apk")
+//        }
+//    }
+
+    /*Gradle3.0 以上的方法*/
+    applicationVariants.all { variant ->
+        if (variant.buildType.name != "debug") {
+            variant.getPackageApplication().outputDirectory = new File(project.rootDir.absolutePath + "/apk")
+        }
+
+        variant.getPackageApplication().outputScope.apkDatas.forEach { apkData ->
+            apkData.outputFileName = rootProject.name + "-" +
+                    variant.versionName + "_" +
+                    apk_time + "_" +
+                    variant.flavorName + "_" +
+                    variant.buildType.name + "_" +
+                    variant.signingConfig.name + "_" +
+                    signConfig.key_alias +
+                    ".apk"
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation project(':UIViewLess')
+    //implementation project(':RLibrary:imagepicker')
+    //implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+    //annotationProcessor 'com.jakewharton:butterknife-compiler:8.4.0'
+    //implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
+    //FPS显示库 https://github.com/wasabeef/Takt
+    //implementation 'jp.wasabeef:takt:1.0.4'
+    //性能检测库 https://github.com/markzhai/AndroidPerformanceMonitor
+    //_devCompile 'com.github.markzhai:blockcanary-android:1.5.0'
+    //preCompile 'com.github.markzhai:blockcanary-android:1.5.0'
+}

@@ -1,0 +1,32 @@
+apply from: './lib_base.gradle'
+
+def _S_VER = hasProperty("S_VER") ? ext.S_VER : '27.1.1'
+
+def okdownload_version = '1.0.5'
+
+dependencies {
+    //exclude group: 'io.reactivex', module: 'rxjava'
+
+    compileOnly 'com.android.support:support-annotations:' + _S_VER
+    compileOnly 'com.android.support:support-v4:' + _S_VER
+
+    //https://github.com/tbruyelle/RxPermissions
+    api('com.tbruyelle.rxpermissions:rxpermissions:0.9.4') {
+        exclude group: 'io.reactivex'
+        exclude group: 'com.android.support'
+    }
+
+    // core
+    api('com.liulishuo.okdownload:okdownload:' + okdownload_version)
+
+    // provide sqlite to store breakpoints
+    api "com.liulishuo.okdownload:sqlite:$okdownload_version"
+
+    // provide okhttp to connect to backend
+    // and then please import okhttp dependencies by yourself
+    api "com.liulishuo.okdownload:okhttp:$okdownload_version"
+
+    //https://github.com/daimajia/AndroidViewAnimations
+    api 'com.daimajia.easing:library:2.0@aar'
+    api 'com.daimajia.androidanimations:library:2.3@aar'
+}

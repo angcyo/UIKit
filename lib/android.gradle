@@ -1,0 +1,105 @@
+def getBuildTime() {
+    return new Date().format("yyyy-MM-dd HH:mm:ss.sss")
+}
+
+def osName() {
+    return System.getProperty("os.name") + "@" + System.getProperty("os.version")
+}
+
+def userName() {
+    return System.getProperty("user.name")
+}
+
+def releaseTime() {
+    return new Date().format("yyyy-MM-dd", TimeZone.getTimeZone("UTC"))
+}
+
+def apkTime() {
+    return new Date().format("yyyy-MM-dd_HH-mm", TimeZone.getTimeZone("UTC"))
+}
+
+def apk_time = apkTime()
+
+def build_time = getBuildTime()
+def release_time = releaseTime()
+
+println "开始编译:" + build_time
+
+android {
+
+    defaultConfig {
+        resValue "string", "build_time", build_time
+        resValue "string", "os_name", osName()
+        resValue "string", "user_name", userName()
+        //resValue "bool", "SHOW_DEBUG", "true"
+
+        buildConfigField "String", "USER_NAME", '"' + userName() + '"'
+    }
+
+    packagingOptions {
+        doNotStrip '*/mips/*.so'
+        doNotStrip '*/mips64/*.so'
+    }
+
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/uiview_release.kotlin_module'
+    }
+
+    lintOptions {
+        checkReleaseBuilds false
+        abortOnError false
+    }
+
+    dexOptions {
+        //使用增量模式构建
+        //incremental false
+
+        //预编译
+        preDexLibraries false
+
+        //是否支持大工程模式
+        jumboMode true
+
+        //dex进程内存
+        javaMaxHeapSize "2g"
+
+        maxProcessCount 8
+
+        //线程数
+        threadCount 8
+    }
+
+    aaptOptions {
+        cruncherEnabled false
+    }
+
+    //useLibrary 'org.apache.http.legacy'
+}
+
+/*包含 aar 文件的目录名称*/
+def aarFolderName = "aar"
+
+repositories {
+    flatDir {
+        dirs "../${aarFolderName}" // aar目录
+    }
+}
+
+dependencies {
+    def libsFolder = new File(aarFolderName)
+    println("开始查找aar文件在 " + libsFolder.getAbsolutePath() + " 中->")
+    for (aarFile in libsFolder.listFiles()) {
+        def fileName = aarFile.getName()
+        if (fileName.endsWith(".aar")) {
+            fileName = fileName.replaceAll(".aar", "")
+            println("implementation aar:" + fileName)
+            implementation name: "${fileName}", ext: 'aar'
+        }
+    }
+    println("查找结束.")
+}

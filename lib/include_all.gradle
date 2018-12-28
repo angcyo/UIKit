@@ -1,0 +1,48 @@
+ext.maxDepth = 2
+ext.includeConfig = [:]
+
+def rootPath = getRootDir()
+println "开始包含项目in->" + rootPath.getAbsolutePath()
+listPath(rootPath)
+includeConfig.each { key, value ->
+    println "->include " + value + " ::" + key
+}
+println "...end..."
+
+/**枚举所有文件夹*/
+def listPath(filePath, depth = 0 /*当前枚举的路径深度, 深度大于maxDepth停止枚举*/, parent = "") {
+    //println filePath.getAbsolutePath() + " " + depth
+    if (depth > maxDepth) {
+        return
+    }
+
+    if (filePath.isDirectory()) {
+
+        filePath.listFiles()?.each {
+            if (it.isDirectory()) {
+                includePath(it, parent)
+
+                listPath(it, depth + 1, ":" + it.getName())
+            }
+        }
+    }
+}
+
+/**include复合目标的文件夹*/
+def includePath(filePath, parent) {
+    if (filePath.isDirectory()) {
+        def buildFile = new File(filePath, "build.gradle")
+        if (buildFile.exists()) {
+            def name = filePath.getName()
+            def path = parent + ":${name}"
+
+            //println "->include " + path
+            includeConfig[name] = path
+
+            include path
+
+            //getRootProject().ext.includeConfig = includeConfig
+            //getRootProject().extensions.includeConfig = includeConfig
+        }
+    }
+}

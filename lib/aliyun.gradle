@@ -1,0 +1,39 @@
+//https://juejin.im/post/5c00ec39e51d4555ec0394f6
+//apply from: './lib/aliyun.gradle'
+
+repositories {
+    maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
+    //maven { url 'http://maven.aliyun.com/nexus/content/repositories/jcenter' }
+}
+
+allprojects {
+    repositories {
+        maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
+        //maven { url 'http://maven.aliyun.com/nexus/content/repositories/jcenter' }
+    }
+}
+
+/*
+https://juejin.im/post/5c00ec39e51d4555ec0394f6
+
+1.通过Gradle编译参数禁用
+
+gradlew build -x lint -x lintVitalRelease
+
+2.Gradle脚本中动态添加编译参数
+
+项目级别的build.gradle中buildScript添加下述代码：
+gradle.startParameter.excludedTaskNames.add('lint')
+gradle.startParameter.excludedTaskNames.add('lintVitalRelease')
+
+3.永久禁用lint
+
+在模块级别的build.gradle中的
+apply plugin: 'com.android.application'
+复制代码前加上下述代码：
+tasks.whenTaskAdded { task ->
+    if (task.name.contains("lint") || task.name.contains("lintVitalRelease")) {
+        task.enabled = false
+    }
+}
+*/

@@ -1,0 +1,85 @@
+apply from: '../lib/find_module.gradle'
+apply from: '../lib/lib_base.gradle'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+
+def _S_VER = hasProperty("S_VER") ? ext.S_VER : '27.1.1'
+def glide_version = "4.8.0" //4.7.1 4.6.1 4.3.1
+
+def refresh_version = '1.1.0-alpha-16'
+
+android {
+    defaultConfig {
+        vectorDrawables.useSupportLibrary = true
+    }
+    sourceSets {
+        main {
+            //manifest.srcFile 'src/main/AndroidManifest.xml'
+            //manifest.(['src/main/AndroidManifest.xml'])
+            assets.srcDirs = ['src/main/assets',
+                              'src/github/assets']
+            java.srcDirs = ['src/main/java',
+                            'src/picture/java',
+                            'src/ucrop/java',
+                            'src/github/java']
+            res.srcDirs = ['src/main/res',
+                           'src/picture/res',
+                           'src/ucrop/res',
+                           'src/github/res']
+        }
+    }
+}
+
+//println getRootDir().getAbsolutePath()
+//println file("..").getAbsolutePath()
+def lib_module = ext.allModule.lib
+def http_module = ext.allModule.http
+
+dependencies {
+    api fileTree(dir: 'libs', include: ['*.jar'])
+
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+
+    api project(lib_module)
+    api project(http_module)
+
+    api 'com.android.support:support-v4:' + _S_VER
+    api 'com.android.support:appcompat-v7:' + _S_VER
+    api 'com.android.support:design:' + _S_VER
+    api 'com.android.support:recyclerview-v7:' + _S_VER
+    api 'com.android.support:cardview-v7:' + _S_VER
+
+    api 'com.android.support.constraint:constraint-layout:1.1.3'
+
+    /*https://github.com/bumptech/glide*/
+    //compile 'com.github.bumptech.glide:glide:3.8.0'
+    api "com.github.bumptech.glide:glide:${glide_version}"
+    kapt "com.github.bumptech.glide:compiler:${glide_version}"
+    //https://github.com/koral--/android-gif-drawable
+    api 'pl.droidsonroids.gif:android-gif-drawable:1.2.12'
+
+    api 'com.android.support:multidex:1.0.3'
+
+    /*https://github.com/orhanobut/hawk*/
+    api('com.orhanobut:hawk:2.0.1') {
+        exclude group: 'com.google.code.gson', module: 'gson'
+    }
+
+    /*https://github.com/angcyo/SmartRefreshLayout*/
+    api 'com.scwang.smartrefresh:SmartRefreshLayout:' + refresh_version
+    /*其他刷新控件*/
+    //api 'com.scwang.smartrefresh:SmartRefreshHeader:' + refresh_version
+
+    //https://github.com/LuckSiege/PictureSelector 2018-12-15
+    //maven { url 'https://jitpack.io' }
+    //api 'com.github.LuckSiege.PictureSelector:picture_library:v2.2.3'
+    //https://github.com/ReactiveX/RxJava
+    //http://jcenter.bintray.com/io/reactivex/rxjava2/rxjava/
+    api "io.reactivex.rxjava2:rxjava:2.2.4"
+    //http://jcenter.bintray.com/io/reactivex/rxjava2/rxandroid/
+    api "io.reactivex.rxjava2:rxandroid:2.1.0"
+}
+
+
