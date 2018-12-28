@@ -1,12 +1,13 @@
 ext.maxDepth = 2
-ext.allModule = [:]
+getRootProject().ext.allModule = [:]
 
 def rootPath = getRootDir()
 println "查找所有Module->" + rootPath.getAbsolutePath()
 listPath(rootPath)
-allModule.each { key, value ->
-    println "->找到 " + value + " ::" + key
-}
+//allModule.each { key, value ->
+//    println "->找到 " + value + " ::" + key
+//}
+println allModule
 println "...end..."
 
 /**枚举所有文件夹*/

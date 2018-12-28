@@ -4,9 +4,10 @@ ext.includeConfig = [:]
 def rootPath = getRootDir()
 println "开始包含项目in->" + rootPath.getAbsolutePath()
 listPath(rootPath)
-includeConfig.each { key, value ->
-    println "->include " + value + " ::" + key
-}
+//includeConfig.each { key, value ->
+//    println "->include " + value + " ::" + key
+//}
+println includeConfig
 println "...end..."
 
 /**枚举所有文件夹*/
