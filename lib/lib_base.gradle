@@ -8,8 +8,11 @@ def V_NAME = "1.0"
 
 def _kotlin_version = hasProperty("kotlin_version") ? ext.kotlin_version : '1.3.10'
 
-def _use_proguard = hasProperty("use_proguard") ? (ext.use_proguard == "true") : false
-def _minify_enabled = hasProperty("minify_enabled") ? (ext.minify_enabled == "true") : false
+def _use_proguard_debug = hasProperty("use_proguard_debug") ? (ext.use_proguard_debug == "true") : false
+def _minify_enabled_debug = hasProperty("minify_enabled_debug") ? (ext.minify_enabled_debug == "true") : false
+def _use_proguard = hasProperty("use_proguard") ? (ext.use_proguard == "true") : _use_proguard_debug
+def _minify_enabled = hasProperty("minify_enabled") ? (ext.minify_enabled == "true") : _minify_enabled_debug
+
 
 //println "kotlin版本:" + _kotlin_version
 //println project.getName()
@@ -62,6 +65,11 @@ android {
         release {
             minifyEnabled _minify_enabled
             useProguard _use_proguard
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            minifyEnabled _minify_enabled_debug
+            useProguard _use_proguard_debug
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
