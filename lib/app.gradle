@@ -9,7 +9,7 @@ if (getRootProject().hasProperty("allGradle")) {
     apply from: '../lib/android.gradle'
 }
 
-def apkTime() {
+static def apkTime() {
     return new Date().format("yyyy-MM-dd", TimeZone.getTimeZone("Asia/Shanghai"))
 }
 

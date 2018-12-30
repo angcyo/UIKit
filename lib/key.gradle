@@ -3,7 +3,7 @@
 apply plugin: 'com.android.application'
 
 println("项目根路径:" + rootDir.getAbsolutePath())
-println("脚本路径:" + new File("").getAbsolutePath())
+println("脚本路径:" + file(".").getAbsolutePath())
 
 ext.maxDepth = 2
 //查找默认的jks文件路径
@@ -56,7 +56,7 @@ if (project.hasProperty("key_file")) {
     if (!keyFile.exists()) {
         println("根目录未找到配置文件:" + keyFile.getAbsolutePath())
 
-        keyFile = new File(keyFileString)
+        keyFile = file(keyFileString)
 
         println("切换到至:" + keyFile.getAbsolutePath())
     }
