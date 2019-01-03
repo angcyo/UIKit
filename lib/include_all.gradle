@@ -42,8 +42,8 @@ def includePath(filePath, parent) {
 
             include path
 
-            //getRootProject().ext.includeConfig = includeConfig
-            //getRootProject().extensions.includeConfig = includeConfig
+            //rootProject.ext.includeConfig = includeConfig
+            //rootProject.extensions.includeConfig = includeConfig
         }
     }
 }

@@ -9,6 +9,7 @@ ext.maxDepth = 2
 //查找默认的jks文件路径
 ext.angcyoJksFile = "未找到默认的angcyo.jks文件"
 
+/**枚举文件夹, 拿到`angcyo.jks`的路径*/
 listPath(getRootDir())
 
 /**枚举所有文件夹*/
@@ -118,7 +119,7 @@ android {
     }
 }
 
-if (getRootProject().hasProperty("allGradle")) {
+if (rootProject.hasProperty("allGradle")) {
     apply from: allGradle.app
 } else {
     apply from: '../lib/app.gradle'

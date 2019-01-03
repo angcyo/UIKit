@@ -3,7 +3,7 @@ apply plugin: 'kotlin-android'
 //apply plugin: 'com.getkeepsafe.dexcount'
 //apply from: 'build_time.gradle'
 
-if (getRootProject().hasProperty("allGradle")) {
+if (rootProject.hasProperty("allGradle")) {
     apply from: allGradle.android
 } else {
     apply from: '../lib/android.gradle'
@@ -124,7 +124,13 @@ android {
         }
 
         variant.getPackageApplication().outputScope.apkDatas.forEach { apkData ->
-            apkData.outputFileName = rootProject.name + "-" +
+            def name = ""
+            if (project.name != "app") {
+                name = project.name
+            } else {
+                name = rootProject.name
+            }
+            apkData.outputFileName = name + "-" +
                     variant.versionName + "_" +
                     apk_time + "_" +
                     variant.flavorName + "_" +
@@ -139,7 +145,7 @@ android {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
 
-    if (getRootProject().hasProperty("allModule")) {
+    if (rootProject.hasProperty("allModule")) {
         implementation project(allModule.UIViewLess)
     } else {
         implementation project(':UIViewLess')

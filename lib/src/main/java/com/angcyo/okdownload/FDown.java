@@ -7,10 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import com.angcyo.lib.L;
-import com.liulishuo.okdownload.DownloadListener;
-import com.liulishuo.okdownload.DownloadTask;
-import com.liulishuo.okdownload.OkDownload;
-import com.liulishuo.okdownload.StatusUtil;
+import com.liulishuo.okdownload.*;
 import com.liulishuo.okdownload.StatusUtil.Status;
 import com.liulishuo.okdownload.core.Util;
 import com.liulishuo.okdownload.core.breakpoint.BreakpointInfo;
@@ -19,6 +16,7 @@ import com.liulishuo.okdownload.core.cause.ResumeFailedCause;
 import com.liulishuo.okdownload.core.dispatcher.DownloadDispatcher;
 
 import java.io.File;
+import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -38,6 +36,18 @@ public class FDown {
 
     public static void init(@NonNull Context context) {
         app = context.getApplicationContext();
+        try {
+            Field contextField = OkDownloadProvider.class.getDeclaredField("context");
+            contextField.setAccessible(true);
+            Object contextObj = contextField.get(null);
+            if (contextObj == null) {
+                contextField.set(null, app);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
         //https://github.com/lingochamp/okdownload/wiki/Advanced-Use-Guideline
         //OkDownload.with().setMonitor(monitor);
 

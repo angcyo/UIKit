@@ -1,9 +1,9 @@
 ext.maxDepth = 2
 
 /**查找所有有效module*/
-getRootProject().ext.allModule = [:]
+rootProject.ext.allModule = [:]
 /**查找所有gradle文件*/
-getRootProject().ext.allGradle = [:]
+rootProject.ext.allGradle = [:]
 
 def rootPath = getRootDir()
 println "查找所有Module->" + rootPath.getAbsolutePath()
