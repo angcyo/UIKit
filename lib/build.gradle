@@ -1,6 +1,6 @@
 apply from: './lib_base.gradle'
 
-def _S_VER = hasProperty("S_VER") ? ext.S_VER : '27.1.1'
+def _S_VER = rootProject.hasProperty("S_VER") ? rootProject.ext.S_VER : '27.1.1'
 
 def okdownload_version = '1.0.5'
 

@@ -15,17 +15,25 @@ static def apkTime() {
 
 def apk_time = apkTime()
 
-def _C_SDK = hasProperty("C_SDK") ? ext.C_SDK : '28'
-def _M_SDK = hasProperty("M_SDK") ? ext.M_SDK : '21'
-def _T_SDK = hasProperty("T_SDK") ? ext.T_SDK : '28'
-def _V_CODE = hasProperty("V_CODE") ? ext.V_CODE : '1'
-def _V_NAME = hasProperty("V_NAME") ? ext.V_NAME : '1.0'
-def application_id = hasProperty("application_id") ? ext.application_id : 'com.angcyo.app'
+def _C_SDK = project.hasProperty("C_SDK") ? project.ext.C_SDK : '28'
+def _M_SDK = project.hasProperty("M_SDK") ? project.ext.M_SDK : '21'
+def _T_SDK = project.hasProperty("T_SDK") ? project.ext.T_SDK : '28'
+def _V_CODE = project.hasProperty("V_CODE") ? project.ext.V_CODE : '1'
+def _V_NAME = project.hasProperty("V_NAME") ? project.ext.V_NAME : '1.0'
+def application_id = project.hasProperty("application_id") ? project.ext.application_id : 'com.angcyo.app'
 
-def _use_proguard_debug = hasProperty("use_proguard_debug") ? (ext.use_proguard_debug == "true") : false
-def _minify_enabled_debug = hasProperty("minify_enabled_debug") ? (ext.minify_enabled_debug == "true") : false
-def _use_proguard = hasProperty("use_proguard") ? (ext.use_proguard == "true") : _use_proguard_debug
-def _minify_enabled = hasProperty("minify_enabled") ? (ext.minify_enabled == "true") : _minify_enabled_debug
+def _use_proguard_debug = project.hasProperty("use_proguard_debug") ? (project.ext.use_proguard_debug == "true") : false
+def _minify_enabled_debug = project.hasProperty("minify_enabled_debug") ? (project.ext.minify_enabled_debug == "true") : false
+def _use_proguard = project.hasProperty("use_proguard") ? (project.ext.use_proguard == "true") : _use_proguard_debug
+def _minify_enabled = project.hasProperty("minify_enabled") ? (project.ext.minify_enabled == "true") : _minify_enabled_debug
+
+//println "........1"
+//println ext.V_NAME
+//println rootProject.ext.V_NAME
+//println hasProperty("V_NAME")
+//println rootProject.hasProperty("V_NAME")
+//println project
+//println rootProject
 
 android {
 
@@ -38,6 +46,7 @@ android {
         versionCode Integer.parseInt(_V_CODE)
         versionName "$_V_NAME"
         multiDexEnabled true
+        resConfigs "zh" //, "en"
 
         manifestPlaceholders = [
                 PACKAGE_NAME: "$application_id"

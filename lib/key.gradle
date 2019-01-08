@@ -49,8 +49,8 @@ String password = 'angcyo'
 
 //读取key文件
 Properties props = new Properties()
-if (project.hasProperty("key_file")) {
-    String keyFileString = project.property("key_file")
+if (rootProject.hasProperty("key_file")) {
+    String keyFileString = rootProject.property("key_file")
     File keyFile = new File(rootDir, keyFileString)
     //println("->" + keyFile.exists() + "->" + keyFile2.exists())
 
@@ -94,7 +94,7 @@ if (jksFile.exists()) {
     }
 }
 
-ext.signConfig = [
+rootProject.ext.signConfig = [
         "key_alias"   : key_alias,
         "key_password": key_password,
         "key_file"    : key_file,
