@@ -27,9 +27,8 @@ def _minify_enabled_debug = project.hasProperty("minify_enabled_debug") ? (proje
 def _use_proguard = project.hasProperty("use_proguard") ? (project.ext.use_proguard == "true") : _use_proguard_debug
 def _minify_enabled = project.hasProperty("minify_enabled") ? (project.ext.minify_enabled == "true") : _minify_enabled_debug
 
-//println "........1"
-//println ext.V_NAME
-//println rootProject.ext.V_NAME
+println "........app........"
+println project.name + " ->" + application_id + " ->" + _V_NAME + " ->" + _V_CODE
 //println hasProperty("V_NAME")
 //println rootProject.hasProperty("V_NAME")
 //println project
