@@ -460,8 +460,8 @@ public class FragmentHelper {
          */
         Bundle args;
 
-        int enterAnim = -1;
-        int exitAnim = -1;
+        int enterAnim = 0;
+        int exitAnim = 0;
 
         /**
          * 是否要确认允许返回, 如果false, 则不会回调 onBackPressed 方法
@@ -684,8 +684,8 @@ public class FragmentHelper {
         }
 
         public Builder noAnim() {
-            enterAnim(-1);
-            exitAnim(-1);
+            enterAnim(0);
+            exitAnim(0);
             return this;
         }
 
