@@ -115,6 +115,8 @@ android {
             keyPassword key_password
             storeFile file(key_file)
             storePassword password
+            v1SigningEnabled true
+            v2SigningEnabled true
         }
     }
 }
