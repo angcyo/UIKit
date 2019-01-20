@@ -6,7 +6,6 @@ import com.androidzeitgeist.ani.discovery.DiscoveryException;
 import com.androidzeitgeist.ani.discovery.DiscoveryListener;
 import com.androidzeitgeist.ani.transmitter.Transmitter;
 import com.androidzeitgeist.ani.transmitter.TransmitterException;
-import org.jetbrains.annotations.NotNull;
 
 import java.net.DatagramPacket;
 import java.net.InetAddress;
@@ -153,29 +152,29 @@ public class UDP {
         System.arraycopy(fill, 0, src, offset, fill.length);
     }
 
-    public static String hexString(@NotNull byte[] data) {
+    public static String hexString(@NonNull byte[] data) {
         return BytesHexStrTranslate.bytesToHexFun2(data);
     }
 
-    public static String[] hexStringArray(@NotNull byte[] data) {
+    public static String[] hexStringArray(@NonNull byte[] data) {
         return hexStringToStringArray(BytesHexStrTranslate.bytesToHexFun2(data));
     }
 
     /**
      * byte 十进制转换成 十六进制字符串
      */
-    public static String hexString(@NotNull byte[] data, int start, int end) {
+    public static String hexString(@NonNull byte[] data, int start, int end) {
         return BytesHexStrTranslate.bytesToHexFun2(data, start, end);
     }
 
     /**
      * 十六进制字符串, 每个2个 添加一个空格. 美观输出
      */
-    public static String formatHex(@NotNull String hex) {
+    public static String formatHex(@NonNull String hex) {
         return formatHex(hex, ' ');
     }
 
-    public static String formatHex(@NotNull String hex, char split) {
+    public static String formatHex(@NonNull String hex, char split) {
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i <= hex.length(); i += 2) {
             if (i > 0 && i % 2 == 0) {
@@ -193,7 +192,7 @@ public class UDP {
     /**
      * 将 CE95160F -> 206.149.22.14
      */
-    public static String formatHexToInt(@NotNull String hex, char split) {
+    public static String formatHexToInt(@NonNull String hex, char split) {
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i <= hex.length(); i += 2) {
             if (i > 0 && i % 2 == 0) {
@@ -216,7 +215,7 @@ public class UDP {
     /**
      * 每2位十六进制 换成 十进制数据返回
      */
-    public static int[] hexStringToIntArray(@NotNull String hex) {
+    public static int[] hexStringToIntArray(@NonNull String hex) {
         hex = fixHexString(hex);
 
         int size = hex.length() / 2;
@@ -233,7 +232,10 @@ public class UDP {
         return result;
     }
 
-    public static byte[] hexStringToByteArray(@NotNull String hex) {
+    /**
+     * A0F988BB -> 字节数组
+     */
+    public static byte[] hexStringToByteArray(@NonNull String hex) {
         hex = fixHexString(hex);
 
         int size = hex.length() / 2;
@@ -250,7 +252,7 @@ public class UDP {
         return result;
     }
 
-    public static String[] hexStringToStringArray(@NotNull String hex) {
+    public static String[] hexStringToStringArray(@NonNull String hex) {
         hex = fixHexString(hex);
 
         int size = hex.length() / 2;
@@ -268,9 +270,9 @@ public class UDP {
     }
 
     /**
-     * 不足偶数位时, 向前补0
+     * 不足偶数位时, 向前补0, 并且自动清除空格字符
      */
-    public static String fixHexString(@NotNull String hex) {
+    public static String fixHexString(@NonNull String hex) {
         hex = hex.replaceAll(" ", "");
         if (hex.length() % 2 != 0) {
             //补齐
@@ -282,7 +284,7 @@ public class UDP {
     /**
      * 小字节数据.
      */
-    public static String reverse(@NotNull String[] hexArray) {
+    public static String reverse(@NonNull String[] hexArray) {
         StringBuilder builder = new StringBuilder();
         for (int i = hexArray.length - 1; i >= 0; i--) {
             builder.append(hexArray[i]);
@@ -290,14 +292,14 @@ public class UDP {
         return builder.toString();
     }
 
-    public static String reverse(@NotNull String hexString) {
+    public static String reverse(@NonNull String hexString) {
         return reverse(hexStringToStringArray(hexString));
     }
 
     /**
      * 将ip格式(192.168.0.0) 转换成 十六进制 C0A80000
      */
-    public static String ipToHexString(@NotNull String ip) {
+    public static String ipToHexString(@NonNull String ip) {
         StringBuilder result = new StringBuilder();
         String[] split = ip.split("\\.");
         for (int i = 0; i < 4; i++) {
@@ -318,7 +320,7 @@ public class UDP {
      * int整型字符串, 转换成 十六进制字符
      * 3659533 (十进制) -> 0x37D70D
      */
-    public static String stringToHexString(@NotNull String intString,
+    public static String stringToHexString(@NonNull String intString,
                                            int size /*需要输出多少个字节, 1个字节等于8位, 等于2位十六进制*/) {
         String hexString = "";
         try {
