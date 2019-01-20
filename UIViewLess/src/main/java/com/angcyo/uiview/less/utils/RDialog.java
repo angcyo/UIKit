@@ -91,43 +91,59 @@ public class RDialog {
     /**
      * 加载中的对话框
      */
-    public static void flow(Context context) {
-        flow(context, null);
+    public static Dialog flow(@NonNull Context context) {
+        return flow(context, null);
     }
 
-    public static synchronized void flow(final Context context, final DialogInterface.OnDismissListener dismissListener) {
+    public static Dialog flow(@NonNull final Context context, @Nullable final DialogInterface.OnDismissListener dismissListener) {
+        return flow(context, R.layout.base_dialog_flow_loading_layout, (int) ResUtil.dpToPx(56), dismissListener);
+    }
+
+    public static synchronized Dialog flow(@NonNull final Context context,
+                                           @LayoutRes int layoutId,
+                                           int dialogWidth,
+                                           @Nullable final DialogInterface.OnDismissListener dismissListener) {
         final AlertDialog alertDialog = build(context)
                 .setCancelable(false)
-                .setDialogWidth((int) ResUtil.dpToPx(56))
+                .setDialogWidth(dialogWidth)
                 .setDimAmount(0f)
                 .setAnimStyleResId(R.style.WindowNoAnim)
                 .setDialogBgColor(Color.TRANSPARENT)
-                .setContentLayoutId(R.layout.base_dialog_flow_loading_layout)
+                .setContentLayoutId(layoutId)
                 .setOnDismissListener(dismissListener)
                 .showAlertDialog();
+
+        delayCanCancelable(alertDialog, 5_000, dismissListener);
+
+        dialogQueue.add(alertDialog);
+
+        return alertDialog;
+    }
+
+    public static Dialog delayCanCancelable(@NonNull final Dialog dialog, long delayMillis,
+                                            @Nullable final DialogInterface.OnDismissListener dismissListener) {
         final Runnable canCancelableRunnable = new Runnable() {
             @Override
             public void run() {
-                alertDialog.setCancelable(true);
+                dialog.setCancelable(true);
             }
         };
         //5秒后, 允许关闭对话框
-        Window window = alertDialog.getWindow();
+        Window window = dialog.getWindow();
         if (window != null) {
             final View decorView = window.getDecorView();
-            decorView.postDelayed(canCancelableRunnable, 5_000);
-            alertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            decorView.postDelayed(canCancelableRunnable, delayMillis);
+            dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
                 @Override
                 public void onDismiss(DialogInterface dialog) {
                     decorView.removeCallbacks(canCancelableRunnable);
                     if (dismissListener != null) {
-                        dismissListener.onDismiss(alertDialog);
+                        dismissListener.onDismiss(dialog);
                     }
                 }
             });
         }
-
-        dialogQueue.add(alertDialog);
+        return dialog;
     }
 
     @Deprecated

@@ -7,6 +7,7 @@ import android.graphics.Paint
 import android.graphics.RectF
 import android.util.AttributeSet
 import android.view.View
+import com.angcyo.uiview.less.R
 import com.angcyo.uiview.less.kotlin.debugPaint
 import com.angcyo.uiview.less.kotlin.density
 import com.angcyo.uiview.less.kotlin.valueAnimator
@@ -21,6 +22,7 @@ class QQFlowProgressView(context: Context, attributeSet: AttributeSet? = null) :
     private val drawRect = RectF()
     var roundRadius = 0f
     private var minDrawWidth = 0f
+    var drawStep: Int = (0.6f * density).toInt()
 
     init {
         roundRadius = 2f * density
@@ -28,6 +30,10 @@ class QQFlowProgressView(context: Context, attributeSet: AttributeSet? = null) :
 
         debugPaint.color = Color.WHITE
         debugPaint.style = Paint.Style.FILL
+
+        val array = context.obtainStyledAttributes(attributeSet, R.styleable.QQFlowProgressView)
+        drawStep = array.getDimensionPixelOffset(R.styleable.QQFlowProgressView_r_flow_step, drawStep)
+        array.recycle()
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
@@ -39,7 +45,6 @@ class QQFlowProgressView(context: Context, attributeSet: AttributeSet? = null) :
         }
     }
 
-    var drawStep = 0.6f * density
     private var isDrawEnd = false
     private var drawWidth = 0f
         set(value) {

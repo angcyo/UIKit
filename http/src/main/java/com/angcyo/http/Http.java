@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -269,20 +268,35 @@ public class Http {
         T covert(String body);
     }
 
+    /**
+     * 将args转成map, 再转成json
+     */
     public static String mapJson(String... args) {
         return Json.to(map(args));
     }
 
     /**
+     * json 请求体
+     */
+    public static RequestBody body(String... args) {
+        return Http.getJsonBody(mapJson(args));
+    }
+
+
+    public static HashMap<String, String> map(String... args) {
+        return mapParam(args);
+    }
+
+    /**
      * 组装参数
      */
-    public static Map<String, Object> map(String... args) {
-        final Map<String, Object> map = new HashMap<>();
+    public static <T> HashMap<String, T> mapParam(String... args) {
+        final HashMap<String, T> map = new HashMap<>();
         foreach(new OnPutValue() {
             @Override
             public void onValue(String key, String value) {
                 if (!TextUtils.isEmpty(key) && !TextUtils.isEmpty(value)) {
-                    map.put(key, value);
+                    map.put(key, (T) value);
                 }
             }
 
@@ -298,7 +312,7 @@ public class Http {
 
             @Override
             public void onEmptyValue(String key, String value) {
-                map.put(key, "");
+                map.put(key, (T) "");
             }
         }, args);
         return map;
