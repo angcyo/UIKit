@@ -37,7 +37,6 @@ class QQFlowProgressView(context: Context, attributeSet: AttributeSet? = null) :
             roundRadius.toInt()
         ).toFloat()
 
-        minDrawWidth = 2f * roundRadius
         array.recycle()
     }
 
@@ -48,6 +47,8 @@ class QQFlowProgressView(context: Context, attributeSet: AttributeSet? = null) :
         } else {
             drawWidth = 0f
         }
+
+        minDrawWidth = (Math.min(h, roundRadius.toInt() * 2) / 2).toFloat()
     }
 
     private var isDrawEnd = false
