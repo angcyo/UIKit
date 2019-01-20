@@ -26,13 +26,18 @@ class QQFlowProgressView(context: Context, attributeSet: AttributeSet? = null) :
 
     init {
         roundRadius = 2f * density
-        minDrawWidth = 2f * roundRadius
 
         debugPaint.color = Color.WHITE
         debugPaint.style = Paint.Style.FILL
 
         val array = context.obtainStyledAttributes(attributeSet, R.styleable.QQFlowProgressView)
         drawStep = array.getDimensionPixelOffset(R.styleable.QQFlowProgressView_r_flow_step, drawStep)
+        roundRadius = array.getDimensionPixelOffset(
+            R.styleable.QQFlowProgressView_r_flow_radius,
+            roundRadius.toInt()
+        ).toFloat()
+
+        minDrawWidth = 2f * roundRadius
         array.recycle()
     }
 
