@@ -1,6 +1,7 @@
 package com.angcyo.uiview.less.widget.group;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.support.annotation.ColorRes;
 import android.support.annotation.DimenRes;
@@ -38,6 +39,16 @@ public class RFlowLayout extends LinearLayout {
     List<View> lineViews = new ArrayList<>();
 
     /**
+     * 每一行最多多少个, 强制限制. -1, 不限制. 大于0生效
+     */
+    int maxCountLine = -1;
+
+    /**
+     * 每一行的Item等宽
+     */
+    boolean itemEquWidth = false;
+
+    /**
      * Instantiates a new Flow radio group.
      *
      * @param context the context
@@ -54,6 +65,12 @@ public class RFlowLayout extends LinearLayout {
      */
     public RFlowLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
+
+        TypedArray array = context.obtainStyledAttributes(attrs, R.styleable.RFlowLayout);
+        maxCountLine = array.getInt(R.styleable.RFlowLayout_r_flow_max_line_child_count, maxCountLine);
+        itemEquWidth = array.getBoolean(R.styleable.RFlowLayout_r_flow_equ_width, itemEquWidth);
+        array.recycle();
+
         init();
     }
 
@@ -89,7 +106,15 @@ public class RFlowLayout extends LinearLayout {
             childWidth = child.getMeasuredWidth() + params.leftMargin + params.rightMargin;
             childHeight = child.getMeasuredHeight() + params.topMargin + params.bottomMargin;
 
-            if (lineWidth + childWidth > sizeWidth - getPaddingLeft() - getPaddingRight()) {
+            int lineViewSize = lineViews.size();
+            if (lineWidth + childWidth > sizeWidth - getPaddingLeft() - getPaddingRight() ||
+                    (maxCountLine > 0 && lineViewSize == maxCountLine)) {
+                //需要换新行
+                if (itemEquWidth) {
+                    //margin,padding 消耗的宽度
+                    childWidth = measureLineEquWidth(lineViews, sizeWidth, heightMeasureSpec) + params.leftMargin + params.rightMargin;
+                }
+
                 width = Math.max(width, lineWidth);
                 height += lineHeight;
                 mLineHeight.add(lineHeight);
@@ -111,6 +136,8 @@ public class RFlowLayout extends LinearLayout {
         }
         mLineHeight.add(lineHeight);
         mAllViews.add(lineViews);
+        measureLineEquWidth(lineViews, sizeWidth, heightMeasureSpec);
+
         width += getPaddingLeft() + getPaddingRight();
         height += getPaddingTop() + getPaddingBottom();
         setMeasuredDimension(
@@ -118,6 +145,24 @@ public class RFlowLayout extends LinearLayout {
                         getMinimumWidth()),
                 Math.max((modeHeight == MeasureSpec.AT_MOST || modeHeight == MeasureSpec.UNSPECIFIED) ? height : sizeHeight,
                         getMinimumHeight()));
+    }
+
+    private int measureLineEquWidth(List<View> lineViews, int viewWidth, int heightMeasureSpec) {
+        int lineViewSize = lineViews.size();
+        int consumeWidth = getPaddingLeft() + getPaddingRight();
+        for (int j = 0; j < lineViewSize; j++) {
+            View lineView = lineViews.get(j);
+            LinearLayout.LayoutParams lineViewParams = (LinearLayout.LayoutParams) lineView.getLayoutParams();
+            consumeWidth += lineViewParams.leftMargin + lineViewParams.rightMargin;
+        }
+
+        int lineChildWidth = (viewWidth - consumeWidth) / lineViewSize;
+        for (int j = 0; j < lineViewSize; j++) {
+            View lineView = lineViews.get(j);
+            lineView.measure(MeasureSpec.makeMeasureSpec(lineChildWidth, MeasureSpec.EXACTLY), heightMeasureSpec);
+            lineView.getMeasuredWidth();
+        }
+        return lineChildWidth;
     }
 
     @Override
