@@ -541,17 +541,12 @@ public class RBaseViewHolder extends RecyclerView.ViewHolder {
         } else {
             fields = clz.getDeclaredFields();
         }
-        for (Field f : fields) {
-            f.setAccessible(true);
-            String name = f.getName();
+        for (Field field : fields) {
+            field.setAccessible(true);
             try {
-                View view = viewByName(name);
-                if (view == null) {
-                    view = viewByName(name + "_view");
-                }
-
+                View view = callback.getViewByField(this, field);
                 if (view != null) {
-                    String value = callback.getFieldValue(bean, f);
+                    String value = callback.getFieldValue(bean, field);
                     callback.onFillView(view, value);
                 }
             } catch (Exception e) {
@@ -594,7 +589,7 @@ public class RBaseViewHolder extends RecyclerView.ViewHolder {
     /**
      * 填充View回调
      */
-    public abstract class OnFillViewCallback {
+    public static abstract class OnFillViewCallback {
 
         /**
          * 如果数据为空时, 是否隐藏View
@@ -605,6 +600,9 @@ public class RBaseViewHolder extends RecyclerView.ViewHolder {
          */
         public boolean withGetMethod = false;
 
+        /**
+         * 填充View
+         */
         public void onFillView(@NonNull View view, @Nullable String value) {
             if (view instanceof TextView) {
                 if (TextUtils.isEmpty(value) && hideForEmpty) {
@@ -627,6 +625,9 @@ public class RBaseViewHolder extends RecyclerView.ViewHolder {
             }
         }
 
+        /**
+         * 获取对象字段的值
+         */
         public String getFieldValue(@NonNull Object bean, @NonNull Field field) {
             String value = null;
             String name = field.getName();
@@ -641,6 +642,18 @@ public class RBaseViewHolder extends RecyclerView.ViewHolder {
                 L.w(/*"the clz=" + clz +*/ "the bean=" + bean.getClass().getSimpleName() + " field=" + name + " is null");
             }
             return value;
+        }
+
+        /**
+         * 通过字段获取View
+         */
+        public View getViewByField(@NonNull RBaseViewHolder viewHolder, @NonNull Field field) {
+            String name = field.getName();
+            View view = viewHolder.viewByName(name);
+            if (view == null) {
+                view = viewHolder.viewByName(name + "_view");
+            }
+            return view;
         }
     }
 }
