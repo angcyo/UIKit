@@ -532,7 +532,9 @@ public class RBaseViewHolder extends RecyclerView.ViewHolder {
      * @param clz 为了效率, 并不会遍历父类的字段, 所以可以指定类
      */
     public void fillView(Class<?> clz, @Nullable Object bean, @Nullable OnFillViewCallback callback) {
-        if (bean == null || callback == null) {
+        if (callback == null ||
+                (clz == null && bean == null)
+        ) {
             return;
         }
         Field[] fields;
@@ -633,18 +635,20 @@ public class RBaseViewHolder extends RecyclerView.ViewHolder {
         /**
          * 获取对象字段的值
          */
-        public String getFieldValue(@NonNull Object bean, @NonNull Field field) {
+        public String getFieldValue(@Nullable Object bean, @NonNull Field field) {
             String value = null;
-            String name = field.getName();
-            try {
-                if (withGetMethod) {
-                    value = String.valueOf(getMethod(bean, name).invoke(bean));
-                } else {
-                    value = field.get(bean).toString();
+            if (bean != null) {
+                String name = field.getName();
+                try {
+                    if (withGetMethod) {
+                        value = String.valueOf(getMethod(bean, name).invoke(bean));
+                    } else {
+                        value = field.get(bean).toString();
+                    }
+                } catch (Exception e) {
+                    //e.printStackTrace();
+                    L.w(/*"the clz=" + clz +*/ "the bean=" + bean.getClass().getSimpleName() + " field=" + name + " is null");
                 }
-            } catch (Exception e) {
-                //e.printStackTrace();
-                L.w(/*"the clz=" + clz +*/ "the bean=" + bean.getClass().getSimpleName() + " field=" + name + " is null");
             }
             return value;
         }
