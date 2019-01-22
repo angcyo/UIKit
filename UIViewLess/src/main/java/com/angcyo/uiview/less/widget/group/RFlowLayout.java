@@ -80,11 +80,11 @@ public class RFlowLayout extends LinearLayout {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        if (isInEditMode()) {
+        if (isInEditMode() || getChildCount() == 0) {
             super.onMeasure(widthMeasureSpec, heightMeasureSpec);
             return;
         }
-        
+
         int sizeWidth = MeasureSpec.getSize(widthMeasureSpec);
         int modeWidth = MeasureSpec.getMode(widthMeasureSpec);
         int sizeHeight = MeasureSpec.getSize(heightMeasureSpec);
