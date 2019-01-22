@@ -592,7 +592,7 @@ public class RBaseViewHolder extends RecyclerView.ViewHolder {
     /**
      * 填充View回调
      */
-    public static abstract class OnFillViewCallback {
+    public static class OnFillViewCallback {
 
         /**
          * 如果数据为空时, 是否隐藏View
@@ -602,6 +602,16 @@ public class RBaseViewHolder extends RecyclerView.ViewHolder {
          * 是否通过get方法获取对象字段的值
          */
         public boolean withGetMethod = false;
+
+        /**
+         * 强制使用小学字符的view id
+         */
+        public boolean viewNameLowerCase = false;
+
+        /**
+         * viewByName的前缀
+         */
+        public String viewPrefix = null;
 
         public void init(Class<?> clz, @Nullable Object bean) {
 
@@ -658,11 +668,37 @@ public class RBaseViewHolder extends RecyclerView.ViewHolder {
          */
         public View getViewByField(@NonNull RBaseViewHolder viewHolder, @NonNull Field field) {
             String name = field.getName();
+            if (!TextUtils.isEmpty(viewPrefix)) {
+                name = viewPrefix + name;
+            }
+            if (viewNameLowerCase) {
+                name = name.toLowerCase();
+            }
             View view = viewHolder.viewByName(name);
             if (view == null) {
                 view = viewHolder.viewByName(name + "_view");
             }
             return view;
+        }
+
+        public OnFillViewCallback setHideForEmpty(boolean hideForEmpty) {
+            this.hideForEmpty = hideForEmpty;
+            return this;
+        }
+
+        public OnFillViewCallback setWithGetMethod(boolean withGetMethod) {
+            this.withGetMethod = withGetMethod;
+            return this;
+        }
+
+        public OnFillViewCallback setViewPrefix(String viewPrefix) {
+            this.viewPrefix = viewPrefix;
+            return this;
+        }
+
+        public OnFillViewCallback setViewNameLowerCase(boolean viewNameLowerCase) {
+            this.viewNameLowerCase = viewNameLowerCase;
+            return this;
         }
     }
 }
