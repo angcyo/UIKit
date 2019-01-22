@@ -577,19 +577,52 @@ public class FragmentHelper {
          * 移除最顶上的Fragment, 显示最新的Fragment
          */
         public Builder replaceFragment(Class<? extends Fragment> showFragment) {
-            remove(findLastFragment(fragmentManager, null));
+            replaceRemove();
             return showFragment(RApplication.getApp(), showFragment);
         }
 
         public Builder replaceFragment(Fragment showFragment) {
-            remove(findLastFragment(fragmentManager, null));
+            replaceRemove();
             return showFragment(showFragment);
+        }
+
+        private void replaceRemove() {
+            Fragment lastFragment = findLastFragment(fragmentManager, null);
+            if (lastFragment != null) {
+                if (!replaceKeepFragmentList.contains(lastFragment)) {
+                    remove(lastFragment);
+                }
+            }
+        }
+
+        private List<Fragment> replaceKeepFragmentList = new ArrayList<>();
+
+        /**
+         * 调用replace的时候, 保持keep列表中的Fragment
+         */
+        public Builder replaceKeepFragment(Class<? extends Fragment>... clas) {
+            replaceKeepFragmentList.clear();
+            if (fragmentManager != null && clas != null) {
+                for (Class cls : clas) {
+                    if (cls == null) {
+                        continue;
+                    }
+                    Fragment fragmentByTag = fragmentManager.findFragmentByTag(cls.getSimpleName());
+                    if (fragmentByTag != null) {
+                        replaceKeepFragmentList.add(fragmentByTag);
+                    }
+                }
+            }
+            return this;
         }
 
         public Builder keepFragment(Class<? extends Fragment>... clas) {
             if (fragmentManager != null && clas != null) {
                 List<Fragment> list = new ArrayList<>();
                 for (Class cls : clas) {
+                    if (cls == null) {
+                        continue;
+                    }
                     Fragment fragmentByTag = fragmentManager.findFragmentByTag(cls.getSimpleName());
                     if (fragmentByTag != null) {
                         list.add(fragmentByTag);
@@ -604,6 +637,9 @@ public class FragmentHelper {
             if (fragmentManager != null && tags != null) {
                 List<Fragment> list = new ArrayList<>();
                 for (String tag : tags) {
+                    if (tag == null) {
+                        continue;
+                    }
                     Fragment fragmentByTag = fragmentManager.findFragmentByTag(tag);
                     if (fragmentByTag != null) {
                         list.add(fragmentByTag);
