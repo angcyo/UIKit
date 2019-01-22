@@ -526,6 +526,10 @@ public class RBaseViewHolder extends RecyclerView.ViewHolder {
         fillView(null, bean, callback);
     }
 
+    public void fillView(Object bean, OnFillViewCallback callback) {
+        fillView(null, bean, callback);
+    }
+
     /**
      * 请勿在bean相当复杂的情况下, 使用此方法, 会消耗很多CPU性能.
      *

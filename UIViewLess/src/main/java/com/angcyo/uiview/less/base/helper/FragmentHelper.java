@@ -581,6 +581,11 @@ public class FragmentHelper {
             return showFragment(RApplication.getApp(), showFragment);
         }
 
+        public Builder replaceFragment(Fragment showFragment) {
+            remove(findLastFragment(fragmentManager, null));
+            return showFragment(showFragment);
+        }
+
         public Builder keepFragment(Class<? extends Fragment>... clas) {
             if (fragmentManager != null && clas != null) {
                 List<Fragment> list = new ArrayList<>();
