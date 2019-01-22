@@ -132,13 +132,7 @@ android {
 //        }
 //
 //        variant.getPackageApplication().outputScope.apkDatas.forEach { apkData ->
-//            def name = ""
-//            if (project.name != "app") {
-//                name = project.name
-//            } else {
-//                name = rootProject.name
-//            }
-//            apkData.outputFileName = name + "-" +
+//            apkData.outputFileName = ((project.name != "app") ? project.name : rootProject.name) + "-" +
 //                    variant.versionName + "_" +
 //                    apk_time + "_" +
 //                    variant.flavorName + "_" +
@@ -156,13 +150,7 @@ android {
         }
 
         variant.getPackageApplicationProvider().get().outputScope.apkDatas.forEach { apkData ->
-            def name = ""
-            if (project.name != "app") {
-                name = project.name
-            } else {
-                name = rootProject.name
-            }
-            apkData.outputFileName = name + "-" +
+            apkData.outputFileName = ((project.name != "app") ? project.name : rootProject.name) + "-" +
                     variant.versionName + "_" +
                     apk_time + "_" +
                     variant.flavorName + "_" +
