@@ -522,16 +522,16 @@ public class RBaseViewHolder extends RecyclerView.ViewHolder {
             }
         };
         callback.hideForEmpty = hideForEmpty;
-        fillView(null, bean, withGetMethod, callback);
+        callback.withGetMethod = withGetMethod;
+        fillView(null, bean, callback);
     }
 
     /**
      * 请勿在bean相当复杂的情况下, 使用此方法, 会消耗很多CPU性能.
      *
-     * @param clz           为了效率, 并不会遍历父类的字段, 所以可以指定类
-     * @param withGetMethod 是否通过get方法获取对象字段的值
+     * @param clz 为了效率, 并不会遍历父类的字段, 所以可以指定类
      */
-    public void fillView(Class<?> clz, @Nullable Object bean, boolean withGetMethod, @NonNull OnFillViewCallback callback) {
+    public void fillView(Class<?> clz, @Nullable Object bean, @NonNull OnFillViewCallback callback) {
         if (bean == null) {
             return;
         }
@@ -551,17 +551,7 @@ public class RBaseViewHolder extends RecyclerView.ViewHolder {
                 }
 
                 if (view != null) {
-                    String value = null;
-                    if (withGetMethod) {
-                        value = String.valueOf(getMethod(bean, name).invoke(bean));
-                    } else {
-                        try {
-                            value = f.get(bean).toString();
-                        } catch (Exception e) {
-                            L.w("the clz=" + clz + " bean=" + bean.getClass().getSimpleName() + " field=" + name + " is null");
-                        }
-                    }
-
+                    String value = callback.getFieldValue(bean, f);
                     callback.onFillView(view, value);
                 }
             } catch (Exception e) {
@@ -610,6 +600,10 @@ public class RBaseViewHolder extends RecyclerView.ViewHolder {
          * 如果数据为空时, 是否隐藏View
          */
         public boolean hideForEmpty = true;
+        /**
+         * 是否通过get方法获取对象字段的值
+         */
+        public boolean withGetMethod = false;
 
         public void onFillView(@NonNull View view, @Nullable String value) {
             if (view instanceof TextView) {
@@ -631,6 +625,22 @@ public class RBaseViewHolder extends RecyclerView.ViewHolder {
                         //.centerCrop()
                         .into(((ImageView) view));
             }
+        }
+
+        public String getFieldValue(@NonNull Object bean, @NonNull Field field) {
+            String value = null;
+            String name = field.getName();
+            try {
+                if (withGetMethod) {
+                    value = String.valueOf(getMethod(bean, name).invoke(bean));
+                } else {
+                    value = field.get(bean).toString();
+                }
+            } catch (Exception e) {
+                //e.printStackTrace();
+                L.w(/*"the clz=" + clz +*/ "the bean=" + bean.getClass().getSimpleName() + " field=" + name + " is null");
+            }
+            return value;
         }
     }
 }
