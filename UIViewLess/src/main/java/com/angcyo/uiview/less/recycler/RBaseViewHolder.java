@@ -531,8 +531,8 @@ public class RBaseViewHolder extends RecyclerView.ViewHolder {
      *
      * @param clz 为了效率, 并不会遍历父类的字段, 所以可以指定类
      */
-    public void fillView(Class<?> clz, @Nullable Object bean, @NonNull OnFillViewCallback callback) {
-        if (bean == null) {
+    public void fillView(Class<?> clz, @Nullable Object bean, @Nullable OnFillViewCallback callback) {
+        if (bean == null || callback == null) {
             return;
         }
         Field[] fields;
@@ -541,6 +541,7 @@ public class RBaseViewHolder extends RecyclerView.ViewHolder {
         } else {
             fields = clz.getDeclaredFields();
         }
+        callback.init(clz, bean);
         for (Field field : fields) {
             field.setAccessible(true);
             try {
@@ -599,6 +600,10 @@ public class RBaseViewHolder extends RecyclerView.ViewHolder {
          * 是否通过get方法获取对象字段的值
          */
         public boolean withGetMethod = false;
+
+        public void init(Class<?> clz, @Nullable Object bean) {
+
+        }
 
         /**
          * 填充View
