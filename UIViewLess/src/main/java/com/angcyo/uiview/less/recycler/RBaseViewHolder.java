@@ -515,17 +515,23 @@ public class RBaseViewHolder extends RecyclerView.ViewHolder {
     }
 
     public void fillView(Object bean, boolean hideForEmpty, boolean withGetMethod) {
-        fillView(null, bean, hideForEmpty, withGetMethod);
+        OnFillViewCallback callback = new OnFillViewCallback() {
+            @Override
+            public void onFillView(@NonNull View view, @Nullable String value) {
+                super.onFillView(view, value);
+            }
+        };
+        callback.hideForEmpty = hideForEmpty;
+        fillView(null, bean, withGetMethod, callback);
     }
 
     /**
      * 请勿在bean相当复杂的情况下, 使用此方法, 会消耗很多CPU性能.
      *
      * @param clz           为了效率, 并不会遍历父类的字段, 所以可以指定类
-     * @param hideForEmpty  如果数据为空时, 是否隐藏View
      * @param withGetMethod 是否通过get方法获取对象字段的值
      */
-    public void fillView(Class<?> clz, Object bean, boolean hideForEmpty, boolean withGetMethod) {
+    public void fillView(Class<?> clz, @Nullable Object bean, boolean withGetMethod, @NonNull OnFillViewCallback callback) {
         if (bean == null) {
             return;
         }
@@ -555,25 +561,8 @@ public class RBaseViewHolder extends RecyclerView.ViewHolder {
                             L.w("the clz=" + clz + " bean=" + bean.getClass().getSimpleName() + " field=" + name + " is null");
                         }
                     }
-                    if (view instanceof TextView) {
-                        if (TextUtils.isEmpty(value) && hideForEmpty) {
-                            view.setVisibility(View.GONE);
-                        } else {
-                            view.setVisibility(View.VISIBLE);
-                        }
-                        ((TextView) view).setText(value);
-                    } else if (view instanceof GlideImageView) {
-                        ((GlideImageView) view).reset();
-                        ((GlideImageView) view).setUrl(value);
-                    } else if (view instanceof ImageView) {
-                        Glide.with(RApplication.getApp())
-                                .load(value)
-                                //.placeholder(R.drawable.default_image)
-                                //.error(R.drawable.default_image)
-                                //.diskCacheStrategy(DiskCacheStrategy.ALL)
-                                //.centerCrop()
-                                .into(((ImageView) view));
-                    }
+
+                    callback.onFillView(view, value);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -610,5 +599,38 @@ public class RBaseViewHolder extends RecyclerView.ViewHolder {
             return true;
         }
         return false;
+    }
+
+    /**
+     * 填充View回调
+     */
+    public abstract class OnFillViewCallback {
+
+        /**
+         * 如果数据为空时, 是否隐藏View
+         */
+        public boolean hideForEmpty = true;
+
+        public void onFillView(@NonNull View view, @Nullable String value) {
+            if (view instanceof TextView) {
+                if (TextUtils.isEmpty(value) && hideForEmpty) {
+                    view.setVisibility(View.GONE);
+                } else {
+                    view.setVisibility(View.VISIBLE);
+                }
+                ((TextView) view).setText(value);
+            } else if (view instanceof GlideImageView) {
+                ((GlideImageView) view).reset();
+                ((GlideImageView) view).setUrl(value);
+            } else if (view instanceof ImageView) {
+                Glide.with(RApplication.getApp())
+                        .load(value)
+                        //.placeholder(R.drawable.default_image)
+                        //.error(R.drawable.default_image)
+                        //.diskCacheStrategy(DiskCacheStrategy.ALL)
+                        //.centerCrop()
+                        .into(((ImageView) view));
+            }
+        }
     }
 }
