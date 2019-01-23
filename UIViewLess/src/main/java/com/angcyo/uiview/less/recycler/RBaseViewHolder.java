@@ -452,15 +452,15 @@ public class RBaseViewHolder extends RecyclerView.ViewHolder {
 
     public void click(View view, int delay, final View.OnClickListener listener) {
         if (view != null) {
-            if (listener instanceof RClickListener) {
+            if (listener == null) {
+                view.setOnClickListener(null);
+            } else if (listener instanceof RClickListener) {
                 view.setOnClickListener(listener);
             } else {
                 view.setOnClickListener(new RClickListener(delay) {
                     @Override
                     public void onRClick(View view) {
-                        if (listener != null) {
-                            listener.onClick(view);
-                        }
+                        listener.onClick(view);
                     }
                 });
             }
