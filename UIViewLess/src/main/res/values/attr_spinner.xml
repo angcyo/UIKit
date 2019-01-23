@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="RSpinner">
+        <attr name="r_spinner_drop_down_layout" format="reference"/>
+    </declare-styleable>
+</resources>

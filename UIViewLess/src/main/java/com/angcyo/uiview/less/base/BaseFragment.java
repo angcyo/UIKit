@@ -69,12 +69,12 @@ public abstract class BaseFragment extends AbsLifeCycleFragment {
         return true;
     }
 
-    @NonNull
+    @Nullable
     public FragmentManager parentFragmentManager() {
         if (getParentFragment() == null) {
-            return requireFragmentManager();
+            return getFragmentManager();
         } else {
-            return getParentFragment().requireFragmentManager();
+            return getParentFragment().getFragmentManager();
         }
     }
 

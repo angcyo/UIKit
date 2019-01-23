@@ -107,7 +107,7 @@ public class FragmentHelper {
         return fragmentList;
     }
 
-    public static Builder build(@NonNull FragmentManager fragmentManager) {
+    public static Builder build(FragmentManager fragmentManager) {
         return new Builder(fragmentManager);
     }
 
@@ -548,11 +548,17 @@ public class FragmentHelper {
         }
 
         public Builder hideFragment(String tag) {
+            if (fragmentManager == null) {
+                return this;
+            }
             this.hideFragment = fragmentManager.findFragmentByTag(tag);
             return this;
         }
 
         public Builder showFragment(String tag) {
+            if (fragmentManager == null) {
+                return this;
+            }
             showFragment(fragmentManager.findFragmentByTag(tag));
             return this;
         }
