@@ -2707,6 +2707,44 @@ public class RUtils {
         }
     }
 
+    /**
+     * 加压
+     * 添加到压缩文件
+     *
+     * @param folderPath 需要压缩的文件夹
+     * @param targetPath zip文件输出路径
+     */
+    public static String zipPath(String folderPath, String targetPath) {
+        String path = folderPath;
+
+        File file = new File(path);
+        if (file.isDirectory()) {
+            File[] files = file.listFiles();
+            if (files != null && files.length > 0) {
+                List<File> fileList = Arrays.asList(files);
+                String zipFilePath = targetPath;
+                File zipFile = new File(zipFilePath);
+                if (zipFile.exists()) {
+                    zipFile.delete();
+                }
+                try {
+                    if (ZipUtils.zipFiles(fileList, zipFilePath)) {
+                        return zipFilePath;
+                    } else {
+                        return null;
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    return null;
+                }
+            } else {
+                return null;
+            }
+        } else {
+            return null;
+        }
+    }
+
     public static String[] toStringArray(List<Object> list) {
         int size = list.size();
         String[] result = new String[size];
