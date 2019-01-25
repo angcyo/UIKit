@@ -14,7 +14,6 @@ import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
-import com.angcyo.uiview.less.R;
 import com.angcyo.uiview.less.skin.SkinHelper;
 
 
@@ -155,6 +154,10 @@ public abstract class BaseDraw {
     }
 
     public void onAttachedToWindow() {
+
+    }
+
+    public void onVisibilityChanged(@NonNull View changedView, int visibility) {
 
     }
 

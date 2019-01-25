@@ -1,14 +1,8 @@
-package com.angcyo.uiview.less.widget;
+package com.angcyo.uiview.less.draw.view;
 
-import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
-import android.graphics.Canvas;
 import android.util.AttributeSet;
-import android.view.View;
-import android.view.animation.LinearInterpolator;
-import com.angcyo.uiview.less.draw.BaseDraw;
-import com.angcyo.uiview.less.draw.BaseDrawView;
 import com.angcyo.uiview.less.draw.RSectionPathDraw;
 import com.angcyo.uiview.less.resources.AnimUtil;
 

@@ -1,14 +1,14 @@
-package com.angcyo.uiview.less.draw;
+package com.angcyo.uiview.less.draw.view;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.View;
-import com.angcyo.http.type.ParameterizedTypeImpl;
+import com.angcyo.uiview.less.draw.BaseDraw;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
@@ -33,6 +33,10 @@ public class BaseDrawView<T extends BaseDraw> extends View {
 
     public BaseDrawView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        initBaseDraw(context, attrs);
+    }
+
+    protected void initBaseDraw(Context context, @Nullable AttributeSet attrs) {
         try {
             Type genericSuperclass = this.getClass().getGenericSuperclass();
             if (genericSuperclass instanceof ParameterizedType) {
@@ -77,6 +81,12 @@ public class BaseDrawView<T extends BaseDraw> extends View {
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         baseDraw.onDetachedFromWindow();
+    }
+
+    @Override
+    protected void onVisibilityChanged(@NonNull View changedView, int visibility) {
+        super.onVisibilityChanged(changedView, visibility);
+        baseDraw.onVisibilityChanged(changedView, visibility);
     }
 
     @Override

@@ -19,6 +19,7 @@ import android.util.TypedValue;
 import android.view.View;
 import com.angcyo.uiview.less.R;
 import com.angcyo.uiview.less.RApplication;
+import com.angcyo.uiview.less.skin.SkinHelper;
 
 import static android.view.View.LAYER_TYPE_HARDWARE;
 import static android.view.View.LAYER_TYPE_NONE;
@@ -774,5 +775,14 @@ public class ResUtil {
 
     public static Bitmap getBitmap(byte[] bytes) {
         return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+    }
+
+    /**
+     * 返回一个颜色的透明颜色,
+     *
+     * @param alpha [0..255] 值越小,越透明
+     */
+    public static int getTranColor(@ColorInt int color, int alpha) {
+        return SkinHelper.getTranColor(color, alpha);
     }
 }
