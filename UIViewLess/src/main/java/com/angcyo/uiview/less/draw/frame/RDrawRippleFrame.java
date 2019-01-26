@@ -8,6 +8,9 @@ import android.view.View;
 import com.angcyo.uiview.less.draw.frame.impl.RippleFrameImpl;
 import com.angcyo.uiview.less.resources.ResUtil;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Email:angcyo@126.com
  *
@@ -27,6 +30,8 @@ public class RDrawRippleFrame extends RDrawFrame {
      */
     int frequency = 800;
 
+    List<IDrawFrame> cacheList = new ArrayList<>();
+
     public RDrawRippleFrame(@NonNull View view) {
         super(view);
     }
@@ -45,12 +50,22 @@ public class RDrawRippleFrame extends RDrawFrame {
     }
 
     private void addFrame() {
-        addFrame(new RippleFrameImpl(0, rippleColor, (int) ResUtil.dpToPx(1)));
+        if (cacheList.isEmpty() || cacheList.size() < 6) {
+            addFrame(new RippleFrameImpl(0, rippleColor, (int) ResUtil.dpToPx(1)));
+        } else {
+            addFrame(cacheList.remove(0));
+        }
     }
 
     @Override
-    public void onAnimationDelayUpdate(ValueAnimator animation) {
+    protected void onAnimationDelayUpdate(ValueAnimator animation) {
         super.onAnimationDelayUpdate(animation);
         addFrame();
+    }
+
+    @Override
+    protected void onRemoveFrame(IDrawFrame frame) {
+        super.onRemoveFrame(frame);
+        cacheList.add(frame);
     }
 }

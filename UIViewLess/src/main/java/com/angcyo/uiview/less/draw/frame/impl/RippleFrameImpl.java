@@ -2,6 +2,8 @@ package com.angcyo.uiview.less.draw.frame.impl;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.view.View;
+import com.angcyo.uiview.less.draw.frame.RDrawFrame;
 import com.angcyo.uiview.less.resources.AnimUtil;
 
 /**
@@ -30,6 +32,12 @@ public class RippleFrameImpl extends BaseFrameImpl {
         super(delayTime);
         this.color = color;
         this.step = step;
+    }
+
+    @Override
+    public void onReady(View view, RDrawFrame drawFrame, long readyTime) {
+        super.onReady(view, drawFrame, readyTime);
+        radius = 0L;
     }
 
     @Override

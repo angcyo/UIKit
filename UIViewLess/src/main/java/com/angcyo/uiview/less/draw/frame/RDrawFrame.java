@@ -108,6 +108,8 @@ public abstract class RDrawFrame extends BaseDraw implements ValueAnimator.Anima
 
                 long removeTime = System.currentTimeMillis();
                 frame.onRemove(removeTime);
+
+                onRemoveFrame(frame);
             }
         }
 
@@ -125,9 +127,13 @@ public abstract class RDrawFrame extends BaseDraw implements ValueAnimator.Anima
         postInvalidateOnAnimation();
     }
 
+    protected void onRemoveFrame(IDrawFrame frame) {
+
+    }
+
     /**
      * 动画延迟后的回调处理
      */
-    public void onAnimationDelayUpdate(ValueAnimator animation) {
+    protected void onAnimationDelayUpdate(ValueAnimator animation) {
     }
 }
