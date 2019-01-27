@@ -34,6 +34,7 @@ android {
         //resValue "bool", "SHOW_DEBUG", "true"
 
         buildConfigField "String", "USER_NAME", '"' + userName() + '"'
+        buildConfigField "String", "BUILD_TIME", '"' + build_time + '"'
     }
 
     packagingOptions {
