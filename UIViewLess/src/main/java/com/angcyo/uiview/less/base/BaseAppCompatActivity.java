@@ -16,6 +16,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import com.angcyo.lib.L;
+import com.angcyo.uiview.less.BuildConfig;
+import com.angcyo.uiview.less.RCrashHandler;
 import com.angcyo.uiview.less.base.helper.ActivityHelper;
 import com.angcyo.uiview.less.base.helper.FragmentHelper;
 import com.angcyo.uiview.less.picture.RPicture;
@@ -298,5 +300,17 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
 
     public void setFragmentSwipeBackLayout(FragmentSwipeBackLayout fragmentSwipeBackLayout) {
         this.fragmentSwipeBackLayout = fragmentSwipeBackLayout;
+    }
+
+    @Override
+    protected void onPostCreate(@Nullable Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        checkCrash();
+    }
+
+    protected void checkCrash() {
+        if (BuildConfig.DEBUG) {
+            RCrashHandler.checkCrash(this);
+        }
     }
 }
