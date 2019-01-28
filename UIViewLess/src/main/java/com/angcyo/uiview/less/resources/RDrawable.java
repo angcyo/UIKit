@@ -1063,6 +1063,36 @@ public class RDrawable {
         return lastDrawable;
     }
 
+    public RDrawable configSize() {
+        if (lastDrawable == null) {
+            doIt();
+        }
+        configSize(lastDrawable);
+        return this;
+    }
+
+    public RDrawable configSize(Drawable drawable) {
+        if (width != NO_INT && height != NO_INT) {
+            if (drawable instanceof GradientDrawable) {
+                ((GradientDrawable) drawable).setSize(width, height);
+            }
+            if (left != NO_INT || top != NO_INT) {
+                drawable.setBounds(left, top, left + width, top + height);
+            }
+        } else {
+            if (width != NO_INT) {
+                if (drawable instanceof GradientDrawable) {
+                    ((GradientDrawable) drawable).setSize(width, -1);
+                }
+            } else if (height != NO_INT) {
+                if (drawable instanceof GradientDrawable) {
+                    ((GradientDrawable) drawable).setSize(-1, height);
+                }
+            }
+        }
+        return this;
+    }
+
     private GradientDrawable configGradient() {
         GradientDrawable gradientDrawable = new GradientDrawable();
         gradientDrawable.setShape(shape);
@@ -1072,18 +1102,9 @@ public class RDrawable {
         if (solidColor != NO_INT) {
             gradientDrawable.setColor(solidColor);
         }
-        if (width != NO_INT && height != NO_INT) {
-            gradientDrawable.setSize(width, height);
-            if (left != NO_INT || top != NO_INT) {
-                gradientDrawable.setBounds(left, top, left + width, top + height);
-            }
-        } else {
-            if (width != NO_INT) {
-                gradientDrawable.setSize(width, -1);
-            } else if (height != NO_INT) {
-                gradientDrawable.setSize(-1, height);
-            }
-        }
+
+        configSize(gradientDrawable);
+
         gradientDrawable.setCornerRadii(radii);
 
         if (gradientColors != null) {
