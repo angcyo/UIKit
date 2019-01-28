@@ -69,6 +69,10 @@ public abstract class BaseTitleFragment extends BaseFragment implements AffectUI
         return R.layout.base_title_fragment_layout;
     }
 
+    protected int getTitleBarLayout() {
+        return R.layout.base_fragment_title_layout;
+    }
+
     @Override
     protected void initBaseView(@NonNull RBaseViewHolder viewHolder, @Nullable Bundle arguments, @Nullable Bundle savedInstanceState) {
         super.initBaseView(viewHolder, arguments, savedInstanceState);
@@ -92,6 +96,8 @@ public abstract class BaseTitleFragment extends BaseFragment implements AffectUI
      * 初始化标题部分
      */
     protected void initBaseTitleLayout(@Nullable Bundle arguments) {
+        LayoutInflater.from(mAttachContext).inflate(getTitleBarLayout(), titleBarLayout);
+
         //设置标题背景颜色
         if (titleBarLayout != null) {
             titleBarLayout.setBackgroundColor(SkinHelper.getSkin().getThemeColor());
