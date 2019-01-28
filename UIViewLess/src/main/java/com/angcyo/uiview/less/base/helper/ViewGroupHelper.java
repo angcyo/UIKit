@@ -70,6 +70,11 @@ public class ViewGroupHelper {
         return visible(View.INVISIBLE);
     }
 
+    public ViewGroupHelper selector() {
+        selectorView = parentView;
+        return this;
+    }
+
     public ViewGroupHelper selector(@IdRes int id) {
         if (parentView != null) {
             selectorView = parentView.findViewById(id);
