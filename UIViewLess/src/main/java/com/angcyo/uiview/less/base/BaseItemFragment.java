@@ -79,8 +79,20 @@ public abstract class BaseItemFragment extends BaseRecyclerFragment<SingleItem> 
                 return itemTypeStart + posInData;
             }
 
+            @Override
+            protected int getItemLayoutId(int viewType) {
+                if (BaseItemFragment.this.getItemLayoutId() != -1) {
+                    return BaseItemFragment.this.getItemLayoutId();
+                }
+                return super.getItemLayoutId(viewType);
+            }
+
         };
         return adapter;
+    }
+
+    protected int getItemLayoutId() {
+        return -1;
     }
 
 

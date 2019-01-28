@@ -30,7 +30,7 @@ abstract class RItemAdapter<T : Item> : RExBaseAdapter<String, T, String> {
         return posInData
     }
 
-    final override fun getItemLayoutId(viewType: Int): Int {
+    override fun getItemLayoutId(viewType: Int): Int {
         val item = mAllDatas[getIndexForItemType(viewType)]
 
         val itemLayoutId = item.itemLayoutId
