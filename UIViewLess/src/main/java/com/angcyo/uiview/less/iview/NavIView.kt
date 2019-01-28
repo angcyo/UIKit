@@ -32,6 +32,9 @@ class NavIView(val viewGroup: ViewGroup) {
         val size = viewGroup.childCount
         viewGroup.childs { index, childView ->
             navViews.add(childView)
+
+            onNavSelector?.onInitPosition(childView, index)
+
             if (onNavSelector?.onCanSelector(index) == true) {
                 childView.setOnClickListener {
                     selector(index)
@@ -41,7 +44,7 @@ class NavIView(val viewGroup: ViewGroup) {
 
         if (size > 0) {
             viewGroup.post {
-                onNavSelector?.onNavSelector(-1, currentPosition)
+                selector(currentPosition)
             }
         }
     }
@@ -71,6 +74,7 @@ class NavIView(val viewGroup: ViewGroup) {
     }
 
     interface OnNavSelector {
+
         fun onNavSelector(fromPosition: Int, toPosition: Int)
         fun onNavReSelector(position: Int) {
 
@@ -78,5 +82,8 @@ class NavIView(val viewGroup: ViewGroup) {
 
         fun onCanSelector(position: Int): Boolean = true
 
+        fun onInitPosition(childView: View, position: Int) {
+
+        }
     }
 }

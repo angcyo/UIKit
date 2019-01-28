@@ -1030,6 +1030,11 @@ public class RDrawable {
         return listDrawable;
     }
 
+    public RDrawable andState() {
+        lastDrawable = state();
+        return this;
+    }
+
     /**
      * 优先返回 layerDrawable, 其次返回 lastDrawable, 再返回 doIt()
      * 返回最后一次创建的有效Drawable, 作用类似于 doIt()
