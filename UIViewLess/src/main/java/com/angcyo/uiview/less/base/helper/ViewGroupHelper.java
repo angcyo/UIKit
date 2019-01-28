@@ -1,5 +1,6 @@
 package com.angcyo.uiview.less.base.helper;
 
+import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.*;
 import android.support.v4.view.ViewCompat;
@@ -7,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import com.angcyo.uiview.less.kotlin.ViewExKt;
 import com.angcyo.uiview.less.resources.ResUtil;
 import com.angcyo.uiview.less.widget.ImageTextView;
 
@@ -246,5 +248,12 @@ public class ViewGroupHelper {
             }
         }
         return null;
+    }
+
+    public ViewGroupHelper setTextBold(boolean bold) {
+        if (selectorView instanceof TextView) {
+            ViewExKt.addPaintFlags((TextView) selectorView, Paint.FAKE_BOLD_TEXT_FLAG, bold, true);
+        }
+        return this;
     }
 }
