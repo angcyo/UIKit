@@ -564,6 +564,14 @@ public fun TextView.addPaintFlags(flag: Int, add: Boolean = true, invalidate: Bo
     }
 }
 
+public fun Paint.setPaintFlags(flag: Int, add: Boolean = true) {
+    if (add) {
+        this.flags = this.flags or flag
+    } else {
+        this.flags = this.flags and flag.inv()
+    }
+}
+
 public fun View.hideFromBottom(anim: Boolean = true) {
     if (this.translationY == 0f) {
         //是显示状态

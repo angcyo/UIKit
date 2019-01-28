@@ -4,6 +4,7 @@ import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.*;
 import android.support.v4.view.ViewCompat;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -100,6 +101,17 @@ public class ViewGroupHelper {
                 ((TextView) selectorView).setText(text);
             } else if (selectorView instanceof ImageTextView) {
                 ((ImageTextView) selectorView).setShowText(text);
+            }
+        }
+        return this;
+    }
+
+    public ViewGroupHelper setTextSize(float textSize) {
+        if (selectorView != null) {
+            if (selectorView instanceof TextView) {
+                ((TextView) selectorView).setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+            } else if (selectorView instanceof ImageTextView) {
+                ((ImageTextView) selectorView).setShowTextSize(textSize);
             }
         }
         return this;
@@ -253,6 +265,8 @@ public class ViewGroupHelper {
     public ViewGroupHelper setTextBold(boolean bold) {
         if (selectorView instanceof TextView) {
             ViewExKt.addPaintFlags((TextView) selectorView, Paint.FAKE_BOLD_TEXT_FLAG, bold, true);
+        } else if (selectorView instanceof ImageTextView) {
+            ViewExKt.setPaintFlags(((ImageTextView) selectorView).getTextPaint(), Paint.FAKE_BOLD_TEXT_FLAG, bold);
         }
         return this;
     }
