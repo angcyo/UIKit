@@ -8,8 +8,9 @@ import android.graphics.Rect;
 import android.graphics.Shader;
 import android.graphics.drawable.*;
 import android.os.Build;
+import android.support.annotation.ColorInt;
 import android.support.annotation.IntDef;
-import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.view.Gravity;
 
 import java.lang.annotation.Retention;
@@ -54,7 +55,7 @@ public class RDrawable {
         reset();
     }
 
-    public static RDrawable get(@NonNull Context context) {
+    public static RDrawable get(@Nullable Context context) {
         return new RDrawable(context);
     }
 
@@ -569,9 +570,10 @@ public class RDrawable {
      * 如果版本不支持时, 返回 state()
      */
     public Drawable ripple() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+       /* if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             andRipple();
-        } else {
+        } else*/
+        {
             //不支持ripple时, 打成 state
             if (stateLinkedHashMap.isEmpty()) {
                 if (normalDrawable == null) {
@@ -1187,4 +1189,17 @@ public class RDrawable {
     }
 
     //</editor-fold desc="注解">
+
+    public RDrawable set(Drawable drawable) {
+        lastDrawable = drawable;
+        return this;
+    }
+
+    public RDrawable tintDrawable(@ColorInt int color) {
+        if (lastDrawable == null) {
+            doIt();
+        }
+        lastDrawable = ResUtil.tintDrawable(lastDrawable, color);
+        return this;
+    }
 }
