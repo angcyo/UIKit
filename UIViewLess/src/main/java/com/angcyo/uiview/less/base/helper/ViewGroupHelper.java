@@ -228,6 +228,29 @@ public class ViewGroupHelper {
         return this;
     }
 
+    public ViewGroupHelper setImageDrawable(Drawable drawable) {
+        setImageDrawable(drawable, -1);
+        return this;
+    }
+
+    public ViewGroupHelper setImageDrawable(Drawable drawable, int filterColor) {
+
+        if (filterColor != -1) {
+            if (drawable != null) {
+                drawable = ResUtil.filterDrawable(drawable, filterColor);
+            }
+        }
+
+        if (selectorView != null) {
+            if (selectorView instanceof ImageTextView) {
+                ((ImageTextView) selectorView).setImageDrawable(drawable);
+            } else if (selectorView instanceof ImageView) {
+                ((ImageView) selectorView).setImageDrawable(drawable);
+            }
+        }
+        return this;
+    }
+
     public ViewGroupHelper setVisibility(int visibility) {
         if (selectorView != null) {
             selectorView.setVisibility(visibility);
