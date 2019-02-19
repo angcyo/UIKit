@@ -3123,6 +3123,10 @@ public class RUtils {
         return 0;
     }
 
+    public static int getScreenHeight() {
+        return getScreenHeight(getApp());
+    }
+
     public static int getScreenWidth(Context activity) {
         if (activity != null) {
             return activity.getResources().getDisplayMetrics().widthPixels;
@@ -3130,7 +3134,23 @@ public class RUtils {
         return 0;
     }
 
+    public static int getScreenWidth() {
+        return getScreenWidth(getApp());
+    }
+
     public static Application getApp() {
         return RApplication.getApp();
+    }
+
+    public static float density() {
+        return getApp().getResources().getDisplayMetrics().density;
+    }
+
+    public static float getDensityDpi() {
+        return getApp().getResources().getDisplayMetrics().densityDpi;
+    }
+
+    public static float getScaledDensity() {
+        return getApp().getResources().getDisplayMetrics().scaledDensity;
     }
 }

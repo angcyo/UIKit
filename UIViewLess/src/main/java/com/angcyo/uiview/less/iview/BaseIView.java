@@ -24,6 +24,7 @@ public abstract class BaseIView {
     public static final int STATUS_CREATE = 0x02;
     public static final int STATUS_LOAD = 0x04;
     public static final int STATUS_SHOW = 0x08;
+    public static final int STATUS_RESHOW = 0x40;
     public static final int STATUS_HIDE = 0x10;
     public static final int STATUS_UNLOAD = 0x20;
 
@@ -33,6 +34,9 @@ public abstract class BaseIView {
     protected ViewGroup parent;
     protected int iViewStatus = STATUS_INIT;
 
+    /**
+     * 从View对象的tag中, 获取BaseIView对象
+     */
     public static BaseIView from(@Nullable View view) {
         if (view == null) {
             return null;
@@ -58,6 +62,10 @@ public abstract class BaseIView {
         return new View(context);
     }
 
+    public Context getContext() {
+        return context;
+    }
+
     public Activity getActivity() {
         if (context instanceof Activity) {
             return (Activity) context;
@@ -76,7 +84,11 @@ public abstract class BaseIView {
      * @param parent  是否需要attach到parent
      * @param state   初始化的状态参数
      */
-    public View createView(@NonNull Context context, @Nullable ViewGroup parent, @Nullable Bundle state) {
+    public View createView(@NonNull Context context, @Nullable ViewGroup parent, @Nullable Bundle state, boolean attachToRoot) {
+        if (isIViewLoad()) {
+            return rootView;
+        }
+
         this.context = context;
         this.parent = parent;
         setViewStatus(STATUS_CREATE);
@@ -97,13 +109,13 @@ public abstract class BaseIView {
             rootView.setLayoutParams(new ViewGroup.LayoutParams(-1, -1));
         }
 
-        if (parent != null) {
+        if (attachToRoot && parent != null) {
             parent.addView(rootView);
         }
 
         initIView(state);
 
-        if (parent != null) {
+        if (attachToRoot && parent != null) {
             onIViewLoad(state);
             onIViewShow(state);
         }
@@ -113,7 +125,7 @@ public abstract class BaseIView {
     /**
      * 1.1 初始化IView
      *
-     * @param state {@link #createView(Context, ViewGroup, Bundle)}
+     * @param state {@link #createView(Context, ViewGroup, Bundle, boolean)}
      */
     protected void initIView(@Nullable Bundle state) {
 
@@ -131,6 +143,10 @@ public abstract class BaseIView {
      */
     public void onIViewShow(@Nullable Bundle state) {
         setViewStatus(STATUS_SHOW);
+    }
+
+    public void onIViewReShow(@Nullable Bundle state) {
+        setViewStatus(STATUS_RESHOW);
     }
 
     /**
@@ -151,7 +167,7 @@ public abstract class BaseIView {
      * 界面已经装载了
      */
     public boolean isIViewLoad() {
-        return iViewStatus == STATUS_LOAD || iViewStatus == STATUS_SHOW;
+        return iViewStatus == STATUS_LOAD || iViewStatus == STATUS_SHOW || iViewStatus == STATUS_RESHOW;
     }
 
     public void show(@NonNull ViewGroup parent, @Nullable final Bundle state, @Nullable Animation animation, final @Nullable Runnable endAction) {
@@ -168,12 +184,19 @@ public abstract class BaseIView {
         }
         this.parent = parent;
         parent.addView(rootView);
-        onIViewLoad(state);
+
+        if (!isIViewLoad()) {
+            onIViewLoad(state);
+        }
 
         final Runnable endRunnable = new Runnable() {
             @Override
             public void run() {
-                onIViewShow(state);
+                if (iViewStatus == STATUS_SHOW) {
+                    onIViewReShow(state);
+                } else {
+                    onIViewShow(state);
+                }
                 if (endAction != null) {
                     endAction.run();
                 }
@@ -231,6 +254,10 @@ public abstract class BaseIView {
                         }
                     });
                     startAnimation(getAnimationView(), animation);
+                }
+            } else {
+                if (endAction != null) {
+                    endAction.run();
                 }
             }
         }

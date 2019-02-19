@@ -63,6 +63,7 @@
         <attr name="r_current_item" format="integer"/>
         <!--指定item的宽度-->
         <attr name="r_item_width" format="dimension"/>
+        <attr name="r_auto_set_item_selector_status" format="boolean"/>
 
 
         <attr name="r_use_child_view_index"/>
@@ -84,6 +85,15 @@
         <attr name="r_border_color"/>
         <attr name="r_border_width"/>
         <attr name="r_border_round_size"/>
+
+        <attr name="r_border_show_type" format="enum">
+            <enum name="SHOW_TYPE_BACKGROUND" value="1"/>
+            <enum name="SHOW_TYPE_FOREGROUND" value="2"/>
+        </attr>
+
+        <attr name="r_item_normal_background_color" format="color"/>
+        <attr name="r_item_selected_background_color" format="color"/>
+        <attr name="r_auto_set_item_background" format="boolean"/>
     </declare-styleable>
 
     <declare-styleable name="RTabLayout_Layout">

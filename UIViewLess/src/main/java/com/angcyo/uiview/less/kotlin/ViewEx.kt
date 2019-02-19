@@ -6,6 +6,7 @@ import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Rect
+import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.GestureDetectorCompat
@@ -25,8 +26,8 @@ import com.angcyo.uiview.less.RApplication
 import com.angcyo.uiview.less.draw.RDrawNoRead
 import com.angcyo.uiview.less.recycler.RBaseViewHolder
 import com.angcyo.uiview.less.recycler.RRecyclerView
+import com.angcyo.uiview.less.resources.ResUtil
 import com.angcyo.uiview.less.utils.RUtils
-import com.angcyo.uiview.less.utils.ScreenUtil
 import com.angcyo.uiview.less.utils.ScreenUtil.density
 import com.angcyo.uiview.less.widget.RExTextView
 import com.angcyo.uiview.less.widget.RImageView
@@ -48,18 +49,22 @@ public fun <V : View> View.v(id: Int): V? {
     return view as V?
 }
 
-public fun <T> T.getDrawable(resId: Int): Drawable? {
+public fun <T> T.getDrawable(resId: Int): Drawable {
     if (resId == -1) {
-        return null
+        return ColorDrawable(Color.TRANSPARENT)
     }
-    return ContextCompat.getDrawable(RApplication.getApp(), resId)
+    return ContextCompat.getDrawable(RApplication.getApp(), resId)!!
 }
 
-public fun View.getDrawable(resId: Int): Drawable? {
+public fun <T> T.getColor(resId: Int): Int {
     if (resId == -1) {
-        return null
+        return Color.TRANSPARENT
     }
-    return ContextCompat.getDrawable(context, resId)
+    return ContextCompat.getColor(RApplication.getApp(), resId)
+}
+
+public fun <T> T.getDimen(resId: Int): Int {
+    return ResUtil.getDimen(resId)
 }
 
 public val View.random: Random by lazy {
@@ -169,7 +174,7 @@ public fun TextView.drawPadding(padding: Float) {
 
 /**设置文本大小 dp单位*/
 public fun TextView.setTextSizeDp(sizeDp: Float) {
-    setTextSize(TypedValue.COMPLEX_UNIT_PX, sizeDp * ScreenUtil.density())
+    setTextSize(TypedValue.COMPLEX_UNIT_PX, sizeDp * RUtils.density())
 }
 
 public fun TextView.setRightIco(id: Int) {
@@ -264,7 +269,7 @@ public fun View.calcLayoutWidthHeight(
         if (rLayoutWidth!!.contains("sw", true)) {
             val ratio = rLayoutWidth.replace("sw", "", true).toFloatOrNull()
             ratio?.let {
-                size[0] = (ratio * (ScreenUtil.screenWidth - rLayoutWidthExclude)).toInt()
+                size[0] = (ratio * (RUtils.getScreenWidth() - rLayoutWidthExclude)).toInt()
             }
         } else if (rLayoutWidth!!.contains("pw", true)) {
             val ratio = rLayoutWidth.replace("pw", "", true).toFloatOrNull()
@@ -277,7 +282,7 @@ public fun View.calcLayoutWidthHeight(
         if (rLayoutHeight!!.contains("sh", true)) {
             val ratio = rLayoutHeight.replace("sh", "", true).toFloatOrNull()
             ratio?.let {
-                size[1] = (ratio * (ScreenUtil.screenHeight - rLayoutHeightExclude)).toInt()
+                size[1] = (ratio * (RUtils.getScreenHeight() - rLayoutHeightExclude)).toInt()
             }
         } else if (rLayoutHeight!!.contains("ph", true)) {
             val ratio = rLayoutHeight.replace("ph", "", true).toFloatOrNull()

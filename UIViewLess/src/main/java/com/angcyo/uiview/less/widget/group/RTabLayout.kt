@@ -15,7 +15,9 @@ import com.angcyo.uiview.less.draw.RDrawBorder
 import com.angcyo.uiview.less.draw.RDrawText
 import com.angcyo.uiview.less.draw.RTabIndicator
 import com.angcyo.uiview.less.kotlin.*
+import com.angcyo.uiview.less.resources.RDrawable
 import com.angcyo.uiview.less.resources.ResUtil
+import com.angcyo.uiview.less.skin.SkinHelper
 import com.angcyo.uiview.less.widget.RDrawTextView
 
 /**
@@ -31,11 +33,20 @@ import com.angcyo.uiview.less.widget.RDrawTextView
  */
 class RTabLayout(context: Context, attributeSet: AttributeSet? = null) : ViewGroup(context, attributeSet) {
 
+    companion object {
+        const val SHOW_TYPE_BACKGROUND = 1
+        const val SHOW_TYPE_FOREGROUND = 2
+    }
+
+    //指示器绘制
     var tabIndicator: RTabIndicator
+    //边框绘制
     var drawBorder: RDrawBorder
 
+    //当设置OnTabLayoutListener时, 是否立马回调
     var firstNotifyListener = true
 
+    //事件监听
     var onTabLayoutListener: OnTabLayoutListener? = null
         set(value) {
             field = value
@@ -45,16 +56,54 @@ class RTabLayout(context: Context, attributeSet: AttributeSet? = null) : ViewGro
                 field?.onTabSelector(this, currentItem, currentItem)
             }
         }
+
+    //当前选中的item
     private var currentItem = 0
+
+    //item是否等宽
     var itemEquWidth = false
+
+    //在等宽的情况下, 指定item的宽度
     var itemWidth = -3
+
+    //当点击item时, 是否同时设置item view 的 selector的状态
+    var autoSetItemSelectorStatus = true
+
+    //自动创建drawable, 并设置给 item
+    //模拟SegmentTabLayout的效果
+    var autoSetItemBackground = false
+
+    //item选中时的背景颜色
+    var itemSelectedBackgroundColor = Color.TRANSPARENT
+    //item未选中时的背景颜色
+    var itemNormalBackgroundColor = Color.TRANSPARENT
+
+    //前台绘制border,还是后台绘制
+    var borderShowType = SHOW_TYPE_BACKGROUND
 
     init {
         val typedArray = context.obtainStyledAttributes(attributeSet, R.styleable.RTabLayout)
         itemEquWidth = typedArray.getBoolean(R.styleable.RTabLayout_r_item_equ_width, itemEquWidth)
         firstNotifyListener = typedArray.getBoolean(R.styleable.RTabLayout_r_first_notify_listener, firstNotifyListener)
+        autoSetItemSelectorStatus =
+            typedArray.getBoolean(R.styleable.RTabLayout_r_auto_set_item_selector_status, autoSetItemSelectorStatus)
         currentItem = typedArray.getInt(R.styleable.RTabLayout_r_current_item, currentItem)
+        borderShowType = typedArray.getInt(R.styleable.RTabLayout_r_border_show_type, borderShowType)
         itemWidth = typedArray.getDimensionPixelOffset(R.styleable.RTabLayout_r_item_width, itemWidth)
+
+        autoSetItemBackground =
+            typedArray.getBoolean(R.styleable.RTabLayout_r_auto_set_item_background, autoSetItemBackground)
+
+        itemSelectedBackgroundColor = if (isInEditMode) {
+            Color.RED
+        } else {
+            SkinHelper.getSkin().themeSubColor
+        }
+        itemSelectedBackgroundColor =
+            typedArray.getColor(R.styleable.RTabLayout_r_item_selected_background_color, itemSelectedBackgroundColor)
+        itemNormalBackgroundColor =
+            typedArray.getColor(R.styleable.RTabLayout_r_item_normal_background_color, itemNormalBackgroundColor)
+
         typedArray.recycle()
 
         setWillNotDraw(false)
@@ -63,7 +112,6 @@ class RTabLayout(context: Context, attributeSet: AttributeSet? = null) : ViewGro
 
         tabIndicator.curIndex = currentItem
     }
-
 
     private var isClickScrollPager = false
     override fun addView(child: View?, index: Int, params: ViewGroup.LayoutParams?) {
@@ -78,9 +126,44 @@ class RTabLayout(context: Context, attributeSet: AttributeSet? = null) : ViewGro
                     isClickScrollPager = true
                     setCurrentItem(toIndex)
 //                    this@RTabLayout.scrollTo(0, 0)
-
                 }
             }
+        }
+        if (autoSetItemSelectorStatus) {
+            child?.isSelected = childCount - 1 == currentItem
+        }
+
+        if (autoSetItemBackground) {
+            updateItemBackgroundStyle()
+        }
+    }
+
+    /**
+     * 更新item背景 drawable
+     * */
+    fun updateItemBackgroundStyle() {
+        childs { index, child ->
+            val rDrawable = RDrawable.get(context)
+
+            if (childCount > 1) {
+                if (index == 0) {
+                    rDrawable.cornerRadiiLeft(drawBorder.borderRoundSize)
+                } else if (index == childCount - 1) {
+                    rDrawable.cornerRadiiRight(drawBorder.borderRoundSize)
+                }
+            }
+
+            ResUtil.setBgDrawable(
+                child, rDrawable
+                    .solidColor(itemSelectedBackgroundColor)
+                    .pressed(true)
+                    .andSelected(true)
+                    .andChecked(true)
+                    .reset()
+                    .solidColor(itemNormalBackgroundColor)
+                    .normal()
+                    .state()
+            )
         }
     }
 
@@ -88,6 +171,11 @@ class RTabLayout(context: Context, attributeSet: AttributeSet? = null) : ViewGro
     fun setCurrentItem(index: Int, notify: Boolean = true) {
         val oldIndex = currentItem
         currentItem = index
+
+        if (autoSetItemSelectorStatus) {
+            updateItemStyle(oldIndex, index)
+        }
+
         tabIndicator.curIndex = index
 
         if (oldIndex == index) {
@@ -107,6 +195,16 @@ class RTabLayout(context: Context, attributeSet: AttributeSet? = null) : ViewGro
             if (notify) {
                 onTabLayoutListener?.onTabSelector(this, oldIndex, index)
             }
+        }
+    }
+
+    fun updateItemStyle(oldIndex: Int, newIndex: Int) {
+        if (oldIndex in 0 until childCount) {
+            getChildAt(oldIndex).isSelected = false
+        }
+
+        if (newIndex in 0 until childCount) {
+            getChildAt(newIndex).isSelected = true
         }
     }
 
@@ -178,6 +276,10 @@ class RTabLayout(context: Context, attributeSet: AttributeSet? = null) : ViewGro
                 setCurrentItem(position, false)
             }
         })
+
+        if (onTabLayoutListener == null) {
+            onTabLayoutListener = DefaultViewPagerListener(viewPager)
+        }
 
         if (currentItem >= 0) {
             viewPager.setCurrentItem(currentItem, false)
@@ -327,11 +429,18 @@ class RTabLayout(context: Context, attributeSet: AttributeSet? = null) : ViewGro
         if (tabIndicator.indicatorType == RTabIndicator.INDICATOR_TYPE_BOTTOM_LINE) {
             tabIndicator.onDraw(canvas)
         }
+
+        if (borderShowType == SHOW_TYPE_FOREGROUND) {
+            drawBorder.onDraw(canvas)
+        }
     }
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        drawBorder.onDraw(canvas)
+
+        if (borderShowType == SHOW_TYPE_BACKGROUND) {
+            drawBorder.onDraw(canvas)
+        }
 
         if (tabIndicator.indicatorType == RTabIndicator.INDICATOR_TYPE_ROUND_RECT_BLOCK) {
             tabIndicator.onDraw(canvas)
@@ -603,7 +712,7 @@ class RTabLayout(context: Context, attributeSet: AttributeSet? = null) : ViewGro
 
             currentDrawTextView?.drawText?.let {
                 it.drawTextSize =
-                        (minTextSize + (maxTextSize - minTextSize) * (1 - positionOffset)).toInt()
+                    (minTextSize + (maxTextSize - minTextSize) * (1 - positionOffset)).toInt()
 
                 selectorTextView(positionOffset < 0.5f, it)
             }
@@ -611,7 +720,7 @@ class RTabLayout(context: Context, attributeSet: AttributeSet? = null) : ViewGro
             if ((currentPosition - nextPosition).abs() == 1) {
                 nextDrawTextView?.drawText?.let {
                     it.drawTextSize =
-                            (minTextSize + (maxTextSize - minTextSize) * (positionOffset)).toInt()
+                        (minTextSize + (maxTextSize - minTextSize) * (positionOffset)).toInt()
 
                     selectorTextView(positionOffset > 0.5f, it)
                 }
@@ -659,6 +768,20 @@ class RTabLayout(context: Context, attributeSet: AttributeSet? = null) : ViewGro
                 view.setBoldText(false)
                 view.setTextColor(ResUtil.getColor(R.color.base_text_color))
             }
+        }
+    }
+
+    /**
+     * 默认实现方式, 用来切换ViewPager
+     * */
+    open class DefaultViewPagerListener(val viewPager: ViewPager) : OnTabLayoutListener() {
+        override fun onTabSelector(tabLayout: RTabLayout, fromIndex: Int, toIndex: Int) {
+            super.onTabSelector(tabLayout, fromIndex, toIndex)
+            viewPager.setCurrentItem(toIndex, (toIndex - fromIndex).abs() == 1)
+        }
+
+        override fun onTabReSelector(tabLayout: RTabLayout, itemView: View, index: Int) {
+            super.onTabReSelector(tabLayout, itemView, index)
         }
     }
 }
