@@ -6,7 +6,7 @@
         android:layout_width="match_parent"
         tools:background="@color/base_red_tran"
         android:layout_height="@dimen/action_bar_height">
-
+        
     <!--左右item控制布局-->
     <LinearLayout
             android:id="@+id/base_title_left_layout"
