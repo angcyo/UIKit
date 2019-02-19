@@ -86,9 +86,9 @@ public abstract class BaseTitleFragment extends BaseFragment implements AffectUI
         contentWrapperLayout = baseViewHolder.v(R.id.base_content_wrapper_layout);
         titleBarLayout = baseViewHolder.v(R.id.base_title_bar_layout);
 
+        initBaseTitleLayout(arguments);
         initLeftControlLayout();
         initRightControlLayout();
-        initBaseTitleLayout(arguments);
         initContentLayout(arguments);
     }
 
