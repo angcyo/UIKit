@@ -86,10 +86,10 @@ public abstract class BaseTitleFragment extends BaseFragment implements AffectUI
         contentWrapperLayout = baseViewHolder.v(R.id.base_content_wrapper_layout);
         titleBarLayout = baseViewHolder.v(R.id.base_title_bar_layout);
 
-        initContentLayout(arguments);
-        initBaseTitleLayout(arguments);
         initLeftControlLayout();
         initRightControlLayout();
+        initBaseTitleLayout(arguments);
+        initContentLayout(arguments);
     }
 
     /**
@@ -333,11 +333,11 @@ public abstract class BaseTitleFragment extends BaseFragment implements AffectUI
     }
 
     public void hideTitleShadow() {
-        ViewGroupHelper.build((ViewGroup) getView()).selector(R.id.base_title_shadow_view).gone();
+        ViewGroupHelper.build(baseViewHolder.itemView).selector(R.id.base_title_shadow_view).gone();
     }
 
     public void removeTitleShadow() {
-        ViewGroupHelper.build((ViewGroup) getView()).selector(R.id.base_title_shadow_view).remove();
+        ViewGroupHelper.build(baseViewHolder.itemView).selector(R.id.base_title_shadow_view).remove();
     }
 
     //</editor-fold>
