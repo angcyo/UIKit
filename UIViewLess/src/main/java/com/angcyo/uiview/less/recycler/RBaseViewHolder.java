@@ -274,6 +274,24 @@ public class RBaseViewHolder extends RecyclerView.ViewHolder {
         return (TextView) v(resId);
     }
 
+    public <T extends TextView> T tv(@IdRes int resId, final String defaultValue) {
+        return tv(resId, defaultValue, null);
+    }
+
+    public <T extends TextView> T tv(@IdRes int resId, final String defaultValue, final String hawkKey) {
+        TextView textView = tv(resId);
+
+        if (textView != null) {
+            if (hawkKey == null) {
+                textView.setText(defaultValue);
+            } else {
+                textView.setText(Hawk.get(hawkKey, defaultValue));
+            }
+        }
+
+        return (T) textView;
+    }
+
 //    public TimeTextView timeV(@IdRes int resId) {
 //        return (TimeTextView) v(resId);
 //    }
