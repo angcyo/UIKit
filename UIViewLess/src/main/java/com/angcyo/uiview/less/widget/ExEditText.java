@@ -1341,6 +1341,19 @@ public class ExEditText extends AppCompatEditText {
      */
     public void error() {
         Anim.band(this);
+
+//        AnimatorSet mAnimatorSet = new AnimatorSet();
+//
+//        mAnimatorSet.playTogether(
+//                ObjectAnimator.ofFloat(this, "scaleX", 1, 1.25f, 0.75f, 1.15f, 1),
+//                ObjectAnimator.ofFloat(this, "scaleY", 1, 0.75f, 1.25f, 0.85f, 1)
+//        );
+//
+//        mAnimatorSet.setInterpolator(new DecelerateInterpolator());
+//        mAnimatorSet.setDuration(300);
+//        mAnimatorSet.start();
+//
+//        requestFocus();
     }
 
     /**
