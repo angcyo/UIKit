@@ -134,6 +134,17 @@ public class RBaseViewHolder extends RecyclerView.ViewHolder {
         return (T) viewByName(idName);
     }
 
+    public <T extends View> T focus(@IdRes int resId) {
+        View v = v(resId);
+        if (v != null) {
+            v.setFocusable(true);
+            v.setFocusableInTouchMode(true);
+            v.requestFocus();
+            return (T) v;
+        }
+        return null;
+    }
+
     public View view(@IdRes int resId) {
         return v(resId);
     }
