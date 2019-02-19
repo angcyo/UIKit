@@ -3,6 +3,7 @@ package com.angcyo.uiview.less.kotlin
 import android.graphics.Point
 import android.graphics.Rect
 import android.graphics.drawable.Drawable
+import com.angcyo.uiview.less.resources.ResUtil
 
 /**
  * Created by angcyo on ：2017/12/15 15:01
@@ -17,3 +18,5 @@ public fun Drawable.getBoundsWith(centerPoint: Point, inRect: Rect) = Rect().app
     right = centerPoint.x + intrinsicWidth / 2
     bottom = centerPoint.y + intrinsicHeight / 2
 }
+
+public fun Drawable.color(filterColor: Int) = ResUtil.filterDrawable(this, filterColor)

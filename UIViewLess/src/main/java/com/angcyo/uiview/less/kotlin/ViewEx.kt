@@ -185,6 +185,10 @@ public fun TextView.setLeftIco(id: Int) {
     RExTextView.setLeftIco(this, id)
 }
 
+public fun TextView.setLeftIco(drawable: Drawable) {
+    RExTextView.setLeftIco(this, drawable)
+}
+
 public fun View.getColor(id: Int): Int = ContextCompat.getColor(context, id)
 
 public fun View.getDimensionPixelOffset(id: Int): Int = resources.getDimensionPixelOffset(id)

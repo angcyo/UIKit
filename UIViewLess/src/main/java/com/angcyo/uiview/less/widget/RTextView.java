@@ -239,9 +239,16 @@ public class RTextView extends AppCompatTextView {
         initView();
     }
 
+
     public static void setLeftIco(TextView textView, @DrawableRes int leftIco) {
         Drawable[] compoundDrawables = textView.getCompoundDrawables();
         textView.setCompoundDrawablesWithIntrinsicBounds(ViewExKt.getDrawable(textView, leftIco),
+                compoundDrawables[1], compoundDrawables[2], compoundDrawables[3]);
+    }
+
+    public static void setLeftIco(TextView textView, Drawable drawable) {
+        Drawable[] compoundDrawables = textView.getCompoundDrawables();
+        textView.setCompoundDrawablesWithIntrinsicBounds(drawable,
                 compoundDrawables[1], compoundDrawables[2], compoundDrawables[3]);
     }
 
@@ -270,6 +277,13 @@ public class RTextView extends AppCompatTextView {
         textView.setCompoundDrawablesWithIntrinsicBounds(
                 compoundDrawables[0], compoundDrawables[1],
                 compoundDrawables[2], ViewExKt.getDrawable(textView, bottomIco));
+    }
+
+    public static void setBottomIco(TextView textView, Drawable drawable) {
+        Drawable[] compoundDrawables = textView.getCompoundDrawables();
+        textView.setCompoundDrawablesWithIntrinsicBounds(
+                compoundDrawables[0], compoundDrawables[1],
+                compoundDrawables[2], drawable);
     }
 
     public void setTextLeftDrawable(@DrawableRes int id) {
