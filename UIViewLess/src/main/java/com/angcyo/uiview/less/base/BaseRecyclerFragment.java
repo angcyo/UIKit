@@ -141,6 +141,11 @@ public abstract class BaseRecyclerFragment<T> extends BaseTitleFragment
      * 重置刷新控件和Adapter状态
      */
     public void resetUIStatus() {
+        resetRefreshStatus();
+        resetAdapterStatus();
+    }
+
+    public void resetRefreshStatus() {
         if (smartRefreshLayout != null) {
             if (smartRefreshLayout.isEnableRefresh()) {
                 smartRefreshLayout.finishRefresh();
@@ -149,6 +154,9 @@ public abstract class BaseRecyclerFragment<T> extends BaseTitleFragment
                 smartRefreshLayout.finishLoadMore();
             }
         }
+    }
+
+    public void resetAdapterStatus() {
         if (baseAdapter != null) {
             if (baseAdapter.isEnableLoadMore()) {
                 baseAdapter.setLoadMoreEnd();
@@ -238,12 +246,14 @@ public abstract class BaseRecyclerFragment<T> extends BaseTitleFragment
     @Override
     public void onFragmentFirstShow(@Nullable Bundle bundle) {
         super.onFragmentFirstShow(bundle);
-        baseViewHolder.postDelay(160, new Runnable() {
-            @Override
-            public void run() {
-                onBaseRefresh(null);
-            }
-        });
+        if (affectUI == null || affectUI.getAffectStatus() != AffectUI.AFFECT_LOADING) {
+            baseViewHolder.postDelay(160, new Runnable() {
+                @Override
+                public void run() {
+                    onBaseRefresh(null);
+                }
+            });
+        }
     }
 
     /**
