@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import com.angcyo.uiview.less.R;
 import com.angcyo.uiview.less.base.helper.TitleItemHelper;
+import com.angcyo.uiview.less.iview.AffectUI;
 import com.angcyo.uiview.less.recycler.RBaseViewHolder;
 import com.angcyo.uiview.less.recycler.adapter.RBaseAdapter;
 import com.angcyo.uiview.less.recycler.widget.ItemLoadMoreLayout;
@@ -28,6 +29,8 @@ public class BaseUI {
         void initBaseTitleLayout(@NonNull BaseTitleFragment titleFragment, @Nullable Bundle arguments);
 
         View createBackItem(@NonNull BaseTitleFragment titleFragment);
+
+        AffectUI createAffectUI(@NonNull BaseTitleFragment titleFragment);
     }
 
     public interface UIAdapterShowStatus {
@@ -70,6 +73,17 @@ public class BaseUI {
                     );
             backItem.setId(R.id.base_title_back_view);
             return backItem;
+        }
+
+        @Override
+        public AffectUI createAffectUI(@NonNull BaseTitleFragment titleFragment) {
+            return AffectUI.build(titleFragment.contentWrapperLayout)
+                    .register(AffectUI.AFFECT_LOADING, R.layout.base_affect_loading)
+                    .register(AffectUI.AFFECT_ERROR, R.layout.base_affect_error)
+                    .register(AffectUI.AFFECT_OTHER, R.layout.base_affect_other)
+                    .setContentAffect(AffectUI.CONTENT_AFFECT_INVISIBLE)
+                    .setAffectChangeListener(titleFragment)
+                    .create();
         }
     }
 
