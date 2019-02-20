@@ -17,6 +17,13 @@
             android:tag="loading"
             android:visibility="gone"/>
 
+    <!--<ProgressBar-->
+    <!--style="?android:attr/progressBarStyleSmallInverse"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:tag="loading"-->
+    <!--android:visibility="gone"/>-->
+
     <!--无网络-->
     <include
             layout="@layout/base_nonet_layout"

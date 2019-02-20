@@ -72,6 +72,9 @@ public class ItemShowStateLayout extends FrameLayout implements IShowState {
                     }
                 }).setInterpolator(new DecelerateInterpolator()).setDuration(160).start();
             } else {
+                if (visibility == View.VISIBLE) {
+                    view.setAlpha(1);
+                }
                 view.setVisibility(visibility);
             }
         }
