@@ -4,13 +4,11 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Rect;
-import android.support.annotation.NonNull;
 import android.text.TextPaint;
 import android.view.View;
 import android.view.ViewGroup;
 import com.angcyo.uiview.less.R;
 import com.angcyo.uiview.less.RApplication;
-import com.angcyo.uiview.less.recycler.RBaseViewHolder;
 
 /**
  * 可以设置top分割线, 和中间分割线样式的{@link Item}
@@ -132,6 +130,11 @@ public abstract class SingleItem implements Item {
     @Override
     public String getTag() {
         return mTag;
+    }
+
+    public SingleItem setTag(String mTag) {
+        this.mTag = mTag;
+        return this;
     }
 
     public enum Type {
