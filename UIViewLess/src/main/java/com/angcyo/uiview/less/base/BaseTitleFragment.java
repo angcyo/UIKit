@@ -10,7 +10,6 @@ import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import com.angcyo.uiview.less.R;
@@ -22,7 +21,6 @@ import com.angcyo.uiview.less.recycler.RBaseViewHolder;
 import com.angcyo.uiview.less.skin.SkinHelper;
 import com.angcyo.uiview.less.widget.ImageTextView;
 import com.angcyo.uiview.less.widget.group.FragmentContentWrapperLayout;
-import com.angcyo.uiview.less.widget.group.RSoftInputLayout;
 import com.angcyo.uiview.less.widget.group.TitleBarLayout;
 
 /**
@@ -239,6 +237,10 @@ public abstract class BaseTitleFragment extends BaseFragment implements AffectUI
                 });
         backItem.setId(R.id.base_title_back_view);
         return backItem;
+    }
+
+    public void onTitleBackClick() {
+        onTitleBackClick(null);
     }
 
     /**
