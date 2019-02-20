@@ -15,8 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import com.angcyo.http.Rx;
 import com.angcyo.lib.L;
-import com.angcyo.uiview.less.R;
-import com.angcyo.uiview.less.RApplication;
+import com.angcyo.uiview.less.base.BaseUI;
 import com.angcyo.uiview.less.recycler.RBaseViewHolder;
 import com.angcyo.uiview.less.recycler.RRecyclerView;
 import com.angcyo.uiview.less.recycler.widget.ILoadMore;
@@ -37,7 +36,12 @@ import java.util.List;
 public abstract class RBaseAdapter<T> extends RecyclerView.Adapter<RBaseViewHolder>
         implements RecyclerView.OnChildAttachStateChangeListener {
 
-    public static final int ITEM_TYPE_LOAD_MORE = 666;
+    /**
+     * 具有此标识的的item type, 会在GridLayoutManager中, 全行显示
+     */
+    public static final int ITEM_SINGLE_LINE = 0x1_000_000_0;
+
+    public static final int ITEM_TYPE_LOAD_MORE = 666 | ITEM_SINGLE_LINE;
     public static final int ITEM_TYPE_SHOW_STATE = 667;
     protected List<T> mAllDatas;
     protected Context mContext;
@@ -256,7 +260,7 @@ public abstract class RBaseAdapter<T> extends RecyclerView.Adapter<RBaseViewHold
 //
                 if (mIShowState != null) {
                     mIShowState.setShowState(mShowState);
-                    onBindShowStateView((ItemShowStateLayout) mIShowState, mShowState);
+                    onBindShowStateView(holder, mShowState, position);
                 }
             } else if (mEnableLoadMore && isLast(position)) {
                 /**如果第一个就是加载更多的布局, 需要调用加载更多么?*/
@@ -265,7 +269,7 @@ public abstract class RBaseAdapter<T> extends RecyclerView.Adapter<RBaseViewHold
                 }
 
                 onBindLoadMore(position);
-                onBindLoadMoreView(holder, position);
+                onBindLoadMoreView(holder, mLoadState, position);
             } else {
                 if ((mEnableLoadMoreWithLastIndex > 0 &&
                         (getAllDataCount() - position) <= mEnableLoadMoreWithLastIndex)) {
@@ -290,9 +294,7 @@ public abstract class RBaseAdapter<T> extends RecyclerView.Adapter<RBaseViewHold
      * View 需要实现 IShowState 接口
      */
     protected View createShowState(Context context, ViewGroup parent) {
-        View itemView = LayoutInflater.from(context)
-                .inflate(R.layout.base_item_show_state_layout, parent, false);
-        return itemView;
+        return BaseUI.uiAdapterShowStatus.createShowState(this, context, parent);
     }
 
     /**
@@ -300,9 +302,7 @@ public abstract class RBaseAdapter<T> extends RecyclerView.Adapter<RBaseViewHold
      * View 需要实现 ILoadMore 接口
      */
     protected View createLoadMore(Context context, ViewGroup parent) {
-        View itemView = LayoutInflater.from(context)
-                .inflate(R.layout.base_item_load_more_layout, parent, false);
-        return itemView;
+        return BaseUI.uiAdapterLoadMore.createLoadMore(this, context, parent);
     }
 
     /**
@@ -317,8 +317,8 @@ public abstract class RBaseAdapter<T> extends RecyclerView.Adapter<RBaseViewHold
      * <p>
      * R.layout.base_item_show_state_layout
      */
-    protected void onBindShowStateView(@NonNull ItemShowStateLayout showStateLayout, int showState) {
-
+    protected void onBindShowStateView(@NonNull RBaseViewHolder holder, int showState, int position) {
+        BaseUI.uiAdapterShowStatus.onBindShowStateView(this, holder, showState, position);
     }
 
     /**
@@ -353,23 +353,8 @@ public abstract class RBaseAdapter<T> extends RecyclerView.Adapter<RBaseViewHold
     /**
      * 重写此方法, 可以修改加载更多视图
      */
-    protected void onBindLoadMoreView(@NonNull RBaseViewHolder holder, int position) {
-        //holder.tv(R.id.base_load_tip_view).setText();
-        //holder.tv(R.id.base_error_tip_view).setText();
-        //holder.tv(R.id.base_no_more_tip_view).setText("");
-
-        if (TextUtils.equals(RApplication.getApp().getPackageName(), "com.hn.d.valley")) {
-//            holder.tv(R.id.base_no_more_tip_view).setTextSize(12f);
-//            holder.tv(R.id.base_no_more_tip_view).setText("到底啦");
-        }
-
-        //加载失败, 点击重试
-        holder.click(R.id.base_error_layout, new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setLoadMoreEnd();
-            }
-        });
+    protected void onBindLoadMoreView(@NonNull RBaseViewHolder holder, int loadState, int position) {
+        BaseUI.uiAdapterLoadMore.onBindLoadMoreView(this, holder, loadState, position);
     }
 
     private void updateLoadMoreView() {

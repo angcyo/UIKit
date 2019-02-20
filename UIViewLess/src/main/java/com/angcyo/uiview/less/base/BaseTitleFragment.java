@@ -14,12 +14,9 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 import com.angcyo.uiview.less.R;
 import com.angcyo.uiview.less.base.helper.FragmentHelper;
-import com.angcyo.uiview.less.base.helper.TitleItemHelper;
 import com.angcyo.uiview.less.base.helper.ViewGroupHelper;
 import com.angcyo.uiview.less.iview.AffectUI;
 import com.angcyo.uiview.less.recycler.RBaseViewHolder;
-import com.angcyo.uiview.less.skin.SkinHelper;
-import com.angcyo.uiview.less.widget.ImageTextView;
 import com.angcyo.uiview.less.widget.group.FragmentContentWrapperLayout;
 import com.angcyo.uiview.less.widget.group.TitleBarLayout;
 
@@ -67,7 +64,7 @@ public abstract class BaseTitleFragment extends BaseFragment implements AffectUI
         return R.layout.base_title_fragment_layout;
     }
 
-    protected int getTitleBarLayout() {
+    protected int getTitleBarLayoutId() {
         return R.layout.base_fragment_title_layout;
     }
 
@@ -94,12 +91,10 @@ public abstract class BaseTitleFragment extends BaseFragment implements AffectUI
      * 初始化标题部分
      */
     protected void initBaseTitleLayout(@Nullable Bundle arguments) {
-        LayoutInflater.from(mAttachContext).inflate(getTitleBarLayout(), titleBarLayout);
+        LayoutInflater.from(mAttachContext).inflate(getTitleBarLayoutId(), titleBarLayout);
 
         //设置标题背景颜色
-        if (titleBarLayout != null) {
-            titleBarLayout.setBackgroundColor(SkinHelper.getSkin().getThemeColor());
-        }
+        BaseUI.uiFragment.initBaseTitleLayout(this, arguments);
 
         //设置标题
         setTitleString(getFragmentTitle());
@@ -228,15 +223,7 @@ public abstract class BaseTitleFragment extends BaseFragment implements AffectUI
      * 创建返回按钮
      */
     protected View createBackItem() {
-        ImageTextView backItem = TitleItemHelper.createItem(mAttachContext, R.drawable.base_back,
-                new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        onTitleBackClick(v);
-                    }
-                });
-        backItem.setId(R.id.base_title_back_view);
-        return backItem;
+        return BaseUI.uiFragment.createBackItem(this);
     }
 
     public void onTitleBackClick() {
