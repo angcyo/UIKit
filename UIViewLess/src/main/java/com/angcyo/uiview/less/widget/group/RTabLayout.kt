@@ -86,13 +86,13 @@ class RTabLayout(context: Context, attributeSet: AttributeSet? = null) : ViewGro
         itemEquWidth = typedArray.getBoolean(R.styleable.RTabLayout_r_item_equ_width, itemEquWidth)
         firstNotifyListener = typedArray.getBoolean(R.styleable.RTabLayout_r_first_notify_listener, firstNotifyListener)
         autoSetItemSelectorStatus =
-            typedArray.getBoolean(R.styleable.RTabLayout_r_auto_set_item_selector_status, autoSetItemSelectorStatus)
+                typedArray.getBoolean(R.styleable.RTabLayout_r_auto_set_item_selector_status, autoSetItemSelectorStatus)
         currentItem = typedArray.getInt(R.styleable.RTabLayout_r_current_item, currentItem)
         borderShowType = typedArray.getInt(R.styleable.RTabLayout_r_border_show_type, borderShowType)
         itemWidth = typedArray.getDimensionPixelOffset(R.styleable.RTabLayout_r_item_width, itemWidth)
 
         autoSetItemBackground =
-            typedArray.getBoolean(R.styleable.RTabLayout_r_auto_set_item_background, autoSetItemBackground)
+                typedArray.getBoolean(R.styleable.RTabLayout_r_auto_set_item_background, autoSetItemBackground)
 
         itemSelectedBackgroundColor = if (isInEditMode) {
             Color.RED
@@ -100,9 +100,12 @@ class RTabLayout(context: Context, attributeSet: AttributeSet? = null) : ViewGro
             SkinHelper.getSkin().themeSubColor
         }
         itemSelectedBackgroundColor =
-            typedArray.getColor(R.styleable.RTabLayout_r_item_selected_background_color, itemSelectedBackgroundColor)
+                typedArray.getColor(
+                    R.styleable.RTabLayout_r_item_selected_background_color,
+                    itemSelectedBackgroundColor
+                )
         itemNormalBackgroundColor =
-            typedArray.getColor(R.styleable.RTabLayout_r_item_normal_background_color, itemNormalBackgroundColor)
+                typedArray.getColor(R.styleable.RTabLayout_r_item_normal_background_color, itemNormalBackgroundColor)
 
         typedArray.recycle()
 
@@ -273,6 +276,9 @@ class RTabLayout(context: Context, attributeSet: AttributeSet? = null) : ViewGro
 
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
+                if (!isViewPagerDragging) {
+                    isClickScrollPager = false
+                }
                 setCurrentItem(position, false)
             }
         })
@@ -426,7 +432,9 @@ class RTabLayout(context: Context, attributeSet: AttributeSet? = null) : ViewGro
 
     override fun draw(canvas: Canvas) {
         super.draw(canvas)
-        if (tabIndicator.indicatorType == RTabIndicator.INDICATOR_TYPE_BOTTOM_LINE) {
+        if (tabIndicator.indicatorType != RTabIndicator.INDICATOR_TYPE_ROUND_RECT_BLOCK &&
+            tabIndicator.indicatorType != RTabIndicator.INDICATOR_TYPE_NONE
+        ) {
             tabIndicator.onDraw(canvas)
         }
 
@@ -712,7 +720,7 @@ class RTabLayout(context: Context, attributeSet: AttributeSet? = null) : ViewGro
 
             currentDrawTextView?.drawText?.let {
                 it.drawTextSize =
-                    (minTextSize + (maxTextSize - minTextSize) * (1 - positionOffset)).toInt()
+                        (minTextSize + (maxTextSize - minTextSize) * (1 - positionOffset)).toInt()
 
                 selectorTextView(positionOffset < 0.5f, it)
             }
@@ -720,7 +728,7 @@ class RTabLayout(context: Context, attributeSet: AttributeSet? = null) : ViewGro
             if ((currentPosition - nextPosition).abs() == 1) {
                 nextDrawTextView?.drawText?.let {
                     it.drawTextSize =
-                        (minTextSize + (maxTextSize - minTextSize) * (positionOffset)).toInt()
+                            (minTextSize + (maxTextSize - minTextSize) * (positionOffset)).toInt()
 
                     selectorTextView(positionOffset > 0.5f, it)
                 }

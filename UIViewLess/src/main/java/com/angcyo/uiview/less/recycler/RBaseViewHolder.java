@@ -23,6 +23,7 @@ import com.angcyo.uiview.less.RApplication;
 import com.angcyo.uiview.less.utils.ScreenUtil;
 import com.angcyo.uiview.less.widget.*;
 import com.angcyo.uiview.less.widget.group.ItemInfoLayout;
+import com.angcyo.uiview.less.widget.group.RTabLayout;
 import com.angcyo.uiview.less.widget.pager.RViewPager;
 import com.angcyo.uiview.view.RClickListener;
 import com.bumptech.glide.Glide;
@@ -253,6 +254,10 @@ public class RBaseViewHolder extends RecyclerView.ViewHolder {
     }
 
     public RViewPager rpager(@IdRes int resId) {
+        return v(resId);
+    }
+
+    public RTabLayout tab(@IdRes int resId) {
         return v(resId);
     }
 

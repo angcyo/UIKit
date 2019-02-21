@@ -4,6 +4,7 @@
         <enum name="TYPE_NONE" value="0"/>
         <enum name="TYPE_BOTTOM_LINE" value="1"/>
         <enum name="TYPE_ROUND_RECT_BLOCK" value="2"/>
+        <enum name="TYPE_BOTTOM_FLOW_LINE" value="3"/>
     </attr>
 
     <!--自定义Drawable, 同样受到r_indicator_type的影响, 决定了bounds-->

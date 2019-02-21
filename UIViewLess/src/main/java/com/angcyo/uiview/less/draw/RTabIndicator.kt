@@ -4,13 +4,13 @@ import android.animation.Animator
 import android.animation.ObjectAnimator
 import android.graphics.Canvas
 import android.graphics.RectF
-import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.OvershootInterpolator
 import com.angcyo.uiview.less.R
+import com.angcyo.uiview.less.kotlin.abs
 import com.angcyo.uiview.less.resources.RAnimListener
 
 /**
@@ -32,6 +32,8 @@ class RTabIndicator(view: View, attributeSet: AttributeSet? = null) : BaseDraw(v
         const val INDICATOR_TYPE_BOTTOM_LINE = 1
         //圆角矩形块状, 会在childView的后面绘制
         const val INDICATOR_TYPE_ROUND_RECT_BLOCK = 2
+        //其他等同 INDICATOR_TYPE_BOTTOM_LINE, 但是在滑动过程中,会放大到目标位置,再缩小的本身大神
+        const val INDICATOR_TYPE_BOTTOM_FLOW_LINE = 3
     }
 
     var indicatorDrawable: Drawable? = null
@@ -121,6 +123,9 @@ class RTabIndicator(view: View, attributeSet: AttributeSet? = null) : BaseDraw(v
     private var animStartWidth = -1
     private var animEndWidth = -1
 
+    //之前的索引
+    private var oldIndex = 0
+
     /**当前指示那个位置*/
     var curIndex = 0
         set(value) {
@@ -132,12 +137,9 @@ class RTabIndicator(view: View, attributeSet: AttributeSet? = null) : BaseDraw(v
                 field = value
                 scrollTabLayoutToCenter()
             } else if (pagerPositionOffset == 0f) {
+                oldIndex = field
 
-                animStartCenterX = getChildCenter(field)
-                animEndCenterX = getChildCenter(value)
-
-                animStartWidth = getIndicatorWidth(field)
-                animEndWidth = getIndicatorWidth(value)
+                resetAnimValue(field, value)
 
                 field = value
 
@@ -155,6 +157,10 @@ class RTabIndicator(view: View, attributeSet: AttributeSet? = null) : BaseDraw(v
             }
         }
 
+    /**INDICATOR_TYPE_BOTTOM_FLOW_LINE 下, 指示器左右的坐标*/
+    private var typeFlowIndicatorLeft = 0
+    private var typeFlowIndicatorRight = 0
+
     /**ViewPager滚动相关*/
     var pagerPositionOffset = 0f
         set(value) {
@@ -167,25 +173,20 @@ class RTabIndicator(view: View, attributeSet: AttributeSet? = null) : BaseDraw(v
             if (field > 0f) {
                 if (curIndex == pagerPosition) {
                     //view pager 往下一页滚
-                    animStartCenterX = getChildCenter(curIndex)
-                    animEndCenterX = getChildCenter(curIndex + 1)
-
-                    animStartWidth = getIndicatorWidth(curIndex)
-                    animEndWidth = getIndicatorWidth(curIndex + 1)
+                    resetAnimValue(curIndex, curIndex + 1)
 
                     animatorValueInterpolator = value
                     animatorValue = value
 
+                    resetNextFlowValue()
                 } else {
                     //往上一页滚
-                    animStartCenterX = getChildCenter(curIndex)
-                    animEndCenterX = getChildCenter(pagerPosition)
-
-                    animStartWidth = getIndicatorWidth(curIndex)
-                    animEndWidth = getIndicatorWidth(pagerPosition)
+                    resetAnimValue(curIndex, pagerPosition)
 
                     animatorValueInterpolator = 1f - value
                     animatorValue = 1f - value
+
+                    resetPrevFlowValue()
                 }
                 postInvalidate()
             }
@@ -194,6 +195,70 @@ class RTabIndicator(view: View, attributeSet: AttributeSet? = null) : BaseDraw(v
 
     private val indicatorDrawRect: RectF by lazy {
         RectF()
+    }
+
+    //准备滚动到下一页需要的数据
+    private fun resetAnimValue(startIndex: Int, endIndex: Int) {
+        animStartCenterX = getChildCenter(startIndex)
+        animEndCenterX = getChildCenter(endIndex)
+
+        animStartWidth = getIndicatorWidth(startIndex)
+        animEndWidth = getIndicatorWidth(endIndex)
+    }
+
+    private fun resetFlowValue() {
+        //指示器有效的宽度
+        val validWidth = animStartWidth + indicatorWidthOffset
+        typeFlowIndicatorLeft = animStartCenterX - validWidth / 2
+        typeFlowIndicatorRight = animStartCenterX + validWidth / 2
+    }
+
+    private fun resetNormalFlowValue() {
+        val validWidth = animStartWidth + indicatorWidthOffset
+
+        //child横向中心x坐标
+        val childCenter: Int = if (isAnimStart()) {
+            (animStartCenterX + (animEndCenterX - animStartCenterX) * animatorValueInterpolator).toInt()
+        } else {
+            getChildCenter(curIndex)
+        }
+
+        //L.e("RTabIndicator: draw ->$viewWidth $childCenter $indicatorDrawWidth $curIndex $animatorValueInterpolator")
+
+        typeFlowIndicatorLeft = childCenter - validWidth / 2
+        typeFlowIndicatorRight = childCenter + validWidth / 2
+    }
+
+    private fun resetNextFlowValue() {
+        //flow允许移动的最大距离
+        val maxDistance = (animEndCenterX - animStartCenterX).abs()
+
+        resetFlowValue()
+
+        if (animatorValueInterpolator <= 0.5f) {
+            //变长
+            typeFlowIndicatorRight += (maxDistance * animatorValueInterpolator / 0.5f).toInt()
+        } else if (animatorValueInterpolator <= 1f) {
+            //变短
+            typeFlowIndicatorRight += maxDistance
+            typeFlowIndicatorLeft += (maxDistance * (animatorValueInterpolator - 0.5f) / 0.5f).toInt()
+        }
+    }
+
+    private fun resetPrevFlowValue() {
+        //flow允许移动的最大距离
+        val maxDistance = (animEndCenterX - animStartCenterX).abs()
+
+        resetFlowValue()
+
+        if (animatorValueInterpolator <= 0.5f) {
+            //变长
+            typeFlowIndicatorLeft -= (maxDistance * animatorValueInterpolator / 0.5f).toInt()
+        } else if (animatorValueInterpolator <= 1f) {
+            //变短
+            typeFlowIndicatorLeft -= maxDistance
+            typeFlowIndicatorRight -= (maxDistance * (animatorValueInterpolator - 0.5f) / 0.5f).toInt()
+        }
     }
 
     private fun getChildCenter(index: Int): Int {
@@ -261,16 +326,28 @@ class RTabIndicator(view: View, attributeSet: AttributeSet? = null) : BaseDraw(v
 
             //L.e("RTabIndicator: draw ->$viewWidth $childCenter $indicatorDrawWidth $curIndex $animatorValueInterpolator")
 
-            val left = (childCenter - indicatorDrawWidth / 2).toFloat()
-            val right = (childCenter + indicatorDrawWidth / 2).toFloat()
+            val left = if (isAnimStart() && indicatorType == INDICATOR_TYPE_BOTTOM_FLOW_LINE) {
+                typeFlowIndicatorLeft.toFloat()
+            } else {
+                (childCenter - indicatorDrawWidth / 2).toFloat()
+            }
+
+            val right = if (isAnimStart() && indicatorType == INDICATOR_TYPE_BOTTOM_FLOW_LINE) {
+                typeFlowIndicatorRight.toFloat()
+            } else {
+                (childCenter + indicatorDrawWidth / 2).toFloat()
+            }
+
             val top = when (indicatorType) {
                 INDICATOR_TYPE_BOTTOM_LINE -> (viewHeight - indicatorOffsetY - indicatorHeight).toFloat()
                 INDICATOR_TYPE_ROUND_RECT_BLOCK -> (childView.top - indicatorHeightOffset / 2).toFloat()
+                INDICATOR_TYPE_BOTTOM_FLOW_LINE -> (viewHeight - indicatorOffsetY - indicatorHeight).toFloat()
                 else -> 0f
             }
             val bottom = when (indicatorType) {
                 INDICATOR_TYPE_BOTTOM_LINE -> (viewHeight - indicatorOffsetY).toFloat()
                 INDICATOR_TYPE_ROUND_RECT_BLOCK -> (childView.bottom + indicatorHeightOffset / 2).toFloat()
+                INDICATOR_TYPE_BOTTOM_FLOW_LINE -> (viewHeight - indicatorOffsetY).toFloat()
                 else -> 0f
             }
             indicatorDrawRect.set(left, top, right, bottom)
@@ -289,6 +366,15 @@ class RTabIndicator(view: View, attributeSet: AttributeSet? = null) : BaseDraw(v
                         )
                     }
                     INDICATOR_TYPE_ROUND_RECT_BLOCK -> {
+                        mBasePaint.color = indicatorColor
+                        canvas.drawRoundRect(
+                            indicatorDrawRect,
+                            indicatorRoundSize.toFloat(),
+                            indicatorRoundSize.toFloat(),
+                            mBasePaint
+                        )
+                    }
+                    INDICATOR_TYPE_BOTTOM_FLOW_LINE -> {
                         mBasePaint.color = indicatorColor
                         canvas.drawRoundRect(
                             indicatorDrawRect,
@@ -360,6 +446,14 @@ class RTabIndicator(view: View, attributeSet: AttributeSet? = null) : BaseDraw(v
                 } else {
                     animatorValueInterpolator = animatorValue
                 }
+//                if (oldIndex + 1 == curIndex) {
+//                    resetNextFlowValue()
+//                } else if (curIndex + 1 == oldIndex) {
+//                    resetPrevFlowValue()
+//                } else {
+//                    resetNormalFlowValue()
+//                }
+                resetNormalFlowValue()
                 //L.e("call: $animatorValue -> ")
                 postInvalidateOnAnimation()
             }
