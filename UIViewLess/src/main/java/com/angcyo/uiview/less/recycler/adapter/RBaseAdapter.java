@@ -338,7 +338,7 @@ public abstract class RBaseAdapter<T> extends RecyclerView.Adapter<RBaseViewHold
     }
 
     /**
-     * @see #onBindLoadMoreView(RBaseViewHolder, int)
+     * @see #onBindLoadMoreView(RBaseViewHolder, int, int)
      * R.layout.base_item_load_more_layout
      */
     @Deprecated
@@ -476,6 +476,14 @@ public abstract class RBaseAdapter<T> extends RecyclerView.Adapter<RBaseViewHold
      * 根据position返回Item的类型.
      */
     public int getItemType(int position) {
+        T data = null;
+        if (mAllDatas != null) {
+            data = mAllDatas.size() > position ? mAllDatas.get(position) : null;
+        }
+        return getItemType(position, data);
+    }
+
+    public int getItemType(int position, T data) {
         return 0;
     }
 
