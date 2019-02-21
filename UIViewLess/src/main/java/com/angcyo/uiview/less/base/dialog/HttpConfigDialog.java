@@ -24,6 +24,8 @@ import java.util.Map;
  * @date 2018/12/13
  */
 public class HttpConfigDialog {
+    public static String MAPPING_URL = "https://www.angcyo.com/api/php/android/c/url_mapping";
+
     public static void show(@NonNull Context context, final String baseUrl, @Nullable final OnHttpConfig onHttpConfig) {
         RDialog.build(context)
                 .setCanceledOnTouchOutside(false)
@@ -45,7 +47,7 @@ public class HttpConfigDialog {
                         dialogViewHolder.click(R.id.get_list, new View.OnClickListener() {
                             @Override
                             public void onClick(final View v) {
-                                Http.request("https://www.angcyo.com/api/php/android/c/url_mapping", new Http.OnHttpRequestCallback() {
+                                Http.request(MAPPING_URL, new Http.OnHttpRequestCallback() {
                                     @Override
                                     public void onRequestCallback(@NonNull final String body) {
                                         L.json(body);
@@ -79,6 +81,6 @@ public class HttpConfigDialog {
     }
 
     public interface OnHttpConfig {
-        void onSaveBaseUrl(@NonNull String baseUrl);
+        void onSaveBaseUrl(@NonNull String newBaseUrl);
     }
 }

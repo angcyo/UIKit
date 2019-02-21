@@ -48,6 +48,10 @@ public class FragmentSwipeBackLayout extends SwipeBackLayout {
 
     private static final String TAG = "FragmentSwipeBackLayout";
     /**
+     * 调试布局 触发手上按下数量
+     */
+    public static int DEBUG_LAYOUT_POINTER = 6;
+    /**
      * 多指是否显示debug layout
      */
     public static boolean showDebugLayout = true;
@@ -530,7 +534,7 @@ public class FragmentSwipeBackLayout extends SwipeBackLayout {
         if (L.LOG_DEBUG &&
                 showDebugLayout &&
                 actionMasked == MotionEvent.ACTION_POINTER_DOWN &&
-                ev.getPointerCount() == 6) {
+                ev.getPointerCount() == DEBUG_LAYOUT_POINTER) {
 
             if (ev.getEventTime() - firstDownTime < 500) {
                 //快速三指按下才受理操作
