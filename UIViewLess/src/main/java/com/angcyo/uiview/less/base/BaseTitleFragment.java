@@ -136,14 +136,11 @@ public abstract class BaseTitleFragment extends BaseFragment implements AffectUI
     /**
      * 创建情感图控制类
      */
+    /**
+     * 创建情感图控制类
+     */
     protected AffectUI createAffectUI() {
-        return AffectUI.build(contentWrapperLayout)
-                .register(AffectUI.AFFECT_LOADING, R.layout.base_affect_loading)
-                .register(AffectUI.AFFECT_ERROR, R.layout.base_affect_error)
-                .register(AffectUI.AFFECT_OTHER, R.layout.base_affect_other)
-                .setContentAffect(AffectUI.CONTENT_AFFECT_INVISIBLE)
-                .setAffectChangeListener(this)
-                .create();
+        return BaseUI.uiFragment.createAffectUI(this);
     }
 
     /**
