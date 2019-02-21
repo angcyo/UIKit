@@ -10,6 +10,7 @@ import com.angcyo.uiview.less.iview.AffectUI;
 import com.angcyo.uiview.less.recycler.RBaseViewHolder;
 import com.angcyo.uiview.less.recycler.RRecyclerView;
 import com.angcyo.uiview.less.recycler.adapter.RBaseAdapter;
+import com.angcyo.uiview.less.recycler.widget.IShowState;
 import com.angcyo.uiview.less.smart.MaterialHeader;
 import com.angcyo.uiview.less.widget.RSmartRefreshLayout;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
@@ -181,6 +182,7 @@ public abstract class BaseRecyclerFragment<T> extends BaseTitleFragment
     public void switchToContent() {
         switchAffectUI(AffectUI.AFFECT_CONTENT);
     }
+
     //<editor-fold desc="事件回调">
 
     /**
@@ -284,9 +286,10 @@ public abstract class BaseRecyclerFragment<T> extends BaseTitleFragment
      * 分出来的刷新回调
      */
     public void onBaseRefresh(@Nullable RefreshLayout refreshLayout) {
-        if (refreshLayout != null) {
-            refreshLayout.finishRefresh(2_000);
-        }
+        currentPageIndex = FIRST_PAGE_INDEX;
+        requestPageIndex = FIRST_PAGE_INDEX;
+
+        onBaseLoadData();
     }
 
     /**
@@ -294,21 +297,66 @@ public abstract class BaseRecyclerFragment<T> extends BaseTitleFragment
      */
     public void onBaseLoadMore(@Nullable RefreshLayout refreshLayout,
                                @Nullable final RBaseAdapter<T> adapter) {
+        requestPageIndex = currentPageIndex + 1;
 
-        if (refreshLayout != null) {
-            refreshLayout.finishLoadMore(2_000);
-        }
-
-        if (adapter != null) {
-            baseViewHolder.postDelay(2_000, new Runnable() {
-                @Override
-                public void run() {
-                    adapter.setNoMore(true);
-                }
-            });
-        }
+        onBaseLoadData();
     }
 
     //</editor-fold>
+
+    //<editor-fold desc="分页加载相关">
+
+    public static int FIRST_PAGE_INDEX = 1;
+
+    /**
+     * 当前请求完成的页
+     */
+    protected int currentPageIndex = FIRST_PAGE_INDEX;
+    /**
+     * 正在请求的页
+     */
+    protected int requestPageIndex = FIRST_PAGE_INDEX;
+
+
+    /**
+     * 重写此方法, 加载数据
+     */
+    public void onBaseLoadData() {
+        if (requestPageIndex <= 1) {
+            if (smartRefreshLayout != null) {
+                smartRefreshLayout.finishRefresh(2_000);
+            }
+        } else {
+            if (smartRefreshLayout != null) {
+                smartRefreshLayout.finishLoadMore(2_000);
+            }
+
+            if (baseAdapter != null) {
+                baseViewHolder.postDelay(2_000, new Runnable() {
+                    @Override
+                    public void run() {
+                        baseAdapter.setNoMore(true);
+                    }
+                });
+            }
+        }
+    }
+
+    /**
+     * 调用此方法, 设置数据
+     */
+    public void onBaseLoadEnd(List<T> datas, int pageSize) {
+        currentPageIndex = requestPageIndex;
+        if (affectUI != null) {
+            affectUI.showAffect(AffectUI.AFFECT_CONTENT);
+        }
+        resetRefreshStatus();
+        if (baseAdapter != null) {
+            baseAdapter.setShowState(IShowState.NORMAL);
+            baseAdapter.loadMoreEnd(datas, requestPageIndex, pageSize);
+        }
+    }
+    //</editor-fold desc="分页加载相关">
+
 
 }

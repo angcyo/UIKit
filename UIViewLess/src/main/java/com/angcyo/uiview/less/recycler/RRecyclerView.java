@@ -11,12 +11,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.ScrollerCompat;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SimpleItemAnimator;
-import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.support.v7.widget.*;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
@@ -24,7 +19,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.OverScroller;
-
 import com.angcyo.lib.L;
 import com.angcyo.uiview.less.R;
 import com.angcyo.uiview.less.RApplication;
@@ -299,8 +293,22 @@ public class RRecyclerView extends RecyclerView implements CanScrollUpCallBack {
                 }
             }
         }
-
-        if (mBaseLayoutManager instanceof LinearLayoutManager) {
+        if (mBaseLayoutManager instanceof GridLayoutManager) {
+            final GridLayoutManager gridLayoutManager = (GridLayoutManager) mBaseLayoutManager;
+            gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+                @Override
+                public int getSpanSize(int position) {
+                    Adapter baseAdapter = getAdapter();
+                    if (baseAdapter != null &&
+                            (baseAdapter.getItemViewType(position) & RBaseAdapter.ITEM_SINGLE_LINE)
+                                    == RBaseAdapter.ITEM_SINGLE_LINE) {
+                        //占满正行
+                        return gridLayoutManager.getSpanCount();
+                    }
+                    return 1;
+                }
+            });
+        } else if (mBaseLayoutManager instanceof LinearLayoutManager) {
             ((LinearLayoutManager) mBaseLayoutManager).setRecycleChildrenOnDetach(true);
         }
         this.setLayoutManager(mBaseLayoutManager);

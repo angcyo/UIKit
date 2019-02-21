@@ -910,6 +910,7 @@ public abstract class RBaseAdapter<T> extends RecyclerView.Adapter<RBaseViewHold
     /**
      * 自动处理分页加载, 和加载更多的数据
      */
+    @Deprecated
     public void onUILoadData(int page /*分页*/, int pageSize /*每一页数量*/, List<T> datas /*数据*/) {
         boolean isDataListEmpty = RUtils.isListEmpty(datas);
         if (isDataListEmpty) {
@@ -952,6 +953,7 @@ public abstract class RBaseAdapter<T> extends RecyclerView.Adapter<RBaseViewHold
         }
     }
 
+    @Deprecated
     public void onUILoadDataSet(int page /*分页*/, int pageSize /*每一页数量*/, int datasSize /*数据数量*/) {
         if (page <= 1) {
             if (datasSize < pageSize) {
@@ -1006,7 +1008,12 @@ public abstract class RBaseAdapter<T> extends RecyclerView.Adapter<RBaseViewHold
                 onFirstPageSetData(datas);
             } else {
                 onFirstPageSetData(datas);
-                setEnableLoadMore(true);
+                if (isEnableLoadMore()) {
+                    mLoadState = ILoadMore.NORMAL;
+                    setLoadMoreEnd();
+                } else {
+                    setEnableLoadMore(true);
+                }
             }
         } else {
             //其他页
