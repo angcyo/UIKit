@@ -134,7 +134,11 @@ public class Http {
                             public T call(ResponseBody stringResponse) {
                                 String body = null;
                                 try {
-                                    body = stringResponse.string();
+                                    if (stringResponse == null) {
+                                        body = "";
+                                    } else {
+                                        body = stringResponse.string();
+                                    }
 
                                     //"接口返回数据-->\n" +
                                     logJson(TAG, body);
@@ -174,7 +178,11 @@ public class Http {
                                 T bean;
                                 String body = null;
                                 try {
-                                    body = stringResponse.string();
+                                    if (stringResponse == null) {
+                                        body = "";
+                                    } else {
+                                        body = stringResponse.string();
+                                    }
 
                                     //"接口返回数据-->\n" +
                                     logJson(TAG, body);
@@ -222,7 +230,11 @@ public class Http {
                                 List<T> list;
                                 String body = null;
                                 try {
-                                    body = stringResponse.string();
+                                    if (stringResponse == null) {
+                                        body = "";
+                                    } else {
+                                        body = stringResponse.string();
+                                    }
 
                                     //"接口返回数据-->\n" +
                                     logJson(TAG, body);
