@@ -83,6 +83,12 @@ public abstract class RBaseAdapter<T> extends RecyclerView.Adapter<RBaseViewHold
 
     protected Handler handler;
 
+    /**
+     * 界面定制处理接口
+     */
+    public BaseUI.UIAdapterLoadMore uiAdapterLoadMore;
+    public BaseUI.UIAdapterShowStatus uiAdapterShowStatus;
+
     public RBaseAdapter() {
         this(null);
     }
@@ -294,6 +300,9 @@ public abstract class RBaseAdapter<T> extends RecyclerView.Adapter<RBaseViewHold
      * View 需要实现 IShowState 接口
      */
     protected View createShowState(Context context, ViewGroup parent) {
+        if (uiAdapterShowStatus != null) {
+            return uiAdapterShowStatus.createShowState(this, context, parent);
+        }
         return BaseUI.uiAdapterShowStatus.createShowState(this, context, parent);
     }
 
@@ -302,6 +311,9 @@ public abstract class RBaseAdapter<T> extends RecyclerView.Adapter<RBaseViewHold
      * View 需要实现 ILoadMore 接口
      */
     protected View createLoadMore(Context context, ViewGroup parent) {
+        if (uiAdapterLoadMore != null) {
+            return uiAdapterLoadMore.createLoadMore(this, context, parent);
+        }
         return BaseUI.uiAdapterLoadMore.createLoadMore(this, context, parent);
     }
 
@@ -318,7 +330,11 @@ public abstract class RBaseAdapter<T> extends RecyclerView.Adapter<RBaseViewHold
      * R.layout.base_item_show_state_layout
      */
     protected void onBindShowStateView(@NonNull RBaseViewHolder holder, int showState, int position) {
-        BaseUI.uiAdapterShowStatus.onBindShowStateView(this, holder, showState, position);
+        if (uiAdapterShowStatus != null) {
+            uiAdapterShowStatus.onBindShowStateView(this, holder, showState, position);
+        } else {
+            BaseUI.uiAdapterShowStatus.onBindShowStateView(this, holder, showState, position);
+        }
     }
 
     /**
@@ -354,7 +370,11 @@ public abstract class RBaseAdapter<T> extends RecyclerView.Adapter<RBaseViewHold
      * 重写此方法, 可以修改加载更多视图
      */
     protected void onBindLoadMoreView(@NonNull RBaseViewHolder holder, int loadState, int position) {
-        BaseUI.uiAdapterLoadMore.onBindLoadMoreView(this, holder, loadState, position);
+        if (uiAdapterLoadMore != null) {
+            uiAdapterLoadMore.onBindLoadMoreView(this, holder, loadState, position);
+        } else {
+            BaseUI.uiAdapterLoadMore.onBindLoadMoreView(this, holder, loadState, position);
+        }
     }
 
     private void updateLoadMoreView() {

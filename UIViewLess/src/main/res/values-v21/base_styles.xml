@@ -4,7 +4,8 @@
     <style name="BaseWhiteAppTheme" parent="BaseAppTheme">
         <!-- Customize your theme here. -->
         <item name="android:windowTranslucentStatus">false</item>
-        <item name="android:windowBackground">@android:color/white</item>
+        <item name="android:statusBarColor">@color/base_white</item>
+        <item name="android:windowBackground">@color/base_white</item>
     </style>
 
     <style name="BasePrimaryAppTheme" parent="BaseWhiteAppTheme">
