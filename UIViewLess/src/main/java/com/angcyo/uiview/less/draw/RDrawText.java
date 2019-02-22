@@ -32,11 +32,11 @@ public class RDrawText extends BaseDraw {
     /**
      * 文本大小, 用来控制测量
      */
-    protected int textSize;
+    protected float textSize;
     /**
      * 文本大小 , 用来控制绘制
      */
-    protected int drawTextSize;
+    protected float drawTextSize;
 
     protected int textGravity = GRAVITY_TOP | GRAVITY_LEFT;
 
@@ -70,7 +70,7 @@ public class RDrawText extends BaseDraw {
         textSize = array.getDimensionPixelOffset(R.styleable.RDrawText_r_draw_text_size, getResources().getDimensionPixelOffset(R.dimen.base_xhdpi_15));
         textOffsetX = array.getDimensionPixelOffset(R.styleable.RDrawText_r_draw_text_offset_x, textOffsetX);
         textOffsetY = array.getDimensionPixelOffset(R.styleable.RDrawText_r_draw_text_offset_y, textOffsetY);
-        drawTextSize = array.getDimensionPixelOffset(R.styleable.RDrawText_r_draw_text_draw_size, textSize);
+        drawTextSize = array.getDimensionPixelOffset(R.styleable.RDrawText_r_draw_text_draw_size, ((int) textSize));
         textGravity = array.getInt(R.styleable.RDrawText_r_draw_text_gravity, textGravity);
 
         if (textColor == null) {
@@ -100,7 +100,7 @@ public class RDrawText extends BaseDraw {
         return (int) mBasePaint.measureText(drawText);
     }
 
-    public int getTextSize() {
+    public float getTextSize() {
         return textSize;
     }
 
@@ -143,18 +143,18 @@ public class RDrawText extends BaseDraw {
         }
     }
 
-    public void setTextSize(int textSize) {
+    public void setTextSize(float textSize) {
         this.textSize = textSize;
         this.drawTextSize = textSize;
         requestLayout();
     }
 
-    public void setDrawTextSize(int drawTextSize) {
+    public void setDrawTextSize(float drawTextSize) {
         this.drawTextSize = drawTextSize;
         postInvalidate();
     }
 
-    public int getDrawTextSize() {
+    public float getDrawTextSize() {
         return drawTextSize;
     }
 

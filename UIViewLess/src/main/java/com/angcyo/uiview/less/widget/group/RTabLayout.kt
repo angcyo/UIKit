@@ -10,6 +10,7 @@ import android.util.AttributeSet
 import android.view.*
 import android.widget.FrameLayout
 import android.widget.OverScroller
+import com.angcyo.lib.L
 import com.angcyo.uiview.less.R
 import com.angcyo.uiview.less.draw.RDrawBorder
 import com.angcyo.uiview.less.draw.RDrawText
@@ -86,13 +87,13 @@ class RTabLayout(context: Context, attributeSet: AttributeSet? = null) : ViewGro
         itemEquWidth = typedArray.getBoolean(R.styleable.RTabLayout_r_item_equ_width, itemEquWidth)
         firstNotifyListener = typedArray.getBoolean(R.styleable.RTabLayout_r_first_notify_listener, firstNotifyListener)
         autoSetItemSelectorStatus =
-                typedArray.getBoolean(R.styleable.RTabLayout_r_auto_set_item_selector_status, autoSetItemSelectorStatus)
+            typedArray.getBoolean(R.styleable.RTabLayout_r_auto_set_item_selector_status, autoSetItemSelectorStatus)
         currentItem = typedArray.getInt(R.styleable.RTabLayout_r_current_item, currentItem)
         borderShowType = typedArray.getInt(R.styleable.RTabLayout_r_border_show_type, borderShowType)
         itemWidth = typedArray.getDimensionPixelOffset(R.styleable.RTabLayout_r_item_width, itemWidth)
 
         autoSetItemBackground =
-                typedArray.getBoolean(R.styleable.RTabLayout_r_auto_set_item_background, autoSetItemBackground)
+            typedArray.getBoolean(R.styleable.RTabLayout_r_auto_set_item_background, autoSetItemBackground)
 
         itemSelectedBackgroundColor = if (isInEditMode) {
             Color.RED
@@ -100,12 +101,12 @@ class RTabLayout(context: Context, attributeSet: AttributeSet? = null) : ViewGro
             SkinHelper.getSkin().themeSubColor
         }
         itemSelectedBackgroundColor =
-                typedArray.getColor(
-                    R.styleable.RTabLayout_r_item_selected_background_color,
-                    itemSelectedBackgroundColor
-                )
+            typedArray.getColor(
+                R.styleable.RTabLayout_r_item_selected_background_color,
+                itemSelectedBackgroundColor
+            )
         itemNormalBackgroundColor =
-                typedArray.getColor(R.styleable.RTabLayout_r_item_normal_background_color, itemNormalBackgroundColor)
+            typedArray.getColor(R.styleable.RTabLayout_r_item_normal_background_color, itemNormalBackgroundColor)
 
         typedArray.recycle()
 
@@ -278,6 +279,10 @@ class RTabLayout(context: Context, attributeSet: AttributeSet? = null) : ViewGro
                 super.onPageSelected(position)
                 if (!isViewPagerDragging) {
                     isClickScrollPager = false
+                    onTabLayoutListener?.let {
+                        it.onPageScrollStateChanged(ViewPager.SCROLL_STATE_IDLE)
+                        it.onSelectorItemView(this@RTabLayout, getChildAt(position), position)
+                    }
                 }
                 setCurrentItem(position, false)
             }
@@ -702,8 +707,12 @@ class RTabLayout(context: Context, attributeSet: AttributeSet? = null) : ViewGro
 
     /**默认实现*/
     open class DefaultTabLayoutListener(val viewPager: ViewPager? = null) : OnTabLayoutListener() {
-        var maxTextSize: Int = ResUtil.dpToPx(16f).toInt()
-        var minTextSize: Int = ResUtil.dpToPx(12f).toInt()
+        var maxTextSize: Float = getDimen(R.dimen.default_text_size16).toFloat()
+        var minTextSize: Float = getDimen(R.dimen.default_text_size9).toFloat()
+
+        fun getRDrawTextView(view: View?): RDrawTextView? {
+            return if (view is RDrawTextView) view else view?.findViewById(R.id.base_draw_text_view)
+        }
 
         override fun onPageScrolled(
             tabLayout: RTabLayout,
@@ -715,20 +724,22 @@ class RTabLayout(context: Context, attributeSet: AttributeSet? = null) : ViewGro
         ) {
             super.onPageScrolled(tabLayout, currentView, nextView, currentPosition, nextPosition, positionOffset)
 
-            val currentDrawTextView = currentView?.findViewById<RDrawTextView>(R.id.base_draw_text_view)
-            val nextDrawTextView = nextView?.findViewById<RDrawTextView>(R.id.base_draw_text_view)
+            val currentDrawTextView = getRDrawTextView(currentView)
+            val nextDrawTextView = getRDrawTextView(nextView)
 
             currentDrawTextView?.drawText?.let {
-                it.drawTextSize =
-                        (minTextSize + (maxTextSize - minTextSize) * (1 - positionOffset)).toInt()
+                it.drawTextSize = (minTextSize + (maxTextSize - minTextSize) * (1 - positionOffset))
+
+                //L.e("size1:${it.drawTextSize}")
 
                 selectorTextView(positionOffset < 0.5f, it)
             }
 
             if ((currentPosition - nextPosition).abs() == 1) {
                 nextDrawTextView?.drawText?.let {
-                    it.drawTextSize =
-                            (minTextSize + (maxTextSize - minTextSize) * (positionOffset)).toInt()
+                    it.drawTextSize = (minTextSize + (maxTextSize - minTextSize) * (positionOffset))
+
+                    //L.e("size2:${it.drawTextSize}")
 
                     selectorTextView(positionOffset > 0.5f, it)
                 }
@@ -738,7 +749,7 @@ class RTabLayout(context: Context, attributeSet: AttributeSet? = null) : ViewGro
         override fun onSelectorItemView(tabLayout: RTabLayout, itemView: View, index: Int) {
             super.onSelectorItemView(tabLayout, itemView, index)
             if (isScrollEnd()) {
-                val drawTextView = itemView.findViewById<RDrawTextView>(R.id.base_draw_text_view)
+                val drawTextView = getRDrawTextView(itemView)
                 drawTextView?.drawText?.let {
                     it.drawTextSize = maxTextSize
                     selectorTextView(true, it)
@@ -748,7 +759,7 @@ class RTabLayout(context: Context, attributeSet: AttributeSet? = null) : ViewGro
 
         override fun onUnSelectorItemView(tabLayout: RTabLayout, itemView: View, index: Int) {
             super.onUnSelectorItemView(tabLayout, itemView, index)
-            val drawTextView = itemView.findViewById<RDrawTextView>(R.id.base_draw_text_view)
+            val drawTextView = getRDrawTextView(itemView)
             drawTextView?.drawText?.let {
                 it.drawTextSize = minTextSize
                 selectorTextView(false, it)
@@ -761,7 +772,7 @@ class RTabLayout(context: Context, attributeSet: AttributeSet? = null) : ViewGro
 
         override fun onTabSelector(tabLayout: RTabLayout, fromIndex: Int, toIndex: Int) {
             super.onTabSelector(tabLayout, fromIndex, toIndex)
-            viewPager?.setCurrentItem(toIndex, true)
+            viewPager?.setCurrentItem(toIndex, (toIndex - fromIndex).abs() == 1)
         }
 
         override fun onTabReSelector(tabLayout: RTabLayout, itemView: View, index: Int) {

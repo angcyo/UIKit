@@ -40,7 +40,7 @@ public class FadeInOutPageTransformer implements ViewPager.PageTransformer {
         else if (position < 1) {
             page.setAlpha(1 - position);
         } else {
-            page.setAlpha(1);
+            page.setAlpha(0);
         }
     }
 }
