@@ -48,6 +48,8 @@ android {
         multiDexEnabled true
         resConfigs "zh" //, "en"
 
+        buildConfigField "boolean", "SHOW_DEBUG", "false"
+
         manifestPlaceholders = [
                 PACKAGE_NAME: "$application_id"
         ]
@@ -84,7 +86,6 @@ android {
         apk {
             dimension "type"
             minSdkVersion Integer.parseInt(_M_SDK)
-            buildConfigField "boolean", "SHOW_DEBUG", "false"
         }
     }
     buildTypes {
