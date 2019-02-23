@@ -1,5 +1,6 @@
 package com.angcyo.uiview.less.base;
 
+import android.animation.Animator;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -7,6 +8,7 @@ import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
 import android.widget.EditText;
 import com.angcyo.http.HttpSubscriber;
 import com.angcyo.http.NonetException;
@@ -22,6 +24,21 @@ import rx.subscriptions.CompositeSubscription;
  * 生命周期的封装, 只需要关注 {@link #onFragmentShow(Bundle)} 和 {@link #onFragmentHide()}
  */
 public abstract class BaseFragment extends AbsLifeCycleFragment {
+
+
+    /**
+     * onCreateAnimation -> onCreateAnimator
+     */
+
+    @Override
+    public Animation onCreateAnimation(int transit, boolean enter, int nextAnim) {
+        return super.onCreateAnimation(transit, enter, nextAnim);
+    }
+
+    @Override
+    public Animator onCreateAnimator(int transit, boolean enter, int nextAnim) {
+        return super.onCreateAnimator(transit, enter, nextAnim);
+    }
 
     @Nullable
     @Override
