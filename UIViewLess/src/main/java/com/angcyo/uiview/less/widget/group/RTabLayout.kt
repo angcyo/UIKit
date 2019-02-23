@@ -805,12 +805,19 @@ class RTabLayout(context: Context, attributeSet: AttributeSet? = null) : ViewGro
      * */
     open class DefaultColorListener(
         val normalColor: Int, val selectedColor: Int,
+        val useBold: Boolean = false,
         viewPager: ViewPager? = null
-    ) : DefaultViewPagerListener() {
+    ) : DefaultViewPagerListener(viewPager) {
 
         fun setViewColor(view: View?, color: Int) {
             if (view is TextView) {
                 view.setTextColor(color)
+            }
+        }
+
+        fun setViewBold(view: View?, bold: Boolean) {
+            if (useBold) {
+                (view as? TextView)?.setTextBold(bold)
             }
         }
 
@@ -831,11 +838,13 @@ class RTabLayout(context: Context, attributeSet: AttributeSet? = null) : ViewGro
         override fun onSelectorItemView(tabLayout: RTabLayout, itemView: View, index: Int) {
             super.onSelectorItemView(tabLayout, itemView, index)
             setViewColor(itemView, selectedColor)
+            setViewBold(itemView, true)
         }
 
         override fun onUnSelectorItemView(tabLayout: RTabLayout, itemView: View, index: Int) {
             super.onUnSelectorItemView(tabLayout, itemView, index)
             setViewColor(itemView, normalColor)
+            setViewBold(itemView, false)
         }
     }
     //</editor-fold desc="选择事件回调">
