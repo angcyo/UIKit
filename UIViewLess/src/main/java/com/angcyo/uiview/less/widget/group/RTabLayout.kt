@@ -10,12 +10,13 @@ import android.util.AttributeSet
 import android.view.*
 import android.widget.FrameLayout
 import android.widget.OverScroller
-import com.angcyo.lib.L
+import android.widget.TextView
 import com.angcyo.uiview.less.R
 import com.angcyo.uiview.less.draw.RDrawBorder
 import com.angcyo.uiview.less.draw.RDrawText
 import com.angcyo.uiview.less.draw.RTabIndicator
 import com.angcyo.uiview.less.kotlin.*
+import com.angcyo.uiview.less.resources.AnimUtil
 import com.angcyo.uiview.less.resources.RDrawable
 import com.angcyo.uiview.less.resources.ResUtil
 import com.angcyo.uiview.less.skin.SkinHelper
@@ -281,7 +282,9 @@ class RTabLayout(context: Context, attributeSet: AttributeSet? = null) : ViewGro
                     isClickScrollPager = false
                     onTabLayoutListener?.let {
                         it.onPageScrollStateChanged(ViewPager.SCROLL_STATE_IDLE)
-                        it.onSelectorItemView(this@RTabLayout, getChildAt(position), position)
+                        if (childCount > position) {
+                            it.onSelectorItemView(this@RTabLayout, getChildAt(position), position)
+                        }
                     }
                 }
                 setCurrentItem(position, false)
@@ -636,6 +639,8 @@ class RTabLayout(context: Context, attributeSet: AttributeSet? = null) : ViewGro
         constructor(source: MarginLayoutParams?) : super(source)
     }
 
+    //<editor-fold desc="选择事件回调">
+
     /**事件监听*/
     open class OnTabLayoutListener {
 
@@ -705,8 +710,8 @@ class RTabLayout(context: Context, attributeSet: AttributeSet? = null) : ViewGro
         }
     }
 
-    /**默认实现*/
-    open class DefaultTabLayoutListener(val viewPager: ViewPager? = null) : OnTabLayoutListener() {
+    /**改变Tab字体大小的实现*/
+    open class DefaultTabLayoutListener(viewPager: ViewPager? = null) : DefaultViewPagerListener(viewPager) {
         var maxTextSize: Float = getDimen(R.dimen.default_text_size16).toFloat()
         var minTextSize: Float = getDimen(R.dimen.default_text_size9).toFloat()
 
@@ -770,15 +775,6 @@ class RTabLayout(context: Context, attributeSet: AttributeSet? = null) : ViewGro
             return super.canSelectorTab(tabLayout, fromIndex, toIndex)
         }
 
-        override fun onTabSelector(tabLayout: RTabLayout, fromIndex: Int, toIndex: Int) {
-            super.onTabSelector(tabLayout, fromIndex, toIndex)
-            viewPager?.setCurrentItem(toIndex, (toIndex - fromIndex).abs() == 1)
-        }
-
-        override fun onTabReSelector(tabLayout: RTabLayout, itemView: View, index: Int) {
-            super.onTabReSelector(tabLayout, itemView, index)
-        }
-
         protected fun selectorTextView(selector: Boolean, view: RDrawText) {
             if (selector) {
                 view.setBoldText(true)
@@ -791,16 +787,56 @@ class RTabLayout(context: Context, attributeSet: AttributeSet? = null) : ViewGro
     }
 
     /**
-     * 默认实现方式, 用来切换ViewPager
+     * 默认实现方式, 简单的切换ViewPager
      * */
-    open class DefaultViewPagerListener(val viewPager: ViewPager) : OnTabLayoutListener() {
+    open class DefaultViewPagerListener(val viewPager: ViewPager? = null) : OnTabLayoutListener() {
         override fun onTabSelector(tabLayout: RTabLayout, fromIndex: Int, toIndex: Int) {
             super.onTabSelector(tabLayout, fromIndex, toIndex)
-            viewPager.setCurrentItem(toIndex, (toIndex - fromIndex).abs() == 1)
+            viewPager?.setCurrentItem(toIndex, (toIndex - fromIndex).abs() == 1)
         }
 
         override fun onTabReSelector(tabLayout: RTabLayout, itemView: View, index: Int) {
             super.onTabReSelector(tabLayout, itemView, index)
         }
     }
+
+    /**
+     * 改变颜色的选择器
+     * */
+    open class DefaultColorListener(
+        val normalColor: Int, val selectedColor: Int,
+        viewPager: ViewPager? = null
+    ) : DefaultViewPagerListener() {
+
+        fun setViewColor(view: View?, color: Int) {
+            if (view is TextView) {
+                view.setTextColor(color)
+            }
+        }
+
+        override fun onPageScrolled(
+            tabLayout: RTabLayout,
+            currentView: View?,
+            nextView: View?,
+            currentPosition: Int,
+            nextPosition: Int,
+            positionOffset: Float
+        ) {
+            super.onPageScrolled(tabLayout, currentView, nextView, currentPosition, nextPosition, positionOffset)
+
+            setViewColor(currentView, AnimUtil.evaluateColor(1 - positionOffset, normalColor, selectedColor))
+            setViewColor(nextView, AnimUtil.evaluateColor(positionOffset, normalColor, selectedColor))
+        }
+
+        override fun onSelectorItemView(tabLayout: RTabLayout, itemView: View, index: Int) {
+            super.onSelectorItemView(tabLayout, itemView, index)
+            setViewColor(itemView, selectedColor)
+        }
+
+        override fun onUnSelectorItemView(tabLayout: RTabLayout, itemView: View, index: Int) {
+            super.onUnSelectorItemView(tabLayout, itemView, index)
+            setViewColor(itemView, normalColor)
+        }
+    }
+    //</editor-fold desc="选择事件回调">
 }
