@@ -38,6 +38,7 @@ import java.lang.reflect.Method;
  */
 public class RBaseViewHolder extends RecyclerView.ViewHolder {
     public static int DEFAULT_CLICK_DELAY_TIME = RClickListener.Companion.getDEFAULT_DELAY_CLICK_TIME();
+    public static int DEFAULT_INITIAL_CAPACITY = 10;
 
     private SparseArray<WeakReference<View>> sparseArray;
     private int viewType = -1;
@@ -47,10 +48,15 @@ public class RBaseViewHolder extends RecyclerView.ViewHolder {
     }
 
     public RBaseViewHolder(View itemView, int viewType) {
+        this(itemView, viewType, DEFAULT_INITIAL_CAPACITY);
+    }
+
+    public RBaseViewHolder(View itemView, int viewType, int initialCapacity) {
         super(itemView);
-        sparseArray = new SparseArray();
+        sparseArray = new SparseArray(initialCapacity);
         this.viewType = viewType;
     }
+
 
     /**
      * 填充两个字段相同的数据对象
