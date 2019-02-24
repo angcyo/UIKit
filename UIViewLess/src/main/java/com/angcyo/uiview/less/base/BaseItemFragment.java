@@ -46,13 +46,13 @@ public abstract class BaseItemFragment extends BaseRecyclerFragment<SingleItem> 
                             new RExItemDecoration.SingleItemCallback() {
 
                                 @Override
-                                public void getItemOffsets2(Rect outRect, int position, int edge) {
+                                public void getItemOffsets2(@NonNull Rect outRect, int position, int edge) {
                                     SingleItem t = singleItems.get(position);
                                     t.setItemOffsets2(outRect, edge);
                                 }
 
                                 @Override
-                                public void draw(Canvas canvas, TextPaint paint, View itemView, Rect offsetRect, int itemCount, int position) {
+                                public void draw(@NonNull Canvas canvas, TextPaint paint, View itemView, Rect offsetRect, int itemCount, int position) {
                                     SingleItem t = singleItems.get(position);
                                     t.draw(canvas, paint, itemView, offsetRect, itemCount, position);
                                 }

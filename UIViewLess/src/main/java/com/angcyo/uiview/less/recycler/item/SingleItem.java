@@ -28,7 +28,7 @@ public abstract class SingleItem implements Item {
     protected int topOffset = 0;
     protected int lineColor = 0;//-1是白色 0是透明
     protected int leftLineColor = Color.WHITE;
-    Type mType = Type.TOP;
+    protected Type mType = Type.TOP;
 
     String mTag = "";
 

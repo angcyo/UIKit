@@ -24,7 +24,9 @@ gradlew.bat
 /RRealm
 
 /httpserver
+/RHttpServer
 /ble
 /umeng
 /tbs
 /uikit
+/uikitex
