@@ -1,6 +1,7 @@
 package com.angcyo.uiview.less.recycler.item;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Rect;
@@ -22,11 +23,13 @@ public abstract class SingleItem implements Item {
      * 左边绘制距离
      */
     protected int leftOffset = 0;
+    protected int rightOffset = 0;
     /**
      * 上边留出距离
      */
     protected int topOffset = 0;
-    protected int lineColor = 0;//-1是白色 0是透明
+    protected int bottomOffset = 1;
+    protected int lineColor = Color.parseColor("#EDF1F7");//-1是白色 0是透明
     protected int leftLineColor = Color.WHITE;
     protected Type mType = Type.TOP;
 
@@ -47,20 +50,32 @@ public abstract class SingleItem implements Item {
 
     public SingleItem(Type type) {
         mType = type;
+        Resources resources = RApplication.getApp().getResources();
         switch (mType) {
             case TOP:
-                this.topOffset = RApplication.getApp().getResources().getDimensionPixelSize(R.dimen.base_xhdpi);
+                this.topOffset = resources.getDimensionPixelSize(R.dimen.base_xhdpi);
                 break;
             case LINE:
-                this.topOffset = RApplication.getApp().getResources().getDimensionPixelSize(R.dimen.base_line);
+                this.topOffset = resources.getDimensionPixelSize(R.dimen.base_line);
                 break;
             case TOP_LINE:
-                this.leftOffset = RApplication.getApp().getResources().getDimensionPixelSize(R.dimen.base_xhdpi);
-                this.topOffset = RApplication.getApp().getResources().getDimensionPixelSize(R.dimen.base_line);
+                this.leftOffset = resources.getDimensionPixelSize(R.dimen.base_xhdpi);
+                this.topOffset = resources.getDimensionPixelSize(R.dimen.base_line);
+                break;
+            case BOTTOM:
+                this.leftOffset = resources.getDimensionPixelSize(R.dimen.base_xhdpi);
+                this.topOffset = 0;
+                this.rightOffset = leftOffset;
                 break;
             default:
                 break;
         }
+    }
+
+    public SingleItem(Type mType, int leftOffset, int rightOffset) {
+        this.leftOffset = leftOffset;
+        this.rightOffset = rightOffset;
+        this.mType = mType;
     }
 
     public SingleItem(Type type, int lineColor) {
@@ -88,9 +103,43 @@ public abstract class SingleItem implements Item {
         this.lineColor = lineColor;
     }
 
+    public SingleItem setLeftOffset(int leftOffset) {
+        this.leftOffset = leftOffset;
+        return this;
+    }
+
+    public SingleItem setRightOffset(int rightOffset) {
+        this.rightOffset = rightOffset;
+        return this;
+    }
+
+    public SingleItem setTopOffset(int topOffset) {
+        this.topOffset = topOffset;
+        return this;
+    }
+
+    public SingleItem setLineColor(int lineColor) {
+        this.lineColor = lineColor;
+        return this;
+    }
+
+    public SingleItem setLeftLineColor(int leftLineColor) {
+        this.leftLineColor = leftLineColor;
+        return this;
+    }
+
+    public SingleItem setBottomOffset(int bottomOffset) {
+        this.bottomOffset = bottomOffset;
+        return this;
+    }
+
     @Override
     public void setItemOffsets(Rect rect) {
-        rect.top = topOffset;
+        if (mType == Type.BOTTOM) {
+            rect.bottom = bottomOffset;
+        } else {
+            rect.top = topOffset;
+        }
         //rect.left = leftOffset;
     }
 
@@ -104,6 +153,13 @@ public abstract class SingleItem implements Item {
         if (mType == Type.LINE || mType == Type.TOP) {
             paint.setColor(lineColor);
             mDrawRect.set(itemView.getLeft(), itemView.getTop() - offsetRect.top, itemView.getRight(), itemView.getTop());
+            canvas.drawRect(mDrawRect, paint);
+        } else if (mType == Type.BOTTOM) {
+            paint.setColor(lineColor);
+            mDrawRect.set(itemView.getLeft() + leftOffset,
+                    itemView.getBottom(),
+                    itemView.getRight() - rightOffset,
+                    itemView.getBottom() + offsetRect.bottom);
             canvas.drawRect(mDrawRect, paint);
         } else {
             paint.setColor(leftLineColor);
@@ -127,14 +183,14 @@ public abstract class SingleItem implements Item {
         return this;
     }
 
-    @Override
-    public String getTag() {
-        return mTag;
-    }
-
     public SingleItem setTag(String mTag) {
         this.mTag = mTag;
         return this;
+    }
+
+    @Override
+    public String getTag() {
+        return mTag;
     }
 
     public enum Type {
@@ -149,6 +205,8 @@ public abstract class SingleItem implements Item {
         /**
          * 左边偏移TOP距离的Line
          */
-        TOP_LINE
+        TOP_LINE,
+
+        BOTTOM,
     }
 }

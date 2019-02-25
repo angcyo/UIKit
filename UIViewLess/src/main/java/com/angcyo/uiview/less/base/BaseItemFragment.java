@@ -52,7 +52,9 @@ public abstract class BaseItemFragment extends BaseRecyclerFragment<SingleItem> 
                                 }
 
                                 @Override
-                                public void draw(@NonNull Canvas canvas, TextPaint paint, View itemView, Rect offsetRect, int itemCount, int position) {
+                                public void draw(@NonNull Canvas canvas, @NonNull TextPaint paint,
+                                                 @NonNull View itemView, @NonNull Rect offsetRect,
+                                                 int itemCount, int position) {
                                     SingleItem t = singleItems.get(position);
                                     t.draw(canvas, paint, itemView, offsetRect, itemCount, position);
                                 }

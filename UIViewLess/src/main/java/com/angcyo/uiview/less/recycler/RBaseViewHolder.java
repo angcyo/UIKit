@@ -38,7 +38,7 @@ import java.lang.reflect.Method;
  */
 public class RBaseViewHolder extends RecyclerView.ViewHolder {
     public static int DEFAULT_CLICK_DELAY_TIME = RClickListener.Companion.getDEFAULT_DELAY_CLICK_TIME();
-    public static int DEFAULT_INITIAL_CAPACITY = 10;
+    public static int DEFAULT_INITIAL_CAPACITY = 16;
 
     private SparseArray<WeakReference<View>> sparseArray;
     private int viewType = -1;
