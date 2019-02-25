@@ -681,3 +681,11 @@ public fun View.getPaddingVertical(): Int {
 public fun View.getPaddingHorizontal(): Int {
     return paddingLeft + paddingRight
 }
+
+public fun View.setBgDrawable(drawable: Drawable? = null) {
+    ResUtil.setBgDrawable(this, drawable)
+}
+
+public fun View.setBgDrawable(resId: Int) {
+    setBgDrawable(getDrawable(resId))
+}

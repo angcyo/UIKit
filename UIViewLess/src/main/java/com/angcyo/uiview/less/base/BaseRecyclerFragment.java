@@ -233,7 +233,19 @@ public abstract class BaseRecyclerFragment<T> extends BaseTitleFragment
             });
         } else if (toAffect == AffectUI.AFFECT_LOADING) {
 
-            if (!isFragmentHide()) {
+            boolean needRefresh = false;
+
+            if (isFragmentInViewPager()) {
+                if (firstShowEnd) {
+                    needRefresh = true;
+                }
+            } else {
+                if (!isFragmentHide()) {
+                    needRefresh = true;
+                }
+            }
+
+            if (needRefresh) {
                 //切换到加载情感图, 调用刷新数据接口
                 baseViewHolder.post(new Runnable() {
                     @Override
@@ -248,7 +260,18 @@ public abstract class BaseRecyclerFragment<T> extends BaseTitleFragment
     @Override
     public void onFragmentFirstShow(@Nullable Bundle bundle) {
         super.onFragmentFirstShow(bundle);
-        if (affectUI == null || affectUI.getAffectStatus() != AffectUI.AFFECT_LOADING) {
+
+        boolean needRefresh = false;
+
+        if (isFragmentInViewPager()) {
+            needRefresh = true;
+        } else {
+            if (affectUI == null || affectUI.getAffectStatus() != AffectUI.AFFECT_LOADING) {
+                needRefresh = true;
+            }
+        }
+
+        if (needRefresh) {
             baseViewHolder.postDelay(160, new Runnable() {
                 @Override
                 public void run() {
@@ -356,6 +379,7 @@ public abstract class BaseRecyclerFragment<T> extends BaseTitleFragment
             baseAdapter.loadMoreEnd(datas, requestPageIndex, pageSize);
         }
     }
+
     //</editor-fold desc="分页加载相关">
 
 

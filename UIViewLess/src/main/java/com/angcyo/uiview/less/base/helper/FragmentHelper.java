@@ -83,6 +83,18 @@ public class FragmentHelper {
     }
 
     /**
+     * 从fragmentManager 中, 拿到所有Fragment
+     */
+    public static List<Fragment> restoreAll(@Nullable FragmentManager fragmentManager) {
+        List<Fragment> fragments = new ArrayList<>();
+        if (fragmentManager == null) {
+            return fragments;
+        }
+        fragments.addAll(fragmentManager.getFragments());
+        return fragments;
+    }
+
+    /**
      * 从fragmentManager中, 恢复Fragment. 如果没有, 则创建新对象, 请在super.onCreate()之后调用
      * <p>
      * 如果Fragment,没有add,则add
