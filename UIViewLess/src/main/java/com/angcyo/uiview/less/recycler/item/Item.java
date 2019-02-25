@@ -19,16 +19,16 @@ public interface Item {
     void onBindView(@NonNull RBaseViewHolder holder, int posInData, Item itemDataBean);
 
     @Deprecated
-    void setItemOffsets(Rect rect);
+    void setItemOffsets(@NonNull Rect rect);
 
-    void setItemOffsets2(Rect rect, int edge);
+    void setItemOffsets2(@NonNull Rect rect, int edge);
 
-    void draw(Canvas canvas, TextPaint paint, View itemView, Rect offsetRect, int itemCount, int position);
+    void draw(@NonNull Canvas canvas, @NonNull TextPaint paint, @NonNull View itemView, @NonNull Rect offsetRect, int itemCount, int position);
 
     /**
      * Item对应的布局id, -1表示默认
      */
     int getItemLayoutId();
 
-    View createItemView(ViewGroup parent, int viewType);
+    View createItemView(@NonNull ViewGroup parent, int viewType);
 }

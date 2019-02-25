@@ -108,11 +108,18 @@ public abstract class AbsFragment extends Fragment {
         } else {
             rootView = createRootView();
         }
-        baseViewHolder = new RBaseViewHolder(rootView);
+        baseViewHolder = new RBaseViewHolder(rootView, -1, getViewHolderInitialCapacity());
 
         initBaseView(baseViewHolder, getArguments(), savedInstanceState);
 
         return rootView;
+    }
+
+    /**
+     * ViewHolder 中 SparseArray 初始化的容量, 防止扩容带来的性能损失
+     */
+    protected int getViewHolderInitialCapacity() {
+        return RBaseViewHolder.DEFAULT_INITIAL_CAPACITY;
     }
 
     /**

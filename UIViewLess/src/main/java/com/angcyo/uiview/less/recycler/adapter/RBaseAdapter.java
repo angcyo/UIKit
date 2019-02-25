@@ -9,6 +9,7 @@ import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.util.SparseIntArray;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -89,6 +90,11 @@ public abstract class RBaseAdapter<T> extends RecyclerView.Adapter<RBaseViewHold
     public BaseUI.UIAdapterLoadMore uiAdapterLoadMore;
     public BaseUI.UIAdapterShowStatus uiAdapterShowStatus;
 
+    /**
+     * 保存 itemType 对应的 layout id
+     */
+    protected SparseIntArray layouts = new SparseIntArray();
+
     public RBaseAdapter() {
         this(null);
     }
@@ -101,7 +107,10 @@ public abstract class RBaseAdapter<T> extends RecyclerView.Adapter<RBaseViewHold
         this.mAllDatas = datas == null ? new ArrayList<T>() : datas;
         this.mContext = context;
         handler = new Handler(Looper.getMainLooper());
+        registerLayouts(layouts);
     }
+
+    //<editor-fold desc="静态方法区">
 
     public static int getListSize(List list) {
         return list == null ? 0 : list.size();
@@ -127,9 +136,28 @@ public abstract class RBaseAdapter<T> extends RecyclerView.Adapter<RBaseViewHold
         }
     }
 
-    public RBaseAdapter<T> setOnLoadMoreListener(OnAdapterLoadMoreListener<T> loadMoreListener) {
-        mLoadMoreListener = loadMoreListener;
-        return this;
+    //</editor-fold desc="静态方法区">
+
+    //<editor-fold desc="生命周期方法">
+
+    @Override
+    public void onChildViewAttachedToWindow(@NonNull View view) {
+        ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
+        if (layoutParams instanceof RecyclerView.LayoutParams) {
+            int viewAdapterPosition = ((RecyclerView.LayoutParams) layoutParams).getViewAdapterPosition();
+            int viewLayoutPosition = ((RecyclerView.LayoutParams) layoutParams).getViewLayoutPosition();
+            onChildViewAttachedToWindow(view, viewAdapterPosition, viewLayoutPosition);
+        }
+    }
+
+    @Override
+    public void onChildViewDetachedFromWindow(@NonNull View view) {
+        ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
+        if (layoutParams instanceof RecyclerView.LayoutParams) {
+            int viewAdapterPosition = ((RecyclerView.LayoutParams) layoutParams).getViewAdapterPosition();
+            int viewLayoutPosition = ((RecyclerView.LayoutParams) layoutParams).getViewLayoutPosition();
+            onChildViewDetachedFromWindow(view, viewAdapterPosition, viewLayoutPosition);
+        }
     }
 
     @Override
@@ -138,64 +166,10 @@ public abstract class RBaseAdapter<T> extends RecyclerView.Adapter<RBaseViewHold
 //        L.w("onViewAttachedToWindow");
     }
 
-    //--------------标准的方法-------------//
-
     @Override
     public void onViewDetachedFromWindow(RBaseViewHolder holder) {
         super.onViewDetachedFromWindow(holder);
 //        L.w("onViewDetachedFromWindow");
-    }
-
-    /**
-     * 返回是否激活加载更多
-     */
-    public boolean isEnableLoadMore() {
-        return mEnableLoadMore || mEnableLoadMoreWithLastIndex != -1;
-    }
-
-    /**
-     * 启用加载更多功能
-     */
-    public void setEnableLoadMore(boolean enableLoadMore) {
-        boolean loadMore = mEnableLoadMore;
-        mEnableLoadMore = enableLoadMore;
-
-        if (isStateLayout() || loadMore == enableLoadMore) {
-            return;
-        }
-
-        if (enableLoadMore) {
-            notifyItemInserted(getLastPosition());
-        } else {
-            notifyItemRemoved(getLastPosition());
-        }
-    }
-
-//    /**用来实现...*/
-//    @NonNull
-//    protected RBaseViewHolder createItemViewHolder(ViewGroup parent, int viewType) {
-//        return null;
-//    }
-
-    //是否该显示状态布局
-    protected boolean isStateLayout() {
-        return mEnableShowState && mShowState != IShowState.NORMAL;
-    }
-
-    @NonNull
-    protected RBaseViewHolder createBaseViewHolder(int viewType, View itemView) {
-        return new RBaseViewHolder(itemView, viewType);
-    }
-
-    @Override
-    final public int getItemViewType(int position) {
-        if (isStateLayout()) {
-            return ITEM_TYPE_SHOW_STATE;
-        }
-        if (mEnableLoadMore && isLast(position)) {
-            return ITEM_TYPE_LOAD_MORE;
-        }
-        return getItemType(position);
     }
 
     @Override
@@ -207,6 +181,34 @@ public abstract class RBaseAdapter<T> extends RecyclerView.Adapter<RBaseViewHold
         if (holder.getItemViewType() == ITEM_TYPE_SHOW_STATE) {
             mIShowState = null;
         }
+    }
+
+    //</editor-fold desc="生命周期方法">
+
+    //<editor-fold desc="Adapter 核心方法">
+
+    @Override
+    public int getItemCount() {
+        if (isStateLayout()) {
+            return 1;
+        }
+
+        int size = mAllDatas == null ? 0 : mAllDatas.size();
+        if (mEnableLoadMore) {
+            size += 1;
+        }
+        return size;
+    }
+
+    @Override
+    final public int getItemViewType(int position) {
+        if (isStateLayout()) {
+            return ITEM_TYPE_SHOW_STATE;
+        }
+        if (mEnableLoadMore && isLast(position)) {
+            return ITEM_TYPE_LOAD_MORE;
+        }
+        return getItemType(position);
     }
 
     @Override
@@ -293,6 +295,59 @@ public abstract class RBaseAdapter<T> extends RecyclerView.Adapter<RBaseViewHold
     final public void onBindViewHolder(RBaseViewHolder holder, int position, List<Object> payloads) {
         super.onBindViewHolder(holder, position, payloads);
         //L.e("call: onBindViewHolder([holder, position, payloads])-> " + position);
+    }
+
+    //</editor-fold desc="Adapter 核心方法">
+
+    //<editor-fold desc="可操作方法">
+
+    /**
+     * 重写此方法需要和{@link #getItemType(int, Object)}配合使用
+     * 但是不需要重写{@link #getItemLayoutId(int)}
+     */
+    protected void registerLayouts(@NonNull SparseIntArray layouts) {
+
+    }
+
+    public RBaseAdapter<T> setOnLoadMoreListener(OnAdapterLoadMoreListener<T> loadMoreListener) {
+        mLoadMoreListener = loadMoreListener;
+        return this;
+    }
+
+    /**
+     * 返回是否激活加载更多
+     */
+    public boolean isEnableLoadMore() {
+        return mEnableLoadMore || mEnableLoadMoreWithLastIndex != -1;
+    }
+
+    /**
+     * 启用加载更多功能
+     */
+    public void setEnableLoadMore(boolean enableLoadMore) {
+        boolean loadMore = mEnableLoadMore;
+        mEnableLoadMore = enableLoadMore;
+
+        if (isStateLayout() || loadMore == enableLoadMore) {
+            return;
+        }
+
+        if (enableLoadMore) {
+            notifyItemInserted(getLastPosition());
+        } else {
+            notifyItemRemoved(getLastPosition());
+        }
+    }
+
+    //是否该显示状态布局
+    protected boolean isStateLayout() {
+        return mEnableShowState && mShowState != IShowState.NORMAL;
+    }
+
+
+    @NonNull
+    protected RBaseViewHolder createBaseViewHolder(int viewType, View itemView) {
+        return new RBaseViewHolder(itemView, viewType);
     }
 
     /**
@@ -460,8 +515,6 @@ public abstract class RBaseAdapter<T> extends RecyclerView.Adapter<RBaseViewHold
         return dataSize - 1;
     }
 
-    //--------------需要实现的方法------------//
-
     /**
      * 数据是否为空
      */
@@ -494,18 +547,6 @@ public abstract class RBaseAdapter<T> extends RecyclerView.Adapter<RBaseViewHold
         return mAllDatas == null ? 0 : mAllDatas.size();
     }
 
-    @Override
-    public int getItemCount() {
-        if (isStateLayout()) {
-            return 1;
-        }
-
-        int size = mAllDatas == null ? 0 : mAllDatas.size();
-        if (mEnableLoadMore) {
-            size += 1;
-        }
-        return size;
-    }
 
     /**
      * 当 {@link #getItemLayoutId(int)} 返回0的时候, 会调用此方法
@@ -516,7 +557,12 @@ public abstract class RBaseAdapter<T> extends RecyclerView.Adapter<RBaseViewHold
 
     //---------------滚动事件的处理--------------------//
 
-    protected abstract int getItemLayoutId(int viewType);
+    /**
+     * 如果未重写 {@link #registerLayouts(SparseIntArray)}, 请重写此方法
+     */
+    protected int getItemLayoutId(int viewType) {
+        return layouts.get(viewType);
+    }
 
     protected abstract void onBindView(@NonNull RBaseViewHolder holder, int position, T bean);
 
@@ -821,25 +867,6 @@ public abstract class RBaseAdapter<T> extends RecyclerView.Adapter<RBaseViewHold
         mAutoEnableLoadMore = autoEnableLoadMore;
     }
 
-    @Override
-    public void onChildViewAttachedToWindow(@NonNull View view) {
-        ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
-        if (layoutParams instanceof RecyclerView.LayoutParams) {
-            int viewAdapterPosition = ((RecyclerView.LayoutParams) layoutParams).getViewAdapterPosition();
-            int viewLayoutPosition = ((RecyclerView.LayoutParams) layoutParams).getViewLayoutPosition();
-            onChildViewAttachedToWindow(view, viewAdapterPosition, viewLayoutPosition);
-        }
-    }
-
-    @Override
-    public void onChildViewDetachedFromWindow(@NonNull View view) {
-        ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
-        if (layoutParams instanceof RecyclerView.LayoutParams) {
-            int viewAdapterPosition = ((RecyclerView.LayoutParams) layoutParams).getViewAdapterPosition();
-            int viewLayoutPosition = ((RecyclerView.LayoutParams) layoutParams).getViewLayoutPosition();
-            onChildViewDetachedFromWindow(view, viewAdapterPosition, viewLayoutPosition);
-        }
-    }
 
     protected void onChildViewAttachedToWindow(@NonNull View view, int adapterPosition, int layoutPosition) {
         //L.v("call: onChildViewAttachedToWindow -> " + adapterPosition + " " + layoutPosition + " " + view);
@@ -1065,6 +1092,10 @@ public abstract class RBaseAdapter<T> extends RecyclerView.Adapter<RBaseViewHold
         return mEnableShowState;
     }
 
+    //</editor-fold desc="可操作方法">
+
+    //<editor-fold desc="事件回调">
+
     public interface OnAdapterLoadMoreListener<T> {
         void onAdapterLodeMore(@NonNull RBaseAdapter<T> baseAdapter);
     }
@@ -1148,5 +1179,7 @@ public abstract class RBaseAdapter<T> extends RecyclerView.Adapter<RBaseViewHold
             return false;
         }
     }
+
+    //</editor-fold desc="事件回调">
 
 }

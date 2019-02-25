@@ -573,6 +573,10 @@ public fun TextView.addPaintFlags(flag: Int, add: Boolean = true, invalidate: Bo
     }
 }
 
+public fun TextView.setTextBold(bold: Boolean) {
+    addPaintFlags(Paint.FAKE_BOLD_TEXT_FLAG, bold, true)
+}
+
 public fun Paint.setPaintFlags(flag: Int, add: Boolean = true) {
     if (add) {
         this.flags = this.flags or flag
