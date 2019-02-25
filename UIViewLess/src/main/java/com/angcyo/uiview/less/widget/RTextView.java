@@ -134,6 +134,12 @@ public class RTextView extends AppCompatTextView {
      */
     private boolean useCharLengthFilter = false;
 
+    /**
+     * 滚动循环绘制文本的圈数, 会在没次setText的时候, 重置为0
+     */
+    private long scrollLoopCount = 0;
+    private OnScrollTextLoopListener onScrollTextLoopListener;
+
     public RTextView(Context context) {
         this(context, null);
     }
@@ -239,7 +245,6 @@ public class RTextView extends AppCompatTextView {
         initView();
     }
 
-
     public static void setLeftIco(TextView textView, @DrawableRes int leftIco) {
         Drawable[] compoundDrawables = textView.getCompoundDrawables();
         textView.setCompoundDrawablesWithIntrinsicBounds(ViewExKt.getDrawable(textView, leftIco),
@@ -335,9 +340,10 @@ public class RTextView extends AppCompatTextView {
         initLeftRes();
     }
 
-    protected void onDrawScrollText(Canvas canvas) {
+    @Deprecated
+    protected void onDrawScrollTextOld(Canvas canvas) {
         String text = String.valueOf(getText());
-        if (text == null) {
+        if (getText() == null) {
             if (isInEditMode()) {
                 text = "会滚动的文本";
             } else {
@@ -405,6 +411,104 @@ public class RTextView extends AppCompatTextView {
         //super.onDraw(canvas);
     }
 
+    protected void onDrawScrollText(Canvas canvas) {
+        String text = String.valueOf(getText());
+        if (getText() == null) {
+            if (isInEditMode()) {
+                text = "会滚动的文本";
+            } else {
+                text = "";
+            }
+        }
+        if (mScrollTextPaint == null) {
+            mScrollTextPaint = new TextPaint(getPaint());
+            //mScrollTextPaint.setTextAlign(Paint.Align.LEFT);
+        }
+        mScrollTextPaint.setColor(getCurrentTextColor());
+
+        float textWidth = mScrollTextPaint.measureText(text);
+
+        float offset = scrollTextCircleOffset;
+        if (scrollTextCircleOffset < 0) {
+            offset = getMeasuredWidth() - textWidth;
+        }
+
+        if (scrollType == SCROLL_TYPE_DEFAULT) {
+            if (isInEditMode()) {
+                scrollCurX = 100;
+            }
+
+            //canvas.drawText(text, getMeasuredWidth() - scrollCurX, drawTextY, mScrollTextPaint);
+
+            canvas.save();
+            canvas.translate(getMeasuredWidth() - scrollCurX, 0);
+            super.onDraw(canvas);
+            canvas.restore();
+
+            if (isScrollTextCircle) {
+                //canvas.drawText(text, getMeasuredWidth() - scrollCurX + textWidth + offset, drawTextY, mScrollTextPaint);
+
+                canvas.save();
+                canvas.translate(getMeasuredWidth() - scrollCurX + textWidth + offset, 0);
+                super.onDraw(canvas);
+                canvas.restore();
+            }
+        } else if (scrollType == SCROLL_TYPE_START) {
+            //canvas.drawText(text, -scrollCurX, drawTextY, mScrollTextPaint);
+
+            canvas.save();
+            canvas.translate(-scrollCurX, 0);
+            super.onDraw(canvas);
+            canvas.restore();
+
+            if (isScrollTextCircle) {
+                //canvas.drawText(text, -scrollCurX + textWidth + offset, drawTextY, mScrollTextPaint);
+
+                canvas.save();
+                canvas.translate(-scrollCurX + textWidth + offset, 0);
+                super.onDraw(canvas);
+                canvas.restore();
+            }
+        }
+
+        scrollCurX += scrollStep;
+
+        if (scrollType == SCROLL_TYPE_DEFAULT) {
+            if (scrollCurX >= (getMeasuredWidth() + textWidth + offset)) {
+                if (isScrollTextCircle) {
+                    scrollCurX = getMeasuredWidth();
+                } else {
+                    scrollCurX = 0;
+                }
+                scrollLoopCount++;
+
+                if (onScrollTextLoopListener != null) {
+                    onScrollTextLoopListener.onScrollLoop(this, scrollLoopCount);
+                }
+            }
+        } else if (scrollType == SCROLL_TYPE_START) {
+            if (scrollCurX >= textWidth + offset) {
+                scrollCurX = 0;
+                scrollLoopCount++;
+
+                if (onScrollTextLoopListener != null) {
+                    onScrollTextLoopListener.onScrollLoop(this, scrollLoopCount);
+                }
+            }
+        }
+
+        if (isInEditMode()) {
+        } else {
+            if (getVisibility() == View.VISIBLE && !pauseScroll) {
+                postInvalidateOnAnimation();
+            }
+        }
+
+        //canvas.drawText(text, );
+        //canvas.translate(-100, 0);
+        //super.onDraw(canvas);
+    }
+
     @Override
     protected void onDraw(Canvas canvas) {
         if (isScrollText) {
@@ -427,6 +531,81 @@ public class RTextView extends AppCompatTextView {
             canvas.drawRect(leftColorRect, colorPaint);
         }
 
+        //左边绘制一些文本
+        drawLeftString(canvas);
+        //左边绘制drawable
+        drawLeftDrawable(canvas);
+
+        mDrawNoRead.onDraw(canvas);
+
+        if (centerSaveCount != -1) {
+            canvas.restoreToCount(centerSaveCount);
+        }
+
+        //提示文本, 可以用来提示 数字(未读数字)
+        drawTipString(canvas);
+    }
+
+    private void drawTipString(Canvas canvas) {
+        if (isShowTipText /*|| isInEditMode()*/) {
+            TextPaint textPaint = mTextPaint;
+            textPaint.setStyle(Paint.Style.FILL);
+
+            float textW = ViewExKt.textWidth(this, String.valueOf(getText()));
+            float textH = ViewExKt.textHeight(this);
+
+            textPaint.setTextSize(tipTextSize);
+            float tipW = ViewExKt.textWidth(this, textPaint, tipText);
+            float tipH = ViewExKt.textHeight(this, textPaint);
+
+            tipTextRectF.set(getMeasuredWidth() - tipW,
+                    getMeasuredHeight() - getPaddingBottom() - textH - tipH,
+                    getMeasuredWidth(),
+                    getMeasuredHeight() - getPaddingBottom() - textH);
+
+            float round = 6 * density();
+            tipTextRectF.inset(-round / 2, 0);//让背景和文本有点距离
+            tipTextRectF.offset(-round, round);//尽量和原有的文本相贴合
+
+            tipTextRectF.offset(-tipTextLeftOffset, -tipTextTopOffset);
+
+            textPaint.setColor(tipTextBgColor);
+            canvas.drawRoundRect(tipTextRectF, round, round, textPaint);
+
+            textPaint.setColor(tipTextColor);
+            //默认位置在右上角
+            canvas.drawText(tipText, tipTextRectF.centerX() - tipW / 2, tipTextRectF.bottom - textPaint.descent(), textPaint);
+        }
+    }
+
+    private void drawLeftDrawable(Canvas canvas) {
+        if (textLeftDrawable != null) {
+            if (leftDrawableGravity == LEFT_DRAWABLE_GRAVITY_TOP) {
+                canvas.save();
+                canvas.translate(leftDrawableOffsetX, leftDrawableOffsetY);
+                textLeftDrawable.draw(canvas);
+                canvas.restore();
+            } else if (leftDrawableGravity == LEFT_DRAWABLE_GRAVITY_CENTER_VERTICAL) {
+                canvas.save();
+//            Layout layout = getLayout();
+                //layout.getLineStart()
+
+//            canvas.translate(rawPaddingLeft + (viewDrawWith - drawWidth) / 2, paddingTop.toFloat() + (viewDrawHeight - drawHeight) / 2)
+
+                canvas.translate(getMeasuredWidth() / 2 -
+                                ViewExKt.textWidth(this, String.valueOf(getText())) / 2 -
+                                textLeftDrawable.getIntrinsicWidth() -
+                                getCompoundDrawablePadding(),
+                        getMeasuredHeight() / 2 - textLeftDrawable.getIntrinsicHeight() / 2);
+
+                textLeftDrawable.draw(canvas);
+
+                canvas.restore();
+            }
+        }
+    }
+
+    private void drawLeftString(Canvas canvas) {
         ensurePaint();
 
         if (!TextUtils.isEmpty(mLeftString)) {
@@ -479,68 +658,8 @@ public class RTextView extends AppCompatTextView {
 
             canvas.restore();
         }
-
-        if (textLeftDrawable != null) {
-            if (leftDrawableGravity == LEFT_DRAWABLE_GRAVITY_TOP) {
-                canvas.save();
-                canvas.translate(leftDrawableOffsetX, leftDrawableOffsetY);
-                textLeftDrawable.draw(canvas);
-                canvas.restore();
-            } else if (leftDrawableGravity == LEFT_DRAWABLE_GRAVITY_CENTER_VERTICAL) {
-                canvas.save();
-//            Layout layout = getLayout();
-                //layout.getLineStart()
-
-//            canvas.translate(rawPaddingLeft + (viewDrawWith - drawWidth) / 2, paddingTop.toFloat() + (viewDrawHeight - drawHeight) / 2)
-
-                canvas.translate(getMeasuredWidth() / 2 -
-                                ViewExKt.textWidth(this, String.valueOf(getText())) / 2 -
-                                textLeftDrawable.getIntrinsicWidth() -
-                                getCompoundDrawablePadding(),
-                        getMeasuredHeight() / 2 - textLeftDrawable.getIntrinsicHeight() / 2);
-
-                textLeftDrawable.draw(canvas);
-
-                canvas.restore();
-            }
-        }
-
-        mDrawNoRead.onDraw(canvas);
-
-        if (centerSaveCount != -1) {
-            canvas.restoreToCount(centerSaveCount);
-        }
-
-        if (isShowTipText /*|| isInEditMode()*/) {
-            TextPaint textPaint = mTextPaint;
-            textPaint.setStyle(Paint.Style.FILL);
-
-            float textW = ViewExKt.textWidth(this, String.valueOf(getText()));
-            float textH = ViewExKt.textHeight(this);
-
-            textPaint.setTextSize(tipTextSize);
-            float tipW = ViewExKt.textWidth(this, textPaint, tipText);
-            float tipH = ViewExKt.textHeight(this, textPaint);
-
-            tipTextRectF.set(getMeasuredWidth() - tipW,
-                    getMeasuredHeight() - getPaddingBottom() - textH - tipH,
-                    getMeasuredWidth(),
-                    getMeasuredHeight() - getPaddingBottom() - textH);
-
-            float round = 6 * density();
-            tipTextRectF.inset(-round / 2, 0);//让背景和文本有点距离
-            tipTextRectF.offset(-round, round);//尽量和原有的文本相贴合
-
-            tipTextRectF.offset(-tipTextLeftOffset, -tipTextTopOffset);
-
-            textPaint.setColor(tipTextBgColor);
-            canvas.drawRoundRect(tipTextRectF, round, round, textPaint);
-
-            textPaint.setColor(tipTextColor);
-            //默认位置在右上角
-            canvas.drawText(tipText, tipTextRectF.centerX() - tipW / 2, tipTextRectF.bottom - textPaint.descent(), textPaint);
-        }
     }
+
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
@@ -586,6 +705,9 @@ public class RTextView extends AppCompatTextView {
 
     @Override
     public void setText(CharSequence text, BufferType type) {
+        scrollCurX = 0;
+        scrollLoopCount = 0;
+
         if (hideWithEmptyText) {
             setVisibility(TextUtils.isEmpty(text) ? View.GONE : View.VISIBLE);
         }
@@ -1063,5 +1185,22 @@ public class RTextView extends AppCompatTextView {
 
     public void setPauseScroll(boolean pauseScroll) {
         this.pauseScroll = pauseScroll;
+    }
+
+    public void setScrollText(boolean scrollText) {
+        isScrollText = scrollText;
+        postInvalidate();
+    }
+
+    public void setOnScrollTextLoopListener(OnScrollTextLoopListener onScrollTextLoopListener) {
+        this.onScrollTextLoopListener = onScrollTextLoopListener;
+    }
+
+    public long getScrollLoopCount() {
+        return scrollLoopCount;
+    }
+
+    public interface OnScrollTextLoopListener {
+        public void onScrollLoop(@NonNull RTextView textView, long scrollLoopCount);
     }
 }

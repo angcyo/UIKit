@@ -219,8 +219,8 @@ public class RBaseViewHolder extends RecyclerView.ViewHolder {
         }
     }
 
-    public void invisible(@IdRes int resId) {
-        invisible(v(resId));
+    public View invisible(@IdRes int resId) {
+        return invisible(v(resId));
     }
 
     public View invisible(View view) {
