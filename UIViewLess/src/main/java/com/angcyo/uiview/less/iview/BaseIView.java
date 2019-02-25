@@ -19,7 +19,7 @@ import com.angcyo.uiview.less.resources.AnimUtil;
  * @author angcyo
  * @date 2018/10/16
  */
-public abstract class BaseIView {
+public abstract class BaseIView implements AffectUI.OnAffectListener {
     public static final int STATUS_INIT = 0x01;
     public static final int STATUS_CREATE = 0x02;
     public static final int STATUS_LOAD = 0x04;
@@ -76,6 +76,41 @@ public abstract class BaseIView {
     protected void setViewStatus(int status) {
         iViewStatus = status;
     }
+
+    //<editor-fold desc="情感图方法">
+
+    protected AffectUI affectUI;
+
+    protected void initAffectUI() {
+        initAffectUI(parent);
+    }
+
+    protected void initAffectUI(ViewGroup viewGroup) {
+        affectUI = AffectUI.build(viewGroup)
+                .register(AffectUI.AFFECT_LOADING, R.layout.base_affect_loading)
+                .register(AffectUI.AFFECT_ERROR, R.layout.base_affect_error)
+                .register(AffectUI.AFFECT_OTHER, R.layout.base_affect_other)
+                .setContentAffect(AffectUI.CONTENT_AFFECT_NONE)
+                .setAffectChangeListener(this)
+                .create();
+    }
+
+    @Override
+    public void onAffectChangeBefore(@NonNull AffectUI affectUI, int fromAffect, int toAffect) {
+
+    }
+
+    @Override
+    public void onAffectChange(@NonNull AffectUI affectUI, int fromAffect, int toAffect, @Nullable View fromView, @Nullable View toView) {
+
+    }
+
+    @Override
+    public void onAffectInitLayout(@NonNull AffectUI affectUI, int affect, @NonNull View rootView) {
+
+    }
+
+    //<editor-fold desc="情感图方法">
 
     /**
      * 1.创建根布局
