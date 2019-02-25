@@ -141,8 +141,9 @@ public class RFlowLayout extends LinearLayout {
         }
         mLineHeight.add(lineHeight);
         mAllViews.add(lineViews);
-        measureLineEquWidth(lineViews, sizeWidth, heightMeasureSpec);
-
+        if (itemEquWidth) {
+            measureLineEquWidth(lineViews, sizeWidth, heightMeasureSpec);
+        }
         width += getPaddingLeft() + getPaddingRight();
         height += getPaddingTop() + getPaddingBottom();
         setMeasuredDimension(

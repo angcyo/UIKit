@@ -23,6 +23,7 @@ import com.angcyo.uiview.less.RApplication;
 import com.angcyo.uiview.less.utils.ScreenUtil;
 import com.angcyo.uiview.less.widget.*;
 import com.angcyo.uiview.less.widget.group.ItemInfoLayout;
+import com.angcyo.uiview.less.widget.group.RFlowLayout;
 import com.angcyo.uiview.less.widget.group.RTabLayout;
 import com.angcyo.uiview.less.widget.pager.RViewPager;
 import com.angcyo.uiview.view.RClickListener;
@@ -278,8 +279,8 @@ public class RBaseViewHolder extends RecyclerView.ViewHolder {
 //    public ItemSubInfoLayout sub(@IdRes int id) {
 //        return v(id);
 //    }
-
-    public ItemInfoLayout item(@IdRes int id) {
+//
+    public RFlowLayout flow(@IdRes int id) {
         return v(id);
     }
 

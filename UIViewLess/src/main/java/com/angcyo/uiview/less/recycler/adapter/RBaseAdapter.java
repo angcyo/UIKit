@@ -1081,6 +1081,10 @@ public abstract class RBaseAdapter<T> extends RecyclerView.Adapter<RBaseViewHold
             if (isEnableShowState()) {
                 setShowState(IShowState.EMPTY);
             }
+        } else {
+            if (isEnableShowState()) {
+                setShowState(IShowState.NORMAL);
+            }
         }
     }
 
