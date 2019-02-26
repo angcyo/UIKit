@@ -1781,8 +1781,8 @@ public class RUtils {
 
             fileName = newFileName;
 
-            String[] list = folder.list();//如果列表文件很多, 比如20W+, 会OOM
-            int size = list.length;
+            //String[] list = folder.list();//如果列表文件很多, 比如20W+, 会OOM
+            //int size = list.length;
 
             for (int i = 1; i < Integer.MAX_VALUE; i++) {
                 newFileName = fileName + String.format("_%05d", i) + extName;
