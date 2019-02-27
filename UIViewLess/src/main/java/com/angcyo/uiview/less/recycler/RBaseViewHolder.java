@@ -276,10 +276,11 @@ public class RBaseViewHolder extends RecyclerView.ViewHolder {
         return (RRecyclerView) viewByName(idName);
     }
 
-//    public ItemSubInfoLayout sub(@IdRes int id) {
-//        return v(id);
-//    }
-//
+    public ItemInfoLayout item(@IdRes int id) {
+        return v(id);
+    }
+
+    //
     public RFlowLayout flow(@IdRes int id) {
         return v(id);
     }

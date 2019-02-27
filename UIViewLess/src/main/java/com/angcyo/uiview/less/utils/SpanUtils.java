@@ -31,9 +31,9 @@ import static android.graphics.BlurMaskFilter.Blur;
  * </pre>
  * https://github.com/Blankj/AndroidUtilCode
  */
-public final class SpanUtils {
+public class SpanUtils {
 
-    private static final int COLOR_DEFAULT = 0xFEFFFFFF;
+    protected static final int COLOR_DEFAULT = 0xFEFFFFFF;
 
     public static final int ALIGN_BOTTOM   = 0;
     public static final int ALIGN_BASELINE = 1;
@@ -47,10 +47,10 @@ public final class SpanUtils {
 
     private static final String LINE_SEPARATOR = System.getProperty("line.separator");
 
-    private CharSequence  mText;
-    private int           flag;
-    private int           foregroundColor;
-    private int           backgroundColor;
+    protected CharSequence  mText;
+    protected int           flag;
+    protected int           foregroundColor;
+    protected int           backgroundColor;
     private int           lineHeight;
     private int           alignLine;
     private int           quoteColor;
@@ -96,9 +96,9 @@ public final class SpanUtils {
     private int spaceSize;
     private int spaceColor;
 
-    private SpannableStringBuilder mBuilder;
+    protected SpannableStringBuilder mBuilder;
 
-    private       int mType;
+    protected        int mType;
     private final int mTypeCharSequence = 0;
     private final int mTypeImage        = 1;
     private final int mTypeSpace        = 2;
@@ -110,7 +110,7 @@ public final class SpanUtils {
         setDefault();
     }
 
-    private void setDefault() {
+    protected void setDefault() {
         flag = Spanned.SPAN_EXCLUSIVE_EXCLUSIVE;
         foregroundColor = COLOR_DEFAULT;
         backgroundColor = COLOR_DEFAULT;
@@ -740,7 +740,7 @@ public final class SpanUtils {
         return mBuilder;
     }
 
-    private void applyLast() {
+    protected void applyLast() {
         if (mType == mTypeCharSequence) {
             updateCharCharSequence();
         } else if (mType == mTypeImage) {
