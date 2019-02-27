@@ -187,6 +187,12 @@ public class RUtils {
     }
 
     /**
+     * 单个文件, 保存的数据最大大小(字节)
+     */
+    public static long MAX_SAVE_FILE_SIZE = 1024 * 1024 * 10;
+
+
+    /**
      * 获取文件类型
      */
     public static String getFileType(String filePath) {
@@ -1765,10 +1771,8 @@ public class RUtils {
             return null;
         }
 
-        long maxFileSize = 1024 * 1024 * 10;
-
         File file = new File(saveFolder, fileName);
-        if (file.length() >= maxFileSize /*大于10MB重命名*/) {
+        if (file.length() >= MAX_SAVE_FILE_SIZE /*大于10MB重命名*/) {
 
             String[] splitFileName = splitFileName(fileName);
 
@@ -1787,7 +1791,7 @@ public class RUtils {
             for (int i = 1; i < Integer.MAX_VALUE; i++) {
                 newFileName = fileName + String.format("_%05d", i) + extName;
                 file = new File(saveFolder, newFileName);
-                if (file.length() >= maxFileSize /*大于10MB重命名*/) {
+                if (file.length() >= MAX_SAVE_FILE_SIZE /*大于10MB重命名*/) {
                     continue;
                 }
                 break;
