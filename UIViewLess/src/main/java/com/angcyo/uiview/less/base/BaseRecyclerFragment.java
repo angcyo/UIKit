@@ -382,5 +382,11 @@ public abstract class BaseRecyclerFragment<T> extends BaseTitleFragment
 
     //</editor-fold desc="分页加载相关">
 
+    /**
+     * 界面首次显示, 是否需要触发加载数据
+     */
+    protected boolean isFirstShowNeedLoadData() {
+        return true;
+    }
 
 }
