@@ -1093,6 +1093,8 @@ public class RDialog {
 
         /**
          * 设置选项
+         *
+         * @see com.contrarywind.interfaces.IPickerViewData
          */
         public OptionsBuilder setPicker(List optionsItems) {
             this.setPicker(optionsItems, null, null);
@@ -1108,6 +1110,9 @@ public class RDialog {
         List<List> options2Items;
         List<List<List>> options3Items;
 
+        /**
+         * @see com.contrarywind.interfaces.IPickerViewData
+         */
         public OptionsBuilder setPicker(List options1Items,
                                         List<List> options2Items,
                                         List<List<List>> options3Items) {

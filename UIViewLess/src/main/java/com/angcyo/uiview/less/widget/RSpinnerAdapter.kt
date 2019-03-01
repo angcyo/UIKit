@@ -98,4 +98,13 @@ open class RSpinnerAdapter<T> : ArrayAdapter<T> {
     open fun onBindDropDownItemView(itemViewHolder: RBaseViewHolder, position: Int, itemBean: T? = null) {
 
     }
+
+    /**
+     * 重置数据源
+     * */
+    fun resetData(datas: List<T>) {
+        thisDataList = datas
+        clear()
+        addAll(datas)
+    }
 }
