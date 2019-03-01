@@ -262,6 +262,12 @@ public abstract class AbsLifeCycleFragment extends AbsFragment implements IFragm
      */
     @Override
     public boolean onBackPressed(@NonNull Activity activity) {
+        if (iLastFragment == null) {
+            return true;
+        }
+        if (iLastFragment instanceof AbsLifeCycleFragment) {
+            return iLastFragment.onBackPressed(activity);
+        }
         return true;
     }
 
