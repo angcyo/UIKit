@@ -51,6 +51,8 @@ public abstract class BaseTitleFragment extends BaseFragment implements AffectUI
 
     protected FragmentContentWrapperLayout fragmentContentWrapperLayout;
 
+    protected BaseUI.UIFragment uiFragment;
+
     //<editor-fold desc="初始化方法">
 
     @NonNull
@@ -99,7 +101,7 @@ public abstract class BaseTitleFragment extends BaseFragment implements AffectUI
         LayoutInflater.from(mAttachContext).inflate(getTitleBarLayoutId(), titleBarLayout);
 
         //设置标题背景颜色
-        BaseUI.uiFragment.initBaseTitleLayout(this, arguments);
+        getUiFragment().initBaseTitleLayout(this, arguments);
 
         //设置标题
         setTitleString(getFragmentTitle());
@@ -147,7 +149,7 @@ public abstract class BaseTitleFragment extends BaseFragment implements AffectUI
      * 创建情感图控制类
      */
     protected AffectUI createAffectUI() {
-        return BaseUI.uiFragment.createAffectUI(this);
+        return getUiFragment().createAffectUI(this);
     }
 
     /**
@@ -227,7 +229,7 @@ public abstract class BaseTitleFragment extends BaseFragment implements AffectUI
      * 创建返回按钮
      */
     protected View createBackItem() {
-        return BaseUI.uiFragment.createBackItem(this);
+        return getUiFragment().createBackItem(this);
     }
 
     public void onTitleBackClick() {
@@ -372,5 +374,18 @@ public abstract class BaseTitleFragment extends BaseFragment implements AffectUI
 
     //</editor-fold>
 
+    //<editor-fold desc="页面样式定制">
 
+    public BaseUI.UIFragment getUiFragment() {
+        if (uiFragment == null) {
+            return BaseUI.uiFragment;
+        }
+        return uiFragment;
+    }
+
+    public void setUiFragment(BaseUI.UIFragment uiFragment) {
+        this.uiFragment = uiFragment;
+    }
+
+    //</editor-fold desc="页面样式定制">
 }

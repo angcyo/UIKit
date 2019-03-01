@@ -87,8 +87,8 @@ public abstract class RBaseAdapter<T> extends RecyclerView.Adapter<RBaseViewHold
     /**
      * 界面定制处理接口
      */
-    public BaseUI.UIAdapterLoadMore uiAdapterLoadMore;
-    public BaseUI.UIAdapterShowStatus uiAdapterShowStatus;
+    protected BaseUI.UIAdapterLoadMore uiAdapterLoadMore;
+    protected BaseUI.UIAdapterShowStatus uiAdapterShowStatus;
 
     /**
      * 保存 itemType 对应的 layout id
@@ -355,10 +355,7 @@ public abstract class RBaseAdapter<T> extends RecyclerView.Adapter<RBaseViewHold
      * View 需要实现 IShowState 接口
      */
     protected View createShowState(Context context, ViewGroup parent) {
-        if (uiAdapterShowStatus != null) {
-            return uiAdapterShowStatus.createShowState(this, context, parent);
-        }
-        return BaseUI.uiAdapterShowStatus.createShowState(this, context, parent);
+        return getUiAdapterShowStatus().createShowState(this, context, parent);
     }
 
     /**
@@ -366,10 +363,7 @@ public abstract class RBaseAdapter<T> extends RecyclerView.Adapter<RBaseViewHold
      * View 需要实现 ILoadMore 接口
      */
     protected View createLoadMore(Context context, ViewGroup parent) {
-        if (uiAdapterLoadMore != null) {
-            return uiAdapterLoadMore.createLoadMore(this, context, parent);
-        }
-        return BaseUI.uiAdapterLoadMore.createLoadMore(this, context, parent);
+        return getUiAdapterLoadMore().createLoadMore(this, context, parent);
     }
 
     /**
@@ -385,11 +379,7 @@ public abstract class RBaseAdapter<T> extends RecyclerView.Adapter<RBaseViewHold
      * R.layout.base_item_show_state_layout
      */
     protected void onBindShowStateView(@NonNull RBaseViewHolder holder, int showState, int position) {
-        if (uiAdapterShowStatus != null) {
-            uiAdapterShowStatus.onBindShowStateView(this, holder, showState, position);
-        } else {
-            BaseUI.uiAdapterShowStatus.onBindShowStateView(this, holder, showState, position);
-        }
+        getUiAdapterShowStatus().onBindShowStateView(this, holder, showState, position);
     }
 
     /**
@@ -425,11 +415,7 @@ public abstract class RBaseAdapter<T> extends RecyclerView.Adapter<RBaseViewHold
      * 重写此方法, 可以修改加载更多视图
      */
     protected void onBindLoadMoreView(@NonNull RBaseViewHolder holder, int loadState, int position) {
-        if (uiAdapterLoadMore != null) {
-            uiAdapterLoadMore.onBindLoadMoreView(this, holder, loadState, position);
-        } else {
-            BaseUI.uiAdapterLoadMore.onBindLoadMoreView(this, holder, loadState, position);
-        }
+        getUiAdapterLoadMore().onBindLoadMoreView(this, holder, loadState, position);
     }
 
     private void updateLoadMoreView() {
@@ -1185,5 +1171,31 @@ public abstract class RBaseAdapter<T> extends RecyclerView.Adapter<RBaseViewHold
     }
 
     //</editor-fold desc="事件回调">
+
+    //<editor-fold desc="页面样式定制">
+
+    public BaseUI.UIAdapterLoadMore getUiAdapterLoadMore() {
+        if (uiAdapterLoadMore == null) {
+            return BaseUI.uiAdapterLoadMore;
+        }
+        return uiAdapterLoadMore;
+    }
+
+    public void setUiAdapterLoadMore(BaseUI.UIAdapterLoadMore uiAdapterLoadMore) {
+        this.uiAdapterLoadMore = uiAdapterLoadMore;
+    }
+
+    public BaseUI.UIAdapterShowStatus getUiAdapterShowStatus() {
+        if (uiAdapterShowStatus == null) {
+            return BaseUI.uiAdapterShowStatus;
+        }
+        return uiAdapterShowStatus;
+    }
+
+    public void setUiAdapterShowStatus(BaseUI.UIAdapterShowStatus uiAdapterShowStatus) {
+        this.uiAdapterShowStatus = uiAdapterShowStatus;
+    }
+
+    //</editor-fold desc="页面样式定制">
 
 }
