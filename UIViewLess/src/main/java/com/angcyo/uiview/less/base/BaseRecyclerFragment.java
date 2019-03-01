@@ -213,47 +213,65 @@ public abstract class BaseRecyclerFragment<T> extends BaseTitleFragment
     public void onAffectChange(@NonNull AffectUI affectUI, int fromAffect, int toAffect, @Nullable View fromView, @NonNull View toView) {
         super.onAffectChange(affectUI, fromAffect, toAffect, fromView, toView);
         if (toAffect == AffectUI.AFFECT_ERROR) {
-            //显示额外的错误信息
-            Object extraObj = affectUI.getExtraObj();
-            if (extraObj != null) {
-                if (extraObj instanceof String) {
-                    baseViewHolder.tv(R.id.base_error_tip_view).setText((CharSequence) extraObj);
-                } else if (extraObj instanceof Number) {
+            onAffectToError(affectUI, fromAffect, toAffect, fromView, toView);
+        } else if (toAffect == AffectUI.AFFECT_LOADING) {
+            onAffectToLoading(affectUI, fromAffect, toAffect, fromView, toView);
+        }
+    }
 
+    /**
+     * 情感图 显示异常时
+     */
+    protected void onAffectToError(@NonNull AffectUI affectUI, int fromAffect, int toAffect, @Nullable View fromView, @NonNull View toView) {
+        //显示额外的错误信息
+        Object extraObj = affectUI.getExtraObj();
+        if (extraObj != null) {
+            if (extraObj instanceof String) {
+                baseViewHolder.tv(R.id.base_error_tip_view).setText((CharSequence) extraObj);
+            } else if (extraObj instanceof Number) {
+
+            } else {
+                baseViewHolder.tv(R.id.base_error_tip_view).setText(extraObj.toString());
+            }
+        }
+
+        baseViewHolder.click(R.id.base_retry_button, new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                switchAffectUI(AffectUI.AFFECT_LOADING);
+            }
+        });
+    }
+
+    /**
+     * 情感图 显示加载时
+     */
+    protected void onAffectToLoading(@NonNull AffectUI affectUI, int fromAffect, int toAffect, @Nullable View fromView, @NonNull View toView) {
+        boolean needRefresh = false;
+
+        if (firstShowEnd) {
+            if (!isFragmentHide()) {
+                needRefresh = true;
+            }
+        } else {
+            if (isFirstNeedLoadData()) {
+                if (isFragmentInViewPager()) {
+                    //不在此处触发
                 } else {
-                    baseViewHolder.tv(R.id.base_error_tip_view).setText(extraObj.toString());
+                    needRefresh = true;
                 }
             }
+        }
 
-            baseViewHolder.click(R.id.base_retry_button, new View.OnClickListener() {
+        if (needRefresh) {
+            int delay = firstShowEnd ? 0 : 160;
+            //切换到加载情感图, 调用刷新数据接口
+            baseViewHolder.postDelay(delay, new Runnable() {
                 @Override
-                public void onClick(View v) {
-                    switchAffectUI(AffectUI.AFFECT_LOADING);
+                public void run() {
+                    onBaseRefresh(null);
                 }
             });
-        } else if (toAffect == AffectUI.AFFECT_LOADING) {
-
-            boolean needRefresh = false;
-
-            if (isFragmentInViewPager()) {
-                if (firstShowEnd) {
-                    needRefresh = true;
-                }
-            } else {
-                if (!isFragmentHide()) {
-                    needRefresh = true;
-                }
-            }
-
-            if (needRefresh) {
-                //切换到加载情感图, 调用刷新数据接口
-                baseViewHolder.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        onBaseRefresh(null);
-                    }
-                });
-            }
         }
     }
 
@@ -271,7 +289,7 @@ public abstract class BaseRecyclerFragment<T> extends BaseTitleFragment
             }
         }
 
-        if (needRefresh) {
+        if (needRefresh && isFirstNeedLoadData()) {
             baseViewHolder.postDelay(160, new Runnable() {
                 @Override
                 public void run() {
@@ -385,7 +403,7 @@ public abstract class BaseRecyclerFragment<T> extends BaseTitleFragment
     /**
      * 界面首次显示, 是否需要触发加载数据
      */
-    protected boolean isFirstShowNeedLoadData() {
+    protected boolean isFirstNeedLoadData() {
         return true;
     }
 

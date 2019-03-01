@@ -12,3 +12,7 @@ import com.angcyo.uiview.less.utils.RUtils
 public fun Float.decimal(bitNum: Int = 2 /*小数点后几位*/, halfUp: Boolean = true /*四舍五入*/): String {
     return RUtils.decimal(this, bitNum, halfUp)
 }
+
+public fun Float.toDecimal(bitNum: Int = 2 /*小数点后几位*/, halfUp: Boolean = true /*四舍五入*/): String {
+    return decimal(bitNum, halfUp)
+}

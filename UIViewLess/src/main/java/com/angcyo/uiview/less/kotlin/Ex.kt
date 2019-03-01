@@ -46,6 +46,14 @@ public fun Int.remove(value: Int): Int = this and value.inv()
 public fun Int.add(value: Int): Int = this or value
 public fun Int.dpi(designDpi: Float): Int = RUtils.size(this, designDpi)
 
+/**
+ * 转换成 百分比
+ * */
+public fun Int.toPercent(bitNum: Int = 0, halfUp: Boolean = false): String =
+    RUtils.decimal(this * 1f / 100f, bitNum, halfUp).toFloat().toPercent()
+
+public fun Float.toPercent(): String = "${this * 100}%"
+
 public inline fun <T> T.isLollipop() = RUtils.isLollipop()
 
 public inline fun <T> T.nextInt(until: Int) = Random.nextInt(until)

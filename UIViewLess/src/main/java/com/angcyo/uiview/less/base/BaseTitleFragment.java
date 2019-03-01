@@ -76,7 +76,9 @@ public abstract class BaseTitleFragment extends BaseFragment implements AffectUI
     }
 
     protected void onInitBaseView(@NonNull RBaseViewHolder viewHolder, @Nullable Bundle arguments, @Nullable Bundle savedInstanceState) {
-        fragmentContentWrapperLayout = (FragmentContentWrapperLayout) viewHolder.itemView;
+        if (viewHolder.itemView instanceof FragmentContentWrapperLayout) {
+            fragmentContentWrapperLayout = (FragmentContentWrapperLayout) viewHolder.itemView;
+        }
 
         contentWrapperLayout = baseViewHolder.v(R.id.base_content_wrapper_layout);
         titleBarLayout = baseViewHolder.v(R.id.base_title_bar_layout);
@@ -91,6 +93,9 @@ public abstract class BaseTitleFragment extends BaseFragment implements AffectUI
      * 初始化标题部分
      */
     protected void initBaseTitleLayout(@Nullable Bundle arguments) {
+        if (titleBarLayout == null) {
+            return;
+        }
         LayoutInflater.from(mAttachContext).inflate(getTitleBarLayoutId(), titleBarLayout);
 
         //设置标题背景颜色
@@ -123,6 +128,9 @@ public abstract class BaseTitleFragment extends BaseFragment implements AffectUI
      * 初始化内容部分
      */
     protected void initContentLayout(@Nullable Bundle arguments) {
+        if (contentWrapperLayout == null) {
+            return;
+        }
         int contentLayoutId = getContentLayoutId();
         if (contentLayoutId == -1) {
             contentView = createContentView(contentWrapperLayout);
@@ -135,9 +143,6 @@ public abstract class BaseTitleFragment extends BaseFragment implements AffectUI
         affectUI = createAffectUI();
     }
 
-    /**
-     * 创建情感图控制类
-     */
     /**
      * 创建情感图控制类
      */

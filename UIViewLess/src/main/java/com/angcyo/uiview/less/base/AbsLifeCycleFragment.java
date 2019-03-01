@@ -3,6 +3,7 @@ package com.angcyo.uiview.less.base;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -45,6 +46,11 @@ public abstract class AbsLifeCycleFragment extends AbsFragment implements IFragm
      * 是否显示过第一次
      */
     protected boolean firstShowEnd = false;
+
+    /**
+     * 触发 {@link #onFragmentShow(Bundle)} 的次数
+     */
+    protected int fragmentShowCount = 0;
 
     //<editor-fold desc="生命周期, 系统的方法">
 
@@ -168,6 +174,7 @@ public abstract class AbsLifeCycleFragment extends AbsFragment implements IFragm
     }
 
 
+    @CallSuper
     @Override
     public void onFragmentShow(@Nullable Bundle bundle) {
         L.i(this.getClass().getSimpleName() +
@@ -176,6 +183,7 @@ public abstract class AbsLifeCycleFragment extends AbsFragment implements IFragm
                 " bundle:" + (bundle == null ? "×" : "√" +
                 " firstShowEnd:" + (firstShowEnd ? "√" : "×")));
         if (getView() != null) {
+            fragmentShowCount++;
             if (firstShowEnd) {
                 onFragmentNotFirstShow(bundle);
             } else {
@@ -275,6 +283,12 @@ public abstract class AbsLifeCycleFragment extends AbsFragment implements IFragm
     @Override
     public boolean hideSoftInputOnTouchDown(@Nullable View touchDownView) {
         return false;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        fragmentShowCount = 0;
     }
 
     //</editor-fold>
