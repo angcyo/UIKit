@@ -224,5 +224,10 @@ public abstract class AbsFragment extends Fragment {
                                 @Nullable Bundle savedInstanceState) {
 
     }
+
+    public RBaseViewHolder getBaseViewHolder() {
+        return baseViewHolder;
+    }
+
     //</editor-fold>
 }

@@ -183,6 +183,13 @@ public abstract class BaseRecyclerFragment<T> extends BaseTitleFragment
         switchAffectUI(AffectUI.AFFECT_CONTENT);
     }
 
+    /**
+     * 显示加载中
+     */
+    public void switchToLoading() {
+        switchAffectUI(AffectUI.AFFECT_LOADING);
+    }
+
     //<editor-fold desc="事件回调">
 
     /**
@@ -321,6 +328,16 @@ public abstract class BaseRecyclerFragment<T> extends BaseTitleFragment
     @Override
     public void onAdapterLodeMore(@NonNull final RBaseAdapter<T> adapter) {
         onBaseLoadMore(null, adapter);
+    }
+
+    @Override
+    public boolean onAdapterRefresh(@NonNull RBaseAdapter<T> baseAdapter) {
+        if (affectUI != null) {
+            switchToLoading();
+            return true;
+        }
+        onBaseRefresh(null);
+        return false;
     }
 
     /**

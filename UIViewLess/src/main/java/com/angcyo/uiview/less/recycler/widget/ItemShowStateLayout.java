@@ -68,6 +68,9 @@ public class ItemShowStateLayout extends FrameLayout implements IShowState {
                 ViewCompat.animate(view).scaleX(1.2f).scaleY(1.2f).alpha(0).withEndAction(new Runnable() {
                     @Override
                     public void run() {
+                        view.setScaleX(1f);
+                        view.setScaleY(1f);
+                        view.setAlpha(1);
                         view.setVisibility(visibility);
                     }
                 }).setInterpolator(new DecelerateInterpolator()).setDuration(160).start();

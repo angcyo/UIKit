@@ -436,6 +436,23 @@ public abstract class RBaseAdapter<T> extends RecyclerView.Adapter<RBaseViewHold
 
     }
 
+    public void adapterRefresh() {
+        onAdapterRefresh();
+
+        if (mLoadMoreListener != null && mLoadMoreListener.onAdapterRefresh(this)) {
+
+        } else {
+            setShowState(IShowState.LOADING);
+        }
+    }
+
+    /**
+     * 情感图显示错误时, 触发的刷新
+     */
+    public void onAdapterRefresh() {
+
+    }
+
     /**
      * 结束加载更多的标识, 方便下一次回调
      */
@@ -1088,6 +1105,13 @@ public abstract class RBaseAdapter<T> extends RecyclerView.Adapter<RBaseViewHold
 
     public interface OnAdapterLoadMoreListener<T> {
         void onAdapterLodeMore(@NonNull RBaseAdapter<T> baseAdapter);
+
+        /**
+         * 情感图触发的刷新事件
+         *
+         * @return true 拦截默认的情感图切换
+         */
+        boolean onAdapterRefresh(@NonNull RBaseAdapter<T> baseAdapter);
     }
 
     public interface OnLocalRefresh {
