@@ -354,6 +354,15 @@ public class ActivityHelper {
         }
 
         /**
+         * 无动画效果
+         */
+        public Builder noAnim() {
+            enterAnim(0);
+            exitAnim(0);
+            return this;
+        }
+
+        /**
          * 用来启动Activity
          */
         public Intent start() {
@@ -371,9 +380,16 @@ public class ActivityHelper {
             return intent;
         }
 
+        public Intent doIt() {
+            return start();
+        }
+
         /**
          * 可以在Fragment中, 关闭Activity , 或者 Remove  Fragment
+         *
+         * @deprecated 请使用 {@link FragmentHelper.Builder#back(Activity)}
          */
+        @Deprecated
         public void back() {
 
         }

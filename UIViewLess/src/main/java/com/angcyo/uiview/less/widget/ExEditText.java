@@ -239,6 +239,24 @@ public class ExEditText extends AppCompatEditText {
         return value;
     }
 
+    public static boolean isPasswordInputType(int inputType) {
+        final int variation =
+                inputType & (EditorInfo.TYPE_MASK_CLASS | EditorInfo.TYPE_MASK_VARIATION);
+        return variation
+                == (EditorInfo.TYPE_CLASS_TEXT | EditorInfo.TYPE_TEXT_VARIATION_PASSWORD)
+                || variation
+                == (EditorInfo.TYPE_CLASS_TEXT | EditorInfo.TYPE_TEXT_VARIATION_WEB_PASSWORD)
+                || variation
+                == (EditorInfo.TYPE_CLASS_NUMBER | EditorInfo.TYPE_NUMBER_VARIATION_PASSWORD);
+    }
+
+    public static boolean isVisiblePasswordInputType(int inputType) {
+        final int variation =
+                inputType & (EditorInfo.TYPE_MASK_CLASS | EditorInfo.TYPE_MASK_VARIATION);
+        return variation
+                == (EditorInfo.TYPE_CLASS_TEXT | EditorInfo.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+    }
+
     public void setCheckInputNumber(boolean checkInputNumber) {
         this.checkInputNumber = checkInputNumber;
     }
@@ -696,7 +714,7 @@ public class ExEditText extends AppCompatEditText {
     }
 
     private boolean isInputTypePassword() {
-        return ExKt.have(getInputType(), EditorInfo.TYPE_TEXT_VARIATION_PASSWORD);
+        return isPasswordInputType(getInputType());
     }
 
     private void updateState(boolean isDownIn) {
@@ -979,6 +997,7 @@ public class ExEditText extends AppCompatEditText {
     /**
      * 长度, 剔除了左右的空格
      */
+    @Override
     public int length() {
         return string().length();
     }
