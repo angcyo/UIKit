@@ -69,7 +69,7 @@ public class RDrawArcLoading extends RSectionDraw {
 
     @Override
     public void onDraw(@NonNull Canvas canvas) {
-        canvas.drawColor(Color.DKGRAY);
+        //canvas.drawColor(Color.DKGRAY);
         super.onDraw(canvas);
     }
 
