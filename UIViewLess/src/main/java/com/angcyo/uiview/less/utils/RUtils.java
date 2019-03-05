@@ -2670,7 +2670,7 @@ public class RUtils {
     }
 
     /**
-     * 加压到当前文件夹
+     * 解压到当前文件夹
      */
     public static String unzip(String filePath) {
         return unzip(filePath, false, true);
