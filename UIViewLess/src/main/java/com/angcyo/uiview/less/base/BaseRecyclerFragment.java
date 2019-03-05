@@ -415,6 +415,23 @@ public abstract class BaseRecyclerFragment<T> extends BaseTitleFragment
         }
     }
 
+    /**
+     * 加载失败, 默认使用 adapter 的错误情感图提示
+     */
+    public void onBaseLoadError(@Nullable Throwable error) {
+        resetUIStatus();
+        if (baseAdapter != null) {
+            if (affectUI != null) {
+                affectUI.showAffect(AffectUI.AFFECT_CONTENT);
+            }
+            if (baseAdapter.getAllDataCount() <= 0) {
+                baseAdapter.setShowState(IShowState.ERROR);
+            }
+        } else if (affectUI != null) {
+            switchToError();
+        }
+    }
+
     //</editor-fold desc="分页加载相关">
 
     /**
