@@ -6,13 +6,13 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Paint
 import android.graphics.Rect
-import android.os.Build
 import android.text.TextUtils
 import android.util.Base64
 import android.view.MotionEvent
 import android.view.ViewConfiguration
 import com.angcyo.http.Http
 import com.angcyo.http.Json
+import com.angcyo.uiview.less.resources.ResUtil
 import com.angcyo.uiview.less.skin.SkinHelper
 import com.angcyo.uiview.less.utils.RUtils
 import com.angcyo.uiview.less.utils.Reflect
@@ -45,6 +45,9 @@ public fun Int.isIn(value1: Int, value2: Int): Boolean {
 public fun Int.remove(value: Int): Int = this and value.inv()
 public fun Int.add(value: Int): Int = this or value
 public fun Int.dpi(designDpi: Float): Int = RUtils.size(this, designDpi)
+
+public fun Float.toDp() = ResUtil.dpToPx(this)
+public fun Int.toDp() = this.toFloat().toDp()
 
 /**
  * 转换成 百分比
