@@ -173,6 +173,8 @@ public abstract class BaseRecyclerFragment<T> extends BaseTitleFragment
             if (baseAdapter.getAllDataCount() <= 0) {
                 switchAffectUI(AffectUI.AFFECT_ERROR);
             }
+        } else {
+            switchAffectUI(AffectUI.AFFECT_ERROR);
         }
     }
 
