@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="r_arc_color" format="color"/>
+    <attr name="r_arc_width" format="dimension"/>
+
+    <declare-styleable name="RArcLoadingView">
+        <attr name="r_arc_color"/>
+        <attr name="r_arc_width"/>
+    </declare-styleable>
+
+    <declare-styleable name="RDrawArcLoading">
+        <attr name="r_arc_color"/>
+        <attr name="r_arc_width"/>
+    </declare-styleable>
+</resources>

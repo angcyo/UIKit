@@ -86,7 +86,7 @@ public class RSectionDraw extends BaseDraw {
                     sectionProgress = interpolatorList.get(i).getInterpolation(sectionProgress);
                 }
 
-                if (totalProgress >= sum && totalProgress <= sum + section) {
+                if (totalProgress >= sum && totalProgress < sum + section) {
                     onDrawProgressSection(canvas, i, sum, sum + section, totalProgress, sectionProgress);
                 }
 

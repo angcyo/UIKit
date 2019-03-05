@@ -862,9 +862,14 @@ public class AnimUtil {
     /**
      * 创建标准的值动画, 需要调用start(),才能开始
      */
+
     public static ValueAnimator valueAnimator(final ValueAnimator.AnimatorUpdateListener updateListener) {
+        return valueAnimator(1000, updateListener);
+    }
+
+    public static ValueAnimator valueAnimator(long duration, final ValueAnimator.AnimatorUpdateListener updateListener) {
         ValueAnimator valueAnimator = ValueAnimator.ofFloat(0f, 1f);
-        valueAnimator.setDuration(1000);
+        valueAnimator.setDuration(duration);
         valueAnimator.setRepeatCount(ValueAnimator.INFINITE);
         valueAnimator.setRepeatMode(ValueAnimator.RESTART);
         valueAnimator.setInterpolator(new LinearInterpolator());
