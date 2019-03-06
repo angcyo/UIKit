@@ -375,3 +375,17 @@ public fun Context.runActivity(cls: Class<*>) {
 public fun Context.getScreenOrientation(): Int {
     return resources.configuration.orientation
 }
+
+/**
+ * 横屏
+ * */
+public fun Context.isLandscape(): Boolean {
+    return resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+}
+
+/**
+ * 竖屏
+ * */
+public fun Context.isPortrait(): Boolean {
+    return resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
+}
