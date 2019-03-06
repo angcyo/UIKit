@@ -2,6 +2,7 @@ package com.angcyo.uiview.less.kotlin
 
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Paint
