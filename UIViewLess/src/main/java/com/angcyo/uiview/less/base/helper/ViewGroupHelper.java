@@ -1,10 +1,12 @@
 package com.angcyo.uiview.less.base.helper;
 
+import android.content.Context;
 import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.*;
 import android.support.v4.view.ViewCompat;
 import android.util.TypedValue;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -12,6 +14,8 @@ import android.widget.TextView;
 import com.angcyo.uiview.less.kotlin.ViewExKt;
 import com.angcyo.uiview.less.resources.ResUtil;
 import com.angcyo.uiview.less.widget.ImageTextView;
+
+import java.util.List;
 
 public class ViewGroupHelper {
     View parentView;
@@ -292,5 +296,46 @@ public class ViewGroupHelper {
             ViewExKt.setPaintFlags(((ImageTextView) selectorView).getTextPaint(), Paint.FAKE_BOLD_TEXT_FLAG, bold);
         }
         return this;
+    }
+
+    public static <T> void resetChild(@NonNull ViewGroup viewGroup, int newSize, @Nullable List<T> datas, @NonNull OnAddViewCallback<T> callback) {
+        resetChildCount(viewGroup, newSize, callback);
+        for (int i = 0; i < viewGroup.getChildCount(); i++) {
+            T data = null;
+            if (datas != null && datas.size() > i) {
+                data = datas.get(i);
+            }
+            callback.onInitView(viewGroup.getChildAt(i), data, i);
+        }
+    }
+
+    public static void resetChildCount(ViewGroup viewGroup, int newSize, OnAddViewCallback callback) {
+        int oldSize = viewGroup.getChildCount();
+        int count = newSize - oldSize;
+        if (count > 0) {
+            //需要补充子View
+            for (int i = 0; i < count; i++) {
+                viewGroup.addView(callback.createView(viewGroup.getContext(), viewGroup));
+            }
+        } else if (count < 0) {
+            //需要移除子View
+            for (int i = Math.abs(count); i < count; i++) {
+                viewGroup.removeViewAt(oldSize - 1 - i);
+            }
+        }
+    }
+
+    public static class OnAddViewCallback<T> {
+        public int getLayoutId() {
+            return -1;
+        }
+
+        public View createView(@NonNull Context context, @NonNull ViewGroup viewGroup) {
+            return LayoutInflater.from(context).inflate(getLayoutId(), viewGroup, false);
+        }
+
+        public void onInitView(@NonNull View itemView, @Nullable T data, int index) {
+
+        }
     }
 }
