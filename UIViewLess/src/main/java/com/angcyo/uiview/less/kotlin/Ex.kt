@@ -365,3 +365,13 @@ public fun Context.runActivity(cls: Class<*>) {
         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     })
 }
+
+/**
+ * 获取屏幕方向
+ *
+ * @see android.content.res.Configuration#ORIENTATION_LANDSCAPE
+ * @see android.content.res.Configuration#ORIENTATION_PORTRAIT
+ */
+public fun Context.getScreenOrientation(): Int {
+    return resources.configuration.orientation
+}

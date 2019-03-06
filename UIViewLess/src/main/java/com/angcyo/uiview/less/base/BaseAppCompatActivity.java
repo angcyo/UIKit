@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.graphics.PixelFormat;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -328,5 +329,30 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
             }
         }
         return have;
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        L.w("\n" + newConfig.toString());
+        onOrientationChanged(newConfig.orientation);
+    }
+
+    protected void onOrientationChanged(int orientation) {
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            //切换到横屏
+            onOrientationToLandscape();
+        } else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+            //切换到竖屏
+            onOrientationToPortrait();
+        }
+    }
+
+    protected void onOrientationToLandscape() {
+
+    }
+
+    protected void onOrientationToPortrait() {
+
     }
 }

@@ -2,6 +2,7 @@ package com.angcyo.uiview.less.base;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
@@ -198,6 +199,31 @@ public abstract class AbsFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         L.i(this.getClass().getSimpleName() + " request:" + requestCode + " result:" + resultCode + " " + data);
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        L.w("\n" + newConfig.toString());
+        onOrientationChanged(newConfig.orientation);
+    }
+
+    protected void onOrientationChanged(int orientation) {
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            //切换到横屏
+            onOrientationToLandscape();
+        } else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+            //切换到竖屏
+            onOrientationToPortrait();
+        }
+    }
+
+    protected void onOrientationToLandscape() {
+
+    }
+
+    protected void onOrientationToPortrait() {
+
     }
 
     //</editor-fold>

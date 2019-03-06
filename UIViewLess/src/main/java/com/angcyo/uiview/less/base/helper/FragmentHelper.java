@@ -119,6 +119,49 @@ public class FragmentHelper {
         return fragmentList;
     }
 
+    /**
+     * 移除已存在
+     * 重新创建所有Fragment
+     * 用于屏幕方向改变后, 切换布局等
+     */
+    public static List<Fragment> recreate(@NonNull Context context,
+                                          @NonNull final FragmentManager fragmentManager,
+                                          @IdRes int layoutId,
+                                          Class<? extends Fragment>... cls) {
+        List<Fragment> oldFragment = fragmentManager.getFragments();
+        List<Fragment> newFragments = new ArrayList<>();
+        for (Class f : cls) {
+            newFragments.add(Fragment.instantiate(context, f.getName()));
+        }
+
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        for (Fragment fragment : oldFragment) {
+            fragmentTransaction.remove(fragment);
+        }
+
+        int size = newFragments.size();
+        for (int i = 0; i < size; i++) {
+            Fragment fragment = newFragments.get(i);
+            fragmentTransaction.add(layoutId, fragment, fragment.getClass().getSimpleName());
+            if (i != size - 1) {
+                fragmentTransaction.hide(fragment);
+            }
+        }
+
+        if (L.LOG_DEBUG) {
+            fragmentTransaction.runOnCommit(new Runnable() {
+                @Override
+                public void run() {
+                    logFragments(fragmentManager);
+                }
+            });
+        }
+
+        fragmentTransaction.commitNow();
+
+        return newFragments;
+    }
+
     public static Builder build(FragmentManager fragmentManager) {
         return new Builder(fragmentManager);
     }
@@ -205,25 +248,25 @@ public class FragmentHelper {
 
     public static void logFragmentStatus(@Nullable Fragment fragment, @Nullable StringBuilder builder) {
         if (fragment != null && builder != null) {
-            builder.append(" A:");
+            builder.append(" a:");
             builder.append(fragment.isAdded() ? "√" : "×");
-            builder.append(" H:");
+            builder.append(" h:");
             builder.append(fragment.isHidden() ? "√" : "×");
-            builder.append(" V:");
+            builder.append(" vHint:");
             builder.append(fragment.getUserVisibleHint() ? "√" : "×");
 
             View view = fragment.getView();
             if (view != null) {
                 Object tag = view.getTag(R.id.base_tag_old_view_visible);
                 if (tag != null) {
-                    builder.append(" OV:");
+                    builder.append("  oVV:");
                     builder.append(visibilityToString((Integer) tag));
                 }
 
-                builder.append(" VV:");
+                builder.append(" vv:");
                 builder.append(visibilityToString(view.getVisibility()));
             } else {
-                builder.append(" view:×");
+                builder.append("  view:×");
             }
 
             if (fragment instanceof IFragment) {

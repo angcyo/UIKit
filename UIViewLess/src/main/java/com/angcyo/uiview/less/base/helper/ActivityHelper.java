@@ -251,12 +251,18 @@ public class ActivityHelper {
                 .start();
     }
 
+    /**
+     * 恢复已存在的
+     */
     public static List<Fragment> restore(@NonNull Context context,
                                          @NonNull FragmentManager fragmentManager,
                                          Class<? extends Fragment>... cls) {
         return FragmentHelper.restore(context, fragmentManager, cls);
     }
 
+    /**
+     * 恢复/添加 所有
+     */
     public static List<Fragment> restoreShow(@NonNull Context context,
                                              @NonNull FragmentManager fragmentManager,
                                              @IdRes int layoutId,
@@ -264,6 +270,15 @@ public class ActivityHelper {
         return FragmentHelper.restoreShow(context, fragmentManager, layoutId, cls);
     }
 
+    /**
+     * 重新创建所有
+     */
+    public static List<Fragment> recreate(@NonNull Context context,
+                                          @NonNull FragmentManager fragmentManager,
+                                          @IdRes int layoutId,
+                                          Class<? extends Fragment>... cls) {
+        return FragmentHelper.recreate(context, fragmentManager, layoutId, cls);
+    }
 
     /**
      * 获取启动的时, 设置的参数
