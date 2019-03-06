@@ -3,6 +3,7 @@
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
+        android:tag="loading"
         android:layout_height="match_parent">
 
     <LinearLayout
@@ -22,7 +23,7 @@
         <TextView
                 android:id="@+id/base_loading_text_view"
                 style="@style/BaseMainTextStyle"
-                android:text="加载中..."
+                android:text="@string/loading_tip"
                 android:layout_marginLeft="@dimen/base_xhdpi"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>

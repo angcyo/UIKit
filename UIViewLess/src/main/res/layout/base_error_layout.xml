@@ -2,13 +2,13 @@
 <FrameLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/base_empty_root_layout"
+        android:id="@+id/base_error_root_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:tag="empty">
+        android:tag="error">
 
     <LinearLayout
-            android:id="@+id/base_content_wrap_layout"
+            android:id="@+id/base_error_wrap_layout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -16,20 +16,21 @@
             android:orientation="vertical">
 
         <android.support.v7.widget.AppCompatImageView
-                android:id="@+id/base_empty_image_view"
+                android:id="@+id/base_error_image_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:tint="@color/colorAccent"
                 android:src="@drawable/base_ico_load_fail"/>
 
         <TextView
-                android:id="@+id/base_empty_tip_view"
+                android:id="@+id/base_error_tip_view"
                 style="@style/BaseMainTextStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:gravity="center"
-                android:text="@string/empty_tip"
+                android:lineSpacingExtra="4dp"
+                android:text="@string/error_tip"
                 android:textColor="@color/default_base_border"
                 android:textSize="@dimen/default_text_little_size"/>
     </LinearLayout>

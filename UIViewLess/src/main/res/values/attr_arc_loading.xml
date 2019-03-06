@@ -2,14 +2,17 @@
 <resources>
     <attr name="r_arc_color" format="color"/>
     <attr name="r_arc_width" format="dimension"/>
+    <attr name="r_arc_duration" format="integer"/>
 
     <declare-styleable name="RArcLoadingView">
         <attr name="r_arc_color"/>
         <attr name="r_arc_width"/>
+        <attr name="r_arc_duration"/>
     </declare-styleable>
 
     <declare-styleable name="RDrawArcLoading">
         <attr name="r_arc_color"/>
         <attr name="r_arc_width"/>
+        <attr name="r_arc_duration"/>
     </declare-styleable>
 </resources>

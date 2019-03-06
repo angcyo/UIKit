@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/base_no_more_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="@dimen/base_item_size"
+        android:layout_gravity="center"
+        android:tag="no_more"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+    <View
+            android:layout_width="260dp"
+            android:layout_gravity="center"
+            android:layout_height="2dp"
+            android:background="#FFF"/>
+
+    <TextView
+            android:id="@+id/base_no_more_tip_view"
+            style="@style/BaseMainTextStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="@color/base_chat_bg_color"
+            android:paddingLeft="@dimen/base_xhdpi"
+            android:paddingRight="@dimen/base_xhdpi"
+            android:text="@string/load_no_more_tip"
+            android:textColor="@color/base_text_color_dark"
+            android:textSize="@dimen/default_text_size"/>
+
+</FrameLayout>

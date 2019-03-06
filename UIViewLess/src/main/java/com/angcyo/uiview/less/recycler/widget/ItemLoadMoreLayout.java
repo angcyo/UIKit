@@ -29,11 +29,11 @@ public class ItemLoadMoreLayout extends FrameLayout implements ILoadMore {
     private void initView() {
         for (int i = 0; i < getChildCount(); i++) {
             final View view = getChildAt(i);
-            if (TextUtils.equals("error_view", (CharSequence) view.getTag())) {
+            if (TextUtils.equals("error", (CharSequence) view.getTag())) {
                 errorView = view;
-            } else if (TextUtils.equals("no_more_view", (CharSequence) view.getTag())) {
+            } else if (TextUtils.equals("no_more", (CharSequence) view.getTag())) {
                 noMoreView = view;
-            } else if (TextUtils.equals("load_view", (CharSequence) view.getTag())) {
+            } else if (TextUtils.equals("loading", (CharSequence) view.getTag())) {
                 loadView = view;
                 mLoadingIndicatorView = loadView.findViewById(R.id.base_load_image_view);
             }

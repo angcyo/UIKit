@@ -10,11 +10,8 @@
             android:visibility="gone"/>
 
     <!--加载中-->
-    <com.angcyo.uiview.less.widget.EmptyView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:padding="@dimen/base_xhdpi"
-            android:tag="loading"
+    <include
+            layout="@layout/base_loading_layout"
             android:visibility="gone"/>
 
     <!--<ProgressBar-->
@@ -30,11 +27,8 @@
             android:visibility="gone"/>
 
     <!--错误-->
-    <TextView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:tag="error"
-            android:text="error"
+    <include
+            layout="@layout/base_error_layout"
             android:visibility="gone"/>
+
 </com.angcyo.uiview.less.recycler.widget.ItemShowStateLayout>

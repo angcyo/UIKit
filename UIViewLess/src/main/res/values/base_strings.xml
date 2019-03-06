@@ -13,4 +13,9 @@
     <string name="base_accessibility_summary">R•Sen微信辅助工具</string>
     <string name="url_link_tip">网页链接</string>
     <string name="see_all">查看全部</string>
+    <string name="error_tip">出错啦, 心情都不好了!\n点击屏幕刷新</string>
+    <string name="load_retry_tip">加载失败, 点击重试</string>
+    <string name="loading_tip">加载中...</string>
+    <string name="load_no_more_tip">我是有底线的</string>
+    <string name="empty_tip">空空如也</string>
 </resources>

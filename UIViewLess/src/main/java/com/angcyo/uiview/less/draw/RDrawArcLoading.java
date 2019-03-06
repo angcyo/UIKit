@@ -12,6 +12,8 @@ import com.angcyo.uiview.less.R;
 import com.angcyo.uiview.less.resources.AnimUtil;
 import com.angcyo.uiview.less.skin.SkinHelper;
 
+import static android.view.View.VISIBLE;
+
 /**
  * 2个扇形转圈, 然后变小的loading动画
  * <p>
@@ -43,6 +45,11 @@ public class RDrawArcLoading extends RSectionDraw {
 
     int arcColor = Color.RED;
 
+    /**
+     * 动画时长
+     */
+    long duration = 2000;
+
     public RDrawArcLoading(@NonNull View view) {
         super(view);
     }
@@ -63,6 +70,8 @@ public class RDrawArcLoading extends RSectionDraw {
 
             strokeWidth = array.getDimensionPixelOffset(R.styleable.RDrawArcLoading_r_arc_width, (int) strokeWidth);
         }
+
+        duration = array.getInt(R.styleable.RDrawArcLoading_r_arc_duration, (int) duration);
 
         array.recycle();
     }
@@ -175,8 +184,29 @@ public class RDrawArcLoading extends RSectionDraw {
     @Override
     public void onAttachedToWindow() {
         super.onAttachedToWindow();
+    }
 
-        valueAnimator = AnimUtil.valueAnimator(2000, new ValueAnimator.AnimatorUpdateListener() {
+    @Override
+    public void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        endLoad();
+    }
+
+    @Override
+    public void onVisibilityChanged(View changedView, int visibility) {
+        super.onVisibilityChanged(changedView, visibility);
+        if (visibility == VISIBLE) {
+            if (valueAnimator != null && valueAnimator.isStarted()) {
+                return;
+            }
+            startLoad();
+        } else {
+            endLoad();
+        }
+    }
+
+    private void startLoad() {
+        valueAnimator = AnimUtil.valueAnimator(duration, new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
                 setProgress((int) (animation.getAnimatedFraction() * 100));
@@ -186,9 +216,7 @@ public class RDrawArcLoading extends RSectionDraw {
         valueAnimator.start();
     }
 
-    @Override
-    public void onDetachedFromWindow() {
-        super.onDetachedFromWindow();
+    private void endLoad() {
         if (valueAnimator != null) {
             valueAnimator.cancel();
             valueAnimator = null;
