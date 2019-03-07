@@ -18,6 +18,16 @@
         <item name="android:windowBackground">@color/theme_color_primary</item>
     </style>
 
+    <style name="BaseTranTheme" parent="BaseAppTheme">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowTranslucentNavigation">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:colorBackgroundCacheHint">@null</item>
+    </style>
+
     <!--透明Activity 主题-->
     <style name="BaseTranslucentTheme" parent="BaseNoTitleBarTheme">
         <item name="android:statusBarColor">@android:color/transparent</item>

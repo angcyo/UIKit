@@ -211,6 +211,15 @@ public class RNotifier {
         nm.cancel(notifyID);
     }
 
+    public static PendingIntent getBroadcastPendingIntent(Context context, int requestCode,
+                                                          @NonNull Intent intent) {
+        return PendingIntent.getBroadcast(context, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+    }
+
+    /**
+     * @param requestCode 用于onActivityResult
+     * @see android.app.Activity#onActivityResult(int, int, Intent)
+     */
     public static PendingIntent getActivityPendingIntent(Context context, int requestCode,
                                                          @NonNull Intent intent) {
         return PendingIntent.getActivity(context, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT, null);
@@ -472,6 +481,10 @@ public class RNotifier {
                     return notifyId;
                 }
             }
+
+            //notify.icon
+            //Icon mSmallIcon = Icon.createWithResource(context, smallIcon);
+            //Reflect.setFieldValue(notify, "mSmallIcon", mSmallIcon);
 
             nm.notify(channelName, notifyId, notify);
 
