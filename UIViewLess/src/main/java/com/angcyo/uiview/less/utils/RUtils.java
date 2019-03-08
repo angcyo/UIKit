@@ -3157,4 +3157,30 @@ public class RUtils {
     public static float getScaledDensity() {
         return getApp().getResources().getDisplayMetrics().scaledDensity;
     }
+
+    /**
+     * 获取当前月有多少天
+     */
+    public static int getMonthDay() {
+        return getMonthDay(System.currentTimeMillis());
+    }
+
+    /**
+     * 获取当前指定时间的 月, 有多少天
+     */
+    public static int getMonthDay(long date) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(new Date(date));
+
+        //2019
+        int year = cal.get(Calendar.YEAR);
+        //0-11月
+        int month = cal.get(Calendar.MONTH);
+
+        cal.set(year, month, 1);
+        cal.roll(Calendar.DAY_OF_MONTH, -1);
+
+        //1-31天
+        return cal.get(Calendar.DAY_OF_MONTH);
+    }
 }
