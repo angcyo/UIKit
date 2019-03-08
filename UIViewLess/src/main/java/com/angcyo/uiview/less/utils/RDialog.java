@@ -11,10 +11,8 @@ import android.support.design.widget.BottomSheetDialog;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatDialog;
 import android.text.TextUtils;
-import android.view.Gravity;
-import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
+import android.view.*;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.angcyo.http.HttpSubscriber;
@@ -103,21 +101,40 @@ public class RDialog {
                                            @LayoutRes int layoutId,
                                            int dialogWidth,
                                            @Nullable final DialogInterface.OnDismissListener dismissListener) {
-        final AlertDialog alertDialog = build(context)
-                .setCancelable(false)
+        final AlertDialog alertDialog = defaultBuild(build(context))
+                .setAutoWidthHeight(false)
                 .setDialogWidth(dialogWidth)
-                .setDimAmount(0f)
-                .setAnimStyleResId(R.style.WindowNoAnim)
-                .setDialogBgColor(Color.TRANSPARENT)
                 .setContentLayoutId(layoutId)
                 .setOnDismissListener(dismissListener)
                 .showAlertDialog();
 
-        delayCanCancelable(alertDialog, 5_000, dismissListener);
+        return defaultDialog(alertDialog, dismissListener);
+    }
 
-        dialogQueue.add(alertDialog);
+    public static synchronized Dialog flow(@NonNull final Context context,
+                                           @LayoutRes int layoutId,
+                                           @Nullable OnInitListener initListener,
+                                           @Nullable final DialogInterface.OnDismissListener dismissListener) {
+        final AlertDialog alertDialog = defaultBuild(build(context))
+                .setInitListener(initListener)
+                .setContentLayoutId(layoutId)
+                .setOnDismissListener(dismissListener)
+                .showAlertDialog();
+        return defaultDialog(alertDialog, dismissListener);
+    }
 
-        return alertDialog;
+    public static Builder defaultBuild(@NonNull Builder builder) {
+        return builder.setCancelable(false)
+                .setAutoWidthHeight(true)
+                .setDimAmount(0f)
+                .setAnimStyleResId(R.style.WindowNoAnim)
+                .setDialogBgColor(Color.TRANSPARENT);
+    }
+
+    public static Dialog defaultDialog(@NonNull Dialog dialog, @Nullable final DialogInterface.OnDismissListener dismissListener) {
+        delayCanCancelable(dialog, 5_000, dismissListener);
+        dialogQueue.add(dialog);
+        return dialog;
     }
 
     public static Dialog delayCanCancelable(@NonNull final Dialog dialog, long delayMillis,
@@ -222,6 +239,35 @@ public class RDialog {
     }
 
     /**
+     * 测量 layout 或者 view 的大小
+     *
+     * @param layoutId 二选一
+     * @param view     二选一
+     */
+    public static int[] measureSize(@NonNull Context context, int layoutId, @Nullable View view) {
+        if (view == null) {
+            view = LayoutInflater.from(context).inflate(layoutId, new FrameLayout(context));
+        }
+        view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        view.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
+                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+
+        return new int[]{view.getMeasuredHeight(), view.getMeasuredHeight()};
+    }
+
+    /**
+     * 重置dialog的大小
+     */
+    public static void resetDialogSize(@Nullable Dialog dialog, int width, int height) {
+        if (dialog != null) {
+            Window window = dialog.getWindow();
+            if (window != null) {
+                window.setLayout(width, height);
+            }
+        }
+    }
+
+    /**
      * 标准对话框
      */
     public static class Builder {
@@ -253,6 +299,11 @@ public class RDialog {
         int dialogWidth = NO_NUM;
         int dialogHeight = NO_NUM;
         int dialogGravity = NO_NUM;
+
+        /**
+         * 自动计算宽高
+         */
+        boolean autoWidthHeight = false;
 
         /**
          * 对话框变暗指数, [0,1]
@@ -343,6 +394,17 @@ public class RDialog {
 
         public Builder setDialogHeight(int dialogHeight) {
             this.dialogHeight = dialogHeight;
+            return this;
+        }
+
+        public Builder setDialogWidthHeight(int dialogWidth, int dialogHeight) {
+            setDialogWidth(dialogWidth);
+            setDialogHeight(dialogHeight);
+            return this;
+        }
+
+        public Builder setAutoWidthHeight(boolean autoWidthHeight) {
+            this.autoWidthHeight = autoWidthHeight;
             return this;
         }
 
@@ -496,15 +558,21 @@ public class RDialog {
             if (window != null) {
                 WindowManager.LayoutParams attributes = window.getAttributes();
 
-                // window的宽高设置
-                if (dialogWidth != NO_NUM && dialogHeight != NO_NUM) {
-                    window.setLayout(dialogWidth, dialogHeight);
+                if (autoWidthHeight && layoutId != -1) {
+                    //自动测量 布局的宽高
+                    int[] size = measureSize(context, layoutId, null);
+                    window.setLayout(size[0], size[1]);
                 } else {
-                    if (dialogHeight != NO_NUM) {
-                        window.setLayout(attributes.width, dialogHeight);
-                    }
-                    if (dialogWidth != NO_NUM) {
-                        window.setLayout(dialogWidth, attributes.height);
+                    // window的宽高设置
+                    if (dialogWidth != NO_NUM && dialogHeight != NO_NUM) {
+                        window.setLayout(dialogWidth, dialogHeight);
+                    } else {
+                        if (dialogHeight != NO_NUM) {
+                            window.setLayout(attributes.width, dialogHeight);
+                        }
+                        if (dialogWidth != NO_NUM) {
+                            window.setLayout(dialogWidth, attributes.height);
+                        }
                     }
                 }
 
