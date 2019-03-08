@@ -81,7 +81,7 @@ public class HttpConfigDialog {
                         RSpinner spinner = dialogViewHolder.v(R.id.url_spinner);
                         List<String> urls = new ArrayList<>();
                         urls.add("选择服务器");
-                        if (urlList.isEmpty()) {
+                        if (urlList == null || urlList.isEmpty()) {
                             urls.add(baseUrl);
                         } else {
                             urls.addAll(urlList);
