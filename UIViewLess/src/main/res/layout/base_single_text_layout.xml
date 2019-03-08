@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/base_text_view"
+        android:background="@drawable/base_bg_selector"
+        android:layout_width="match_parent"
+        style="@style/BaseMainTextStyle"
+        android:minHeight="40dp"
+        android:paddingLeft="@dimen/base_hdpi"
+        android:paddingRight="@dimen/base_hdpi"
+        android:paddingTop="@dimen/base_ldpi"
+        android:paddingBottom="@dimen/base_ldpi"
+        android:layout_height="wrap_content">
+
+</TextView>

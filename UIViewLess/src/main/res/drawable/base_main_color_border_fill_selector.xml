@@ -19,7 +19,7 @@
     <item>
         <shape android:shape="rectangle">
             <stroke android:width="@dimen/base_border_little_size"
-                    android:color="@color/theme_color_primary_dark_tran"/>
+                    android:color="@color/theme_color_primary_dark"/>
             <corners android:radius="@dimen/base_round_little_radius"/>
         </shape>
     </item>
