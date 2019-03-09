@@ -19,6 +19,8 @@ import android.media.*;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Looper;
 import android.os.Process;
@@ -54,7 +56,9 @@ import com.angcyo.uiview.less.widget.RExTextView;
 
 import java.io.*;
 import java.lang.reflect.Field;
+import java.net.InetAddress;
 import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -63,6 +67,7 @@ import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import static android.content.Context.WIFI_SERVICE;
 import static com.angcyo.uiview.less.RCrashHandler.FILE_NAME_SUFFIX;
 
 /**
@@ -3182,5 +3187,47 @@ public class RUtils {
 
         //1-31天
         return cal.get(Calendar.DAY_OF_MONTH);
+    }
+
+    /**
+     * 获取wifi ip地址
+     */
+    public static String getIP(@NonNull Context context) {
+        try {
+            WifiManager wifiManager = (WifiManager) context.getApplicationContext().getSystemService(WIFI_SERVICE);
+            WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+            int ipAddress = wifiInfo.getIpAddress();
+            //ipAddress 为0时, 有可能wifi被禁用, 或者未连接. 也有可能是正在连接
+            //<unknown ssid>
+            return String.format(Locale.getDefault(), "%d.%d.%d.%d",
+                    (ipAddress & 0xff), (ipAddress >> 8 & 0xff),
+                    (ipAddress >> 16 & 0xff), (ipAddress >> 24 & 0xff));
+        } catch (Exception ex) {
+            //Log.e(TAG, ex.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * fe80::ccf1:47ff:feee:a89d%dummy0
+     */
+    public static String getMobileIP() {
+        try {
+            for (Enumeration<NetworkInterface> en = NetworkInterface
+                    .getNetworkInterfaces(); en.hasMoreElements(); ) {
+                NetworkInterface intf = en.nextElement();
+                for (Enumeration<InetAddress> enumIpAddr = intf
+                        .getInetAddresses(); enumIpAddr.hasMoreElements(); ) {
+                    InetAddress inetAddress = enumIpAddr.nextElement();
+                    if (!inetAddress.isLoopbackAddress()) {
+                        String ipaddress = inetAddress.getHostAddress();
+                        return ipaddress;
+                    }
+                }
+            }
+        } catch (SocketException ex) {
+            // Log.e(TAG, "Exception in Get IP Address: " + ex.toString());
+        }
+        return null;
     }
 }
