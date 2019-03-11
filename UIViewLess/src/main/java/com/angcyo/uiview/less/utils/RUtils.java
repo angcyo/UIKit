@@ -3191,6 +3191,7 @@ public class RUtils {
 
     /**
      * 获取wifi ip地址
+     * android.permission.ACCESS_WIFI_STATE
      */
     public static String getIP(@NonNull Context context) {
         try {
