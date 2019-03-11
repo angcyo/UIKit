@@ -24,6 +24,7 @@ import static com.luck.picture.lib.config.PictureConfig.SINGLE;
 
 /**
  * https://github.com/LuckSiege/PictureSelector
+ * 2.2.3(未更新)
  * <p>
  * Email:angcyo@126.com
  *
