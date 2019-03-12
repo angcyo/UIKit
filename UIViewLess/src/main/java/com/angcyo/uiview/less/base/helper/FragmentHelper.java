@@ -595,6 +595,10 @@ public class FragmentHelper {
 
         public Builder(FragmentManager fragmentManager) {
             this.fragmentManager = fragmentManager;
+            if (fragmentManager != null) {
+                //当调用了onSaveInstanceState,则允许状态丢失
+                allowStateLoss(fragmentManager.isStateSaved());
+            }
         }
 
         public Builder hideFragment(Fragment hideFragment) {
