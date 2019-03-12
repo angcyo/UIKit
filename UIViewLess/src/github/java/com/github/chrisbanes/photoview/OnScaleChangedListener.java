@@ -1,4 +1,4 @@
-package com.luck.picture.lib.photoview;
+package com.github.chrisbanes.photoview;
 
 
 /**

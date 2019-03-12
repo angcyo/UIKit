@@ -689,3 +689,25 @@ public fun View.setBgDrawable(drawable: Drawable? = null) {
 public fun View.setBgDrawable(resId: Int) {
     setBgDrawable(getDrawable(resId))
 }
+
+/**
+ * 设置视图的宽高
+ * */
+public fun View.setWidthHeight(width: Int, height: Int) {
+    val params = layoutParams
+    params.width = width
+    params.height = height
+    layoutParams = params
+}
+
+public fun View.setWidth(width: Int) {
+    val params = layoutParams
+    params.width = width
+    layoutParams = params
+}
+
+public fun View.setHeight(height: Int) {
+    val params = layoutParams
+    params.height = height
+    layoutParams = params
+}
