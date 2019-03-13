@@ -8,6 +8,8 @@ import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import com.angcyo.uiview.less.R;
+import com.angcyo.uiview.less.recycler.RBaseViewHolder;
 
 import java.lang.ref.WeakReference;
 
@@ -34,6 +36,8 @@ public abstract class RPagerAdapter extends PagerAdapter implements ViewPager.On
             } else {
                 view = createView(context, position, itemType);
             }
+
+            view.setTag(R.id.tag, new RBaseViewHolder(view));
         }
 
         if (view.getParent() == null) {
@@ -44,7 +48,9 @@ public abstract class RPagerAdapter extends PagerAdapter implements ViewPager.On
             }
         }
 
+
         initItemView(view, position, itemType);
+        initItemView(((RBaseViewHolder) view.getTag(R.id.tag)), position, itemType);
 
         return view;
     }
@@ -84,7 +90,12 @@ public abstract class RPagerAdapter extends PagerAdapter implements ViewPager.On
     /**
      * 重写初始化布局
      */
+    @Deprecated
     protected void initItemView(@NonNull View rootView, int position, int itemType) {
+
+    }
+
+    protected void initItemView(@NonNull RBaseViewHolder viewHolder, int position, int itemType) {
 
     }
 

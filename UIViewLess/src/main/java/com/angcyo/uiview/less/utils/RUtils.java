@@ -2999,6 +2999,7 @@ public class RUtils {
      * 无网络
      */
     public static boolean isNoNet() {
+        //        return !NetworkUtils.isConnected();
         return NetworkUtil.getNetType(RApplication.getApp()) == -1;
     }
 
@@ -3023,6 +3024,8 @@ public class RUtils {
 
     /**
      * 导航栏高度
+     *
+     * @see #navBarHeight(Context)
      */
     public static int getNavBarHeight(Context context) {
         Resources resources = context.getResources();
@@ -3230,5 +3233,37 @@ public class RUtils {
             // Log.e(TAG, "Exception in Get IP Address: " + ex.toString());
         }
         return null;
+    }
+
+    /**
+     * 导航栏是否显示
+     */
+    public static boolean isNavBarShow(Context context) {
+        return navBarHeight(context) > 0;
+    }
+
+    /**
+     * 导航栏的高度(如果显示了)
+     */
+    public static int navBarHeight(Context context) {
+        int result = 0;
+
+        if (context instanceof Activity) {
+            Rect decorRect = new Rect();
+            Rect windowRect = new Rect();
+
+            ((Activity) context).getWindow().getDecorView().getGlobalVisibleRect(decorRect);
+            ((Activity) context).getWindow().findViewById(Window.ID_ANDROID_CONTENT).getGlobalVisibleRect(windowRect);
+
+            if (decorRect.width() > decorRect.height()) {
+                //横屏
+                result = decorRect.width() - windowRect.width();
+            } else {
+                //竖屏
+                result = decorRect.bottom - windowRect.bottom;
+            }
+        }
+
+        return result;
     }
 }
