@@ -116,7 +116,7 @@ public abstract class BaseFragment extends AbsLifeCycleFragment {
         }
     }
 
-    //<editor-fold desc="网络请求管理">
+    //<editor-fold defaultstate="collapsed" desc="网络请求管理">
 
     @Override
     public void onDestroy() {
