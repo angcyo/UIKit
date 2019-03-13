@@ -53,6 +53,7 @@ object RPhotoPager {
         val imageViews = getImageViews(recyclerView, imageViewId)
         config.originPhotoRect = getImageRects(imageViews)
         config.previewDrawables = getImageDrawables(imageViews)
+        config.scaleType = imageViews[startIndex].scaleType
 
         config.dataSource = object : SinglePhotoDataSource<String>(photos) {
             override fun getPlaceholder(position: Int): Drawable? {
@@ -82,17 +83,19 @@ object RPhotoPager {
     ) {
         val config = RPhotoPagerConfig()
         config.currentIndex = startIndex
-        config.dataSource = object : SinglePhotoDataSource<String>(photos) {
-            override fun getPlaceholder(position: Int): Drawable? {
-                return config.getPreviewDrawable(position)
-            }
-        }
+        config.scaleType = images[startIndex].scaleType
 
         //小图赋值
         config.previewDrawables = getImageDrawables(images)
 
         //位置赋值
         config.originPhotoRect = getImageRects(images)
+
+        config.dataSource = object : SinglePhotoDataSource<String>(photos) {
+            override fun getPlaceholder(position: Int): Drawable? {
+                return config.getPreviewDrawable(position)
+            }
+        }
 
         init?.let { config.it() }
 
@@ -183,6 +186,11 @@ class RPhotoPagerConfig {
      * 预览的小图
      * */
     var previewDrawables: MutableList<Drawable?>? = null
+
+    /**
+     * 图片显示的scale类型
+     * */
+    var scaleType: ImageView.ScaleType = ImageView.ScaleType.CENTER_CROP
 
     /**
      * 原始图片view, 所在的屏幕坐标位置

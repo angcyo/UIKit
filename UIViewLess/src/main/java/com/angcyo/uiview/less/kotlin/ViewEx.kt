@@ -738,6 +738,7 @@ public fun ImageView.load(url: String?, option: (RequestBuilder<Drawable>.() -> 
                 //dontAnimate()
                 //autoClone()
                 diskCacheStrategy(DiskCacheStrategy.ALL)
+                override(Target.SIZE_ORIGINAL)
 
                 addListener(object : RequestListener<Drawable> {
                     override fun onResourceReady(

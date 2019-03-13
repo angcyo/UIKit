@@ -182,6 +182,7 @@ public class PhotoPagerFragment extends BaseFragment {
                     params.width = -1;
                     params.height = -1;
 
+                    previewImageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
                     previewImageView.setLayoutParams(params);
                 }
             });
@@ -229,6 +230,9 @@ public class PhotoPagerFragment extends BaseFragment {
         }
     }
 
+    /**
+     * 目标状态
+     */
     protected void setPreviewTargetParam(Rect targetRect) {
         previewImageView.setTranslationX(targetRect.left);
         previewImageView.setTranslationY(targetRect.top);
@@ -238,6 +242,7 @@ public class PhotoPagerFragment extends BaseFragment {
         params.height = targetRect.height();
 
         previewImageView.setLayoutParams(params);
+        previewImageView.setScaleType(photoPagerConfig.getScaleType());
     }
 
     protected TransitionSet defaultTransitionSet() {
@@ -291,6 +296,7 @@ public class PhotoPagerFragment extends BaseFragment {
         viewPager.setAlpha(0f);
         viewPager.setCurrentItem(photoPagerConfig.getCurrentIndex(), false);
 
+        previewImageView.setScaleType(photoPagerConfig.getScaleType());
         showPreviewDrawable(photoPagerConfig.getCurrentIndex());
 
         startBgShowAnim();

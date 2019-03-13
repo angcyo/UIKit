@@ -80,6 +80,11 @@ open class GlideImageView(context: Context, attributeSet: AttributeSet? = null) 
 
     var override = true
 
+    /**
+     * 使用原始大小 进行override
+     * */
+    var originalSize = false
+
     /**跳过内存缓存*/
     var skipMemoryCache = true
 
@@ -101,7 +106,7 @@ open class GlideImageView(context: Context, attributeSet: AttributeSet? = null) 
         val typedArray = context.obtainStyledAttributes(attributeSet, R.styleable.GlideImageView)
         defaultPlaceholderDrawable = typedArray.getDrawable(R.styleable.GlideImageView_r_placeholder_drawable)
         noPlaceholderDrawable =
-                typedArray.getBoolean(R.styleable.GlideImageView_r_no_placeholder_drawable, noPlaceholderDrawable)
+            typedArray.getBoolean(R.styleable.GlideImageView_r_no_placeholder_drawable, noPlaceholderDrawable)
 
         if (defaultPlaceholderDrawable != null) {
             placeholderDrawable = defaultPlaceholderDrawable
@@ -277,12 +282,22 @@ open class GlideImageView(context: Context, attributeSet: AttributeSet? = null) 
         return requestOptions
     }
 
-    private fun intoConfig(onDelayInto: () -> Unit) {
+    private fun intoConfig(requestOptions: RequestOptions, onDelayInto: () -> Unit) {
+        fun config() {
+            if (originalSize) {
+                requestOptions.override(Target.SIZE_ORIGINAL)
+            } else if (override) {
+                requestOptions.override(measuredWidth, measuredHeight)
+            }
+        }
+
         if (override && (measuredWidth == 0 || measuredHeight == 0)) {
             post {
+                config()
                 onDelayInto.invoke()
             }
         } else {
+            config()
             onDelayInto.invoke()
         }
     }
@@ -291,10 +306,7 @@ open class GlideImageView(context: Context, attributeSet: AttributeSet? = null) 
     private fun intoConfigFile(request: RequestBuilder<File>, requestOptions: RequestOptions) {
         initListener(request)
 
-        intoConfig {
-            if (override) {
-                requestOptions.override(measuredWidth, measuredHeight)
-            }
+        intoConfig(requestOptions) {
             request.apply(requestOptions)
             if (animType == AnimType.TRANSITION) {
                 request.into(object : SimpleTarget<File>() {
@@ -314,10 +326,7 @@ open class GlideImageView(context: Context, attributeSet: AttributeSet? = null) 
     private fun intoConfigGifDrawable(request: RequestBuilder<GifDrawable>, requestOptions: RequestOptions) {
         initListener(request)
 
-        intoConfig {
-            if (override) {
-                requestOptions.override(measuredWidth, measuredHeight)
-            }
+        intoConfig(requestOptions) {
             request.apply(requestOptions)
             if (animType == AnimType.TRANSITION) {
                 request.into(object : SimpleTarget<GifDrawable>() {
@@ -338,10 +347,7 @@ open class GlideImageView(context: Context, attributeSet: AttributeSet? = null) 
     private fun intoConfigDrawable(request: RequestBuilder<Drawable>, requestOptions: RequestOptions) {
         initListener(request)
 
-        intoConfig {
-            if (override) {
-                requestOptions.override(measuredWidth, measuredHeight)
-            }
+        intoConfig(requestOptions) {
             request.apply(requestOptions)
             if (animType == AnimType.TRANSITION) {
                 request.into(object : SimpleTarget<Drawable>() {
@@ -361,10 +367,7 @@ open class GlideImageView(context: Context, attributeSet: AttributeSet? = null) 
     private fun intoConfigBitmap(request: RequestBuilder<Bitmap>, requestOptions: RequestOptions) {
         initListener(request)
 
-        intoConfig {
-            if (override) {
-                requestOptions.override(measuredWidth, measuredHeight)
-            }
+        intoConfig(requestOptions) {
             request.apply(requestOptions)
             if (animType == AnimType.TRANSITION) {
                 request.into(object : SimpleTarget<Bitmap>() {
@@ -485,8 +488,9 @@ open class GlideImageView(context: Context, attributeSet: AttributeSet? = null) 
 
         initListener(request)
 
-        intoConfig {
-            request.apply(defaultConfig(true))
+        val requestOptions = defaultConfig(true)
+        intoConfig(requestOptions) {
+            request.apply(requestOptions)
             request.into(object : SimpleTarget<File>() {
                 override fun onResourceReady(resource: File, transition: Transition<in File>?) {
                     resource.let {
@@ -623,8 +627,10 @@ open class GlideImageView(context: Context, attributeSet: AttributeSet? = null) 
 
         initListener(request)
 
-        intoConfig {
-            request.apply(defaultConfig(true))
+        val requestOptions = defaultConfig(true)
+
+        intoConfig(requestOptions) {
+            request.apply(requestOptions)
             request.into(object : SimpleTarget<File>() {
                 override fun onResourceReady(resource: File, transition: Transition<in File>?) {
                     resource.let {
