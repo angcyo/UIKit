@@ -1,20 +1,20 @@
-def getBuildTime() {
+static def getBuildTime() {
     return new Date().format("yyyy-MM-dd HH:mm:ss.sss")
 }
 
-def osName() {
+static def osName() {
     return System.getProperty("os.name") + "@" + System.getProperty("os.version")
 }
 
-def userName() {
+static def userName() {
     return System.getProperty("user.name")
 }
 
-def releaseTime() {
+static def releaseTime() {
     return new Date().format("yyyy-MM-dd", TimeZone.getTimeZone("UTC"))
 }
 
-def apkTime() {
+static def apkTime() {
     return new Date().format("yyyy-MM-dd_HH-mm", TimeZone.getTimeZone("UTC"))
 }
 
