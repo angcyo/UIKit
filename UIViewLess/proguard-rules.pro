@@ -53,8 +53,8 @@
 }
 
 #Fragment不需要在AndroidManifest.xml中注册，需要额外保护下
-#-keep public class * extends android.support.v4.app.Fragment
-#-keep public class * extends android.app.Fragment
+-keep class * extends android.support.v4.app.Fragment
+-keep class * extends android.app.Fragment
 
 # 保持测试相关的代码
 -dontnote junit.framework.**
@@ -68,8 +68,13 @@
 -keep class * extends FileProvider {*;}
 
 -keep class * extends Activity {*;}
+-keep class * extends View {*;}
 -keep class com.luck.picture.lib.rxbus2.**{*;}
 
 -keep class com.bigkoo.pickerview.**{*;}
 -keep class com.bigkoo.pickerview.bean.**{*;}
 -keep class com.contrarywind.view.**{*;}
+
+# 自绘对象
+-keep class com.angcyo.uiview.less.draw.** {*;}
+-keep class * extends BaseDraw {*;}
