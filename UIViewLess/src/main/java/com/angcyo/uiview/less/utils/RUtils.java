@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.Application;
 import android.app.DownloadManager;
+import android.arch.core.util.Function;
 import android.content.*;
 import android.content.pm.*;
 import android.content.res.Configuration;
@@ -26,7 +27,9 @@ import android.os.Looper;
 import android.os.Process;
 import android.provider.MediaStore;
 import android.provider.Settings;
+import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.content.FileProvider;
 import android.support.v7.widget.RecyclerView;
 import android.telephony.TelephonyManager;
@@ -35,10 +38,7 @@ import android.text.format.Formatter;
 import android.util.DisplayMetrics;
 import android.util.LruCache;
 import android.util.TypedValue;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
+import android.view.*;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import com.angcyo.http.Rx;
@@ -1830,6 +1830,27 @@ public class RUtils {
         frameLayout.draw(canvas);
 
         return bitmap;
+    }
+
+    /**
+     * 保存xml对应的截图
+     */
+    public static Bitmap saveView(@NonNull Context context, @LayoutRes int layoutId, @Nullable Function<View, Void> init) {
+        View view = LayoutInflater.from(context).inflate(layoutId, null);
+        if (init != null) {
+            init.apply(view);
+        }
+        int measureSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
+        view.measure(measureSpec, measureSpec);
+        view.layout(0, 0, view.getMeasuredWidth(), view.getMeasuredHeight());
+        view.setDrawingCacheEnabled(true);
+        view.buildDrawingCache();
+        Bitmap cache = view.getDrawingCache();
+        cache = cache.copy(cache.getConfig(), false);
+        view.destroyDrawingCache();
+        view.setDrawingCacheEnabled(false);
+
+        return cache;
     }
 
     /**
