@@ -78,3 +78,15 @@
 # 自绘对象
 -keep class com.angcyo.uiview.less.draw.** {*;}
 -keep class * extends BaseDraw {*;}
+
+#手动启用support keep注解
+#http://tools.android.com/tech-docs/support-annotations
+#https://blog.csdn.net/blueangle17/article/details/80521311
+-dontskipnonpubliclibraryclassmembers
+-printconfiguration
+-keep,allowobfuscation @interface android.support.annotation.Keep
+
+-keep @android.support.annotation.Keep class *
+-keepclassmembers class * {
+    @android.support.annotation.Keep *;
+}
