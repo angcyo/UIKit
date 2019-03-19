@@ -20,6 +20,9 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
+#打印混淆信息
+-verbose
+
 #指定压缩级别
 -optimizationpasses 5
 
@@ -52,6 +55,10 @@
     java.lang.Object readResolve();
 }
 
+#不混淆实现android.os.Parcelable的类
+-keep class * implements android.os.Parcelable
+-keep class * implements java.io.Serializable
+
 #Fragment不需要在AndroidManifest.xml中注册，需要额外保护下
 -keep class * extends android.support.v4.app.Fragment
 -keep class * extends android.app.Fragment
@@ -82,6 +89,8 @@
 #手动启用support keep注解
 #http://tools.android.com/tech-docs/support-annotations
 #https://blog.csdn.net/blueangle17/article/details/80521311
+-keepattributes *Annotation*
+-dontwarn android.support.annotation.Keep
 -dontskipnonpubliclibraryclassmembers
 -printconfiguration
 -keep,allowobfuscation @interface android.support.annotation.Keep
@@ -89,4 +98,9 @@
 -keep @android.support.annotation.Keep class *
 -keepclassmembers class * {
     @android.support.annotation.Keep *;
+}
+
+-keep @android.support.annotation.Keep class **{
+@android.support.annotation.Keep <fields>;
+@android.support.annotation.Keep <methods>;
 }
