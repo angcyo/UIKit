@@ -6,7 +6,7 @@ rootProject.ext.allModule = [:]
 rootProject.ext.allGradle = [:]
 
 def rootPath = getRootDir()
-println "查找所有Module->" + rootPath.getAbsolutePath()
+println "find_module.gradle\n查找所有Module->" + rootPath.getAbsolutePath()
 listPath(rootPath)
 //allModule.each { key, value ->
 //    println "->找到 " + value + " ::" + key

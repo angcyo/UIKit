@@ -2,7 +2,7 @@
 
 apply plugin: 'com.android.application'
 
-println("项目根路径:" + rootDir.getAbsolutePath())
+println("key.gradle\n项目根路径:" + rootDir.getAbsolutePath())
 println("脚本路径:" + file(".").getAbsolutePath())
 
 ext.maxDepth = 2
@@ -107,6 +107,8 @@ println(
                 "\nkey.file:" + signConfig.key_file +
                 "\npassword:" + signConfig.password + "\n"
 )
+
+println("...end...\n")
 
 android {
     signingConfigs {

@@ -2,7 +2,7 @@ ext.maxDepth = 2
 ext.includeConfig = [:]
 
 def rootPath = getRootDir()
-println "开始包含项目in->" + rootPath.getAbsolutePath()
+println "include_all.gradle\n开始包含项目in->" + rootPath.getAbsolutePath()
 listPath(rootPath)
 //includeConfig.each { key, value ->
 //    println "->include " + value + " ::" + key

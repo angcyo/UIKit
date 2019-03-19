@@ -30,7 +30,9 @@ def _minify_enabled = project.hasProperty("minify_enabled") ? (project.ext.minif
 
 println "\n........app.gradle........"
 println "工程名->" + project.name + " 包名->" + application_id + " ->" + _V_NAME + " ->" + _V_CODE
+println "C_SDK->" + _C_SDK + " M_SDK->" + _M_SDK + " T_SDK->" + _T_SDK + " minify_enabled->" + _minify_enabled + " use_proguard->" + _use_proguard
 println "........app.gradle........end"
+
 //println hasProperty("V_NAME")
 //println rootProject.hasProperty("V_NAME")
 //println project

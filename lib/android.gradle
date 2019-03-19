@@ -23,7 +23,9 @@ def apk_time = apkTime()
 def build_time = getBuildTime()
 def release_time = releaseTime()
 
-println "开始编译:" + build_time
+def schema = project.hasProperty("schema") ? project.ext.schema : 'default'
+
+println "android.gradle\n开始编译:schema:" + schema + " time->" + build_time
 
 android {
 
@@ -35,6 +37,7 @@ android {
 
         buildConfigField "String", "USER_NAME", '"' + userName() + '"'
         buildConfigField "String", "BUILD_TIME", '"' + build_time + '"'
+        buildConfigField "String", "SCHEMA", '"' + schema + '"'
     }
 
     packagingOptions {
@@ -49,6 +52,7 @@ android {
         exclude 'META-INF/LICENSE.txt'
         exclude 'META-INF/NOTICE.txt'
         exclude 'META-INF/uiview_release.kotlin_module'
+        exclude 'META-INF/proguard/androidx-annotations.pro'
     }
 
     lintOptions {
