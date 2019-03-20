@@ -104,3 +104,7 @@
 @android.support.annotation.Keep <fields>;
 @android.support.annotation.Keep <methods>;
 }
+
+# 保持所有Bean类
+-keep class com.angcyo.**.**Bean {*;}
+-keep class com.wayto.**.**Bean {*;}
