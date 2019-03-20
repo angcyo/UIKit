@@ -21,10 +21,16 @@ dependencies {
     }
     api('com.squareup.retrofit2:converter-gson:' + retrofit_version) {
         exclude group: 'com.squareup.okhttp3'
+        exclude group: 'com.google.code.gson'
     }
 
+    //http://jcenter.bintray.com/com/google/code/gson/gson/
+    api "com.google.code.gson:gson:2.8.5"
+
     //https://github.com/square/okhttp/
-    api 'com.squareup.okhttp3:okhttp:3.12.0'
+    //http://jcenter.bintray.com/com/squareup/okhttp3/okhttp/
+    api 'com.squareup.okhttp3:okhttp:3.14.0'
+
 
     //https://github.com/ReactiveX/RxJava/
     //api 'io.reactivex:rxjava:1.3.8'
