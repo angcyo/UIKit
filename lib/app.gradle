@@ -135,6 +135,10 @@ android {
         //https://www.jianshu.com/p/93678f8b3421
         disable 'GoogleAppIndexingWarning'
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
     /*Gradle3.0 以下的方法*/
 //    getApplicationVariants().all { variant ->
 //        variant.outputs.each { output ->
