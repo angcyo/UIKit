@@ -2,11 +2,14 @@ package com.angcyo.uiview.less.picture;
 
 import android.app.Activity;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.animation.ArgbEvaluatorCompat;
 import android.support.transition.*;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.animation.FastOutSlowInInterpolator;
@@ -25,6 +28,7 @@ import com.angcyo.uiview.less.base.helper.FragmentHelper;
 import com.angcyo.uiview.less.recycler.RBaseViewHolder;
 import com.angcyo.uiview.less.resources.AnimUtil;
 import com.angcyo.uiview.less.resources.RAnimtionListener;
+import com.angcyo.uiview.less.widget.group.MatrixLayout;
 import com.angcyo.uiview.less.widget.pager.RViewPager;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function3;
@@ -66,8 +70,7 @@ public class PhotoPagerFragment extends BaseFragment {
             @Override
             public void onPageSelected(int position) {
                 super.onPageSelected(position);
-                photoPagerConfig.setCurrentIndex(position);
-                showPreviewDrawable(position);
+                setPagePosition(position);
             }
         });
         PhotoDataSource dataSource = photoPagerConfig.getDataSource();
@@ -84,10 +87,52 @@ public class PhotoPagerFragment extends BaseFragment {
                         }
                     });
                 }
+                if (((SinglePhotoDataSource) dataSource).getOnMatrixTouchListener() == null) {
+                    ((SinglePhotoDataSource) dataSource).setOnMatrixTouchListener(new MatrixLayout.OnMatrixTouchListener() {
+                        @Override
+                        public boolean checkTouchEvent(@NonNull MatrixLayout matrixLayout) {
+                            return true;
+                        }
+
+                        @Override
+                        public void onMatrixChange(@NonNull MatrixLayout matrixLayout,
+                                                   @NonNull Matrix matrix,
+                                                   @NonNull RectF fromRect,
+                                                   @NonNull RectF toRect) {
+                            bgHideDragColor = getColor(toRect.top / fromRect.bottom, bgHideStartColor, bgHideEndColor);
+                            getBgAnimView().setBackgroundColor(bgHideDragColor);
+                        }
+
+                        @Override
+                        public boolean onTouchEnd(@NonNull MatrixLayout matrixLayout, @NonNull Matrix matrix,
+                                                  @NonNull RectF fromRect,
+                                                  @NonNull RectF toRect) {
+                            if (toRect.top / fromRect.bottom > 0.3f) {
+                                if (dragRectF == null) {
+                                    dragRectF = new RectF();
+                                }
+                                dragRectF.set(toRect);
+                                toHide();
+                                return true;
+                            }
+                            return false;
+                        }
+                    });
+                }
             }
         }
 
         toShow();
+    }
+
+    /**
+     * 设置当前到第几页了
+     */
+    public void setPagePosition(int position) {
+        dragRectF = null;
+        bgHideDragColor = bgHideStartColor;
+        photoPagerConfig.setCurrentIndex(position);
+        showPreviewDrawable(position);
     }
 
     //<editor-fold desc="背景控制">
@@ -96,7 +141,10 @@ public class PhotoPagerFragment extends BaseFragment {
     protected int bgShowEndColor = Color.BLACK;
 
     protected int bgHideStartColor = Color.BLACK;
+    protected int bgHideDragColor = Color.BLACK;
     protected int bgHideEndColor = Color.TRANSPARENT;
+
+    protected RectF dragRectF;
 
     protected View getBgAnimView() {
         return rootLayout;
@@ -110,7 +158,7 @@ public class PhotoPagerFragment extends BaseFragment {
     }
 
     protected void startBgHideAnim() {
-        AnimUtil.startArgb(getBgAnimView(), bgHideStartColor, bgHideEndColor, ANIM_DURATION);
+        AnimUtil.startArgb(getBgAnimView(), bgHideDragColor, bgHideEndColor, ANIM_DURATION);
     }
 
     //</editor-fold desc="背景控制">
@@ -118,14 +166,7 @@ public class PhotoPagerFragment extends BaseFragment {
     //<editor-fold desc="预览视图控制">
 
     protected void startShowPreviewAnim() {
-        Rect rect = null;
-        List<Rect> rectList = photoPagerConfig.getOriginPhotoRect();
-        if (rectList != null) {
-            if (rectList.size() > photoPagerConfig.getCurrentIndex()) {
-                rect = rectList.get(photoPagerConfig.getCurrentIndex());
-            }
-        }
-        startShowPreviewAnim(rect);
+        startShowPreviewAnim(getOriginPhotoRect());
     }
 
     /**
@@ -190,6 +231,10 @@ public class PhotoPagerFragment extends BaseFragment {
     }
 
     protected void startHidePreviewAnim() {
+        startHidePreviewAnim(getOriginPhotoRect());
+    }
+
+    protected Rect getOriginPhotoRect() {
         Rect rect = null;
         List<Rect> rectList = photoPagerConfig.getOriginPhotoRect();
         if (rectList != null) {
@@ -197,13 +242,13 @@ public class PhotoPagerFragment extends BaseFragment {
                 rect = rectList.get(photoPagerConfig.getCurrentIndex());
             }
         }
-        startHidePreviewAnim(rect);
+        return rect;
     }
 
     /**
      * 预览图片隐藏的动画
      */
-    protected void startHidePreviewAnim(Rect targetRect) {
+    protected void startHidePreviewAnim(final Rect targetRect) {
         onHideAnimStart();
         if (targetRect == null || noPreviewDrawable()) {
             float from = 0.9f;
@@ -216,17 +261,30 @@ public class PhotoPagerFragment extends BaseFragment {
             animationSet.setInterpolator(new FastOutSlowInInterpolator());
             viewPager.startAnimation(animationSet);
         } else {
-
-            TransitionSet transitionSet = defaultTransitionSet();
+            final TransitionSet transitionSet = defaultTransitionSet();
             transitionSet.addListener(new TransitionListenerAdapter() {
                 @Override
                 public void onTransitionEnd(@NonNull Transition transition) {
                     super.onTransitionEnd(transition);
                 }
             });
-            TransitionManager.beginDelayedTransition(rootLayout, transitionSet);
 
-            setPreviewTargetParam(targetRect);
+            Runnable runnable = new Runnable() {
+                @Override
+                public void run() {
+                    TransitionManager.beginDelayedTransition(rootLayout, transitionSet);
+                    setPreviewTargetParam(targetRect);
+                }
+            };
+
+            if (dragRectF != null) {
+                setPreviewTargetParam(new Rect(((int) dragRectF.left), ((int) dragRectF.top),
+                        (int) dragRectF.right, ((int) dragRectF.bottom)));
+                previewImageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                rootLayout.post(runnable);
+            } else {
+                runnable.run();
+            }
         }
     }
 
@@ -234,20 +292,24 @@ public class PhotoPagerFragment extends BaseFragment {
      * 目标状态
      */
     protected void setPreviewTargetParam(Rect targetRect) {
-        previewImageView.setTranslationX(targetRect.left);
-        previewImageView.setTranslationY(targetRect.top);
+        setTargetParam(previewImageView, targetRect);
+        previewImageView.setScaleType(photoPagerConfig.getScaleType());
+    }
 
-        final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) previewImageView.getLayoutParams();
+    protected void setTargetParam(View view, Rect targetRect) {
+        view.setTranslationX(targetRect.left);
+        view.setTranslationY(targetRect.top);
+
+        final ViewGroup.LayoutParams params = view.getLayoutParams();
         params.width = targetRect.width();
         params.height = targetRect.height();
 
-        previewImageView.setLayoutParams(params);
-        previewImageView.setScaleType(photoPagerConfig.getScaleType());
+        view.setLayoutParams(params);
     }
 
     protected TransitionSet defaultTransitionSet() {
         TransitionSet transitionSet = new TransitionSet();
-        transitionSet.addTarget(previewImageView);
+        //transitionSet.addTarget(previewImageView);
         transitionSet.setDuration(ANIM_DURATION);
         transitionSet.addTransition(new ChangeBounds());
         transitionSet.addTransition(new ChangeTransform());
@@ -343,6 +405,14 @@ public class PhotoPagerFragment extends BaseFragment {
 
     //</editor-fold desc="进出动画控制">
 
+    private ArgbEvaluatorCompat argbEvaluator;
+
+    private int getColor(float fraction, int startValue, int endValue) {
+        if (argbEvaluator == null) {
+            argbEvaluator = new ArgbEvaluatorCompat();
+        }
+        return argbEvaluator.evaluate(fraction, startValue, endValue);
+    }
 
     @Override
     public boolean onBackPressed(@NonNull Activity activity) {
