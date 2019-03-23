@@ -64,3 +64,8 @@
 -keep class retrofit2.HttpServiceMethod
 -keep class com.angcyo.http.** {*;}
 -keep class okhttp3.** {*;}
+-dontwarn okhttp3.**
+
+-ignorewarnings -keep class * { public private *; }
+
+# -ignorewarnings
