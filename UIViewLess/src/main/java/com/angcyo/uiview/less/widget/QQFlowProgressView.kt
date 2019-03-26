@@ -85,6 +85,7 @@ class QQFlowProgressView(context: Context, attributeSet: AttributeSet? = null) :
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
         valueAnimator.apply {
+            removeAllUpdateListeners()
             addUpdateListener {
                 if (isDrawEnd) {
                     drawWidth -= drawStep
