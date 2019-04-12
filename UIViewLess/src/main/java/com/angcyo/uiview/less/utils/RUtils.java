@@ -153,6 +153,10 @@ public class RUtils {
             {".zip", "application/x-zip-compressed"},
             {"", "*/*"}
     };
+    /**
+     * 单个文件, 保存的数据最大大小(字节)
+     */
+    public static long MAX_SAVE_FILE_SIZE = 1024 * 1024 * 10;
 
     static {
         //images
@@ -190,12 +194,6 @@ public class RUtils {
     public static int sdk() {
         return Build.VERSION.SDK_INT;
     }
-
-    /**
-     * 单个文件, 保存的数据最大大小(字节)
-     */
-    public static long MAX_SAVE_FILE_SIZE = 1024 * 1024 * 10;
-
 
     /**
      * 获取文件类型
@@ -821,26 +819,6 @@ public class RUtils {
         return apps;
     }
 
-    public static class AppInfo implements Serializable {
-        public String label = "";//标签,
-        public String packageName = "";//包名
-        public String processName = "";//进程名
-
-        public String appName = "";
-        public String versionName = "";
-        public int versionCode = 0;
-        public Drawable appIcon;
-
-        //签名相关
-        public String md5;
-        public String sha1;
-
-        @Override
-        public boolean equals(Object o) {
-            return packageName.equalsIgnoreCase(((AppInfo) o).packageName);
-        }
-    }
-
     /**
      * 打开文件
      *
@@ -916,7 +894,6 @@ public class RUtils {
         intent.putExtra("sms_body", message);
         ctx.startActivity(intent);
     }
-
 
     /**
      * 使用,分割string, 并返回一个列表
@@ -1003,7 +980,6 @@ public class RUtils {
         }
         return safe(builder);
     }
-
 
     /**
      * 组装参数
@@ -1424,10 +1400,6 @@ public class RUtils {
         return Looper.myLooper() == Looper.getMainLooper();
     }
 
-//    public static Ok.ImageType getImageType(File file) {
-//        return Ok.ImageType.of(Ok.ImageTypeUtil.getImageType(file));
-//    }
-
     /**
      * 获取图片宽高
      */
@@ -1438,6 +1410,10 @@ public class RUtils {
         BitmapFactory.decodeFile(filePath, options);
         return new int[]{options.outWidth, options.outHeight};
     }
+
+//    public static Ok.ImageType getImageType(File file) {
+//        return Ok.ImageType.of(Ok.ImageTypeUtil.getImageType(file));
+//    }
 
     /**
      * 00:00的格式输出, 如果有小时: 01:00:00
@@ -1471,24 +1447,6 @@ public class RUtils {
         shareBitmap(context, bitmap, false, true);
     }
 
-//    public static void shareBitmap(Context context, byte[] data, boolean shareQQ) {
-//        Intent intent = new Intent();
-//        intent.setAction(Intent.ACTION_SEND);//设置分享行为
-//        intent.setType("image/*");//设置分享内容的类型
-//        intent.putExtra(Intent.EXTRA_STREAM, data);
-//        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-//
-//        List<ResolveInfo> resolveInfos = context.getPackageManager().queryIntentActivities(intent, PackageManager.GET_RESOLVED_FILTER);
-//
-//        if (shareQQ) {
-//            configQQIntent(intent);
-//        } else {
-//            intent = Intent.createChooser(intent, "分享图片");
-//        }
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//        context.startActivity(intent);
-//    }
-
     public static void shareBitmap(Context context, Bitmap bitmap, boolean shareQQ, boolean chooser) {
         Uri uri = Uri.parse(MediaStore.Images.Media.insertImage(context.getContentResolver(), bitmap, null, null));
         Intent intent = new Intent();
@@ -1510,6 +1468,24 @@ public class RUtils {
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
     }
+
+//    public static void shareBitmap(Context context, byte[] data, boolean shareQQ) {
+//        Intent intent = new Intent();
+//        intent.setAction(Intent.ACTION_SEND);//设置分享行为
+//        intent.setType("image/*");//设置分享内容的类型
+//        intent.putExtra(Intent.EXTRA_STREAM, data);
+//        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+//
+//        List<ResolveInfo> resolveInfos = context.getPackageManager().queryIntentActivities(intent, PackageManager.GET_RESOLVED_FILTER);
+//
+//        if (shareQQ) {
+//            configQQIntent(intent);
+//        } else {
+//            intent = Intent.createChooser(intent, "分享图片");
+//        }
+//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//        context.startActivity(intent);
+//    }
 
     /**
      * 分享文件
@@ -1590,7 +1566,6 @@ public class RUtils {
         intent.setClassName("com.tencent.mobileqq", "com.tencent.mobileqq.activity.JumpActivity");//QQ好友或QQ群
 //        intent.setClassName("com.tencent.mm", "com.tencent.mm.ui.tools.ShareToTimeLineUI");//微信朋友圈，仅支持分享图片
     }
-
 
     /**
      * 摄像头是否可用
@@ -1689,7 +1664,6 @@ public class RUtils {
         // 大于6尺寸则为Pad
         return screenInches;
     }
-
 
     public static void saveToSDCard(String data) {
         String fileName = getDataTime("yyyy-MM-dd_HH-mm-ss-SSS") + FILE_NAME_SUFFIX;
@@ -3073,17 +3047,6 @@ public class RUtils {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
     }
 
-    interface OnPutValue {
-        void onValue(String key, String value);
-
-        void onRemove(String key);
-    }
-
-    public static class QueryAppBean {
-        public AppInfo mAppInfo;
-        public Intent startIntent;
-    }
-
     public static void installApp(Context context, String apkPath) {
         AppUtils.installApp(context, apkPath);
     }
@@ -3127,6 +3090,14 @@ public class RUtils {
         if (activity instanceof Activity) {
             Window window = ((Activity) activity).getWindow();
             return window.getDecorView().getMeasuredHeight();
+        }
+        return 0;
+    }
+
+    public static int getDecorViewWidth(Context activity) {
+        if (activity instanceof Activity) {
+            Window window = ((Activity) activity).getWindow();
+            return window.getDecorView().getMeasuredWidth();
         }
         return 0;
     }
@@ -3286,5 +3257,36 @@ public class RUtils {
         }
 
         return result;
+    }
+
+    interface OnPutValue {
+        void onValue(String key, String value);
+
+        void onRemove(String key);
+    }
+
+    public static class AppInfo implements Serializable {
+        public String label = "";//标签,
+        public String packageName = "";//包名
+        public String processName = "";//进程名
+
+        public String appName = "";
+        public String versionName = "";
+        public int versionCode = 0;
+        public Drawable appIcon;
+
+        //签名相关
+        public String md5;
+        public String sha1;
+
+        @Override
+        public boolean equals(Object o) {
+            return packageName.equalsIgnoreCase(((AppInfo) o).packageName);
+        }
+    }
+
+    public static class QueryAppBean {
+        public AppInfo mAppInfo;
+        public Intent startIntent;
     }
 }

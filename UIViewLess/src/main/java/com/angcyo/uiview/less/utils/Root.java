@@ -40,15 +40,17 @@ public class Root {
 
         builder.append(RUtils.getScreenWidth(activity)).append("×").append(RUtils.getScreenHeight(activity));
         builder.append(" ");
-        builder.append(" ch:");
         builder.append(RUtils.getContentViewHeight(activity));
-        builder.append(" ");
-        builder.append(" dh:");
-        builder.append(RUtils.getDecorViewHeight(activity));
+        builder.append("/");
+        int decorViewHeight = RUtils.getDecorViewHeight(activity);
+        int decorViewWidth = RUtils.getDecorViewWidth(activity);
+        builder.append(decorViewHeight);
         builder.append(" ");
 
+        float density = ScreenUtil.density();
+        builder.append((int) (decorViewWidth / density)).append("/").append((int) (decorViewHeight / density)).append("/");
         builder.append(ScreenUtil.getDensityDpi()).append(" ");
-        builder.append(ScreenUtil.density()).append(" ");
+        builder.append(density).append(" ");
 
         builder.append(Build.VERSION.RELEASE).append("/");
         builder.append(Build.VERSION.SDK_INT).append(" ");
