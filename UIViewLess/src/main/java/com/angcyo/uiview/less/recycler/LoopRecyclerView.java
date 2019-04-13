@@ -89,7 +89,7 @@ public class LoopRecyclerView extends RRecyclerView {
     }
 
     @Override
-    protected void resetLayoutManager(Context context, String match) {
+    public void resetLayoutManager(Context context, String match) {
         //super.resetLayoutManager(context, match);
     }
 

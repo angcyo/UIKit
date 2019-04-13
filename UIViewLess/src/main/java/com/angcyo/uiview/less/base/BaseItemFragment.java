@@ -5,6 +5,7 @@ import android.graphics.Rect;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.TextPaint;
 import android.text.TextUtils;
 import android.view.View;
@@ -126,10 +127,32 @@ public abstract class BaseItemFragment extends BaseRecyclerFragment<SingleItem> 
     /**
      * 更新布局, 重新创建了items, 如果item的数量有变化, 建议使用这个方法
      * 请在post方法中调用
+     *
+     * @see #updateItemsLayout()
      */
     public void refreshLayout() {
-        singleItems.clear();
-        onCreateItems(singleItems);
+
+        recyclerView.saveLastPosition();
+        initRecyclerView(recyclerView);
+
+        RecyclerView.RecycledViewPool recycledViewPool = recyclerView.getRecycledViewPool();
+//        recycledViewPool.clear();
+//
+//        for (int i = 0; i < recyclerView.getChildCount(); i++) {
+//            try {
+//                View child = recyclerView.getChildAt(i);
+//                RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) child.getLayoutParams();
+//                RecyclerView.ViewHolder holder = recyclerView.findViewHolderForAdapterPosition(params.getViewAdapterPosition());
+//                if (holder != null) {
+//                    Reflect.setMember(RecyclerView.ViewHolder.class, holder, "mFlags", 8);
+//                }
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        }
+//
+//        singleItems.clear();
+//        onCreateItems(singleItems);
         if (!areItemTypeTheSame()) {
             itemTypeStart = itemTypeStart << 1;
 
@@ -139,16 +162,19 @@ public abstract class BaseItemFragment extends BaseRecyclerFragment<SingleItem> 
         }
         for (int i = 0; recyclerView != null && i < singleItems.size(); i++) {
             //只需要缓存一个就行
-            recyclerView.getRecycledViewPool().clear();
-            recyclerView.getRecycledViewPool().setMaxRecycledViews(i, 1);
+            recycledViewPool.setMaxRecycledViews(i, 1);
         }
-        if (baseAdapter != null) {
-            baseAdapter.notifyDataSetChanged();
-        }
+//        if (baseAdapter != null) {
+//            baseAdapter.notifyDataSetChanged();
+//        }
+
+        recyclerView.resetToLastPosition();
     }
 
     /**
      * 如果只是要更新item的数据, 建议使用此方法
+     *
+     * @see #refreshLayout()
      */
     public void updateItemsLayout() {
         if (baseAdapter != null) {

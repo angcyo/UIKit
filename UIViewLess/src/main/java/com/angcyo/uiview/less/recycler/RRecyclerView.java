@@ -260,7 +260,7 @@ public class RRecyclerView extends RecyclerView implements CanScrollUpCallBack {
         addOnScrollListener(mScrollListener);
     }
 
-    protected void resetLayoutManager(Context context, String match) {
+    public void resetLayoutManager(Context context, String match) {
         if (TextUtils.isEmpty(match) || "V".equalsIgnoreCase(match)) {
             mBaseLayoutManager = new LinearLayoutManagerWrap(context, orientation, false);
         } else {
@@ -356,7 +356,7 @@ public class RRecyclerView extends RecyclerView implements CanScrollUpCallBack {
         resetLayoutManager(getContext(), match);
     }
 
-    private String getTagString() {
+    public String getTagString() {
         Object tag = getTag();
         if (tag == null) {
             return "";
@@ -572,7 +572,9 @@ public class RRecyclerView extends RecyclerView implements CanScrollUpCallBack {
             startAutoScroll();
         }
 
-        resetToLastPosition();
+        if (autoScrollToLastPosition) {
+            resetToLastPosition();
+        }
     }
 
     @Override
@@ -585,8 +587,7 @@ public class RRecyclerView extends RecyclerView implements CanScrollUpCallBack {
      * 恢复滚动信息
      */
     public void resetToLastPosition() {
-        if (autoScrollToLastPosition &&
-                lastVisiblePosition >= 0) {
+        if (lastVisiblePosition >= 0) {
             LayoutManager layoutManager = getLayoutManager();
             if (layoutManager instanceof LinearLayoutManager) {
                 ((LinearLayoutManager) layoutManager).scrollToPositionWithOffset(lastVisiblePosition, lastVisibleItemOffset);

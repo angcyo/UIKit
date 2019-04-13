@@ -281,12 +281,14 @@ public class Recorder implements OnCompletionListener, OnErrorListener {
         mSampleFile = null;
         mState = IDLE_STATE;
 
-        File sampleDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath()
-                + SAMPLE_DEFAULT_DIR);
-        if (!sampleDir.exists()) {
-            sampleDir.mkdirs();
+        if (mSampleDir == null) {
+            File sampleDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath()
+                    + SAMPLE_DEFAULT_DIR);
+            if (!sampleDir.exists()) {
+                sampleDir.mkdirs();
+            }
+            mSampleDir = sampleDir;
         }
-        mSampleDir = sampleDir;
 
         signalStateChanged(IDLE_STATE);
     }

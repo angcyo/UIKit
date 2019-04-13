@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.media.AudioManager;
 import android.media.MediaRecorder;
 import android.os.Handler;
 import android.os.Looper;
@@ -106,17 +107,25 @@ public class RRecord {
 
         IntentFilter filter = new IntentFilter();
         filter.addAction(RecorderService.RECORDER_SERVICE_BROADCAST_NAME);
-        context.registerReceiver(mReceiver, filter);
+        this.context.registerReceiver(mReceiver, filter);
     }
 
     /**
-     * 开始录制
+     * 开始录制, 需要注册 RecorderService 服务哦
+     *
+     * @param fileName 不包括后缀名
+     * @see RecorderService
      */
     public RRecord startRecord(String fileName) {
         int state = innerRecorder.state();
         if (state != Recorder.IDLE_STATE) {
             return this;
         }
+
+        //重置 2019-4-13
+        innerRecorder.reset();
+
+        requestAudioFocus(context);
 
         boolean isHighQuality = false;
 
@@ -132,6 +141,7 @@ public class RRecord {
      * 停止录制
      */
     public RRecord stopRecord() {
+        abandonAudioFocus(context);
         innerRecorder.stopRecording();
         return this;
     }
@@ -140,6 +150,7 @@ public class RRecord {
      * 释放资源
      */
     public RRecord release() {
+        abandonAudioFocus(context);
         innerRecorder.stop();
         context.unregisterReceiver(mReceiver);
         return this;
@@ -150,6 +161,7 @@ public class RRecord {
      * 开始回放
      */
     public RRecord startPlayback(String playPath, float percentage) {
+        requestAudioFocus(context);
         innerRecorder.startPlayback(playPath, percentage);
         return this;
     }
@@ -158,6 +170,7 @@ public class RRecord {
      * 结束回放
      */
     public RRecord stopPlayback() {
+        abandonAudioFocus(context);
         innerRecorder.stopPlayback();
         return this;
     }
@@ -184,6 +197,22 @@ public class RRecord {
     private void checkProgress() {
         mainHandler.removeCallbacks(checkProgressRunnable);
         mainHandler.post(checkProgressRunnable);
+    }
+
+    /**
+     * 请求拿到音频焦点
+     */
+    private static void requestAudioFocus(Context context) {
+        AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+        audioManager.requestAudioFocus(null, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);//请求焦点
+    }
+
+    /**
+     * 释放音频焦点
+     */
+    private static void abandonAudioFocus(Context context) {
+        AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+        audioManager.abandonAudioFocus(null);//放弃焦点
     }
 
     private class RecorderReceiver extends BroadcastReceiver {

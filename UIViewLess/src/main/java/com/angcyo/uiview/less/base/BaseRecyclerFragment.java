@@ -55,6 +55,11 @@ public abstract class BaseRecyclerFragment<T> extends BaseTitleFragment
     }
 
     public void initRefreshRecyclerView(@Nullable SmartRefreshLayout smartRefreshLayout, @Nullable RRecyclerView recyclerView) {
+        initRefreshView(smartRefreshLayout);
+        initRecyclerView(recyclerView);
+    }
+
+    public void initRefreshView(@Nullable SmartRefreshLayout smartRefreshLayout) {
         if (smartRefreshLayout != null) {
             smartRefreshLayout.setOnRefreshListener(this);
             /*设置加载更多监听之后, 会自动开启加载更多*/
@@ -98,6 +103,10 @@ public abstract class BaseRecyclerFragment<T> extends BaseTitleFragment
             //smartRefreshLayout.setRefreshHeader(new ClassicsHeader(mAttachContext));
             smartRefreshLayout.setRefreshFooter(new ClassicsFooter(mAttachContext));
         }
+
+    }
+
+    protected void initRecyclerView(@Nullable RRecyclerView recyclerView) {
         if (recyclerView != null) {
             baseAdapter = onCreateAdapter(new ArrayList<T>());
             recyclerView.setAdapter(baseAdapter);
@@ -108,6 +117,7 @@ public abstract class BaseRecyclerFragment<T> extends BaseTitleFragment
             //recyclerView.setBackgroundColor(Color.GREEN);
         }
     }
+
 
     /**
      * 禁掉下拉刷新效果
