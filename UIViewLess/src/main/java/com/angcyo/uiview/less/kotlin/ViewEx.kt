@@ -30,13 +30,9 @@ import com.angcyo.uiview.less.recycler.RRecyclerView
 import com.angcyo.uiview.less.resources.ResUtil
 import com.angcyo.uiview.less.utils.RUtils
 import com.angcyo.uiview.less.utils.ScreenUtil.density
-import com.angcyo.uiview.less.widget.RExTextView
-import com.angcyo.uiview.less.widget.RImageView
-import com.angcyo.uiview.less.widget.RTextView
-import com.angcyo.uiview.less.widget.SingleTextWatcher
+import com.angcyo.uiview.less.widget.*
 import com.angcyo.uiview.less.widget.group.RSoftInputLayout
 import com.angcyo.uiview.less.widget.rsen.RGestureDetector
-import com.angcyo.uiview.less.widget.RClickListener
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestBuilder
 import com.bumptech.glide.load.DataSource
@@ -85,6 +81,10 @@ public val View.scaledDensity: Float
 
 public val View.density: Float
     get() = resources.displayMetrics.density
+
+public val <T> T.dp: Float by lazy {
+    RApplication.getApp().resources.displayMetrics.density
+}
 
 public val View.viewDrawWith: Int
     get() = measuredWidth - paddingLeft - paddingRight

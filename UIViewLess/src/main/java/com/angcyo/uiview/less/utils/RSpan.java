@@ -127,7 +127,7 @@ public class RSpan extends SpanUtils {
          * 当`文本`大小小于minSize时, 使用 minSize
          * 负数 表示使用原始大小
          */
-        protected int minSize = 400;
+        protected int minSize = -1;
 
         /**
          * 需要替代显示的文本
@@ -145,7 +145,11 @@ public class RSpan extends SpanUtils {
         protected int foregroundColor = -1;
 
         //缓存测量的大小
-        protected int spanSize = 0;
+        protected float spanSize = 0;
+
+        protected float offsetY = 0;
+
+        protected float offsetX = 0;
 
         public TextSpan() {
         }
@@ -181,13 +185,13 @@ public class RSpan extends SpanUtils {
                            @Nullable Paint.FontMetricsInt fm) {
             if (isValid(text, start, end)) {
                 float originTextSize = paint.measureText(String.valueOf(text.subSequence(start, end)));
-                spanSize = (int) originTextSize;
+                spanSize = originTextSize;
 
                 float replaceTextSize = 0f;
                 if (replaceText != null) {
                     replaceTextSize = paint.measureText(replaceText, 0, replaceText.length());
 
-                    spanSize = (int) replaceTextSize;
+                    spanSize = replaceTextSize;
                 }
 
                 //spanSize = (int) Math.max(originTextSize, replaceTextSize);
@@ -209,7 +213,7 @@ public class RSpan extends SpanUtils {
             } else {
                 spanSize = 0;
             }
-            return spanSize;
+            return (int) spanSize;
         }
 
         @Override
@@ -229,11 +233,16 @@ public class RSpan extends SpanUtils {
                     paint.setColor(foregroundColor);
                 }
 
+                x += offsetX;
+                y += offsetY;
+
                 if (replaceText != null) {
-                    canvas.drawText(replaceText, 0, replaceText.length(), x, y, paint);
-                } else {
-                    canvas.drawText(text, start, end, x, y, paint);
+                    text = replaceText;
+                    start = 0;
+                    end = replaceText.length();
                 }
+
+                canvas.drawText(text, start, end, x, y, paint);
             }
         }
 
@@ -267,6 +276,18 @@ public class RSpan extends SpanUtils {
         public void setForegroundColor(int foregroundColor) {
             this.foregroundColor = foregroundColor;
             isSetColor = true;
+        }
+
+        public void setOffsetY(float offsetY) {
+            this.offsetY = offsetY;
+        }
+
+        public void setOffsetX(float offsetX) {
+            this.offsetX = offsetX;
+        }
+
+        public void setSpanSize(float spanSize) {
+            this.spanSize = spanSize;
         }
     }
 }
