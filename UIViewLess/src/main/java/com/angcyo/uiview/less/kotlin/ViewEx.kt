@@ -36,7 +36,7 @@ import com.angcyo.uiview.less.widget.RTextView
 import com.angcyo.uiview.less.widget.SingleTextWatcher
 import com.angcyo.uiview.less.widget.group.RSoftInputLayout
 import com.angcyo.uiview.less.widget.rsen.RGestureDetector
-import com.angcyo.uiview.view.RClickListener
+import com.angcyo.uiview.less.widget.RClickListener
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestBuilder
 import com.bumptech.glide.load.DataSource

@@ -18,7 +18,7 @@ import com.angcyo.uiview.less.R;
 import com.angcyo.uiview.less.recycler.RBaseViewHolder;
 import com.angcyo.uiview.less.resources.ResUtil;
 import com.angcyo.uiview.less.skin.SkinHelper;
-import com.angcyo.uiview.view.RClickListener;
+import com.angcyo.uiview.less.widget.RClickListener;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;

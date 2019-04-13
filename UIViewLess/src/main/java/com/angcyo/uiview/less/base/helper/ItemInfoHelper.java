@@ -1,12 +1,10 @@
 package com.angcyo.uiview.less.base.helper;
 
-import android.support.annotation.DrawableRes;
 import android.view.View;
 import com.angcyo.uiview.less.R;
-import com.angcyo.uiview.less.recycler.RBaseViewHolder;
 import com.angcyo.uiview.less.resources.ResUtil;
 import com.angcyo.uiview.less.widget.group.ItemInfoLayout;
-import com.angcyo.uiview.view.RClickListener;
+import com.angcyo.uiview.less.widget.RClickListener;
 import org.jetbrains.annotations.Nullable;
 
 /**

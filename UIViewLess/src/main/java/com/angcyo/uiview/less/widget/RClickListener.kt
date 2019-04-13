@@ -1,6 +1,5 @@
-package com.angcyo.uiview.view
+package com.angcyo.uiview.less.widget
 
-import android.net.ConnectivityManager
 import android.view.View
 import com.angcyo.uiview.less.R
 import com.angcyo.uiview.less.RApplication

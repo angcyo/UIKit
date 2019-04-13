@@ -9,7 +9,7 @@ import android.widget.TextView;
 import com.angcyo.uiview.less.R;
 import com.angcyo.uiview.less.kotlin.ViewExKt;
 import com.angcyo.uiview.less.widget.RTextView;
-import com.angcyo.uiview.view.RClickListener;
+import com.angcyo.uiview.less.widget.RClickListener;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;

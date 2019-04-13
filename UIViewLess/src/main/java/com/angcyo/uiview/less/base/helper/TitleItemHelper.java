@@ -13,7 +13,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import com.angcyo.uiview.less.R;
 import com.angcyo.uiview.less.widget.ImageTextView;
-import com.angcyo.uiview.view.RClickListener;
+import com.angcyo.uiview.less.widget.RClickListener;
 
 /**
  * 标题栏 item 创建/控制

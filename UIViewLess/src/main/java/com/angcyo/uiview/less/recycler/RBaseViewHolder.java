@@ -26,7 +26,7 @@ import com.angcyo.uiview.less.widget.group.ItemInfoLayout;
 import com.angcyo.uiview.less.widget.group.RFlowLayout;
 import com.angcyo.uiview.less.widget.group.RTabLayout;
 import com.angcyo.uiview.less.widget.pager.RViewPager;
-import com.angcyo.uiview.view.RClickListener;
+import com.angcyo.uiview.less.widget.RClickListener;
 import com.bumptech.glide.Glide;
 import com.orhanobut.hawk.Hawk;
 
