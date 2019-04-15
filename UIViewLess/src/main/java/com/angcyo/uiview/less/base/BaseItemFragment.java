@@ -28,12 +28,23 @@ import java.util.List;
  * @date 2018/12/08
  */
 public abstract class BaseItemFragment extends BaseRecyclerFragment<SingleItem> {
-    ArrayList<SingleItem> singleItems = new ArrayList<>();
+    ArrayList<SingleItem> singleItems;
 
     /**
      * 每次调用{@link #refreshLayout()}, 如果item类型有改变, 左移此条目, 必须是高四位开始
      */
     protected int itemTypeStart = 0x1_0000;
+
+    public BaseItemFragment() {
+        singleItems = new ArrayList<>(getItemInitialCapacity());
+    }
+
+    /**
+     * 初始化容量
+     */
+    protected int getItemInitialCapacity() {
+        return getViewHolderInitialCapacity();
+    }
 
     @Override
     public void initRefreshRecyclerView(@Nullable SmartRefreshLayout smartRefreshLayout, @Nullable RRecyclerView recyclerView) {

@@ -71,7 +71,7 @@ class RPlayer {
         mediaPlay.start()
     }
 
-    /**@param url 可是有效的网络, 和有效的本地地址*/
+    /**@param url 可以有效的网络, 和有效的本地地址*/
     fun startPlay(url: String) {
         if (playUrl == url) {
             if (isPlayCall()) {
@@ -195,8 +195,9 @@ class RPlayer {
     private fun startProgress() {
         Thread(Runnable {
             while ((isPlayCall() || isPause()) &&
-                    mediaPlay != null &&
-                    onPlayListener != null) {
+                mediaPlay != null &&
+                onPlayListener != null
+            ) {
                 ThreadExecutor.instance().onMain {
                     if (isPlaying() && mediaPlay != null) {
                         currentPosition = mediaPlay!!.currentPosition
@@ -218,10 +219,10 @@ class RPlayer {
         /**@param duration 媒体总时长 毫秒*/
         fun onPreparedCompletion(duration: Int)
 
-        /**播放进度回调*/
+        /**播放进度回调, 毫秒*/
         fun onPlayProgress(progress: Int, duration: Int)
 
-        /**播放完成*/
+        /**播放完成, 毫秒*/
         fun onPlayCompletion(duration: Int)
 
         /**播放错误*/
