@@ -703,11 +703,19 @@ public class RBaseViewHolder extends RecyclerView.ViewHolder {
                     } else {
                         value = field.get(bean).toString();
                     }
+                    value = onConvertValueByKey(name, value);
                 } catch (Exception e) {
                     //e.printStackTrace();
                     L.w(/*"the clz=" + clz +*/ "the bean=" + bean.getClass().getSimpleName() + " field=" + name + " is null");
                 }
             }
+            return value;
+        }
+
+        /**
+         * 重写此方法，可以过滤/重写 key对应的value
+         */
+        public String onConvertValueByKey(@NonNull String key, @Nullable String value) {
             return value;
         }
 

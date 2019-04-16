@@ -17,6 +17,7 @@ import com.angcyo.uiview.less.resources.ResUtil
 import com.angcyo.uiview.less.skin.SkinHelper
 import com.angcyo.uiview.less.utils.RUtils
 import com.angcyo.uiview.less.utils.Reflect
+import com.angcyo.uiview.less.utils.utilcode.utils.FileUtils
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.net.URLEncoder
@@ -280,6 +281,13 @@ public fun String.urlEncode(): String {
 }
 
 /**
+ * 获取文件扩展名
+ * */
+public fun String.extName(): String {
+    return FileUtils.getExtensionName(this)
+}
+
+/**
  * 获取Int对应颜色的透明颜色
  * @param alpha [0..255] 值越小,越透明
  * */
@@ -389,4 +397,12 @@ public fun Context.isLandscape(): Boolean {
  * */
 public fun Context.isPortrait(): Boolean {
     return resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
+}
+
+/**
+ * 是否是平板
+ * */
+public fun Context.isTablet(): Boolean {
+    return (resources.configuration.screenLayout and
+            Configuration.SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_LARGE
 }
