@@ -33,6 +33,8 @@ class RPlayer {
     /**正在播放的url*/
     private var playUrl = ""
 
+    private var oldPlayUrl = ""
+
     /**当前播放的状态*/
     private var playState: AtomicInteger = AtomicInteger(STATE_INIT)
 
@@ -128,7 +130,7 @@ class RPlayer {
     fun stopPlay() {
 
         mediaPlay?.let {
-            if (isPlaying()) {
+            if (isPlaying() && it.isPlaying) {
                 it.stop()
             }
             it.reset()
@@ -165,6 +167,14 @@ class RPlayer {
         setPlayState(STATE_PLAYING)
     }
 
+    /**
+     * 重新播放
+     * */
+    fun replay() {
+        playUrl = ""
+        startPlay(oldPlayUrl)
+    }
+
     /**释放资源, 下次需要重新创建*/
     fun release() {
         setPlayState(STATE_RELEASE)
@@ -192,7 +202,23 @@ class RPlayer {
 
     fun isPause() = playState.get() == STATE_PAUSE
 
+    private fun stateString(state: Int): String {
+        return when (state) {
+            STATE_INIT -> "STATE_INIT"
+            STATE_NORMAL -> "STATE_NORMAL"
+            STATE_PLAYING -> "STATE_PLAYING"
+            STATE_STOP -> "STATE_STOP"
+            STATE_RELEASE -> "STATE_RELEASE"
+            STATE_PAUSE -> "STATE_PAUSE"
+            STATE_COMPLETION -> "STATE_COMPLETION"
+            STATE_ERROR -> "STATE_ERROR"
+            else -> "UNKNOWN"
+        }
+    }
+
     private fun setPlayState(state: Int) {
+        oldPlayUrl = playUrl
+
         val oldState = playState.get()
         playState.set(state)
 
@@ -200,10 +226,10 @@ class RPlayer {
             STATE_STOP, STATE_RELEASE, STATE_ERROR, STATE_COMPLETION -> playUrl = ""
         }
 
-        L.d("RPlayer: onPlayStateChange -> $oldState->$state")
+        L.i("RPlayer: onPlayStateChange -> ${stateString(oldState)}->${stateString(state)}")
 
         if (oldState != state) {
-            onPlayListener?.onPlayStateChange(playUrl, oldState, state)
+            onPlayListener?.onPlayStateChange(oldPlayUrl, oldState, state)
         }
     }
 
