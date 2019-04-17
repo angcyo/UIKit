@@ -26,7 +26,6 @@ import com.angcyo.uiview.less.widget.group.ItemInfoLayout;
 import com.angcyo.uiview.less.widget.group.RFlowLayout;
 import com.angcyo.uiview.less.widget.group.RTabLayout;
 import com.angcyo.uiview.less.widget.pager.RViewPager;
-import com.angcyo.uiview.less.widget.RClickListener;
 import com.bumptech.glide.Glide;
 import com.orhanobut.hawk.Hawk;
 
@@ -559,12 +558,7 @@ public class RBaseViewHolder extends RecyclerView.ViewHolder {
     }
 
     public void fillView(Object bean, boolean hideForEmpty, boolean withGetMethod) {
-        OnFillViewCallback callback = new OnFillViewCallback() {
-            @Override
-            public void onFillView(@NonNull View view, @Nullable String value) {
-                super.onFillView(view, value);
-            }
-        };
+        OnFillViewCallback callback = new OnFillViewCallback();
         callback.hideForEmpty = hideForEmpty;
         callback.withGetMethod = withGetMethod;
         fillView(null, bean, callback);
@@ -593,12 +587,16 @@ public class RBaseViewHolder extends RecyclerView.ViewHolder {
         }
         callback.init(clz, bean);
         for (Field field : fields) {
-            field.setAccessible(true);
             try {
-                View view = callback.getViewByField(this, field);
-                if (view != null) {
-                    String value = callback.getFieldValue(bean, field);
-                    callback.onFillView(view, value);
+                field.setAccessible(true);
+                if (callback.isFilterField(field)) {
+                    //过滤
+                } else {
+                    View view = callback.getViewByField(this, field);
+                    if (view != null) {
+                        CharSequence value = callback.getFieldValue(bean, field);
+                        callback.onFillView(view, value);
+                    }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -668,7 +666,7 @@ public class RBaseViewHolder extends RecyclerView.ViewHolder {
         /**
          * 填充View
          */
-        public void onFillView(@NonNull View view, @Nullable String value) {
+        public void onFillView(@NonNull View view, @Nullable CharSequence value) {
             if (view instanceof TextView) {
                 if (TextUtils.isEmpty(value) && hideForEmpty) {
                     view.setVisibility(View.GONE);
@@ -678,7 +676,7 @@ public class RBaseViewHolder extends RecyclerView.ViewHolder {
                 ((TextView) view).setText(value);
             } else if (view instanceof GlideImageView) {
                 ((GlideImageView) view).reset();
-                ((GlideImageView) view).setUrl(value);
+                ((GlideImageView) view).setUrl(String.valueOf(value));
             } else if (view instanceof ImageView) {
                 Glide.with(RApplication.getApp())
                         .load(value)
@@ -691,10 +689,10 @@ public class RBaseViewHolder extends RecyclerView.ViewHolder {
         }
 
         /**
-         * 获取对象字段的值
+         * 通过字段, 获取值
          */
-        public String getFieldValue(@Nullable Object bean, @NonNull Field field) {
-            String value = null;
+        public CharSequence getFieldValue(@Nullable Object bean, @NonNull Field field) {
+            CharSequence value = null;
             if (bean != null) {
                 String name = field.getName();
                 try {
@@ -715,7 +713,7 @@ public class RBaseViewHolder extends RecyclerView.ViewHolder {
         /**
          * 重写此方法，可以过滤/重写 key对应的value
          */
-        public String onConvertValueByKey(@NonNull String key, @Nullable String value) {
+        public CharSequence onConvertValueByKey(@NonNull String key, @Nullable CharSequence value) {
             return value;
         }
 
@@ -735,6 +733,15 @@ public class RBaseViewHolder extends RecyclerView.ViewHolder {
                 view = viewHolder.viewByName(name + "_view");
             }
             return view;
+        }
+
+        /**
+         * 是否需要跳过字段
+         *
+         * @param field 当前判断的字段
+         */
+        public boolean isFilterField(@NonNull Field field) {
+            return false;
         }
 
         public OnFillViewCallback setHideForEmpty(boolean hideForEmpty) {
