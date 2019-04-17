@@ -83,7 +83,9 @@ class RPlayer {
             }
             return
         } else {
-            stopPlay()
+            if (playState.get() != STATE_INIT) {
+                stopPlay()
+            }
         }
         if (mediaPlay == null) {
             init()
@@ -135,6 +137,9 @@ class RPlayer {
         setPlayState(STATE_STOP)
     }
 
+    /**
+     * 暂停播放
+     * */
     fun pausePlay() {
 
         mediaPlay?.let {
@@ -144,6 +149,20 @@ class RPlayer {
         }
 
         setPlayState(STATE_PAUSE)
+    }
+
+    /**
+     * 恢复播放
+     * */
+    fun resumePlay() {
+
+        mediaPlay?.let {
+            if (isPause()) {
+                it.start()
+            }
+        }
+
+        setPlayState(STATE_PLAYING)
     }
 
     /**释放资源, 下次需要重新创建*/
@@ -201,7 +220,7 @@ class RPlayer {
                 ThreadExecutor.instance().onMain {
                     if (isPlaying() && mediaPlay != null) {
                         currentPosition = mediaPlay!!.currentPosition
-                        L.d("RPlayer: startProgress -> $currentPosition:$mediaPlay!!.duration")
+                        L.d("RPlayer: startProgress -> $currentPosition:${mediaPlay!!.duration}")
                         onPlayListener?.onPlayProgress(currentPosition, mediaPlay!!.duration)
                     }
                 }

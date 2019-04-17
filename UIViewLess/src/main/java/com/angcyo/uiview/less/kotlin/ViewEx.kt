@@ -83,7 +83,7 @@ public val View.density: Float
     get() = resources.displayMetrics.density
 
 public val <T> T.dp: Float by lazy {
-    RApplication.getApp().resources.displayMetrics.density
+    RApplication.getApp()?.resources?.displayMetrics?.density ?: 0f
 }
 
 public val View.viewDrawWith: Int

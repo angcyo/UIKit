@@ -21,12 +21,39 @@ public class ViewGroupHelper {
     View parentView;
     View selectorView;
 
+    public ViewGroupHelper(View parentView) {
+        this.parentView = parentView;
+    }
+
     public static ViewGroupHelper build(View parentView) {
         return new ViewGroupHelper(parentView);
     }
 
-    public ViewGroupHelper(View parentView) {
-        this.parentView = parentView;
+    public static <T> void resetChild(@NonNull ViewGroup viewGroup, int newSize, @Nullable List<T> datas, @NonNull OnAddViewCallback<T> callback) {
+        resetChildCount(viewGroup, newSize, callback);
+        for (int i = 0; i < viewGroup.getChildCount(); i++) {
+            T data = null;
+            if (datas != null && datas.size() > i) {
+                data = datas.get(i);
+            }
+            callback.onInitView(viewGroup.getChildAt(i), data, i);
+        }
+    }
+
+    public static void resetChildCount(ViewGroup viewGroup, int newSize, OnAddViewCallback callback) {
+        int oldSize = viewGroup.getChildCount();
+        int count = newSize - oldSize;
+        if (count > 0) {
+            //需要补充子View
+            for (int i = 0; i < count; i++) {
+                viewGroup.addView(callback.createView(viewGroup.getContext(), viewGroup));
+            }
+        } else if (count < 0) {
+            //需要移除子View
+            for (int i = Math.abs(count); i < count; i++) {
+                viewGroup.removeViewAt(oldSize - 1 - i);
+            }
+        }
     }
 
     public ViewGroupHelper addView(@NonNull View itemView) {
@@ -60,6 +87,21 @@ public class ViewGroupHelper {
         if (parentView != null && selectorView != null) {
             if (selectorView.getVisibility() != visibility) {
                 selectorView.setVisibility(visibility);
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 显示id指定的子view
+     */
+    public ViewGroupHelper visibleId(int... ids) {
+        if (parentView instanceof ViewGroup && ids != null) {
+            for (int i = 0; i < ids.length; i++) {
+                View viewById = parentView.findViewById(ids[i]);
+                if (viewById != null) {
+                    viewById.setVisibility(View.VISIBLE);
+                }
             }
         }
         return this;
@@ -110,6 +152,8 @@ public class ViewGroupHelper {
         return this;
     }
 
+    //<editor-fold desc="Drawable过滤颜色方法">
+
     public ViewGroupHelper setTextSize(float textSize) {
         if (selectorView != null) {
             if (selectorView instanceof TextView) {
@@ -132,14 +176,15 @@ public class ViewGroupHelper {
         return this;
     }
 
-    //<editor-fold desc="Drawable过滤颜色方法">
-
     public ViewGroupHelper colorFilter(@ColorInt int color) {
         if (selectorView != null) {
             colorFilterView(selectorView, color);
         }
         return this;
     }
+    //</editor-fold>
+
+    //<editor-fold desc="文本过滤颜色的方法">
 
     public ViewGroupHelper colorFilter(@Nullable ViewGroup view, @ColorInt int color) {
         if (view != null) {
@@ -167,9 +212,6 @@ public class ViewGroupHelper {
         }
         return this;
     }
-    //</editor-fold>
-
-    //<editor-fold desc="文本过滤颜色的方法">
 
     public ViewGroupHelper textColorFilter(@ColorInt int color) {
         if (selectorView != null) {
@@ -177,6 +219,8 @@ public class ViewGroupHelper {
         }
         return this;
     }
+
+    //</editor-fold>
 
     public ViewGroupHelper textColorFilter(@Nullable ViewGroup view, @ColorInt int color) {
         if (view != null) {
@@ -204,8 +248,6 @@ public class ViewGroupHelper {
         }
         return this;
     }
-
-    //</editor-fold>
 
     public ViewGroupHelper setBackgroundColor(@ColorInt int color) {
         if (selectorView != null) {
@@ -298,32 +340,54 @@ public class ViewGroupHelper {
         return this;
     }
 
-    public static <T> void resetChild(@NonNull ViewGroup viewGroup, int newSize, @Nullable List<T> datas, @NonNull OnAddViewCallback<T> callback) {
-        resetChildCount(viewGroup, newSize, callback);
-        for (int i = 0; i < viewGroup.getChildCount(); i++) {
-            T data = null;
-            if (datas != null && datas.size() > i) {
-                data = datas.get(i);
+    /**
+     * 设置所以子View, 的可见性
+     *
+     * @param filterIds 需要排除的子view, id
+     */
+    public ViewGroupHelper visibilityAllId(int visibility, int... filterIds) {
+        if (parentView instanceof ViewGroup) {
+            for (int i = 0; i < ((ViewGroup) parentView).getChildCount(); i++) {
+                View child = ((ViewGroup) parentView).getChildAt(i);
+                boolean filter = false;
+                if (filterIds != null) {
+                    int id = child.getId();
+                    for (int j = 0; j < filterIds.length; j++) {
+                        if (filterIds[j] == id) {
+                            filter = true;
+                            break;
+                        }
+                    }
+                }
+                if (!filter) {
+                    child.setVisibility(visibility);
+                }
             }
-            callback.onInitView(viewGroup.getChildAt(i), data, i);
         }
+        return this;
     }
 
-    public static void resetChildCount(ViewGroup viewGroup, int newSize, OnAddViewCallback callback) {
-        int oldSize = viewGroup.getChildCount();
-        int count = newSize - oldSize;
-        if (count > 0) {
-            //需要补充子View
-            for (int i = 0; i < count; i++) {
-                viewGroup.addView(callback.createView(viewGroup.getContext(), viewGroup));
-            }
-        } else if (count < 0) {
-            //需要移除子View
-            for (int i = Math.abs(count); i < count; i++) {
-                viewGroup.removeViewAt(oldSize - 1 - i);
+    public ViewGroupHelper visibilityAllView(int visibility, View... filterViews) {
+        if (parentView instanceof ViewGroup) {
+            for (int i = 0; i < ((ViewGroup) parentView).getChildCount(); i++) {
+                View child = ((ViewGroup) parentView).getChildAt(i);
+                boolean filter = false;
+                if (filterViews != null) {
+                    for (int j = 0; j < filterViews.length; j++) {
+                        if (filterViews[j] == child) {
+                            filter = true;
+                            break;
+                        }
+                    }
+                }
+                if (!filter) {
+                    child.setVisibility(visibility);
+                }
             }
         }
+        return this;
     }
+
 
     public static class OnAddViewCallback<T> {
         public int getLayoutId() {
