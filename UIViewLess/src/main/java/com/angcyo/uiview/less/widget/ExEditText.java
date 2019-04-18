@@ -1654,6 +1654,13 @@ public class ExEditText extends AppCompatEditText {
         }
     }
 
+    @Override
+    protected void onVisibilityChanged(View changedView, int visibility) {
+        super.onVisibilityChanged(changedView, visibility);
+        if (visibility != VISIBLE) {
+            hideSoftInput();
+        }
+    }
 
     public interface getIdFromUserName {
         String userId(String userName);

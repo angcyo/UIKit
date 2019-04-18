@@ -2,6 +2,7 @@ package com.angcyo.uiview.less.media
 
 import android.media.AudioManager
 import android.media.MediaPlayer
+import android.text.TextUtils
 import com.angcyo.lib.L
 import com.angcyo.uiview.less.utils.ThreadExecutor
 import java.util.concurrent.atomic.AtomicInteger
@@ -196,6 +197,21 @@ class RPlayer {
         }
     }
 
+    /**
+     * 多次点击同一视图,自动处理 暂停/恢复/播放
+     * */
+    fun click(url: String? = null) {
+        if (isPlaying()) {
+            pausePlay()
+        } else if (isPause()) {
+            resumePlay()
+        } else {
+            if (!TextUtils.isEmpty(url)) {
+                startPlay(url!!)
+            }
+        }
+    }
+
     /**正在播放中, 解析也完成了*/
     fun isPlaying() = playState.get() == STATE_PLAYING
 
@@ -242,8 +258,8 @@ class RPlayer {
     private fun startProgress() {
         Thread(Runnable {
             while ((isPlayCall() || isPause()) &&
-                    mediaPlay != null &&
-                    onPlayListener != null
+                mediaPlay != null &&
+                onPlayListener != null
             ) {
                 ThreadExecutor.instance().onMain {
                     if (isPlaying() && mediaPlay != null) {
@@ -266,7 +282,11 @@ class RPlayer {
         /**@param duration 媒体总时长 毫秒*/
         fun onPreparedCompletion(duration: Int)
 
-        /**播放进度回调, 毫秒*/
+        /**
+         * 播放进度回调, 毫秒
+         * @param progress 当前播放多少毫秒
+         * @param duration 总共多少毫秒
+         * */
         fun onPlayProgress(progress: Int, duration: Int)
 
         /**播放完成, 毫秒*/
@@ -295,6 +315,9 @@ abstract class SimplePlayerListener : RPlayer.OnPlayerListener {
     override fun onPreparedCompletion(duration: Int) {
     }
 
+    /**
+     * @see com.angcyo.uiview.less.media.RPlayer.OnPlayerListener#onPlayProgress(Int, Int)
+     * */
     override fun onPlayProgress(progress: Int, duration: Int) {
     }
 

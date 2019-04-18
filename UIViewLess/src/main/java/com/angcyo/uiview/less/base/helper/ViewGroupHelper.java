@@ -14,6 +14,7 @@ import android.widget.TextView;
 import com.angcyo.uiview.less.kotlin.ViewExKt;
 import com.angcyo.uiview.less.resources.ResUtil;
 import com.angcyo.uiview.less.widget.ImageTextView;
+import com.angcyo.uiview.less.widget.RClickListener;
 
 import java.util.List;
 
@@ -388,6 +389,15 @@ public class ViewGroupHelper {
         return this;
     }
 
+    public ViewGroupHelper click(int id, final View.OnClickListener listener) {
+        if (parentView instanceof ViewGroup) {
+            View view = parentView.findViewById(id);
+            if (view != null) {
+                view.setOnClickListener(new RClickListener(listener));
+            }
+        }
+        return this;
+    }
 
     public static class OnAddViewCallback<T> {
         public int getLayoutId() {

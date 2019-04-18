@@ -267,6 +267,7 @@ public class RRecord {
 
         /**
          * 返回播放时长, 和进度比例
+         * @param time 秒
          */
         public void onPlayProgress(int time, float progress) {
 

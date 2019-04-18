@@ -17,7 +17,7 @@ import com.angcyo.uiview.less.utils.T_
  * 修改备注：
  * Version: 1.0.0
  */
-abstract class RClickListener : View.OnClickListener {
+open class RClickListener : View.OnClickListener {
 
     companion object {
         var DEFAULT_DELAY_CLICK_TIME = 500
@@ -28,6 +28,8 @@ abstract class RClickListener : View.OnClickListener {
 
     /**是否只在有网络的情况下可以点击*/
     var checkNet = false
+
+    var listener: View.OnClickListener? = null
 
     constructor() {
         this.delayTime = DEFAULT_DELAY_CLICK_TIME
@@ -44,6 +46,10 @@ abstract class RClickListener : View.OnClickListener {
 
     constructor(checkNet: Boolean) {
         this.checkNet = checkNet
+    }
+
+    constructor(listener: View.OnClickListener?) {
+        this.listener = listener
     }
 
     /*点击的时间, 用来判断延迟*/
@@ -66,7 +72,9 @@ abstract class RClickListener : View.OnClickListener {
         }
     }
 
-    abstract fun onRClick(view: View?)
+    open fun onRClick(view: View?) {
+        listener?.onClick(view)
+    }
 
     /**网络不佳的回调*/
     open fun onNetPoor() {

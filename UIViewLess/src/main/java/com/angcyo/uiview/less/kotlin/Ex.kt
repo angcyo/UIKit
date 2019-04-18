@@ -288,6 +288,13 @@ public fun String.extName(): String {
 }
 
 /**
+ * 不带扩展名的文件名
+ * */
+public fun String.noExtName(): String {
+    return FileUtils.getFileNameNoEx(this)
+}
+
+/**
  * 获取Int对应颜色的透明颜色
  * @param alpha [0..255] 值越小,越透明
  * */
