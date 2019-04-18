@@ -332,6 +332,14 @@ public class ViewGroupHelper {
         return null;
     }
 
+    @Nullable
+    public View view(int id) {
+        if (parentView instanceof ViewGroup) {
+            return parentView.findViewById(id);
+        }
+        return null;
+    }
+
     public ViewGroupHelper setTextBold(boolean bold) {
         if (selectorView instanceof TextView) {
             ViewExKt.addPaintFlags((TextView) selectorView, Paint.FAKE_BOLD_TEXT_FLAG, bold, true);

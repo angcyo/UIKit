@@ -141,6 +141,11 @@ public class ExEditText extends AppCompatEditText {
      */
     private boolean onFocusChangedSelectionLast = false;
 
+    /**
+     * 是否是不可编辑模式
+     */
+    private boolean isNoEditMode = false;
+
     public ExEditText(Context context) {
         super(context);
     }
@@ -339,6 +344,8 @@ public class ExEditText extends AppCompatEditText {
 
         setShowContentMenu(typedArray.getBoolean(R.styleable.ExEditText_r_show_content_menu, showContentMenu));
 
+        isNoEditMode = typedArray.getBoolean(R.styleable.ExEditText_r_is_no_edit_mode, isNoEditMode);
+
         typedArray.recycle();
 
         setLeftString(string);
@@ -516,7 +523,7 @@ public class ExEditText extends AppCompatEditText {
     /**
      * 设置输入的文本, 并且自动定位到末尾
      */
-    public void setInputText(String text) {
+    public void setInputText(CharSequence text) {
         setText(text);
         int textLength = getTextLength();//修改文本之后的长度
         int length = TextUtils.isEmpty(text) ? 0 : text.length();//需要请求的长度
@@ -618,6 +625,9 @@ public class ExEditText extends AppCompatEditText {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        if (isNoEditMode || !isEnabled()) {
+            return false;
+        }
         int action = event.getAction();
 
         boolean downInClearButton = isDownIn;
@@ -1564,6 +1574,22 @@ public class ExEditText extends AppCompatEditText {
             setLongClickable(false);
             return false;
         }
+    }
+
+    @Override
+    public boolean requestFocus(int direction, Rect previouslyFocusedRect) {
+        if (isNoEditMode) {
+            return false;
+        }
+        return super.requestFocus(direction, previouslyFocusedRect);
+    }
+
+    public boolean isNoEditMode() {
+        return isNoEditMode;
+    }
+
+    public void setNoEditMode(boolean noEditMode) {
+        isNoEditMode = noEditMode;
     }
 
     public void showSoftInput() {

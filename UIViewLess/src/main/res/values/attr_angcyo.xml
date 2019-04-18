@@ -310,6 +310,8 @@
         <attr name="r_allow_input_overflow" format="boolean"/>
         <!--获取到焦点时, 光标移至末尾-->
         <attr name="r_on_focus_selection_last" format="boolean"/>
+
+        <attr name="r_is_no_edit_mode" format="boolean"/>
     </declare-styleable>
 
     <declare-styleable name="JumpAdProgressBar">
