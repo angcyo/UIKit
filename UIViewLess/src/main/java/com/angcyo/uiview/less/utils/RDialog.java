@@ -246,13 +246,37 @@ public class RDialog {
      */
     public static int[] measureSize(@NonNull Context context, int layoutId, @Nullable View view) {
         if (view == null) {
-            view = LayoutInflater.from(context).inflate(layoutId, new FrameLayout(context));
+            view = LayoutInflater.from(context).inflate(layoutId, new FrameLayout(context), false);
+        }
+        int originWidth = -1;
+        int originHeight = -1;
+
+        int width;
+        int height;
+
+        ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
+        if (layoutParams != null) {
+            if (layoutParams.width > 0) {
+                originWidth = layoutParams.width;
+            }
+            if (layoutParams.height > 0) {
+                originHeight = layoutParams.height;
+            }
         }
         view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         view.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
                 View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
-
-        return new int[]{view.getMeasuredHeight(), view.getMeasuredHeight()};
+        if (originWidth != -1) {
+            width = originWidth;
+        } else {
+            width = view.getMeasuredWidth();
+        }
+        if (originHeight != -1) {
+            height = originHeight;
+        } else {
+            height = view.getMeasuredHeight();
+        }
+        return new int[]{width, height};
     }
 
     /**

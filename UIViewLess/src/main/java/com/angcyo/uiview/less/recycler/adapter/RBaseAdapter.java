@@ -123,14 +123,25 @@ public abstract class RBaseAdapter<T> extends RecyclerView.Adapter<RBaseViewHold
         if (recyclerView == null || localRefresh == null) {
             return;
         }
-        RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
-        if (layoutManager instanceof LinearLayoutManager) {
-            int firstVisibleItemPosition = ((LinearLayoutManager) layoutManager).findFirstVisibleItemPosition();
-            for (int i = 0; i < layoutManager.getChildCount(); i++) {
-                int position = firstVisibleItemPosition + i;
-                RBaseViewHolder vh = (RBaseViewHolder) recyclerView.findViewHolderForAdapterPosition(position);
-                if (vh != null) {
-                    localRefresh.onLocalRefresh(vh, position);
+        int childCount = recyclerView.getChildCount();
+        for (int i = 0; i < childCount; i++) {
+            View child = recyclerView.getChildAt(i);
+            ViewGroup.LayoutParams params = child.getLayoutParams();
+            if (params instanceof RecyclerView.LayoutParams) {
+                //https://stackoverflow.com/questions/29684154/recyclerview-viewholder-getlayoutposition-vs-getadapterposition
+                int layoutPosition = ((RecyclerView.LayoutParams) params).getViewLayoutPosition();
+
+                //当notifyDataSetChanged调用后, adapterPosition等于-1
+                int adapterPosition = ((RecyclerView.LayoutParams) params).getViewAdapterPosition();
+
+                RecyclerView.ViewHolder holder = recyclerView.findViewHolderForLayoutPosition(layoutPosition);
+                if (adapterPosition == RecyclerView.NO_POSITION) {
+                    adapterPosition = layoutPosition;
+                }
+
+                if (holder instanceof RBaseViewHolder) {
+                    RBaseViewHolder vh = (RBaseViewHolder) holder;
+                    localRefresh.onLocalRefresh(vh, adapterPosition);
                 }
             }
         }

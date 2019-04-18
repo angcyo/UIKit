@@ -14,6 +14,7 @@ import retrofit2.RetrofitServiceMapping;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import rx.Observable;
+import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
@@ -32,9 +33,9 @@ import java.util.concurrent.TimeUnit;
  * @date 2018/10/15
  */
 public class Http {
+    public static final String TAG = "HttpResult";
     public static int TIME_OUT = 5_000;
     public static String BASE_URL = "http://www.api.com";
-    public static final String TAG = "HttpResult";
     public static boolean LOG_BODY = BuildConfig.DEBUG;
     public static boolean LOG_INTERCEPTOR_RESPONSE = BuildConfig.DEBUG;
 
@@ -42,6 +43,9 @@ public class Http {
         return builder(defaultOkHttpClick(logTag).build(), baseUrl);
     }
 
+    /**
+     * Retrofit 构建
+     */
     public static Retrofit.Builder builder(OkHttpClient client, String baseUrl) {
         return new Retrofit.Builder()
                 .baseUrl(baseUrl)
@@ -51,6 +55,9 @@ public class Http {
                 ;
     }
 
+    /**
+     * OkHttp 客户端构建
+     */
     public static OkHttpClient.Builder defaultOkHttpClick(String logTag) {
         HttpLoggingInterceptorM httpLoggingInterceptorM = new HttpLoggingInterceptorM(new LogInterceptor(logTag));
         if (BuildConfig.DEBUG) {
@@ -75,7 +82,7 @@ public class Http {
     }
 
     /**
-     * 创建接口
+     * 创建接口, 支持映射
      */
     public static <T> T create(Retrofit retrofit, Class<T> service) {
         return RetrofitServiceMapping.mapping(retrofit, service).create(service);
@@ -271,15 +278,6 @@ public class Http {
         }
     }
 
-
-    public interface IConvertString {
-        String covert(String body);
-    }
-
-    public interface IConvertJson<T> {
-        T covert(String body);
-    }
-
     /**
      * 将args转成map, 再转成json
      */
@@ -293,7 +291,6 @@ public class Http {
     public static RequestBody body(String... args) {
         return Http.getJsonBody(mapJson(args));
     }
-
 
     public static HashMap<String, String> map(String... args) {
         return mapParam(args);
@@ -434,11 +431,12 @@ public class Http {
     /**
      * 简单的OkHttp网络请求
      */
-    public static void request(@NonNull String url, @Nullable final OnHttpRequestCallback callback) {
+    public static Call request(@NonNull String url, @Nullable final OnHttpRequestCallback callback) {
         OkHttpClient client = new OkHttpClient().newBuilder().build();
         Request request = new Request.Builder().url(url).build();
+        Call call = client.newCall(request);
 
-        client.newCall(request).enqueue(new Callback() {
+        call.enqueue(new Callback() {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
 
@@ -459,7 +457,38 @@ public class Http {
                 }
             }
         });
+
+        return call;
     }
+
+    public static <T> Observable<T> single(@NonNull final retrofit2.Call<T> call) {
+        return Rx.create(new Func<T>() {
+            @Override
+            public T call(Observer observer) {
+                retrofit2.Response<T> response = null;
+                try {
+                    response = call.execute();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    observer.onError(e);
+                }
+                if (response == null) {
+                    return null;
+                }
+                return response.body();
+            }
+        });
+    }
+
+    public interface IConvertString {
+        String covert(String body);
+    }
+
+
+    public interface IConvertJson<T> {
+        T covert(String body);
+    }
+
 
     public interface OnHttpRequestCallback {
         void onRequestCallback(@NonNull String body);

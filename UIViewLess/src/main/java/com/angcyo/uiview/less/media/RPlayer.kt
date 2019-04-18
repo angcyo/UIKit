@@ -30,10 +30,11 @@ class RPlayer {
     var leftVolume: Float = 0.5f
     var rightVolume: Float = 0.5f
 
-    /**正在播放的url*/
-    private var playUrl = ""
+    /**正在播放的url, 播放完成后, 会被置空*/
+    var playingUrl = ""
 
-    private var oldPlayUrl = ""
+    /**播放的url, 正常播放过的url*/
+    var playUrl = ""
 
     /**当前播放的状态*/
     private var playState: AtomicInteger = AtomicInteger(STATE_INIT)
@@ -75,7 +76,7 @@ class RPlayer {
 
     /**@param url 可以有效的网络, 和有效的本地地址*/
     fun startPlay(url: String) {
-        if (playUrl == url) {
+        if (playingUrl == url) {
             if (isPlayCall()) {
 
             } else {
@@ -119,6 +120,7 @@ class RPlayer {
                 }
             }
             it.setDataSource(url)
+            playingUrl = url
             playUrl = url
 
             setPlayState(STATE_NORMAL)
@@ -171,8 +173,8 @@ class RPlayer {
      * 重新播放
      * */
     fun replay() {
-        playUrl = ""
-        startPlay(oldPlayUrl)
+        playingUrl = ""
+        startPlay(playUrl)
     }
 
     /**释放资源, 下次需要重新创建*/
@@ -217,19 +219,19 @@ class RPlayer {
     }
 
     private fun setPlayState(state: Int) {
-        oldPlayUrl = playUrl
+        playUrl = playingUrl
 
         val oldState = playState.get()
         playState.set(state)
 
         when (state) {
-            STATE_STOP, STATE_RELEASE, STATE_ERROR, STATE_COMPLETION -> playUrl = ""
+            STATE_STOP, STATE_RELEASE, STATE_ERROR, STATE_COMPLETION -> playingUrl = ""
         }
 
         L.i("RPlayer: onPlayStateChange -> ${stateString(oldState)}->${stateString(state)}")
 
         if (oldState != state) {
-            onPlayListener?.onPlayStateChange(oldPlayUrl, oldState, state)
+            onPlayListener?.onPlayStateChange(playUrl, oldState, state)
         }
     }
 
@@ -240,8 +242,8 @@ class RPlayer {
     private fun startProgress() {
         Thread(Runnable {
             while ((isPlayCall() || isPause()) &&
-                mediaPlay != null &&
-                onPlayListener != null
+                    mediaPlay != null &&
+                    onPlayListener != null
             ) {
                 ThreadExecutor.instance().onMain {
                     if (isPlaying() && mediaPlay != null) {
