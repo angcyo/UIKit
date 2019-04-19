@@ -90,6 +90,9 @@ public class ResUtil {
         return wrappedDrawable;
     }
 
+    /**
+     * 根据版本, 自动选择方法
+     * */
     public static Drawable filterDrawable(@NonNull Drawable drawable, @ColorInt int color) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             return tintDrawable(drawable, color);

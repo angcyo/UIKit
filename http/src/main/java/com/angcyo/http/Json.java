@@ -1,18 +1,20 @@
 package com.angcyo.http;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.JsonReader;
 import com.angcyo.http.type.TypeBuilder;
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 import java.io.IOException;
 import java.io.StringReader;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Copyright (C) 2016,深圳市红鸟网络科技股份有限公司 All rights reserved.
@@ -162,6 +164,177 @@ public class Json {
                 jsonReader.skipValue();
             } catch (IOException e1) {
                 //e1.printStackTrace();
+            }
+        }
+    }
+
+    public static Builder build() {
+        return json();
+    }
+
+    public static Builder array() {
+        return new Builder().array();
+    }
+
+    public static Builder json() {
+        return new Builder().json();
+    }
+
+    public static class Builder {
+        JsonElement rootElement;
+        Stack<JsonElement> subElementStack;
+
+        /**
+         * 当对象的值为null时, 是否忽略
+         */
+        boolean ignoreNull = true;
+
+        private Builder() {
+            subElementStack = new Stack<>();
+        }
+
+        /**
+         * 构建一个Json对象
+         */
+        private Builder json() {
+            if (rootElement == null) {
+                rootElement = new JsonObject();
+            }
+            return this;
+        }
+
+        /**
+         * 构建一个Json数组
+         */
+        private Builder array() {
+            if (rootElement == null) {
+                rootElement = new JsonArray();
+            }
+            return this;
+        }
+
+        public Builder ignoreNull(boolean ignoreNull) {
+            this.ignoreNull = ignoreNull;
+            return this;
+        }
+
+        private JsonElement getOperateElement() {
+            checkRootElement();
+            if (subElementStack.isEmpty()) {
+                return rootElement;
+            } else {
+                return subElementStack.lastElement();
+            }
+        }
+
+        private void operateElement(@Nullable JsonElement element, @NonNull String key, @Nullable Object obj) {
+            if (element instanceof JsonObject) {
+                if (obj == null) {
+                    if (!ignoreNull) {
+                        ((JsonObject) element).add(key, null);
+                    }
+                } else if (obj instanceof String) {
+                    ((JsonObject) element).addProperty(key, (String) obj);
+                } else if (obj instanceof Number) {
+                    ((JsonObject) element).addProperty(key, (Number) obj);
+                } else if (obj instanceof Character) {
+                    ((JsonObject) element).addProperty(key, (Character) obj);
+                } else if (obj instanceof Boolean) {
+                    ((JsonObject) element).addProperty(key, (Boolean) obj);
+                } else if (obj instanceof JsonElement) {
+                    ((JsonObject) element).add(key, (JsonElement) obj);
+                } else {
+                    ((JsonObject) element).addProperty(key, obj.toString());
+                }
+            } else if (element instanceof JsonArray) {
+                if (obj == null) {
+                    if (!ignoreNull) {
+                        ((JsonArray) element).add(((String) null));
+                    }
+                } else if (obj instanceof String) {
+                    ((JsonArray) element).add((String) obj);
+                } else if (obj instanceof Number) {
+                    ((JsonArray) element).add((Number) obj);
+                } else if (obj instanceof Character) {
+                    ((JsonArray) element).add((Character) obj);
+                } else if (obj instanceof Boolean) {
+                    ((JsonArray) element).add((Boolean) obj);
+                } else if (obj instanceof JsonElement) {
+                    ((JsonArray) element).add((JsonElement) obj);
+                } else {
+                    ((JsonArray) element).add(obj.toString());
+                }
+            }
+
+        }
+
+        /**
+         * 产生一个新的Json对象子集
+         */
+        public Builder groupJson(@NonNull String key) {
+            JsonObject element = new JsonObject();
+            add(key, element);
+            subElementStack.push(element);
+            return this;
+        }
+
+        /**
+         * 产生一个新的Json数组对象子集
+         */
+        public Builder groupArray(@NonNull String key) {
+            JsonArray element = new JsonArray();
+            add(key, element);
+            subElementStack.push(element);
+            return this;
+        }
+
+        /**
+         * 结束新对象
+         */
+        public Builder endGroup() {
+            subElementStack.pop();
+            return this;
+        }
+
+        public Builder add(@NonNull String key, @Nullable Boolean bool) {
+            operateElement(getOperateElement(), key, bool);
+            return this;
+
+        }
+
+        public Builder add(@NonNull String key, @Nullable Character character) {
+            operateElement(getOperateElement(), key, character);
+            return this;
+
+        }
+
+        public Builder add(@NonNull String key, @Nullable Number number) {
+            operateElement(getOperateElement(), key, number);
+            return this;
+
+        }
+
+        public Builder add(@NonNull String key, @Nullable String string) {
+            operateElement(getOperateElement(), key, string);
+            return this;
+        }
+
+        public Builder add(@NonNull String key, @Nullable JsonElement element) {
+            operateElement(getOperateElement(), key, element);
+            return this;
+        }
+
+        public JsonElement build() {
+            return rootElement;
+        }
+
+        public String get() {
+            return rootElement.toString();
+        }
+
+        private void checkRootElement() {
+            if (rootElement == null) {
+                throw new NullPointerException("你需要先调用 json() or array() 方法.");
             }
         }
     }
