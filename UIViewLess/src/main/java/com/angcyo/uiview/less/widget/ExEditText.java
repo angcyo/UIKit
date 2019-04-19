@@ -1590,6 +1590,11 @@ public class ExEditText extends AppCompatEditText {
 
     public void setNoEditMode(boolean noEditMode) {
         isNoEditMode = noEditMode;
+        if (noEditMode) {
+            if (isFocused()) {
+                clearFocus();
+            }
+        }
     }
 
     public void showSoftInput() {
