@@ -3,6 +3,7 @@ package com.angcyo.http;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.JsonReader;
+import android.util.Log;
 import com.angcyo.http.type.TypeBuilder;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -180,7 +181,12 @@ public class Json {
         return new Builder().json();
     }
 
+    public interface Call {
+        void call(Builder builder);
+    }
+
     public static class Builder {
+        final static String TAG = "JsonBuilder";
         JsonElement rootElement;
         Stack<JsonElement> subElementStack;
 
@@ -246,7 +252,13 @@ public class Json {
                 } else {
                     ((JsonObject) element).addProperty(key, obj.toString());
                 }
-            } else if (element instanceof JsonArray) {
+            } else {
+                Log.w(TAG, " 当前操作已被忽略:" + key + "->" + obj);
+            }
+        }
+
+        private void operateElement(@Nullable JsonElement element, @Nullable Object obj) {
+            if (element instanceof JsonArray) {
                 if (obj == null) {
                     if (!ignoreNull) {
                         ((JsonArray) element).add(((String) null));
@@ -264,8 +276,9 @@ public class Json {
                 } else {
                     ((JsonArray) element).add(obj.toString());
                 }
+            } else {
+                Log.w(TAG, " 当前操作已被忽略:" + obj);
             }
-
         }
 
         /**
@@ -285,6 +298,12 @@ public class Json {
             JsonArray element = new JsonArray();
             add(key, element);
             subElementStack.push(element);
+            return this;
+        }
+
+        public Builder groupArray(@NonNull String key, @NonNull Call call) {
+            groupArray(key);
+            call(call);
             return this;
         }
 
@@ -321,6 +340,42 @@ public class Json {
 
         public Builder add(@NonNull String key, @Nullable JsonElement element) {
             operateElement(getOperateElement(), key, element);
+            return this;
+        }
+
+        public Builder add(@Nullable Boolean bool) {
+            operateElement(getOperateElement(), bool);
+            return this;
+
+        }
+
+        public Builder add(@Nullable Character character) {
+            operateElement(getOperateElement(), character);
+            return this;
+
+        }
+
+        public Builder add(@Nullable Number number) {
+            operateElement(getOperateElement(), number);
+            return this;
+
+        }
+
+        public Builder add(@Nullable String string) {
+            operateElement(getOperateElement(), string);
+            return this;
+        }
+
+        public Builder add(@Nullable JsonElement element) {
+            operateElement(getOperateElement(), element);
+            return this;
+        }
+
+        /**
+         * 回调出去
+         */
+        public Builder call(@NonNull Call action) {
+            action.call(this);
             return this;
         }
 
