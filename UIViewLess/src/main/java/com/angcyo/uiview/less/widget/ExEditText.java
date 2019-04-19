@@ -54,18 +54,26 @@ import java.util.regex.Pattern;
 
 public class ExEditText extends AppCompatEditText {
 
+    /**
+     * @see #onAttachedToWindow()
+     */
+    public boolean isAttached = false;
     Rect clearRect = new Rect();//删除按钮区域
-    boolean isDownIn = false;//是否在 一键清空 按钮区域按下
     Drawable clearDrawable;
-
-    boolean showClear = true;//是否显示删除按钮
-
-    boolean isPassword = false;//隐藏显示密码
-
+    /**
+     * 是否在 一键清空 按钮区域按下
+     */
+    boolean isDownIn = false;
+    /**
+     * 是否显示删除按钮
+     */
+    boolean showClear = true;
+    /**
+     * 隐藏显示密码, 在touch down一段时候后
+     */
+    boolean showPasswordOnTouch = false;
     boolean handleTouch = false;
-
     long downTime = 0;//按下的时间
-
     /**
      * 是否当键盘弹出的时候, touch down事件隐藏键盘
      */
@@ -91,12 +99,10 @@ public class ExEditText extends AppCompatEditText {
      * 是否激活@功能,会检查文本 ,当调用{@link #setOnMentionInputListener(OnMentionInputListener)}后, 自动激活
      */
     private boolean enableMention = false;
-
     /**
      * 是否监听@字符输入
      */
     private boolean enableCallback = true;
-
     private RTextPaint mTextPaint;
     private String mLeftString;
     /**
@@ -113,10 +119,8 @@ public class ExEditText extends AppCompatEditText {
     private int mPaddingLeft;
     private ValueAnimator rollAnim;
     private int lastRollAnimValue = -100;
-
     private boolean showContentMenu = true;
     private boolean checkInputNumber = false;
-
     private OnTextEmptyListener mOnTextEmptyListener;
     /**
      * 屏幕一键删除按钮点击后, 触发输入框选择, 弹出的菜单的问题
@@ -130,21 +134,23 @@ public class ExEditText extends AppCompatEditText {
      * 过滤的最大长度
      */
     private int maxCharLength = 0;
-
     /**
      * 允许输入溢出
      */
     private boolean allowInputOverflow = false;
-
     /**
      * 收到焦点时, 是否将光标定位到末尾
      */
     private boolean onFocusChangedSelectionLast = false;
-
     /**
      * 是否是不可编辑模式
      */
     private boolean isNoEditMode = false;
+
+    /**
+     * 是否只有在 touch 事件的时候, 才可以请求焦点. 防止在列表中,自动获取焦点的情况
+     */
+    private boolean requestFocusOnTouch = false;
 
     public ExEditText(Context context) {
         super(context);
@@ -262,40 +268,6 @@ public class ExEditText extends AppCompatEditText {
                 == (EditorInfo.TYPE_CLASS_TEXT | EditorInfo.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
     }
 
-    public void setCheckInputNumber(boolean checkInputNumber) {
-        this.checkInputNumber = checkInputNumber;
-    }
-
-    public boolean unableCallback() {
-        enableCallback = false;
-        return enableCallback;
-    }
-
-    public boolean enableCallback() {
-        enableCallback = true;
-        return enableCallback;
-    }
-
-    public void setEnableCallback(boolean enableCallback) {
-        this.enableCallback = enableCallback;
-    }
-
-    public void setEnableMention(boolean enableMention) {
-        this.enableMention = enableMention;
-    }
-
-    public void setMaxNumber(float mMaxNumber) {
-        this.mMaxNumber = mMaxNumber;
-    }
-
-    public void setMinNumber(float minNumber) {
-        mMinNumber = minNumber;
-    }
-
-    public void setDecimalCount(int mDecimalCount) {
-        this.mDecimalCount = mDecimalCount;
-    }
-
     protected void initView(Context context, AttributeSet attrs) {
         mPaddingLeft = getPaddingLeft();
 
@@ -345,16 +317,13 @@ public class ExEditText extends AppCompatEditText {
         setShowContentMenu(typedArray.getBoolean(R.styleable.ExEditText_r_show_content_menu, showContentMenu));
 
         isNoEditMode = typedArray.getBoolean(R.styleable.ExEditText_r_is_no_edit_mode, isNoEditMode);
+        requestFocusOnTouch = typedArray.getBoolean(R.styleable.ExEditText_r_request_focus_on_touch, requestFocusOnTouch);
 
         typedArray.recycle();
 
         setLeftString(string);
 
         mTextPaint.setTextColor(color);
-    }
-
-    public boolean canVerticalScroll() {
-        return canVerticalScroll(this);
     }
 
     @Override
@@ -418,6 +387,203 @@ public class ExEditText extends AppCompatEditText {
             canvas.drawText(mRHintText, x, y, textPaint);
             canvas.restore();
         }
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        isAttached = false;
+    }
+
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        isAttached = true;
+        initView();
+        ensurePaint();
+    }
+
+    @Override
+    public void setTag(Object tag) {
+        super.setTag(tag);
+        initView();
+    }
+
+    @Override
+    protected void onFocusChanged(boolean focused, int direction, Rect previouslyFocusedRect) {
+        super.onFocusChanged(focused, direction, previouslyFocusedRect);
+        checkEdit(focused);
+
+        if (focused) {
+//            if (isInputTypeNumber() && showClear) {
+//                //数字输入时, 自动把焦点移植最后
+//                post(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        setSelectionLast();
+//                    }
+//                });
+//            }
+        } else {
+            touchDownWithHandle = 0;
+            //没有焦点的时候, 检查自动匹配输入
+            if (isInputTipPattern()) {
+                setText(mInputTipText);
+            }
+        }
+    }
+
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+        if (showClear) {
+            int offset = (int) (4 * getResources().getDisplayMetrics().density);
+            clearRect.set(w - getPaddingRight() - getClearDrawable().getIntrinsicWidth() - offset,
+                    getPaddingTop(), w - getPaddingRight() + offset, Math.min(w, h) - getPaddingBottom());
+        }
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        if (isNoEditMode || !isEnabled()) {
+            return false;
+        }
+        int action = event.getAction();
+
+        boolean downInClearButton = isDownIn;
+
+        if (action == MotionEvent.ACTION_DOWN) {
+            downTime = System.currentTimeMillis();
+        }
+
+        if (showClear && isFocused()) {
+            if (action == MotionEvent.ACTION_DOWN) {
+                isDownIn = checkClear(event.getX(), event.getY());
+                downInClearButton = isDownIn;
+                updateState(isDownIn);
+            } else if (action == MotionEvent.ACTION_MOVE) {
+                updateState(checkClear(event.getX(), event.getY()));
+            } else if (action == MotionEvent.ACTION_UP) {
+                updateState(false);
+                if (isDownIn && checkClear(event.getX(), event.getY())) {
+                    if (!TextUtils.isEmpty(getText())) {
+                        setText("");
+                        setSelection(0);
+                        return true;
+                    }
+                }
+                isDownIn = false;
+
+                if (autoHideSoftInput && isSoftKeyboardShow()) {
+                    post(new Runnable() {
+                        @Override
+                        public void run() {
+                            hideSoftInput();
+                        }
+                    });
+                }
+            } else if (action == MotionEvent.ACTION_CANCEL) {
+                updateState(false);
+                isDownIn = false;
+            }
+        }
+
+        //L.e("call: onTouchEvent([event])-> canVerticalScroll:" + canVerticalScroll(this));
+
+        if (showPasswordOnTouch) {
+            if (action == MotionEvent.ACTION_DOWN) {
+            } else if (action == MotionEvent.ACTION_MOVE) {
+                if ((System.currentTimeMillis() - downTime) > 100) {
+                    if (isDownIn) {
+                        hidePassword();
+                    } else {
+                        showPassword();
+                    }
+                }
+            } else if (action == MotionEvent.ACTION_CANCEL || action == MotionEvent.ACTION_UP) {
+                hidePassword();
+            }
+        }
+
+        if (!showContentMenu ||
+                downInClearButton ||
+                isInputTypePassword()) {
+            //禁止掉系统的所有菜单选项, 同时文本的光标定位, 选择功能也会不可用
+            if (action == MotionEvent.ACTION_DOWN) {
+                if (touchDownWithHandle != 0) {
+                    if (isFocused()) {
+                        showSoftInput();
+                    }
+                } else {
+                    if (isInputTypePassword()) {
+                        //密码类型
+                        showSoftInput();
+                        setSelection(getText().length());
+                    } else {
+                        super.onTouchEvent(event);
+                    }
+                    touchDownWithHandle = 1;
+                }
+            } else if (action == MotionEvent.ACTION_CANCEL || action == MotionEvent.ACTION_UP) {
+                if (touchDownWithHandle == 1) {
+                    if (isInputTypePassword()) {
+                    } else {
+                        super.onTouchEvent(event);
+                    }
+                    touchDownWithHandle = 2;
+                } else {
+                    setSelection(getText().length());
+                }
+            }
+            return true;
+        } else {
+            if (action == MotionEvent.ACTION_DOWN && onFocusChangedSelectionLast && !isFocused()) {
+                showSoftInput();
+                setSelectionLast();
+                return true;
+            } else {
+                return super.onTouchEvent(event);
+            }
+        }
+    }
+
+    public void setCheckInputNumber(boolean checkInputNumber) {
+        this.checkInputNumber = checkInputNumber;
+    }
+
+    public boolean unableCallback() {
+        enableCallback = false;
+        return enableCallback;
+    }
+
+    public boolean enableCallback() {
+        enableCallback = true;
+        return enableCallback;
+    }
+
+    public void setEnableCallback(boolean enableCallback) {
+        this.enableCallback = enableCallback;
+    }
+
+    public void setEnableMention(boolean enableMention) {
+        this.enableMention = enableMention;
+    }
+
+    public void setMaxNumber(float mMaxNumber) {
+        this.mMaxNumber = mMaxNumber;
+    }
+
+    public void setMinNumber(float minNumber) {
+        mMinNumber = minNumber;
+    }
+
+    public void setDecimalCount(int mDecimalCount) {
+        this.mDecimalCount = mDecimalCount;
+    }
+
+
+    public boolean canVerticalScroll() {
+        return canVerticalScroll(this);
     }
 
     protected boolean checkNeedDrawRHintText() {
@@ -496,24 +662,6 @@ public class ExEditText extends AppCompatEditText {
         return true;
     }
 
-    @Override
-    protected void onDetachedFromWindow() {
-        super.onDetachedFromWindow();
-    }
-
-    @Override
-    protected void onAttachedToWindow() {
-        super.onAttachedToWindow();
-        initView();
-        ensurePaint();
-    }
-
-    @Override
-    public void setTag(Object tag) {
-        super.setTag(tag);
-        initView();
-    }
-
     private void ensurePaint() {
         if (mTextPaint == null) {
             mTextPaint = new RTextPaint(getPaint());
@@ -549,7 +697,7 @@ public class ExEditText extends AppCompatEditText {
 
             if (tagString.contains("password")) {
                 //隐藏显示密码
-                isPassword = true;
+                showPasswordOnTouch = true;
             }
 
             if (tagString.contains("hide")) {
@@ -587,140 +735,6 @@ public class ExEditText extends AppCompatEditText {
 
     public void setFilter(InputFilter filter) {
         ViewExKt.setFilter(this, filter);
-    }
-
-    @Override
-    protected void onFocusChanged(boolean focused, int direction, Rect previouslyFocusedRect) {
-        super.onFocusChanged(focused, direction, previouslyFocusedRect);
-        checkEdit(focused);
-
-        if (focused) {
-//            if (isInputTypeNumber() && showClear) {
-//                //数字输入时, 自动把焦点移植最后
-//                post(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        setSelectionLast();
-//                    }
-//                });
-//            }
-        } else {
-            touchDownWithHandle = 0;
-            //没有焦点的时候, 检查自动匹配输入
-            if (isInputTipPattern()) {
-                setText(mInputTipText);
-            }
-        }
-    }
-
-    @Override
-    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        super.onSizeChanged(w, h, oldw, oldh);
-        if (showClear) {
-            int offset = (int) (4 * getResources().getDisplayMetrics().density);
-            clearRect.set(w - getPaddingRight() - getClearDrawable().getIntrinsicWidth() - offset,
-                    getPaddingTop(), w - getPaddingRight() + offset, Math.min(w, h) - getPaddingBottom());
-        }
-    }
-
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        if (isNoEditMode || !isEnabled()) {
-            return false;
-        }
-        int action = event.getAction();
-
-        boolean downInClearButton = isDownIn;
-
-        if (showClear && isFocused()) {
-            if (action == MotionEvent.ACTION_DOWN) {
-                isDownIn = checkClear(event.getX(), event.getY());
-                downInClearButton = isDownIn;
-                updateState(isDownIn);
-            } else if (action == MotionEvent.ACTION_MOVE) {
-                updateState(checkClear(event.getX(), event.getY()));
-            } else if (action == MotionEvent.ACTION_UP) {
-                updateState(false);
-                if (isDownIn && checkClear(event.getX(), event.getY())) {
-                    if (!TextUtils.isEmpty(getText())) {
-                        setText("");
-                        setSelection(0);
-                        return true;
-                    }
-                }
-                isDownIn = false;
-
-                if (autoHideSoftInput && isSoftKeyboardShow()) {
-                    post(new Runnable() {
-                        @Override
-                        public void run() {
-                            hideSoftInput();
-                        }
-                    });
-                }
-            } else if (action == MotionEvent.ACTION_CANCEL) {
-                updateState(false);
-                isDownIn = false;
-            }
-        }
-
-        //L.e("call: onTouchEvent([event])-> canVerticalScroll:" + canVerticalScroll(this));
-
-//        if (isPassword) {
-//            if (action == MotionEvent.ACTION_DOWN) {
-//                downTime = System.currentTimeMillis();
-//            } else if (action == MotionEvent.ACTION_MOVE) {
-//                if ((System.currentTimeMillis() - downTime) > 100) {
-//                    if (isDownIn) {
-//                        hidePassword();
-//                    } else {
-//                        showPassword();
-//                    }
-//                }
-//            } else if (action == MotionEvent.ACTION_CANCEL || action == MotionEvent.ACTION_UP) {
-//                hidePassword();
-//            }
-//        }
-        if (!showContentMenu ||
-                downInClearButton ||
-                isInputTypePassword()) {
-            //禁止掉系统的所有菜单选项, 同时文本的光标定位, 选择功能也会不可用
-            if (action == MotionEvent.ACTION_DOWN) {
-                if (touchDownWithHandle != 0) {
-                    if (isFocused()) {
-                        showSoftInput();
-                    }
-                } else {
-                    if (isInputTypePassword()) {
-                        //密码类型
-                        showSoftInput();
-                        setSelection(getText().length());
-                    } else {
-                        super.onTouchEvent(event);
-                    }
-                    touchDownWithHandle = 1;
-                }
-            } else if (action == MotionEvent.ACTION_CANCEL || action == MotionEvent.ACTION_UP) {
-                if (touchDownWithHandle == 1) {
-                    if (isInputTypePassword()) {
-                    } else {
-                        super.onTouchEvent(event);
-                    }
-                    touchDownWithHandle = 2;
-                } else {
-                    setSelection(getText().length());
-                }
-            }
-            return true;
-        } else {
-            if (action == MotionEvent.ACTION_DOWN && onFocusChangedSelectionLast && !isFocused()) {
-                showSoftInput();
-                setSelectionLast();
-                return true;
-            } else {
-                return super.onTouchEvent(event);
-            }
-        }
     }
 
     private boolean isInputTypePassword() {
@@ -945,7 +959,7 @@ public class ExEditText extends AppCompatEditText {
     /**
      * 判断是否是有效
      */
-    public boolean isPassword() {
+    public boolean isShowPasswordOnTouch() {
         final String string = string().trim();
         int min = 6;
         int max = getResources().getInteger(R.integer.password_count);
@@ -1580,6 +1594,11 @@ public class ExEditText extends AppCompatEditText {
     public boolean requestFocus(int direction, Rect previouslyFocusedRect) {
         if (isNoEditMode) {
             return false;
+        }
+        if (requestFocusOnTouch) {
+            if (System.currentTimeMillis() - downTime > 160) {
+                return false;
+            }
         }
         return super.requestFocus(direction, previouslyFocusedRect);
     }
