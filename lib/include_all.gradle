@@ -33,7 +33,13 @@ def listPath(filePath, depth = 0 /*当前枚举的路径深度, 深度大于maxD
 def includePath(filePath, parent) {
     if (filePath.isDirectory()) {
         def buildFile = new File(filePath, "build.gradle")
+        def ignoreFile = new File(filePath, "ignore")
         if (buildFile.exists()) {
+            if (ignoreFile.exists()) {
+                println "\n" + buildFile.getAbsolutePath() + " 已被忽略!\n"
+                return
+            }
+
             def name = filePath.getName()
             def path = parent + ":${name}"
 
