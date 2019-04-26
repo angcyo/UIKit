@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.os.PowerManager;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.IdRes;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -233,6 +234,12 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
                                 + s.replaceAll("1", " 允许").replaceAll("0", " 拒绝").replaceAll(":", "\n"));
                         onResult.call(s);
                     }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        throwable.printStackTrace();
+                        onResult.call("0");
+                    }
                 });
 //                .subscribe(new Action1<Permission>() {
 //                    @Override
@@ -295,10 +302,19 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         Fragment lastFragment = FragmentHelper.getLastFragment(getSupportFragmentManager(), getFragmentParentLayoutId(), 0);
-        if (lastFragment != null) {
+        if (lastFragment instanceof AbsFragment) {
             lastFragment.onActivityResult(requestCode, resultCode, data);
         }
         RPicture.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        Fragment lastFragment = FragmentHelper.getLastFragment(getSupportFragmentManager(), getFragmentParentLayoutId(), 0);
+        if (lastFragment instanceof AbsFragment) {
+            lastFragment.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
     }
 
     public void setFragmentSwipeBackLayout(FragmentSwipeBackLayout fragmentSwipeBackLayout) {

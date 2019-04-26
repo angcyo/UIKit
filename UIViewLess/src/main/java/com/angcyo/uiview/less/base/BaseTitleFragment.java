@@ -252,21 +252,6 @@ public abstract class BaseTitleFragment extends BaseFragment implements AffectUI
         backFragment(true);
     }
 
-    public void backFragment(boolean checkBackPress) {
-        FragmentManager fragmentManager = requireFragmentManager();
-//        if (getParentFragment() == null) {
-//            fragmentManager = requireFragmentManager();
-//        } else {
-//            fragmentManager = getChildFragmentManager();
-//        }
-
-        FragmentHelper.build(fragmentManager)
-                .parentLayoutId(this)
-                .defaultExitAnim()
-                .setCheckBackPress(checkBackPress)
-                .back(getActivity());
-    }
-
     /**
      * 添加左边控制按钮
      */

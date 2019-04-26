@@ -413,6 +413,8 @@ public class FragmentHelper {
 
                 break lastFragment;
             }
+        } else if (!fragments.isEmpty()) {
+            lastFragment = fragments.get(fragments.size() - 1);
         }
         return lastFragment;
     }
@@ -592,6 +594,8 @@ public class FragmentHelper {
          * 是否要确认允许返回, 如果false, 则不会回调 onBackPressed 方法
          */
         boolean checkBackPress = true;
+        private List<Fragment> replaceKeepFragmentList = new ArrayList<>();
+        private FragmentTransaction fragmentTransaction;
 
         public Builder(FragmentManager fragmentManager) {
             this.fragmentManager = fragmentManager;
@@ -659,8 +663,6 @@ public class FragmentHelper {
                 }
             }
         }
-
-        private List<Fragment> replaceKeepFragmentList = new ArrayList<>();
 
         /**
          * 调用replace的时候, 保持keep列表中的Fragment
@@ -893,7 +895,6 @@ public class FragmentHelper {
             return this;
         }
 
-
         public Builder defaultExitAnim() {
             this.enterAnim = R.anim.base_alpha_exit;
             this.exitAnim = R.anim.base_tran_to_bottom;
@@ -932,8 +933,6 @@ public class FragmentHelper {
                         enterAnim, exitAnim);
             }
         }
-
-        private FragmentTransaction fragmentTransaction;
 
         private void configTransaction() {
             if (fragmentTransaction == null && fragmentManager != null) {

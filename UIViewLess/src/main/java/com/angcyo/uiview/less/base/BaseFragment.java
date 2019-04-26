@@ -13,6 +13,7 @@ import android.view.animation.Animation;
 import android.widget.EditText;
 import com.angcyo.http.HttpSubscriber;
 import com.angcyo.http.NonetException;
+import com.angcyo.uiview.less.base.helper.FragmentHelper;
 import com.angcyo.uiview.less.recycler.RBaseViewHolder;
 import com.angcyo.uiview.less.widget.group.RSoftInputLayout;
 import rx.Subscription;
@@ -26,6 +27,32 @@ import rx.subscriptions.CompositeSubscription;
  */
 public abstract class BaseFragment extends AbsLifeCycleFragment {
 
+    protected CompositeSubscription mSubscriptions;
+
+    public static void addSubscription(CompositeSubscription subscriptions, Subscription subscription,
+                                       boolean checkToken, Runnable onCancel) {
+        if (subscription == null) {
+            return;
+        }
+        if (subscriptions != null) {
+            subscriptions.add(subscription);
+        }
+        if (NetworkStateReceiver.getNetType().value() < 2) {
+            //2G网络以下, 取消网络请求
+            if (onCancel != null) {
+                onCancel.run();
+            }
+            try {
+                if (subscription instanceof SafeSubscriber) {
+                    if (((SafeSubscriber) subscription).getActual() instanceof HttpSubscriber) {
+                        ((SafeSubscriber) subscription).getActual().onError(new NonetException());
+                    }
+                }
+            } catch (Exception e) {
+
+            }
+        }
+    }
 
     /**
      * onCreateAnimation -> onCreateAnimator
@@ -101,6 +128,9 @@ public abstract class BaseFragment extends AbsLifeCycleFragment {
         }
     }
 
+
+    //<editor-fold defaultstate="collapsed" desc="网络请求管理">
+
     /**
      * 隐藏键盘
      */
@@ -116,15 +146,26 @@ public abstract class BaseFragment extends AbsLifeCycleFragment {
         }
     }
 
-    //<editor-fold defaultstate="collapsed" desc="网络请求管理">
+    public void backFragment(boolean checkBackPress) {
+        FragmentManager fragmentManager = requireFragmentManager();
+//        if (getParentFragment() == null) {
+//            fragmentManager = requireFragmentManager();
+//        } else {
+//            fragmentManager = getChildFragmentManager();
+//        }
+
+        FragmentHelper.build(fragmentManager)
+                .parentLayoutId(this)
+                .defaultExitAnim()
+                .setCheckBackPress(checkBackPress)
+                .back(getActivity());
+    }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         onCancelSubscriptions();
     }
-
-    protected CompositeSubscription mSubscriptions;
 
     public void onCancelSubscriptions() {
         if (mSubscriptions != null) {
@@ -143,30 +184,6 @@ public abstract class BaseFragment extends AbsLifeCycleFragment {
                 onCancelSubscriptions();
             }
         });
-    }
-
-    public static void addSubscription(CompositeSubscription subscriptions, Subscription subscription, boolean checkToken, Runnable onCancel) {
-        if (subscription == null) {
-            return;
-        }
-        if (subscriptions != null) {
-            subscriptions.add(subscription);
-        }
-        if (NetworkStateReceiver.getNetType().value() < 2) {
-            //2G网络以下, 取消网络请求
-            if (onCancel != null) {
-                onCancel.run();
-            }
-            try {
-                if (subscription instanceof SafeSubscriber) {
-                    if (((SafeSubscriber) subscription).getActual() instanceof HttpSubscriber) {
-                        ((SafeSubscriber) subscription).getActual().onError(new NonetException());
-                    }
-                }
-            } catch (Exception e) {
-
-            }
-        }
     }
 
     //</editor-fold">
