@@ -19,9 +19,13 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
+import javax.net.ssl.*;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.security.SecureRandom;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -64,13 +68,58 @@ public class Http {
             httpLoggingInterceptorM.setLevel(HttpLoggingInterceptorM.Level.BODY);
         }
         httpLoggingInterceptorM.logResponse = LOG_INTERCEPTOR_RESPONSE;
-        return new OkHttpClient.Builder()
+        return noSSL(new OkHttpClient.Builder()
                 .connectTimeout(TIME_OUT, TimeUnit.SECONDS)
                 .readTimeout(TIME_OUT, TimeUnit.SECONDS)
                 .writeTimeout(TIME_OUT, TimeUnit.SECONDS)
                 .addNetworkInterceptor(httpLoggingInterceptorM)
                 .addInterceptor(new CopyrightInterceptor())
-                .addNetworkInterceptor(new ProgressIntercept());
+                .addNetworkInterceptor(new ProgressIntercept()));
+    }
+
+    /**
+     * Https SSL安全验证
+     */
+    public static OkHttpClient.Builder noSSL(OkHttpClient.Builder builder) {
+        X509TrustManager x509TrustManager = new X509TrustManager() {
+            @Override
+            public void checkClientTrusted(
+                    X509Certificate[] chain,
+                    String authType) throws CertificateException {
+            }
+
+            @Override
+            public void checkServerTrusted(
+                    X509Certificate[] chain,
+                    String authType) throws CertificateException {
+            }
+
+            @Override
+            public X509Certificate[] getAcceptedIssuers() {
+                return new X509Certificate[0];
+            }
+        };
+
+        final TrustManager[] trustAllCerts = new TrustManager[]{x509TrustManager};
+
+        HostnameVerifier hostnameVerifier = new HostnameVerifier() {
+            @Override
+            public boolean verify(String hostname, SSLSession session) {
+                return true;
+            }
+        };
+
+        // Install the all-trusting trust manager
+        try {
+            SSLContext sslContext = SSLContext.getInstance("SSL");
+            sslContext.init(null, trustAllCerts, new SecureRandom());
+            builder.sslSocketFactory(sslContext.getSocketFactory(), x509TrustManager);
+            builder.hostnameVerifier(hostnameVerifier);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return builder;
     }
 
     public static <T> T create(Class<T> service) {
