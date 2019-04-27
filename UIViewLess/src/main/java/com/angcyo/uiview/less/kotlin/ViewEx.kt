@@ -2,6 +2,7 @@ package com.angcyo.uiview.less.kotlin
 
 
 import android.animation.ValueAnimator
+import android.app.Activity
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.Paint
@@ -768,4 +769,46 @@ public fun ImageView.load(url: String?, option: (RequestBuilder<Drawable>.() -> 
             }
             .into(this)
     }
+}
+
+/**
+ * 获取View, 相对于手机屏幕的矩形
+ * */
+public fun View.getViewRect(): Rect {
+    var offsetX = 0
+    var offsetY = 0
+
+    //横屏, 并且显示了虚拟导航栏的时候. 需要左边偏移
+    //只计算一次
+    (context as? Activity)?.let {
+        val decorRect = Rect()
+        it.window.decorView.getGlobalVisibleRect(decorRect)
+        if (decorRect.width() > decorRect.height()) {
+            //横屏了
+            offsetX = -RUtils.navBarHeight(it)
+        }
+    }
+
+    return getViewRect(offsetX, offsetY)
+}
+
+/**
+ * 获取View, 相对于手机屏幕的矩形, 带皮阿尼一
+ * */
+public fun View.getViewRect(offsetX: Int, offsetY: Int): Rect {
+    val r = Rect()
+    //可见位置的坐标, 超出屏幕的距离会被剃掉
+    //image.getGlobalVisibleRect(r)
+    val r2 = IntArray(2)
+    //val r3 = IntArray(2)
+    //相对于屏幕的坐标
+    getLocationOnScreen(r2)
+    //相对于窗口的坐标
+    //image.getLocationInWindow(r3)
+
+    val left = r2[0] + offsetX
+    val top = r2[1] + offsetY
+
+    r.set(left, top, left + measuredWidth, top + measuredHeight)
+    return r
 }

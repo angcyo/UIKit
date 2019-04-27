@@ -8,6 +8,7 @@ import android.support.v7.widget.RecyclerView
 import android.widget.ImageView
 import com.angcyo.uiview.less.base.helper.FragmentHelper
 import com.angcyo.uiview.less.kotlin.childs
+import com.angcyo.uiview.less.kotlin.getViewRect
 import com.angcyo.uiview.less.utils.RUtils
 
 /**
@@ -153,28 +154,17 @@ object RPhotoPager {
                 }
             }
 
-            val r = Rect()
-            //可见位置的坐标, 超出屏幕的距离会被剃掉
-            //image.getGlobalVisibleRect(r)
-            val r2 = IntArray(2)
-            //val r3 = IntArray(2)
-            //相对于屏幕的坐标
-            image.getLocationOnScreen(r2)
-            //相对于窗口的坐标
-            //image.getLocationInWindow(r3)
-
-            val left = r2[0] + offsetX
-            val top = r2[1] + offsetY
-
-            r.set(left, top, left + image.measuredWidth, top + image.measuredHeight)
-            rects.add(r)
+            rects.add(image.getViewRect(offsetX, offsetY))
         }
         return rects
     }
 }
 
-class RPhotoPagerConfig {
+open class RPhotoPagerConfig {
 
+    /**
+     * 持久保存开始时的索引
+     * */
     protected var startIndex = 0
 
     /**
@@ -202,7 +192,7 @@ class RPhotoPagerConfig {
      * */
     var dataSource: PhotoDataSource? = null
 
-    fun getPreviewDrawable(index: Int): Drawable? {
+    open fun getPreviewDrawable(index: Int): Drawable? {
         return previewDrawables?.let {
             if (it.size > index) {
                 it[index]

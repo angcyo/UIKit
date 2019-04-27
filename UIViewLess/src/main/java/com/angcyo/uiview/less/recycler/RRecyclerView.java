@@ -227,16 +227,16 @@ public class RRecyclerView extends RecyclerView implements CanScrollUpCallBack {
 
     private static void setEdgeEffect(RecyclerView recyclerView, int color) {
         Object mGlow = Reflect.getMember(RecyclerView.class, recyclerView, "mTopGlow");
-        setEdgetEffect(mGlow, color);
+        setEdgeEffect(mGlow, color);
         mGlow = Reflect.getMember(RecyclerView.class, recyclerView, "mLeftGlow");
-        setEdgetEffect(mGlow, color);
+        setEdgeEffect(mGlow, color);
         mGlow = Reflect.getMember(RecyclerView.class, recyclerView, "mRightGlow");
-        setEdgetEffect(mGlow, color);
+        setEdgeEffect(mGlow, color);
         mGlow = Reflect.getMember(RecyclerView.class, recyclerView, "mBottomGlow");
-        setEdgetEffect(mGlow, color);
+        setEdgeEffect(mGlow, color);
     }
 
-    public static void setEdgetEffect(Object edgeEffectCompat, @ColorInt int color) {
+    public static void setEdgeEffect(Object edgeEffectCompat, @ColorInt int color) {
         Object mEdgeEffect = Reflect.getMember(edgeEffectCompat, "mEdgeEffect");
         Object mPaint;
         if (mEdgeEffect != null) {

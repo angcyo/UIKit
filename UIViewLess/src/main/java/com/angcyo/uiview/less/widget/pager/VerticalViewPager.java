@@ -1,58 +1,68 @@
 package com.angcyo.uiview.less.widget.pager;
 
-/**
- * Copyright (C) 2015 Kaelaela
- * <p>
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License. You may obtain a copy of the License at
- * <p>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- * or implied. See the License for the specific language governing permissions and limitations under
- * the License.
- */
-
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
+import android.view.View;
 
+/**
+ * From http://stackoverflow.com/a/22797619/2719186
+ */
 public class VerticalViewPager extends ViewPager {
 
     public VerticalViewPager(Context context) {
-        this(context, null);
+        super(context);
+        init();
     }
 
     public VerticalViewPager(Context context, AttributeSet attrs) {
         super(context, attrs);
-        setPageTransformer(false, new DefaultVerticalTransformer());
+        init();
     }
 
-    private MotionEvent swapTouchEvent(MotionEvent event) {
+    private void init() {
+        setPageTransformer(true, new VerticalPageTransformer());
+        setOverScrollMode(OVER_SCROLL_NEVER);
+    }
+
+    private MotionEvent swapXY(MotionEvent ev) {
         float width = getWidth();
         float height = getHeight();
-
-        float swappedX = (event.getY() / height) * width;
-        float swappedY = (event.getX() / width) * height;
-
-        event.setLocation(swappedX, swappedY);
-
-        return event;
+        float newX = (ev.getY() / height) * width;
+        float newY = (ev.getX() / width) * height;
+        ev.setLocation(newX, newY);
+        return ev;
     }
 
     @Override
-    public boolean onInterceptTouchEvent(MotionEvent event) {
-        boolean intercept = super.onInterceptTouchEvent(swapTouchEvent(event));
-        //If not intercept, touch event should not be swapped.
-        swapTouchEvent(event);
-        return intercept;
+    public boolean onInterceptTouchEvent(MotionEvent ev) {
+        boolean intercepted = super.onInterceptTouchEvent(swapXY(ev));
+        swapXY(ev);
+        return intercepted;
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
-        return super.onTouchEvent(swapTouchEvent(ev));
+        return super.onTouchEvent(swapXY(ev));
+    }
+
+    private class VerticalPageTransformer implements ViewPager.PageTransformer {
+
+        @Override
+        public void transformPage(@NonNull View view, float position) {
+            if (position < -1) {
+                view.setAlpha(0);
+            } else if (position <= 1) {
+                view.setAlpha(1);
+                view.setTranslationX(view.getWidth() * -position);
+                float yPosition = position * view.getHeight();
+                view.setTranslationY(yPosition);
+            } else {
+                view.setAlpha(0);
+            }
+        }
     }
 
 }

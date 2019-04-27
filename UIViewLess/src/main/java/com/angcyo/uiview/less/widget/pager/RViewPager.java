@@ -30,7 +30,7 @@ public class RViewPager extends ViewPager {
 
     private OnPagerEndListener mOnPagerEndListener;
 
-    private int heightMeauseMode = MeasureSpec.EXACTLY;
+    private int heightMeasureMode = MeasureSpec.EXACTLY;
 
     public RViewPager(Context context) {
         this(context, null);
@@ -72,7 +72,7 @@ public class RViewPager extends ViewPager {
 
             @Override
             public void onPageSelected(int i) {
-                if (heightMeauseMode != MeasureSpec.EXACTLY) {
+                if (heightMeasureMode != MeasureSpec.EXACTLY) {
                     post(new Runnable() {
                         @Override
                         public void run() {
@@ -122,7 +122,7 @@ public class RViewPager extends ViewPager {
         int heightSize = View.MeasureSpec.getSize(heightMeasureSpec);
         int heightMode = View.MeasureSpec.getMode(heightMeasureSpec);
 
-        heightMeauseMode = heightMode;
+        heightMeasureMode = heightMode;
 
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
@@ -205,9 +205,9 @@ public class RViewPager extends ViewPager {
         }
         try {
             Object mGlow = Reflect.getMember(ViewPager.class, viewPager, "mLeftEdge");
-            setEdgetEffect(mGlow, color);
+            setEdgeEffect(mGlow, color);
             mGlow = Reflect.getMember(ViewPager.class, viewPager, "mRightEdge");
-            setEdgetEffect(mGlow, color);
+            setEdgeEffect(mGlow, color);
         } catch (Exception e) {
             L.e(e.getMessage());
         }
@@ -222,15 +222,15 @@ public class RViewPager extends ViewPager {
         }
         try {
             Object mGlow = Reflect.getMember(HorizontalScrollView.class, horizontalScrollView, "mEdgeGlowLeft");
-            setEdgetEffect(mGlow, color);
+            setEdgeEffect(mGlow, color);
             mGlow = Reflect.getMember(HorizontalScrollView.class, horizontalScrollView, "mEdgeGlowRight");
-            setEdgetEffect(mGlow, color);
+            setEdgeEffect(mGlow, color);
         } catch (Exception e) {
             L.e(e.getMessage());
         }
     }
 
-    public static void setEdgetEffect(Object edgeEffectCompat, @ColorInt int color) {
+    public static void setEdgeEffect(Object edgeEffectCompat, @ColorInt int color) {
         Object mEdgeEffect = Reflect.getMember(edgeEffectCompat, "mEdgeEffect");
         Object mPaint;
 
