@@ -14,7 +14,7 @@ import android.animation.AnimatorListenerAdapter
  * 修改备注：
  * Version: 1.0.0
  */
-abstract class RAnimListener : AnimatorListenerAdapter() {
+abstract class RAnimatorListener : AnimatorListenerAdapter() {
 
     private var isCancel = false
 

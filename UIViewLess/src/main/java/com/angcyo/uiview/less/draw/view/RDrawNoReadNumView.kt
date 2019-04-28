@@ -20,4 +20,6 @@ class RDrawNoReadNumView(context: Context, attributeSet: AttributeSet? = null) :
 
         setMeasuredDimension(measureDraw[0], measureDraw[1])
     }
+
+    fun getDrawReadNum(): RDrawNoReadNum = baseDraw
 }

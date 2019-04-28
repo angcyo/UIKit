@@ -15,7 +15,7 @@ import com.angcyo.uiview.less.kotlin.calcLayoutWidthHeight
 import com.angcyo.uiview.less.kotlin.calcWidthHeightRatio
 import com.angcyo.uiview.less.kotlin.density
 import com.angcyo.uiview.less.kotlin.exactlyMeasure
-import com.angcyo.uiview.less.resources.RAnimListener
+import com.angcyo.uiview.less.resources.RAnimatorListener
 import com.angcyo.uiview.less.utils.ClipHelper
 
 /**
@@ -247,7 +247,7 @@ open class ClipLayout(context: Context, attributeSet: AttributeSet? = null) : Fr
                             clipRadius = value
                             postInvalidateOnAnimation()
                         }
-                        addListener(object : RAnimListener() {
+                        addListener(object : RAnimatorListener() {
                             override fun onAnimationFinish(animation: Animator?) {
                                 super.onAnimationFinish(animation)
                                 animator = null
@@ -280,7 +280,7 @@ open class ClipLayout(context: Context, attributeSet: AttributeSet? = null) : Fr
                     val h: Float = height + (measuredHeight - height) * value
                     clipRectTo(w, h)
                 }
-                addListener(object : RAnimListener() {
+                addListener(object : RAnimatorListener() {
                     override fun onAnimationFinish(animation: Animator?) {
                         super.onAnimationFinish(animation)
                         animator = null
@@ -310,7 +310,7 @@ open class ClipLayout(context: Context, attributeSet: AttributeSet? = null) : Fr
                     val h: Float = measuredHeight - (measuredHeight - height) * value
                     clipRectTo(w, h)
                 }
-                addListener(object : RAnimListener() {
+                addListener(object : RAnimatorListener() {
                     override fun onAnimationFinish(animation: Animator?) {
                         super.onAnimationFinish(animation)
                         animator = null

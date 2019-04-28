@@ -38,6 +38,10 @@ class RDrawNoReadNum(view: View) : BaseDraw(view) {
      * 需要绘制的字符串数字, 为null时, 啥都不绘制, 为空时, 只绘制背景和边框
      * */
     var readNumString: String? = null
+        set(value) {
+            field = value
+            postInvalidate()
+        }
 
     /**
      * 圆角的大小

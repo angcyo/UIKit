@@ -10,8 +10,7 @@ import android.view.View
 import android.view.animation.Animation
 import android.view.animation.LinearInterpolator
 import com.angcyo.uiview.less.kotlin.density
-import com.angcyo.uiview.less.resources.RAnimListener
-import com.angcyo.uiview.less.widget.rsen.RefreshLayout
+import com.angcyo.uiview.less.resources.RAnimatorListener
 
 /**
  * Created by angcyo on 2017-07-23.
@@ -42,7 +41,7 @@ class BasePointRefreshView(context: Context) : View(context),
             //L.e("call: startAnimation -> $currentPoint")
             postInvalidateOnAnimation()
         }
-        anim.addListener(object : RAnimListener() {
+        anim.addListener(object : RAnimatorListener() {
 
             override fun onAnimationFinish(animation: Animator?, cancel: Boolean) {
                 super.onAnimationFinish(animation, cancel)

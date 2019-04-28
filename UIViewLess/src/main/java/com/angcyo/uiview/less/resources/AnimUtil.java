@@ -483,8 +483,8 @@ public class AnimUtil {
             return;
         }
         for (Animator.AnimatorListener listener : animator.getListeners()) {
-            if (listener instanceof RAnimListener) {
-                ((RAnimListener) listener).onAnimationProgress(animator, progress);
+            if (listener instanceof RAnimatorListener) {
+                ((RAnimatorListener) listener).onAnimationProgress(animator, progress);
             }
         }
     }
@@ -494,8 +494,8 @@ public class AnimUtil {
             return;
         }
         for (Animator.AnimatorListener listener : animator.getListeners()) {
-            if (listener instanceof RAnimListener) {
-                ((RAnimListener) listener).onDelayBeforeStart(animator);
+            if (listener instanceof RAnimatorListener) {
+                ((RAnimatorListener) listener).onDelayBeforeStart(animator);
             }
         }
     }
@@ -505,8 +505,8 @@ public class AnimUtil {
             return;
         }
         for (Animator.AnimatorListener listener : animator.getListeners()) {
-            if (listener instanceof RAnimListener) {
-                ((RAnimListener) listener).onDelayAfterEnd(animator);
+            if (listener instanceof RAnimatorListener) {
+                ((RAnimatorListener) listener).onDelayAfterEnd(animator);
             }
         }
     }

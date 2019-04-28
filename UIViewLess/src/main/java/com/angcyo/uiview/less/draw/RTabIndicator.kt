@@ -11,7 +11,7 @@ import android.view.ViewGroup
 import android.view.animation.OvershootInterpolator
 import com.angcyo.uiview.less.R
 import com.angcyo.uiview.less.kotlin.abs
-import com.angcyo.uiview.less.resources.RAnimListener
+import com.angcyo.uiview.less.resources.RAnimatorListener
 
 /**
  * Copyright (C) 2016,深圳市红鸟网络科技股份有限公司 All rights reserved.
@@ -457,7 +457,7 @@ class RTabIndicator(view: View, attributeSet: AttributeSet? = null) : BaseDraw(v
                 //L.e("call: $animatorValue -> ")
                 postInvalidateOnAnimation()
             }
-            addListener(object : RAnimListener() {
+            addListener(object : RAnimatorListener() {
                 override fun onAnimationFinish(animation: Animator?, cancel: Boolean) {
                     super.onAnimationFinish(animation, cancel)
                     animatorValueInterpolator = -1f

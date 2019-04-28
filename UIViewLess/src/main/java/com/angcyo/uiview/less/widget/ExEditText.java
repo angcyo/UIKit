@@ -35,7 +35,7 @@ import com.angcyo.uiview.less.R;
 import com.angcyo.uiview.less.RApplication;
 import com.angcyo.uiview.less.kotlin.ExKt;
 import com.angcyo.uiview.less.kotlin.ViewExKt;
-import com.angcyo.uiview.less.resources.RAnimListener;
+import com.angcyo.uiview.less.resources.RAnimatorListener;
 import com.angcyo.uiview.less.skin.SkinHelper;
 import com.angcyo.uiview.less.utils.RUtils;
 import com.angcyo.uiview.less.utils.Reflect;
@@ -1569,7 +1569,7 @@ public class ExEditText extends AppCompatEditText {
                 }
             }
         });
-        rollAnim.addListener(new RAnimListener() {
+        rollAnim.addListener(new RAnimatorListener() {
             @Override
             public void onAnimationFinish(Animator animation, boolean cancel) {
                 super.onAnimationFinish(animation, cancel);
