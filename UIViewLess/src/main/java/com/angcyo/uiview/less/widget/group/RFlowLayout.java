@@ -18,7 +18,7 @@ import com.angcyo.uiview.less.resources.ResUtil;
 import com.angcyo.uiview.less.skin.SkinHelper;
 import com.angcyo.uiview.less.widget.RTextCheckView;
 import com.angcyo.uiview.less.widget.RTextView;
-import kotlin.jvm.functions.Function0;
+import kotlin.jvm.functions.Function1;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -296,9 +296,9 @@ public class RFlowLayout extends LinearLayout {
     public void addTextView(List<String> texts, final OnAddViewListener onAddViewListener) {
         final int offset = getDimensionPixelOffset(R.dimen.base_ldpi);
 
-        ViewGroupExKt.resetChildCount(this, texts.size(), new Function0<View>() {
+        ViewGroupExKt.resetChildCount(this, texts.size(), new Function1<Integer, View>() {
             @Override
-            public View invoke() {
+            public View invoke(Integer integer) {
                 RTextView textView = new RTextView(getContext());
                 textView.setTextColor(getColor(R.color.base_text_color));
                 textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, getDimensionPixelOffset(R.dimen.default_text_size9));
@@ -306,7 +306,7 @@ public class RFlowLayout extends LinearLayout {
 
                 textView.setPadding(offset, offset / 2, offset, offset / 2);
 
-                LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(-2, -2);
+                LayoutParams layoutParams = new LayoutParams(-2, -2);
                 layoutParams.setMarginEnd(offset * 2);
                 textView.setLayoutParams(layoutParams);
                 return textView;
@@ -314,7 +314,7 @@ public class RFlowLayout extends LinearLayout {
         });
 
         for (int i = 0; i < texts.size(); i++) {
-            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(-2, -2);
+            LayoutParams layoutParams = new LayoutParams(-2, -2);
             layoutParams.setMarginEnd(offset * 2);
 
             TextView textView = (TextView) getChildAt(i);

@@ -191,13 +191,13 @@ public fun ViewGroup.findRecyclerView(
 }
 
 /**将子View的数量, 重置到指定的数量*/
-public fun ViewGroup.resetChildCount(newSize: Int, onAddView: () -> View) {
+public fun ViewGroup.resetChildCount(newSize: Int, onAddView: (childIndex: Int) -> View) {
     val oldSize = childCount
     val count = newSize - oldSize
     if (count > 0) {
         //需要补充子View
         for (i in 0 until count) {
-            addView(onAddView.invoke())
+            addView(onAddView.invoke(oldSize + i))
         }
     } else if (count < 0) {
         //需要移除子View
@@ -207,7 +207,11 @@ public fun ViewGroup.resetChildCount(newSize: Int, onAddView: () -> View) {
     }
 }
 
-public fun <T> ViewGroup.addView(size: Int, datas: List<T>, onAddViewCallback: OnAddViewCallback<T>) {
+public fun <T> ViewGroup.resetChild(size: Int, datas: List<T>? = null, onAddViewCallback: OnAddViewCallback<T>) {
+    addView(size, datas, onAddViewCallback)
+}
+
+public fun <T> ViewGroup.addView(size: Int, datas: List<T>? = null, onAddViewCallback: OnAddViewCallback<T>) {
     this.resetChildCount(size) {
         val layoutId = onAddViewCallback.getLayoutId()
         val childView = if (layoutId > 0) {
@@ -220,7 +224,7 @@ public fun <T> ViewGroup.addView(size: Int, datas: List<T>, onAddViewCallback: O
     }
 
     for (i in 0 until size) {
-        onAddViewCallback.onInitView(getChildAt(i), if (i < datas.size) datas[i] else null, i)
+        onAddViewCallback.onInitView(getChildAt(i), if (datas != null && i < datas.size) datas[i] else null, i)
     }
 }
 
@@ -231,10 +235,10 @@ public fun <T> ViewGroup.addView(datas: List<T>, onAddViewCallback: OnAddViewCal
 }
 
 /**枚举所有child view*/
-public fun ViewGroup.childs(map: (Int, View) -> Unit) {
-    for (i in 0 until childCount) {
-        val childAt = getChildAt(i)
-        map.invoke(i, childAt)
+public fun ViewGroup.childs(map: (index: Int, child: View) -> Unit) {
+    for (index in 0 until childCount) {
+        val childAt = getChildAt(index)
+        map.invoke(index, childAt)
     }
 }
 
