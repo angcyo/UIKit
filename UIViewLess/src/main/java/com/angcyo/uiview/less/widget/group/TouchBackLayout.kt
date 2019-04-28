@@ -241,6 +241,11 @@ open class TouchBackLayout(context: Context, attributeSet: AttributeSet? = null)
         }
     }
 
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        overScroller.forceFinished(true)
+    }
+
     var onTouchBackListener: OnTouchBackListener? = null
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {

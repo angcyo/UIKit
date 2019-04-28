@@ -99,14 +99,17 @@ class ImageTextView(context: Context, attributeSet: AttributeSet? = null) : AppC
         } else {
             //有图片
             imageSize = drawable.intrinsicWidth
+            if (wMode != MeasureSpec.EXACTLY) {
 
-            if (!TextUtils.isEmpty(showText)) {
-                val width =
-                    (paddingLeft + paddingRight + imageSize + textOffset + textPaint.textWidth(showText!!)).toInt()
-                setMeasuredDimension(
-                    Math.max(width, minWidth),
-                    measuredHeight
-                )
+                if (!TextUtils.isEmpty(showText)) {
+                    val width =
+                        (paddingLeft + paddingRight + imageSize + textOffset + textPaint.textWidth(showText!!)).toInt()
+
+                    setMeasuredDimension(
+                        Math.max(width, minWidth),
+                        measuredHeight
+                    )
+                }
             }
         }
 
@@ -117,26 +120,27 @@ class ImageTextView(context: Context, attributeSet: AttributeSet? = null) : AppC
         if (!TextUtils.isEmpty(showText)) {
             textPaint.color = textShowColor
 
+            val drawHeight = measuredHeight - paddingTop - paddingBottom
+            val drawWidth = measuredWidth - paddingLeft - paddingRight
+
             if (imageSize > 0) {
                 canvas.save()
-                canvas.translate(-textWidth / 2, 0f)
+                canvas.translate(-textWidth / 2 - textOffset, 0f)
                 super.onDraw(canvas)
                 canvas.restore()
 
                 //绘制需要显示的文本文本
-                val rawHeight = measuredHeight - paddingTop - paddingBottom
                 canvas.drawText(
-                    showText, paddingLeft + imageSize + textOffset - 4 * density,
-                    paddingTop + rawHeight / 2 + textHeight / 2 - textPaint.descent(), textPaint
+                    showText!!, paddingLeft + textOffset - 4 * density + drawWidth / 2,
+                    paddingTop + drawHeight / 2 + textHeight / 2 - textPaint.descent(), textPaint
                 )
             } else {
                 super.onDraw(canvas)
 
                 //绘制需要显示的文本文本
-                val rawHeight = measuredHeight - paddingTop - paddingBottom
                 canvas.drawText(
-                    showText, getDrawCenterCx() - textWidth / 2,
-                    paddingTop + rawHeight / 2 + textHeight / 2 - textPaint.descent(), textPaint
+                    showText!!, getDrawCenterCx() - textWidth / 2,
+                    paddingTop + drawHeight / 2 + textHeight / 2 - textPaint.descent(), textPaint
                 )
             }
         } else {
@@ -148,7 +152,7 @@ class ImageTextView(context: Context, attributeSet: AttributeSet? = null) : AppC
 
     val textHeight: Float
         get() {
-            textPaint.textSize = showTextSize.toFloat()
+            textPaint.textSize = showTextSize
             return textPaint.descent() - textPaint.ascent()
         }
     val textWidth: Float
@@ -156,7 +160,7 @@ class ImageTextView(context: Context, attributeSet: AttributeSet? = null) : AppC
             if (showText.isNullOrEmpty()) {
                 return 0f
             }
-            textPaint.textSize = showTextSize.toFloat()
+            textPaint.textSize = showTextSize
             return textPaint.measureText(showText)
         }
 }

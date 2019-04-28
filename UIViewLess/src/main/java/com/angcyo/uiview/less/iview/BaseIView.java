@@ -29,10 +29,11 @@ public abstract class BaseIView implements AffectUI.OnAffectListener {
     public static final int STATUS_UNLOAD = 0x20;
 
     protected View rootView;
-    protected RBaseViewHolder baseViewHolder;
+    protected RBaseViewHolder iViewHolder;
     protected Context context;
     protected ViewGroup parent;
     protected int iViewStatus = STATUS_INIT;
+    protected AffectUI affectUI;
 
     /**
      * 从View对象的tag中, 获取BaseIView对象
@@ -73,13 +74,11 @@ public abstract class BaseIView implements AffectUI.OnAffectListener {
         return null;
     }
 
+    //<editor-fold desc="情感图方法">
+
     protected void setViewStatus(int status) {
         iViewStatus = status;
     }
-
-    //<editor-fold desc="情感图方法">
-
-    protected AffectUI affectUI;
 
     protected void initAffectUI() {
         initAffectUI(parent);
@@ -135,7 +134,7 @@ public abstract class BaseIView implements AffectUI.OnAffectListener {
             rootView = LayoutInflater.from(context).inflate(layoutId, parent, false);
         }
 
-        baseViewHolder = new RBaseViewHolder(rootView);
+        iViewHolder = new RBaseViewHolder(rootView);
 
         //将 BaseIView 对象和 View 关联.
         rootView.setTag(R.id.tag_base_iview, this);
@@ -202,15 +201,35 @@ public abstract class BaseIView implements AffectUI.OnAffectListener {
      * 界面已经装载了
      */
     public boolean isIViewLoad() {
-        return iViewStatus == STATUS_LOAD || iViewStatus == STATUS_SHOW || iViewStatus == STATUS_RESHOW;
+        return iViewStatus == STATUS_LOAD || isIViewShow();
+    }
+
+    public boolean isIViewShow() {
+        return iViewStatus == STATUS_SHOW || iViewStatus == STATUS_RESHOW;
     }
 
     public void show(@NonNull ViewGroup parent, @Nullable final Bundle state, @Nullable Animation animation, final @Nullable Runnable endAction) {
+        final Runnable endRunnable = new Runnable() {
+            @Override
+            public void run() {
+                if (isIViewShow()) {
+                    onIViewReShow(state);
+                } else {
+                    onIViewShow(state);
+                }
+                if (endAction != null) {
+                    endAction.run();
+                }
+            }
+        };
+
         if (iViewStatus == STATUS_INIT || rootView == null) {
-            throw new IllegalArgumentException("请调用先createView().");
+            //throw new IllegalArgumentException("请调用先createView().");
+            createView(parent.getContext(), parent, state, false);
         }
         if (rootView.getParent() != null) {
             Log.d("BaseIView", "已经在布局中.");
+            endRunnable.run();
             return;
         }
 
@@ -223,20 +242,6 @@ public abstract class BaseIView implements AffectUI.OnAffectListener {
         if (!isIViewLoad()) {
             onIViewLoad(state);
         }
-
-        final Runnable endRunnable = new Runnable() {
-            @Override
-            public void run() {
-                if (iViewStatus == STATUS_SHOW) {
-                    onIViewReShow(state);
-                } else {
-                    onIViewShow(state);
-                }
-                if (endAction != null) {
-                    endAction.run();
-                }
-            }
-        };
 
         if (animation == null) {
             endRunnable.run();
@@ -332,7 +337,6 @@ public abstract class BaseIView implements AffectUI.OnAffectListener {
     protected View getAnimationView() {
         return rootView;
     }
-
 
     public static abstract class AnimationEnd implements Animation.AnimationListener {
         @Override
