@@ -36,6 +36,7 @@ public abstract class BaseDraw {
      * 去除padding后, 允许绘制的区域
      */
     protected RectF mDrawRectF;
+    protected int[] measureTemp = new int[2];
 
     public BaseDraw(@NonNull View view) {
         this(view, null);
@@ -148,6 +149,7 @@ public abstract class BaseDraw {
     }
 
     public void onSizeChanged(int w, int h, int oldw, int oldh) {
+        mDrawRectF.set(getPaddingLeft(), getPaddingTop(), getViewWidth() - getPaddingRight(), getViewHeight() - getPaddingBottom());
     }
 
     public void onDetachedFromWindow() {
@@ -184,8 +186,6 @@ public abstract class BaseDraw {
     public int measureDrawHeight() {
         return (int) (mBasePaint.descent() - mBasePaint.ascent());
     }
-
-    private int[] measureTemp = new int[2];
 
     /**
      * 返回测量后, Draw的宽高大小

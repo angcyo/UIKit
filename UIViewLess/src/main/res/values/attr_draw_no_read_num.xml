@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="r_draw_background_color" format="color"/>
+    <attr name="r_draw_keep_circle" format="boolean"/>
+    <attr name="r_draw_round_size" format="dimension"/>
+    <attr name="r_draw_space_size" format="dimension"/>
+    <attr name="r_draw_read_num_string" format="string"/>
+
+    <declare-styleable name="RDrawNoReadNumView">
+        <attr name="r_draw_text_size"/>
+        <attr name="r_draw_text_color"/>
+        <attr name="r_draw_background_color"/>
+        <attr name="r_draw_border_color"/>
+        <attr name="r_draw_border_width"/>
+        <attr name="r_draw_keep_circle"/>
+        <attr name="r_draw_round_size"/>
+        <attr name="r_draw_read_num_string"/>
+        <attr name="r_draw_border"/>
+        <attr name="r_draw_space_size"/>
+    </declare-styleable>
+
+    <declare-styleable name="RDrawNoReadNum">
+        <attr name="r_draw_text_size"/>
+        <attr name="r_draw_text_color"/>
+        <attr name="r_draw_border"/>
+        <attr name="r_draw_background_color"/>
+        <attr name="r_draw_border_color"/>
+        <attr name="r_draw_border_width"/>
+        <attr name="r_draw_keep_circle"/>
+        <attr name="r_draw_round_size"/>
+        <attr name="r_draw_read_num_string"/>
+        <attr name="r_draw_space_size"/>
+    </declare-styleable>
+</resources>

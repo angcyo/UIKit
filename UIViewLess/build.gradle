@@ -82,7 +82,7 @@ dependencies {
         exclude group: 'com.google.code.gson', module: 'gson'
     }
 
-    /*https://github.com/angcyo/SmartRefreshLayout*/
+    /*https://github.com/scwang90/SmartRefreshLayout*/
     api 'com.scwang.smartrefresh:SmartRefreshLayout:' + refresh_version
     /*其他刷新控件*/
     //api 'com.scwang.smartrefresh:SmartRefreshHeader:' + refresh_version
