@@ -3259,6 +3259,24 @@ public class RUtils {
         return result;
     }
 
+    /**
+     * 获取屏幕中心点为坐标的一个矩形
+     */
+    public static Rect screenCenterRect(int width, int height) {
+        Rect rect = new Rect();
+        int screenWidth = getScreenWidth();
+        int screenHeight = getScreenHeight();
+
+        int w2 = width / 2;
+        int h2 = height / 2;
+
+        int sw2 = screenWidth / 2;
+        int sh2 = screenHeight / 2;
+
+        rect.set(sw2 - w2, sh2 - h2, sw2 + w2, sh2 + h2);
+        return rect;
+    }
+
     interface OnPutValue {
         void onValue(String key, String value);
 
