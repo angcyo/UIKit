@@ -147,6 +147,10 @@ public abstract class BaseFragment extends AbsLifeCycleFragment {
     }
 
     public void backFragment(boolean checkBackPress) {
+        backFragment(checkBackPress, true);
+    }
+
+    public void backFragment(boolean checkBackPress, boolean defaultAnim) {
         FragmentManager fragmentManager = requireFragmentManager();
 //        if (getParentFragment() == null) {
 //            fragmentManager = requireFragmentManager();
@@ -154,11 +158,17 @@ public abstract class BaseFragment extends AbsLifeCycleFragment {
 //            fragmentManager = getChildFragmentManager();
 //        }
 
-        FragmentHelper.build(fragmentManager)
+        FragmentHelper.Builder builder = FragmentHelper.build(fragmentManager)
                 .parentLayoutId(this)
-                .defaultExitAnim()
-                .setCheckBackPress(checkBackPress)
-                .back(getActivity());
+                .setCheckBackPress(checkBackPress);
+
+        if (defaultAnim) {
+            builder.defaultExitAnim();
+        } else {
+            builder.noAnim();
+        }
+
+        builder.back(getActivity());
     }
 
     @Override
