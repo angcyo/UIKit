@@ -97,6 +97,8 @@ public class TitleBarLayout extends FrameLayout {
 
         int screenHeight = getResources().getDisplayMetrics().heightPixels;
 
+        screenHeight = Math.max(screenHeight, heightSize);
+
         if (fitActionBar && enablePadding) {
             topHeight = statusBarHeight + actionBarHeight;
         } else if (enablePadding) {
