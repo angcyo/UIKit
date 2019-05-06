@@ -95,4 +95,10 @@ public interface ISkin {
      * @return 返回计算后的字体大小, {@link android.widget.TextView#setTextSize(int, float)} 时,请使用 {@link android.util.TypedValue#COMPLEX_UNIT_PX}
      */
     float getTextSize(float sizePx);
+
+    int getThemeColorAccent();
+
+    int getThemeColorPrimaryDark();
+
+    int getThemeColorPrimary();
 }

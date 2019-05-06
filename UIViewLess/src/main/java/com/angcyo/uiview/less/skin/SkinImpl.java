@@ -138,4 +138,19 @@ public class SkinImpl implements ISkin {
         }
         return size;
     }
+
+    @Override
+    public int getThemeColorAccent() {
+        return getThemeColor();
+    }
+
+    @Override
+    public int getThemeColorPrimaryDark() {
+        return getThemeDarkColor();
+    }
+
+    @Override
+    public int getThemeColorPrimary() {
+        return getThemeColor();
+    }
 }

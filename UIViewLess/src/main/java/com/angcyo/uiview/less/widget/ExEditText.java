@@ -152,6 +152,11 @@ public class ExEditText extends AppCompatEditText {
      */
     private boolean requestFocusOnTouch = false;
 
+    /**
+     * clear 按钮功能切换成, 显示/隐藏 密码.
+     */
+    private boolean isPasswordDrawable = false;
+
     public ExEditText(Context context) {
         super(context);
     }
@@ -319,6 +324,10 @@ public class ExEditText extends AppCompatEditText {
         isNoEditMode = typedArray.getBoolean(R.styleable.ExEditText_r_is_no_edit_mode, isNoEditMode);
         requestFocusOnTouch = typedArray.getBoolean(R.styleable.ExEditText_r_request_focus_on_touch, requestFocusOnTouch);
 
+        clearDrawable = typedArray.getDrawable(R.styleable.ExEditText_r_clear_drawable);
+        showPasswordOnTouch = typedArray.getBoolean(R.styleable.ExEditText_r_show_password_on_touch, showPasswordOnTouch);
+        isPasswordDrawable = typedArray.getBoolean(R.styleable.ExEditText_r_is_password_drawable, isPasswordDrawable);
+
         typedArray.recycle();
 
         setLeftString(string);
@@ -443,6 +452,25 @@ public class ExEditText extends AppCompatEditText {
         }
     }
 
+    private boolean onClickClearDrawable() {
+        if (isPasswordDrawable) {
+            if (isPasswordShow()) {
+                hidePassword();
+            } else {
+                showPassword();
+            }
+            updateState(true);
+            return true;
+        }
+
+        if (!TextUtils.isEmpty(getText())) {
+            setText("");
+            setSelection(0);
+            return true;
+        }
+        return false;
+    }
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if (isNoEditMode || !isEnabled()) {
@@ -466,9 +494,9 @@ public class ExEditText extends AppCompatEditText {
             } else if (action == MotionEvent.ACTION_UP) {
                 updateState(false);
                 if (isDownIn && checkClear(event.getX(), event.getY())) {
-                    if (!TextUtils.isEmpty(getText())) {
-                        setText("");
-                        setSelection(0);
+                    isDownIn = false;
+
+                    if (onClickClearDrawable()) {
                         return true;
                     }
                 }
@@ -746,10 +774,19 @@ public class ExEditText extends AppCompatEditText {
         if (clearDrawable == null) {
             return;
         }
-        if (isDownIn) {
-            clearDrawable.setState(new int[]{android.R.attr.state_checked});
+
+        if (isPasswordDrawable) {
+            if (isPasswordShow()) {
+                clearDrawable.setState(new int[]{android.R.attr.state_checked, android.R.attr.state_pressed, android.R.attr.state_selected});
+            } else {
+                clearDrawable.setState(new int[]{});
+            }
         } else {
-            clearDrawable.setState(new int[]{});
+            if (isDownIn) {
+                clearDrawable.setState(new int[]{android.R.attr.state_checked, android.R.attr.state_pressed, android.R.attr.state_selected});
+            } else {
+                clearDrawable.setState(new int[]{});
+            }
         }
     }
 
@@ -785,6 +822,8 @@ public class ExEditText extends AppCompatEditText {
         super.onTextChanged(text, start, lengthBefore, lengthAfter);
         checkDebugCmd(text);
         checkEdit(isFocused());
+        updateState(false);
+
         if (enableMention) {
             checkMentionString();
         }
@@ -930,6 +969,13 @@ public class ExEditText extends AppCompatEditText {
         final int selection = getSelectionEnd();
         setTransformationMethod(PasswordTransformationMethod.getInstance());
         setSelection(selection);
+    }
+
+    /**
+     * 当前密码, 是否可见
+     */
+    public boolean isPasswordShow() {
+        return !(getTransformationMethod() instanceof PasswordTransformationMethod);
     }
 
     void passwordVisibilityToggleRequested() {

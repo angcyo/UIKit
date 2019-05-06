@@ -47,4 +47,19 @@ public class BaseSkin extends SkinImpl {
     public int getThemeDisableColor() {
         return ContextCompat.getColor(mContext, R.color.theme_color_disable);
     }
+
+    @Override
+    public int getThemeColorAccent() {
+        return ContextCompat.getColor(mContext, R.color.theme_color_accent);
+    }
+
+    @Override
+    public int getThemeColorPrimaryDark() {
+        return ContextCompat.getColor(mContext, R.color.theme_color_primary_dark);
+    }
+
+    @Override
+    public int getThemeColorPrimary() {
+        return ContextCompat.getColor(mContext, R.color.theme_color_primary);
+    }
 }

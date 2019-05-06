@@ -3,6 +3,7 @@ package com.angcyo.uiview.less.kotlin
 
 import android.animation.ValueAnimator
 import android.app.Activity
+import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.Paint
@@ -15,10 +16,7 @@ import android.support.v4.view.ViewCompat
 import android.text.InputFilter
 import android.text.TextUtils
 import android.util.TypedValue
-import android.view.GestureDetector
-import android.view.KeyEvent
-import android.view.MotionEvent
-import android.view.View
+import android.view.*
 import android.view.animation.LinearInterpolator
 import android.widget.CompoundButton
 import android.widget.EditText
@@ -84,7 +82,11 @@ public val View.density: Float
     get() = resources.displayMetrics.density
 
 public val <T> T.dp: Float by lazy {
-    RApplication.getApp()?.resources?.displayMetrics?.density ?: 0f
+    Resources.getSystem()?.displayMetrics?.density ?: 0f
+}
+
+public val <T> T.dpi: Int by lazy {
+    Resources.getSystem()?.displayMetrics?.density?.toInt() ?: 0
 }
 
 public val View.viewDrawWith: Int
@@ -811,4 +813,18 @@ public fun View.getViewRect(offsetX: Int, offsetY: Int): Rect {
 
     r.set(left, top, left + measuredWidth, top + measuredHeight)
     return r
+}
+
+public fun View.marginLayoutParams(config: ViewGroup.MarginLayoutParams.() -> Unit) {
+    (layoutParams as? ViewGroup.MarginLayoutParams)?.let {
+        it.config()
+        layoutParams = it
+    }
+}
+
+public fun View.layoutParams(config: ViewGroup.LayoutParams.() -> Unit) {
+    layoutParams.let {
+        it.config()
+        layoutParams = it
+    }
 }

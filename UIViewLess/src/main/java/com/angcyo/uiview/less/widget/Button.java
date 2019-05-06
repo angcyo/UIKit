@@ -58,6 +58,9 @@ public class Button extends RTextView {
     int borderWidth;
     int roundRadii;
 
+    int gradientStartColor;
+    int gradientEndColor;
+
     public Button(Context context) {
         this(context, null);
     }
@@ -67,7 +70,6 @@ public class Button extends RTextView {
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.Button);
         mButtonStyle = typedArray.getInt(R.styleable.Button_r_button_style, DEFAULT);
 
-
         //typedArray.getDimensionPixelOffset(com.android.in)
 
         int defaultValue = (int) (3 * density());
@@ -75,22 +77,34 @@ public class Button extends RTextView {
             defaultValue = RADII;
         }
 
-        rippleColor = typedArray.getInt(R.styleable.Button_r_button_ripple_color, Color.WHITE);
         if (isInEditMode()) {
-            themeColor = typedArray.getInt(R.styleable.Button_r_button_theme_color, ViewExKt.getColor(this, R.color.theme_color_accent));
-            themeDarkColor = typedArray.getInt(R.styleable.Button_r_button_theme_dark_color, ViewExKt.getColor(this, R.color.theme_color_primary_dark));
-            disableColor = typedArray.getInt(R.styleable.Button_r_button_disable_color, Color.GRAY);
+            themeColor = ViewExKt.getColor(this, R.color.theme_color_accent);
+            themeDarkColor = ViewExKt.getColor(this, R.color.theme_color_primary_dark);
+            disableColor = Color.GRAY;
 
-            borderWidth = typedArray.getDimensionPixelOffset(R.styleable.Button_r_button_border_width, (int) (2 * density()));
-            roundRadii = typedArray.getDimensionPixelOffset(R.styleable.Button_r_button_round_radii, defaultValue);
+            gradientStartColor = ViewExKt.getColor(this, R.color.theme_color_primary);
+            gradientEndColor = ViewExKt.getColor(this, R.color.theme_color_primary_dark);
         } else {
-            themeColor = typedArray.getInt(R.styleable.Button_r_button_theme_color, SkinHelper.getSkin().getThemeSubColor());
-            themeDarkColor = typedArray.getInt(R.styleable.Button_r_button_theme_dark_color, SkinHelper.getSkin().getThemeDarkColor());
-            disableColor = typedArray.getInt(R.styleable.Button_r_button_disable_color, ContextCompat.getColor(getContext(), R.color.base_color_disable));
+            themeColor = SkinHelper.getSkin().getThemeSubColor();
+            themeDarkColor = SkinHelper.getSkin().getThemeDarkColor();
+            disableColor = ContextCompat.getColor(getContext(), R.color.base_color_disable);
 
-            borderWidth = typedArray.getDimensionPixelOffset(R.styleable.Button_r_button_border_width, (int) (1 * density()));
-            roundRadii = typedArray.getDimensionPixelOffset(R.styleable.Button_r_button_round_radii, defaultValue);
+            gradientStartColor = SkinHelper.getSkin().getThemeColorPrimary();
+            gradientEndColor = SkinHelper.getSkin().getThemeColorPrimaryDark();
         }
+
+        rippleColor = typedArray.getInt(R.styleable.Button_r_button_ripple_color, Color.WHITE);
+
+        themeColor = typedArray.getInt(R.styleable.Button_r_button_theme_color, themeColor);
+        themeDarkColor = typedArray.getInt(R.styleable.Button_r_button_theme_dark_color, themeDarkColor);
+        disableColor = typedArray.getInt(R.styleable.Button_r_button_disable_color, disableColor);
+
+        borderWidth = typedArray.getDimensionPixelOffset(R.styleable.Button_r_button_border_width, (int) (1 * density()));
+        roundRadii = typedArray.getDimensionPixelOffset(R.styleable.Button_r_button_round_radii, defaultValue);
+
+        gradientStartColor = typedArray.getInt(R.styleable.Button_r_gradient_start_color, gradientStartColor);
+        gradientEndColor = typedArray.getInt(R.styleable.Button_r_gradient_end_color, gradientEndColor);
+
         typedArray.recycle();
 
         /*不覆盖系统的background属性*/
@@ -148,9 +162,9 @@ public class Button extends RTextView {
                 case ROUND_GRADIENT_RECT:
                     setBackground(ResUtil.ripple(rippleColor,
                             ResUtil.selector(
-                                    ResUtil.createGradientDrawable(getContext(), roundRadii),
-                                    ResUtil.createGradientDrawable(getContext(), roundRadii),
-                                    ResUtil.createGradientDrawable(getContext(), roundRadii))
+                                    ResUtil.createGradientDrawable(gradientStartColor, gradientEndColor, roundRadii),
+                                    ResUtil.createGradientDrawable(gradientStartColor, gradientEndColor, roundRadii),
+                                    ResUtil.createGradientDrawable(gradientStartColor, gradientEndColor, roundRadii))
                     ));
                     break;
                 default:
