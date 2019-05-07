@@ -67,25 +67,37 @@ public fun View.getLayoutOffsetTopWidthSoftInput(): Int {
 
 /**获取touch坐标对应的RecyclerView, 如果没有则null*/
 public fun ViewGroup.getTouchOnRecyclerView(touchRawX: Float, touchRawY: Float): RecyclerView? {
-    return findRecyclerView(this, touchRawX, touchRawY, getLayoutOffsetTopWidthSoftInput())
+    return findRecyclerView(touchRawX, touchRawY)
+}
+
+public fun ViewGroup.getTouchOnRecyclerView(event: MotionEvent): RecyclerView? {
+    return findRecyclerView(event.rawX, event.rawY)
 }
 
 /**
  * 根据touch坐标, 返回touch的View
  */
-public fun ViewGroup.findView(event: MotionEvent): View? {
-    return findView(this, event.rawX, event.rawY, getLayoutOffsetTopWidthSoftInput())
-}
-
-public fun ViewGroup.findView(touchRawX: Float, touchRawY: Float): View? {
-    return findView(this, touchRawX, touchRawY, getLayoutOffsetTopWidthSoftInput())
+public fun ViewGroup.findView(
+    event: MotionEvent,
+    intercept: (View, Rect) -> Boolean = { _, _ -> false }
+): View? {
+    return findView(this, event.rawX, event.rawY, getLayoutOffsetTopWidthSoftInput(), intercept)
 }
 
 public fun ViewGroup.findView(
-    targetView: View /*判断需要结果的View*/,
     touchRawX: Float,
     touchRawY: Float,
-    offsetTop: Int = 0
+    intercept: (View, Rect) -> Boolean = { _, _ -> false }
+): View? {
+    return findView(this, touchRawX, touchRawY, getLayoutOffsetTopWidthSoftInput(), intercept)
+}
+
+public fun ViewGroup.findView(
+    targetView: View /*判断需要结束的View*/,
+    touchRawX: Float,
+    touchRawY: Float,
+    offsetTop: Int = 0,
+    intercept: (View, Rect) -> Boolean = { _, _ -> false } /*是否需要拦截View, 拦截后 立马返回*/
 ): View? {
     /**键盘的高度*/
     var touchView: View? = targetView
@@ -118,22 +130,28 @@ public fun ViewGroup.findView(
             return null
         }
 
+        val checkView = check(childAt)
+
+        //拦截处理
+        if (checkView != null && intercept.invoke(childAt, rect)) {
+            touchView = childAt
+            break
+        }
+
         if (childAt is ViewGroup && childAt.childCount > 0) {
-            val resultView = childAt.findView(targetView, touchRawX, touchRawY, offsetTop)
+            val resultView = childAt.findView(targetView, touchRawX, touchRawY, offsetTop, intercept)
             if (resultView != null && resultView != targetView) {
                 touchView = resultView
                 break
             } else {
-                val check = check(childAt)
-                if (check != null) {
-                    touchView = childAt
+                if (checkView != null) {
+                    touchView = checkView
                     break
                 }
             }
         } else {
-            val check = check(childAt)
-            if (check != null) {
-                touchView = childAt
+            if (checkView != null) {
+                touchView = checkView
                 break
             }
         }
@@ -142,51 +160,20 @@ public fun ViewGroup.findView(
 }
 
 public fun ViewGroup.findRecyclerView(
-    targetView: View /*判断需要结果的View*/,
     touchRawX: Float,
-    touchRawY: Float,
-    offsetTop: Int = 0
+    touchRawY: Float
 ): RecyclerView? {
     /**键盘的高度*/
     var touchView: RecyclerView? = null
-    val rect = Rect()
 
-    for (i in childCount - 1 downTo 0) {
-        val childAt = getChildAt(i)
-
-        if (childAt.visibility != View.VISIBLE) {
-            continue
-        }
-        childAt.getGlobalVisibleRect(rect)
-        rect.offset(0, -offsetTop)
-
-        fun check(view: View): View? {
-            if (view.visibility == View.VISIBLE &&
-                view.measuredHeight != 0 &&
-                view.measuredWidth != 0 &&
-                (view.left != view.right) &&
-                (view.top != view.bottom) &&
-                rect.contains(touchRawX.toInt(), touchRawY.toInt())
-            ) {
-                return view
-            }
-            return null
-        }
-
-        if (childAt is RecyclerView) {
-            val check = check(childAt)
-            if (check != null) {
-                touchView = childAt
-                break
-            }
-        } else if (childAt is ViewGroup && childAt.childCount > 0) {
-            val resultView = childAt.findRecyclerView(targetView, touchRawX, touchRawY, offsetTop)
-            if (resultView != null) {
-                touchView = resultView
-                break
-            }
-        }
+    val findView = findView(touchRawX, touchRawY) { view, _ ->
+        view is RecyclerView
     }
+
+    if (findView is RecyclerView) {
+        touchView = findView
+    }
+
     return touchView
 }
 
@@ -439,6 +426,7 @@ open class OnGetViewTextCallback {
         }
         return null
     }
+
 }
 
 abstract class OnAddViewCallback<T> {

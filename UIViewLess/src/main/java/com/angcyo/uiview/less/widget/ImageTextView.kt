@@ -131,7 +131,7 @@ class ImageTextView(context: Context, attributeSet: AttributeSet? = null) : AppC
 
                 //绘制需要显示的文本文本
                 canvas.drawText(
-                    showText!!, paddingLeft + textOffset - 4 * density + drawWidth / 2,
+                    showText!!, paddingLeft + textOffset - 4 * density + drawWidth / 2 - imageSize / 2,
                     paddingTop + drawHeight / 2 + textHeight / 2 - textPaint.descent(), textPaint
                 )
             } else {

@@ -1,22 +1,22 @@
 package com.angcyo.uiview.less.widget;
 
 import android.content.Context;
+import android.content.res.TypedArray;
+import android.os.Build;
 import android.support.annotation.Px;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
-import android.view.GestureDetector;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.ViewConfiguration;
-import android.view.ViewGroup;
+import android.view.*;
 import android.widget.OverScroller;
-import android.widget.RelativeLayout;
 import com.angcyo.uiview.less.R;
 import com.angcyo.uiview.less.kotlin.ViewExKt;
+import com.angcyo.uiview.less.kotlin.ViewGroupExKt;
 import com.angcyo.uiview.less.recycler.RRecyclerView;
+import com.angcyo.uiview.less.utils.RUtils;
 import com.angcyo.uiview.less.utils.Reflect;
+import com.angcyo.uiview.less.utils.UI;
 
 
 /**
@@ -28,12 +28,15 @@ import com.angcyo.uiview.less.utils.Reflect;
  * 3: 悬停布局, 可以不需要
  */
 
-public class StickLayout2 extends RelativeLayout {
+public class StickLayout2 extends ViewGroup {
 
     View mFloatView;
     int floatTopOffset = 0;
-    int floatTop = 0;//
-    float downY, downX, lastX;
+    int floatTop = 0;
+    //手指现在的坐标
+    float downY, downX;
+    //最后一次touch down 的坐标
+    float lastX, lastY;
     CanScrollUpCallBack mScrollTarget;
     boolean inTopTouch = false;
     boolean isFirst = true;
@@ -59,6 +62,14 @@ public class StickLayout2 extends RelativeLayout {
     private boolean mWantV = true;
     private int mStartScrollY;
 
+    /**
+     * 设置 floatTopOffset 为 标题栏的高度, 兼容 android 5.0 以上
+     */
+    private boolean fixActionBar = false;
+
+    //手指最后一次touch down 所在的 RecyclerView
+    private RecyclerView lastRecyclerView;
+
     public StickLayout2(Context context) {
         this(context, null);
     }
@@ -69,6 +80,23 @@ public class StickLayout2 extends RelativeLayout {
 
     public StickLayout2(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+
+        TypedArray array = context.obtainStyledAttributes(attrs, R.styleable.StickLayout2);
+        floatTopOffset = array.getDimensionPixelOffset(R.styleable.StickLayout2_r_stick_offset_top, floatTopOffset);
+        fixActionBar = array.getBoolean(R.styleable.StickLayout2_r_stick_fix_action_bar, fixActionBar);
+        array.recycle();
+
+        if (fixActionBar) {
+            int actionBarHeight = getResources().getDimensionPixelOffset(R.dimen.action_bar_height);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                int statusBarHeight = RUtils.getStatusBarHeight(getContext());
+                floatTopOffset = statusBarHeight + actionBarHeight;
+            } else {
+                floatTopOffset = actionBarHeight;
+            }
+        }
+
         initLayout();
     }
 
@@ -128,12 +156,12 @@ public class StickLayout2 extends RelativeLayout {
                     mScrollTarget = new CanScrollUpCallBack() {
                         @Override
                         public boolean canChildScrollUp() {
-                            return false;
+                            return UI.canChildScrollUp(ensureRecyclerView());
                         }
 
                         @Override
                         public RecyclerView getRecyclerView() {
-                            return null;
+                            return ensureRecyclerView();
                         }
                     };
                 }
@@ -143,6 +171,18 @@ public class StickLayout2 extends RelativeLayout {
         if (getChildCount() > 2) {
             mFloatView = getChildAt(2);
         }
+    }
+
+    private RecyclerView ensureRecyclerView() {
+
+        if (lastX > 0 && lastY > 0) {
+            RecyclerView recyclerView = ViewGroupExKt.findRecyclerView(StickLayout2.this, lastX, lastY);
+            if (recyclerView != null) {
+                lastRecyclerView = recyclerView;
+            }
+        }
+
+        return lastRecyclerView;
     }
 
     @Override
@@ -215,7 +255,10 @@ public class StickLayout2 extends RelativeLayout {
 
 //            topView.measure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(heightSize, MeasureSpec.AT_MOST));
         } else {
-            measureChild(topView, widthMeasureSpec, MeasureSpec.makeMeasureSpec(heightSize, MeasureSpec.UNSPECIFIED));
+            if (topView != null) {
+                measureChild(topView, widthMeasureSpec, MeasureSpec.makeMeasureSpec(heightSize, MeasureSpec.UNSPECIFIED));
+                floatTop = topView.getMeasuredHeight();
+            }
         }
 
         if (mFloatView != null) {
@@ -225,14 +268,18 @@ public class StickLayout2 extends RelativeLayout {
                 measureChild(mFloatView, widthMeasureSpec, heightMeasureSpec);
             }
         }
-        measureChild(scrollView, widthMeasureSpec,
-                MeasureSpec.makeMeasureSpec(heightSize - floatViewHeight() - floatTopOffset, MeasureSpec.EXACTLY));
 
-        floatTop = topView.getMeasuredHeight();
+        int scrollViewHeight = 0;
+        if (scrollView != null) {
+            measureChild(scrollView, widthMeasureSpec,
+                    MeasureSpec.makeMeasureSpec(heightSize - floatViewHeight() - floatTopOffset, MeasureSpec.EXACTLY));
+            scrollViewHeight = scrollView.getMeasuredHeight();
+        }
+
         maxScrollY = floatTop - floatTopOffset;
         topHeight = floatTop + floatViewHeight();
 
-        viewMaxHeight = floatTop + floatViewHeight() + scrollView.getMeasuredHeight();
+        viewMaxHeight = floatTop + floatViewHeight() + scrollViewHeight;
         setMeasuredDimension(widthMeasureSpec, heightMeasureSpec);
     }
 
@@ -406,6 +453,8 @@ public class StickLayout2 extends RelativeLayout {
                 onTouchUp();
                 onTouchEnd();
                 break;
+            default:
+                break;
         }
         return super.dispatchTouchEvent(ev);
     }
@@ -474,7 +523,7 @@ public class StickLayout2 extends RelativeLayout {
     private void onTouchDown(MotionEvent ev) {
         onTouchUp();
 
-        downY = ev.getY() + 0.5f;
+        lastY = downY = ev.getY() + 0.5f;
         lastX = downX = ev.getX() + 0.5f;
         mStartScrollY = getScrollY();
 

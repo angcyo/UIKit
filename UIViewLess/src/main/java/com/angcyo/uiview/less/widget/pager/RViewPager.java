@@ -89,113 +89,6 @@ public class RViewPager extends ViewPager {
         });
     }
 
-    public void setOnPagerEndListener(OnPagerEndListener onPagerEndListener) {
-        mOnPagerEndListener = onPagerEndListener;
-    }
-
-    public void setOrientation(int orientation) {
-        mOrientation = orientation;
-    }
-
-    public void resetItem(int position) {
-        PagerAdapter adapter = getAdapter();
-        if (adapter != null) {
-            adapter.destroyItem(this, position, getChildAt(position));
-            adapter.instantiateItem(this, position);
-        }
-//        if (adapter instanceof RPagerAdapter) {
-//            WeakReference<View> viewWeakReference = ((RPagerAdapter) adapter).mViewCache.get(position);
-//            View view = null;
-//            if (viewWeakReference != null) {
-//                view = viewWeakReference.get();
-//            }
-//            if (view != null) {
-//                ((RPagerAdapter) adapter).initItemView(view, position);
-//            }
-//        }
-    }
-
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        int widthSize = View.MeasureSpec.getSize(widthMeasureSpec);
-        int widthMode = View.MeasureSpec.getMode(widthMeasureSpec);
-        int heightSize = View.MeasureSpec.getSize(heightMeasureSpec);
-        int heightMode = View.MeasureSpec.getMode(heightMeasureSpec);
-
-        heightMeasureMode = heightMode;
-
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-
-        if (heightMode == MeasureSpec.EXACTLY) {
-        } else {
-            //支持高度的wrap_content
-            if (getChildCount() > getCurrentItem()) {
-                View childAt = getChildAt(getCurrentItem());
-                measureChild(childAt, widthMeasureSpec, heightMeasureSpec);
-                setMeasuredDimension(widthSize, childAt.getMeasuredHeight() + getPaddingLeft() + getPaddingRight());
-            }
-        }
-
-    }
-
-    @Override
-    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        super.onSizeChanged(w, h, oldw, oldh);
-        if (!isInEditMode()) {
-            ensureGlow(this, SkinHelper.getSkin().getThemeSubColor());
-        }
-    }
-
-
-    @Override
-    public boolean onTouchEvent(MotionEvent ev) {
-        try {
-            if (mOrientation == LinearLayout.VERTICAL) {
-                return mGestureDetectorCompat.onTouchEvent(ev)
-                        || super.onTouchEvent(swapTouchEvent(ev));
-            }
-            return mGestureDetectorCompat.onTouchEvent(ev)
-                    || super.onTouchEvent(ev);
-        } catch (IllegalArgumentException ex) {
-            ex.printStackTrace();
-        }
-        return false;
-    }
-
-
-    @Override
-    public boolean onInterceptTouchEvent(MotionEvent ev) {
-        try {
-            if (mOrientation == LinearLayout.VERTICAL) {
-                return super.onInterceptTouchEvent(swapTouchEvent(ev));
-            }
-            return super.onInterceptTouchEvent(ev);
-        } catch (IllegalArgumentException ex) {
-            ex.printStackTrace();
-        }
-        return false;
-    }
-
-    private MotionEvent swapTouchEvent(MotionEvent event) {
-        float width = getWidth();
-        float height = getHeight();
-
-        float swappedX = (event.getY() / height) * width;
-        float swappedY = (event.getX() / width) * height;
-
-        event.setLocation(swappedX, swappedY);
-
-        return event;
-    }
-
-    @Override
-    public void setAdapter(@Nullable PagerAdapter adapter) {
-        super.setAdapter(adapter);
-        if (adapter instanceof RPagerAdapter) {
-            addOnPageChangeListener((OnPageChangeListener) adapter);
-        }
-    }
-
     public static void ensureGlow(ViewPager viewPager, int color) {
         if (RUtils.isLollipop()) {
             if (viewPager != null) {
@@ -242,6 +135,115 @@ public class RViewPager extends ViewPager {
 
         if (mPaint instanceof Paint) {
             ((Paint) mPaint).setColor(color);
+        }
+    }
+
+    public void setOnPagerEndListener(OnPagerEndListener onPagerEndListener) {
+        mOnPagerEndListener = onPagerEndListener;
+    }
+
+    public void setOrientation(int orientation) {
+        mOrientation = orientation;
+    }
+
+    public void resetItem(int position) {
+        PagerAdapter adapter = getAdapter();
+        if (adapter != null) {
+            adapter.destroyItem(this, position, getChildAt(position));
+            adapter.instantiateItem(this, position);
+        }
+//        if (adapter instanceof RPagerAdapter) {
+//            WeakReference<View> viewWeakReference = ((RPagerAdapter) adapter).mViewCache.get(position);
+//            View view = null;
+//            if (viewWeakReference != null) {
+//                view = viewWeakReference.get();
+//            }
+//            if (view != null) {
+//                ((RPagerAdapter) adapter).initItemView(view, position);
+//            }
+//        }
+    }
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        int widthSize = MeasureSpec.getSize(widthMeasureSpec);
+        int widthMode = MeasureSpec.getMode(widthMeasureSpec);
+        int heightSize = MeasureSpec.getSize(heightMeasureSpec);
+        int heightMode = MeasureSpec.getMode(heightMeasureSpec);
+
+        heightMeasureMode = heightMode;
+
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+
+        if (heightMode == MeasureSpec.EXACTLY) {
+        } else {
+            //支持高度的wrap_content
+            if (getChildCount() > getCurrentItem()) {
+                View childAt = getChildAt(getCurrentItem());
+                measureChild(childAt, widthMeasureSpec, heightMeasureSpec);
+                setMeasuredDimension(widthSize, childAt.getMeasuredHeight() + getPaddingLeft() + getPaddingRight());
+            }
+        }
+
+    }
+
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+        if (!isInEditMode()) {
+            ensureGlow(this, SkinHelper.getSkin().getThemeSubColor());
+        }
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent ev) {
+        try {
+            if (mOrientation == LinearLayout.VERTICAL) {
+                return mGestureDetectorCompat.onTouchEvent(ev)
+                        || super.onTouchEvent(swapTouchEvent(ev));
+            }
+            return mGestureDetectorCompat.onTouchEvent(ev)
+                    || super.onTouchEvent(ev);
+        } catch (IllegalArgumentException ex) {
+            ex.printStackTrace();
+        }
+        return false;
+    }
+
+    @Override
+    public boolean onInterceptTouchEvent(MotionEvent ev) {
+        try {
+            if (mOrientation == LinearLayout.VERTICAL) {
+                return super.onInterceptTouchEvent(swapTouchEvent(ev));
+            }
+            return super.onInterceptTouchEvent(ev);
+        } catch (IllegalArgumentException ex) {
+            ex.printStackTrace();
+        }
+        return false;
+    }
+
+    private MotionEvent swapTouchEvent(MotionEvent event) {
+        float width = getWidth();
+        float height = getHeight();
+
+        float swappedX = (event.getY() / height) * width;
+        float swappedY = (event.getX() / width) * height;
+
+        event.setLocation(swappedX, swappedY);
+
+        return event;
+    }
+
+    @Override
+    public void setAdapter(@Nullable PagerAdapter adapter) {
+        PagerAdapter oldAdapter = getAdapter();
+        if (oldAdapter instanceof RPagerAdapter) {
+            removeOnPageChangeListener((OnPageChangeListener) oldAdapter);
+        }
+        super.setAdapter(adapter);
+        if (adapter instanceof RPagerAdapter) {
+            addOnPageChangeListener((OnPageChangeListener) adapter);
         }
     }
 

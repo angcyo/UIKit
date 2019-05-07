@@ -33,6 +33,7 @@ import com.angcyo.uiview.less.kotlin.ViewGroupExKt;
 import com.angcyo.uiview.less.resources.AnimUtil;
 import com.angcyo.uiview.less.utils.Debug;
 import com.angcyo.uiview.less.utils.RUtils;
+import kotlin.jvm.functions.Function2;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -447,7 +448,13 @@ public class FragmentSwipeBackLayout extends SwipeBackLayout {
                     }
 
                     if (targetViewGroup != null) {
-                        view = ViewGroupExKt.findView(targetViewGroup, ev.getRawX(), ev.getRawY());
+                        view = ViewGroupExKt.findView(targetViewGroup, ev.getRawX(), ev.getRawY(),
+                                new Function2<View, Rect, Boolean>() {
+                                    @Override
+                                    public Boolean invoke(View view, Rect rect) {
+                                        return false;
+                                    }
+                                });
                         StringBuilder builder = new StringBuilder("\ntouch on->");
                         if (view == null) {
                             builder.append("null");

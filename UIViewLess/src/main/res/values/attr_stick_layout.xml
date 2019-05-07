@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="StickLayout2">
+        <attr name="r_stick_offset_top" format="dimension"/>
+        <attr name="r_stick_fix_action_bar" format="boolean"/>
+    </declare-styleable>
+</resources>
