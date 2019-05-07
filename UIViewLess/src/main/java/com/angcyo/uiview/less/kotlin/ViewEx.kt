@@ -828,3 +828,7 @@ public fun View.layoutParams(config: ViewGroup.LayoutParams.() -> Unit) {
         layoutParams = it
     }
 }
+
+public fun <T : View> View.find(id: Int): T? {
+    return findViewById<T>(id)
+}

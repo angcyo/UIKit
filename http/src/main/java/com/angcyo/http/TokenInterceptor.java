@@ -168,4 +168,22 @@ public class TokenInterceptor implements Interceptor {
          */
         void tryGetToken(@NonNull CountDownLatch latch);
     }
+
+    public static class TokenListenerAdapter implements OnTokenListener {
+
+        @Override
+        public Request initToken(@NonNull Request originRequest) {
+            return originRequest;
+        }
+
+        @Override
+        public boolean isTokenInvalid(@NonNull Response response, @NonNull String bodyString) {
+            return false;
+        }
+
+        @Override
+        public void tryGetToken(@NonNull CountDownLatch latch) {
+            latch.countDown();
+        }
+    }
 }

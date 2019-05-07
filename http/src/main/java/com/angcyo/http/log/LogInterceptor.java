@@ -8,7 +8,7 @@ package com.angcyo.http.log;
 public class LogInterceptor implements HttpLoggingInterceptorM.Logger {
 
     public static String INTERCEPTOR_TAG_STR = "OkHttp";
-    int maxLength = 1024;
+    int maxLength = 4096;
 
     public LogInterceptor() {
     }
