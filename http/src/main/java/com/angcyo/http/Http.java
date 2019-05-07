@@ -44,7 +44,7 @@ public class Http {
     public static boolean LOG_INTERCEPTOR_RESPONSE = BuildConfig.DEBUG;
 
     public static Retrofit.Builder builder(String baseUrl, String logTag) {
-        return builder(defaultOkHttpClick(logTag).build(), baseUrl);
+        return builder(defaultOkHttpClient(logTag).build(), baseUrl);
     }
 
     /**
@@ -62,7 +62,7 @@ public class Http {
     /**
      * OkHttp 客户端构建
      */
-    public static OkHttpClient.Builder defaultOkHttpClick(String logTag) {
+    public static OkHttpClient.Builder defaultOkHttpClient(String logTag) {
         HttpLoggingInterceptorM httpLoggingInterceptorM = new HttpLoggingInterceptorM(new LogInterceptor(logTag));
         if (BuildConfig.DEBUG) {
             httpLoggingInterceptorM.setLevel(HttpLoggingInterceptorM.Level.BODY);
