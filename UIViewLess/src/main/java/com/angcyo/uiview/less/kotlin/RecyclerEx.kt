@@ -1,6 +1,8 @@
 package com.angcyo.uiview.less.kotlin
 
+import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import com.angcyo.uiview.less.kotlin.dsl.DslRecyclerScroll
 import com.angcyo.uiview.less.recycler.adapter.DslAdapter
 import com.angcyo.uiview.less.recycler.adapter.DslAdapterItem
 
@@ -22,4 +24,30 @@ public fun DslAdapter.renderItem(init: DslAdapterItem.() -> Unit) {
     val adapterItem = DslAdapterItem()
     adapterItem.init()
     addLastItem(adapterItem)
+}
+
+public fun RecyclerView.onScroll(init: DslRecyclerScroll.() -> Unit) {
+    val dslRecyclerView = DslRecyclerScroll()
+    dslRecyclerView.init()
+    addOnScrollListener(object : RecyclerView.OnScrollListener() {
+        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+            super.onScrolled(recyclerView, dx, dy)
+
+            val layoutManager = recyclerView.layoutManager
+            if (layoutManager is LinearLayoutManager) {
+                dslRecyclerView.firstItemAdapterPosition = layoutManager.findFirstVisibleItemPosition()
+                dslRecyclerView.firstItemCompletelyVisibleAdapterPosition =
+                    layoutManager.findFirstCompletelyVisibleItemPosition()
+            } else {
+
+            }
+
+            dslRecyclerView.onRecyclerScrolled.invoke(recyclerView, dx, dy)
+        }
+
+        override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+            super.onScrollStateChanged(recyclerView, newState)
+            dslRecyclerView.onRecyclerScrollStateChanged.invoke(recyclerView, newState)
+        }
+    })
 }

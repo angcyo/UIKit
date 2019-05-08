@@ -231,7 +231,7 @@ public class StickLayout2 extends ViewGroup {
             requestLayout();
         }
         if (mOnScrollListener != null) {
-            mOnScrollListener.onScrollTo(offset);
+            mOnScrollListener.onScrollTo(maxScrollY, offset);
         }
     }
 

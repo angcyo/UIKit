@@ -360,13 +360,19 @@ class RTabLayout(context: Context, attributeSet: AttributeSet? = null) : ViewGro
         var heightSize = MeasureSpec.getSize(heightMeasureSpec)
         val heightMode = MeasureSpec.getMode(heightMeasureSpec)
 
-        var heightSpec: Int
+        var childHeightSpec: Int
         if (heightMode != MeasureSpec.EXACTLY) {
             //没有明确指定高度的情况下, 默认的高度
-            heightSize = (40 * density).toInt() + paddingTop + paddingBottom
-            heightSpec = exactlyMeasure(heightSize)
+            if (suggestedMinimumHeight > 0) {
+                heightSize = suggestedMinimumHeight
+            } else {
+                heightSize = (40 * density).toInt()
+            }
+            childHeightSpec = exactlyMeasure(heightSize)
+
+            heightSize += paddingTop + paddingBottom
         } else {
-            heightSpec = exactlyMeasure(heightSize - paddingTop - paddingBottom)
+            childHeightSpec = exactlyMeasure(heightSize - paddingTop - paddingBottom)
         }
 
         //child总共的宽度
@@ -382,10 +388,11 @@ class RTabLayout(context: Context, attributeSet: AttributeSet? = null) : ViewGro
                 lp.layoutWidth, lp.layoutHeight,
                 widthSize, heightSize, 0, 0
             )
-            val childHeightSpec = if (widthHeight[1] > 0) {
+
+            childHeightSpec = if (widthHeight[1] > 0) {
                 exactlyMeasure(widthHeight[1])
             } else {
-                heightSpec
+                childHeightSpec
             }
 
             if (itemEquWidth) {
