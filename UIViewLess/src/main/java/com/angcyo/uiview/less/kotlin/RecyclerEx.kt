@@ -36,7 +36,6 @@ public fun RecyclerView.dslAdapter(spanCount: Int = 1, init: DslAdapter.() -> Un
     adapter = dslAdapter
 }
 
-
 public fun DslAdapter.renderItem(init: DslAdapterItem.() -> Unit) {
     val adapterItem = DslAdapterItem()
     adapterItem.init()
@@ -67,4 +66,10 @@ public fun RecyclerView.onScroll(init: DslRecyclerScroll.() -> Unit) {
             dslRecyclerView.onRecyclerScrollStateChanged.invoke(recyclerView, newState)
         }
     })
+}
+
+public fun RecyclerView.clearItemDecoration() {
+    for (i in itemDecorationCount - 1 downTo 0) {
+        removeItemDecorationAt(i)
+    }
 }
