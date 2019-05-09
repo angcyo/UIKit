@@ -1,8 +1,10 @@
 package com.angcyo.uiview.less.kotlin
 
+import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import com.angcyo.uiview.less.kotlin.dsl.DslRecyclerScroll
+import com.angcyo.uiview.less.recycler.RRecyclerView
 import com.angcyo.uiview.less.recycler.adapter.DslAdapter
 import com.angcyo.uiview.less.recycler.adapter.DslAdapterItem
 
@@ -19,6 +21,21 @@ public fun RecyclerView.dslAdapter(init: DslAdapter.() -> Unit) {
     dslAdapter.init()
     adapter = dslAdapter
 }
+
+public fun RecyclerView.dslAdapter(spanCount: Int = 1, init: DslAdapter.() -> Unit) {
+    val dslAdapter = DslAdapter()
+    dslAdapter.init()
+
+    layoutManager = RRecyclerView.GridLayoutManagerWrap(context, spanCount).apply {
+        spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+            override fun getSpanSize(position: Int): Int {
+                return dslAdapter.getItemData(position).itemSpanCount
+            }
+        }
+    }
+    adapter = dslAdapter
+}
+
 
 public fun DslAdapter.renderItem(init: DslAdapterItem.() -> Unit) {
     val adapterItem = DslAdapterItem()

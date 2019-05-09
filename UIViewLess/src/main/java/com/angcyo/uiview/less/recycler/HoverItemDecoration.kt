@@ -2,6 +2,7 @@ package com.angcyo.uiview.less.recycler
 
 import android.app.Activity
 import android.graphics.*
+import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.MotionEvent
 import android.view.View
@@ -192,7 +193,7 @@ open class HoverItemDecoration : RecyclerView.ItemDecoration() {
                                 return
                             }
 
-                            //第一个位置的child 需要分割线
+                            //创建第一个位置的child 需要分割线
                             val firstViewHolder =
                                 callback.createDecorationOverView.invoke(
                                     parent,
@@ -203,7 +204,7 @@ open class HoverItemDecoration : RecyclerView.ItemDecoration() {
                             val overView = firstViewHolder.itemView
                             tempRect.set(overView.left, overView.top, overView.right, overView.bottom)
 
-                            val nextViewHolder = childViewHolder(parent, 1)
+                            val nextViewHolder = childViewHolder(parent, findGridNextChildIndex())
                             if (nextViewHolder != null) {
                                 //紧挨着的下一个child也有分割线, 监测是否需要上推
 
@@ -243,6 +244,30 @@ open class HoverItemDecoration : RecyclerView.ItemDecoration() {
                 }
             }
         }
+    }
+
+    /**
+     * 查找GridLayoutManager中, 下一个具有全屏样式的child索引
+     * */
+    internal fun findGridNextChildIndex(): Int {
+        var result = 1
+        recyclerView?.layoutManager?.apply {
+            if (this is GridLayoutManager) {
+
+                for (i in 1 until recyclerView!!.childCount) {
+                    childViewHolder(recyclerView!!, i)?.let {
+                        if (it.adapterPosition != RecyclerView.NO_POSITION) {
+                            if (spanSizeLookup?.getSpanSize(it.adapterPosition) == this.spanCount) {
+                                result = i
+
+                                return result
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return result
     }
 
     fun clearOverDecoration() {
