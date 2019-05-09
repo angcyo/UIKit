@@ -163,15 +163,34 @@ open class HoverItemDecoration : RecyclerView.ItemDecoration() {
      * */
     internal fun checkOverDecoration(parent: RecyclerView) {
         childViewHolder(parent, 0)?.let { viewHolder ->
-            val firstChildAdapterPosition = viewHolder.adapterPosition
+            var firstChildAdapterPosition = viewHolder.adapterPosition
 
             if (firstChildAdapterPosition != RecyclerView.NO_POSITION) {
 
                 parent.adapter?.let { adapter ->
                     hoverCallback?.let { callback ->
-                        if (callback.haveOverDecoration.invoke(firstChildAdapterPosition)) {
+
+                        var firstChildHaveOver = callback.haveOverDecoration.invoke(firstChildAdapterPosition)
+
+                        if (!firstChildHaveOver) {
+                            //第一个child没有分割线, 查找之前最近有分割线的position
+                            val findOverPrePosition = findOverPrePosition(firstChildAdapterPosition)
+                            if (findOverPrePosition != RecyclerView.NO_POSITION) {
+                                //找到了最近的分割线
+                                firstChildHaveOver = true
+
+                                firstChildAdapterPosition = findOverPrePosition
+                            }
+                        }
+
+                        if (firstChildHaveOver) {
 
                             val overStartPosition = findOverStartPosition(adapter, firstChildAdapterPosition)
+
+                            if (overStartPosition == RecyclerView.NO_POSITION) {
+                                clearOverDecoration()
+                                return
+                            }
 
                             //第一个位置的child 需要分割线
                             val firstViewHolder =
@@ -188,7 +207,8 @@ open class HoverItemDecoration : RecyclerView.ItemDecoration() {
                             if (nextViewHolder != null) {
                                 //紧挨着的下一个child也有分割线, 监测是否需要上推
 
-                                if (!callback.isOverDecorationSame.invoke(
+                                if (callback.haveOverDecoration.invoke(nextViewHolder.adapterPosition) &&
+                                    !callback.isOverDecorationSame.invoke(
                                         adapter,
                                         firstChildAdapterPosition,
                                         nextViewHolder.adapterPosition
@@ -233,7 +253,7 @@ open class HoverItemDecoration : RecyclerView.ItemDecoration() {
     }
 
     /**
-     * 查找指定位置的分割线, 最开始的adapterPosition
+     * 查找指定位置类型相同的分割线, 最开始的adapterPosition
      * */
     internal fun findOverStartPosition(
         adapter: RecyclerView.Adapter<RecyclerView.ViewHolder>,
@@ -246,6 +266,29 @@ open class HoverItemDecoration : RecyclerView.ItemDecoration() {
                 break
             } else if (!hoverCallback!!.isOverDecorationSame(adapter, adapterPosition, i)) {
                 result = i + 1
+                break
+            }
+        }
+
+        if (result == 0) {
+            hoverCallback?.let {
+                if (!it.haveOverDecoration.invoke(result)) {
+                    result = RecyclerView.NO_POSITION
+                }
+            }
+        }
+
+        return result
+    }
+
+    /**
+     * 查找指定位置 没有分割线时, 最前出现分割线的adapterPosition
+     * */
+    internal fun findOverPrePosition(adapterPosition: Int): Int {
+        var result = RecyclerView.NO_POSITION
+        for (i in adapterPosition - 1 downTo 0) {
+            if (hoverCallback!!.haveOverDecoration.invoke(i)) {
+                result = i
                 break
             }
         }
@@ -275,10 +318,8 @@ open class HoverItemDecoration : RecyclerView.ItemDecoration() {
             adapter: RecyclerView.Adapter<RecyclerView.ViewHolder>,
             nowAdapterPosition: Int, nextAdapterPosition: Int
         ) -> Boolean =
-            { adapter, nowAdapterPosition, nextAdapterPosition ->
-                adapter.getItemViewType(nowAdapterPosition) == adapter.getItemViewType(
-                    nextAdapterPosition
-                )
+            { _, _, _ ->
+                false
             }
 
         /**
