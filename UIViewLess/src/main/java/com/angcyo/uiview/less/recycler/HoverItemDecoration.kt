@@ -50,7 +50,11 @@ open class HoverItemDecoration : RecyclerView.ItemDecoration() {
                 overViewHolder?.apply {
                     //一定要调用dispatchTouchEvent, 否则ViewGroup里面的子View, 不会响应touchEvent
                     itemView.dispatchTouchEvent(event)
-                    if (itemView is ViewGroup && (itemView as ViewGroup).onInterceptTouchEvent(event)) {
+                    if (itemView is ViewGroup) {
+                        if ((itemView as ViewGroup).onInterceptTouchEvent(event)) {
+                            itemView.onTouchEvent(event)
+                        }
+                    } else {
                         itemView.onTouchEvent(event)
                     }
                 }
@@ -157,6 +161,8 @@ open class HoverItemDecoration : RecyclerView.ItemDecoration() {
     internal val overDecorationRect = Rect()
     /**下一个悬浮分割线的坐标.*/
     internal val nextDecorationRect = Rect()
+    /**分割线的所在位置*/
+    internal var overAdapterPosition = RecyclerView.NO_POSITION
 
     private var tempRect = Rect()
     /**
@@ -229,10 +235,14 @@ open class HoverItemDecoration : RecyclerView.ItemDecoration() {
                                 //第一个child, 正好是 分割线的开始位置
                                 clearOverDecoration()
                             } else {
-                                if (overDecorationRect != tempRect) {
+                                if (overAdapterPosition != overStartPosition) {
                                     clearOverDecoration()
 
                                     overViewHolder = firstViewHolder
+                                    overDecorationRect.set(tempRect)
+
+                                    overAdapterPosition = overStartPosition
+                                } else if (overDecorationRect != tempRect) {
                                     overDecorationRect.set(tempRect)
                                 }
                             }
@@ -275,6 +285,7 @@ open class HoverItemDecoration : RecyclerView.ItemDecoration() {
         nextDecorationRect.clear()
         removeHoverView()
         overViewHolder = null
+        overAdapterPosition = RecyclerView.NO_POSITION
     }
 
     /**

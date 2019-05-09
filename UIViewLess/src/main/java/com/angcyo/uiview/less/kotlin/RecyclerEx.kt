@@ -68,8 +68,11 @@ public fun RecyclerView.onScroll(init: DslRecyclerScroll.() -> Unit) {
     })
 }
 
-public fun RecyclerView.clearItemDecoration() {
+public fun RecyclerView.clearItemDecoration(filter: (RecyclerView.ItemDecoration) -> Boolean = { false }) {
     for (i in itemDecorationCount - 1 downTo 0) {
-        removeItemDecorationAt(i)
+        if (filter.invoke(getItemDecorationAt(i))) {
+        } else {
+            removeItemDecorationAt(i)
+        }
     }
 }
