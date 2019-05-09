@@ -56,8 +56,12 @@ object TopToast {
             titleView.text = tipText
         }
 
-        imageView?.visibility = if (tipImageResId <= 0) View.GONE else View.VISIBLE
-        imageView?.setImageResource(tipImageResId)
+        if (tipImageResId > 0) {
+            imageView?.visibility = View.VISIBLE
+            imageView?.setImageResource(tipImageResId)
+        } else {
+            imageView?.visibility = View.GONE
+        }
 
         toast!!.show()
     }
