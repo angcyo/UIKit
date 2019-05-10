@@ -86,6 +86,8 @@ open class DslDateFilter(val adapter: DslAdapter) {
             val childSize = groupChildSize(startIndex)
 
             if (childSize > 0) {
+                adapter.updateFilterDataList()
+
                 if (fold) {
                     //折叠
                     adapter.notifyItemRangeRemoved(startIndex + 1, childSize)

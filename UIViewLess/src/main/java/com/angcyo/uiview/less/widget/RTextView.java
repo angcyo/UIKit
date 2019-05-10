@@ -59,9 +59,13 @@ public class RTextView extends AppCompatTextView {
      */
     protected boolean aeqWidth = false;
     /**
-     * 左边垂直矩形的颜色
+     * 左边垂直的矩形
      */
-    Rect leftColorRect;
+    RectF leftColorRect;
+    /**
+     * 左边垂直矩形的圆角大小
+     */
+    float leftRoundSize = 0;
     Paint colorPaint;
     int leftWidth = 0;
     @ColorInt
@@ -153,8 +157,10 @@ public class RTextView extends AppCompatTextView {
 
         //绘制左边的提示竖线
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.RTextView);
-        leftColor = typedArray.getColor(R.styleable.RTextView_r_left_color, isInEditMode() ? Color.GREEN : SkinHelper.getSkin().getThemeColor());
+        leftColor = typedArray.getColor(R.styleable.RTextView_r_left_color,
+                isInEditMode() ? getResources().getColor(R.color.colorPrimary) : SkinHelper.getSkin().getThemeColor());
         leftWidth = typedArray.getDimensionPixelOffset(R.styleable.RTextView_r_left_width, 0);
+        leftRoundSize = typedArray.getDimensionPixelOffset(R.styleable.RTextView_r_left_round_size, (int) leftRoundSize);
         hasUnderline = typedArray.getBoolean(R.styleable.RTextView_r_has_underline, false);
         centerLeftDrawable = typedArray.getBoolean(R.styleable.RTextView_r_center_left_drawable, centerLeftDrawable);
         mBackgroundDrawable = typedArray.getDrawable(R.styleable.RTextView_r_background);
@@ -524,11 +530,12 @@ public class RTextView extends AppCompatTextView {
         int centerSaveCount = -1;
         if (centerLeftDrawable && textLeftDrawable != null) {
             centerSaveCount = canvas.save();
-            canvas.translate((textLeftDrawable.getIntrinsicWidth() + getCompoundDrawablePadding()) / 2, 0);
+            float dx = (textLeftDrawable.getIntrinsicWidth() + getCompoundDrawablePadding()) * 1f / 2;
+            canvas.translate(dx, 0);
         }
         super.onDraw(canvas);
         if (leftWidth > 0) {
-            canvas.drawRect(leftColorRect, colorPaint);
+            canvas.drawRoundRect(leftColorRect, leftRoundSize, leftRoundSize, colorPaint);
         }
 
         //左边绘制一些文本
@@ -962,7 +969,7 @@ public class RTextView extends AppCompatTextView {
 
         int viewHeight = getMeasuredHeight();
         if (leftColorRect == null) {
-            leftColorRect = new Rect();
+            leftColorRect = new RectF();
         }
         if (colorPaint == null) {
             colorPaint = new Paint(Paint.ANTI_ALIAS_FLAG);

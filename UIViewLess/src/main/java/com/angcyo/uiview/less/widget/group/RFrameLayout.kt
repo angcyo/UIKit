@@ -94,10 +94,13 @@ open class RFrameLayout(context: Context, attributeSet: AttributeSet? = null) : 
             innerBorderWidth = typedArray.getDimensionPixelOffset(R.styleable.RFrameLayout_r_inner_border_width, 4)
             innerBorderColor = typedArray.getColor(R.styleable.RFrameLayout_r_inner_border_color, Color.RED)
         } else {
-            innerBorderWidth = typedArray.getDimensionPixelOffset(R.styleable.RFrameLayout_r_inner_border_width, (2 * density).toInt())
-            innerBorderColor = typedArray.getColor(R.styleable.RFrameLayout_r_inner_border_color, SkinHelper.getSkin().themeSubColor)
+            innerBorderWidth =
+                typedArray.getDimensionPixelOffset(R.styleable.RFrameLayout_r_inner_border_width, (2 * density).toInt())
+            innerBorderColor =
+                typedArray.getColor(R.styleable.RFrameLayout_r_inner_border_color, SkinHelper.getSkin().themeSubColor)
         }
-        innerBorderOffset = typedArray.getDimensionPixelOffset(R.styleable.RFrameLayout_r_inner_border_offset, innerBorderOffset)
+        innerBorderOffset =
+            typedArray.getDimensionPixelOffset(R.styleable.RFrameLayout_r_inner_border_offset, innerBorderOffset)
 
         rBackgroundDrawable = typedArray.getDrawable(R.styleable.RFrameLayout_r_background)
         resetMaxHeight(typedArray.getDimension(R.styleable.RFrameLayout_r_max_height, 0f))
@@ -114,11 +117,11 @@ open class RFrameLayout(context: Context, attributeSet: AttributeSet? = null) : 
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         if (maxHeight > 0) run {
-            val heightMode = View.MeasureSpec.getMode(heightMeasureSpec)
-            super.onMeasure(widthMeasureSpec, View.MeasureSpec.makeMeasureSpec(maxHeight, View.MeasureSpec.AT_MOST))
+            val heightMode = MeasureSpec.getMode(heightMeasureSpec)
+            super.onMeasure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(maxHeight, MeasureSpec.AT_MOST))
             val measuredHeight = measuredHeight
             if (measuredHeight > maxHeight) {
-                super.onMeasure(widthMeasureSpec, View.MeasureSpec.makeMeasureSpec(maxHeight, heightMode))
+                super.onMeasure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(maxHeight, heightMode))
             }
         } else {
             super.onMeasure(widthMeasureSpec, heightMeasureSpec)
@@ -126,20 +129,24 @@ open class RFrameLayout(context: Context, attributeSet: AttributeSet? = null) : 
 
         if (equWidth) {
             //setMeasuredDimension(measuredWidth, measuredWidth)
-            super.onMeasure(View.MeasureSpec.makeMeasureSpec(measuredWidth, View.MeasureSpec.EXACTLY),
-                    View.MeasureSpec.makeMeasureSpec(measuredWidth, View.MeasureSpec.EXACTLY))
+            super.onMeasure(
+                MeasureSpec.makeMeasureSpec(measuredWidth, MeasureSpec.EXACTLY),
+                MeasureSpec.makeMeasureSpec(measuredWidth, MeasureSpec.EXACTLY)
+            )
         } else {
             calcWidthHeightRatio(widthHeightRatio)?.let {
                 //setMeasuredDimension(it[0], it[1])
-                super.onMeasure(View.MeasureSpec.makeMeasureSpec(it[0], View.MeasureSpec.EXACTLY),
-                        View.MeasureSpec.makeMeasureSpec(it[1], View.MeasureSpec.EXACTLY))
+                super.onMeasure(
+                    MeasureSpec.makeMeasureSpec(it[0], MeasureSpec.EXACTLY),
+                    MeasureSpec.makeMeasureSpec(it[1], MeasureSpec.EXACTLY)
+                )
             }
         }
     }
 
     override fun draw(canvas: Canvas) {
         rBackgroundDrawable?.let {
-            it.bounds = canvas.clipBounds
+            it.bounds.set(0, 0, measuredWidth, measuredHeight)
             it.draw(canvas)
         }
         super.draw(canvas)
@@ -152,14 +159,12 @@ open class RFrameLayout(context: Context, attributeSet: AttributeSet? = null) : 
             innerBorderPaint.strokeWidth = innerBorderWidth.toFloat()
             innerBorderPaint.color = innerBorderColor
             val l2 = innerBorderWidth * 1f / 2
-            canvas.drawRect(l2 + innerBorderOffset, l2 + innerBorderOffset,
-                    measuredWidth - l2 - innerBorderOffset, measuredHeight - l2 - innerBorderOffset,
-                    innerBorderPaint)
+            canvas.drawRect(
+                l2 + innerBorderOffset, l2 + innerBorderOffset,
+                measuredWidth - l2 - innerBorderOffset, measuredHeight - l2 - innerBorderOffset,
+                innerBorderPaint
+            )
         }
-    }
-
-    override fun onDraw(canvas: Canvas) {
-        super.onDraw(canvas)
     }
 
     private fun resetMaxHeight() {
@@ -338,14 +343,15 @@ open class RFrameLayout(context: Context, attributeSet: AttributeSet? = null) : 
                     } else {
                         childAt.top
                     }
-                    childAt.layout(childLeft, childTop, childLeft + childAt.measuredWidth, childTop + childAt.measuredHeight)
+                    childAt.layout(
+                        childLeft,
+                        childTop,
+                        childLeft + childAt.measuredWidth,
+                        childTop + childAt.measuredHeight
+                    )
                 }
             }
         }
-    }
-
-    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
-        super.onSizeChanged(w, h, oldw, oldh)
     }
 
     private fun handleFloatViewOnTouchUp() {
@@ -364,9 +370,9 @@ open class RFrameLayout(context: Context, attributeSet: AttributeSet? = null) : 
                         animEndY = touchViewTop
                         //floatAnim.start()
                         touchFloatView!!.animate()
-                                .translationXBy((animEndX - animStartX).toFloat())
-                                .setDuration(300)
-                                .start()
+                            .translationXBy((animEndX - animStartX).toFloat())
+                            .setDuration(300)
+                            .start()
                     }
                 } else {
                     //自动到左边
@@ -380,9 +386,9 @@ open class RFrameLayout(context: Context, attributeSet: AttributeSet? = null) : 
                         //floatAnim.start()
 
                         touchFloatView!!.animate()
-                                .translationXBy((animEndX - animStartX).toFloat())
-                                .setDuration(300)
-                                .start()
+                            .translationXBy((animEndX - animStartX).toFloat())
+                            .setDuration(300)
+                            .start()
                     }
                 }
 

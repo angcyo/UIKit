@@ -1,9 +1,14 @@
 package com.angcyo.uiview.less.kotlin
 
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.Rect
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.view.View
 import com.angcyo.uiview.less.kotlin.dsl.DslRecyclerScroll
+import com.angcyo.uiview.less.recycler.DslItemDecoration
 import com.angcyo.uiview.less.recycler.RRecyclerView
 import com.angcyo.uiview.less.recycler.adapter.DslAdapter
 import com.angcyo.uiview.less.recycler.adapter.DslAdapterItem
@@ -29,7 +34,7 @@ public fun RecyclerView.dslAdapter(spanCount: Int = 1, init: DslAdapter.() -> Un
     layoutManager = RRecyclerView.GridLayoutManagerWrap(context, spanCount).apply {
         spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
-                return dslAdapter.getItemData(position).itemSpanCount
+                return dslAdapter.getItemData(position)?.itemSpanCount ?: 1
             }
         }
     }
@@ -75,4 +80,11 @@ public fun RecyclerView.clearItemDecoration(filter: (RecyclerView.ItemDecoration
             removeItemDecorationAt(i)
         }
     }
+}
+
+
+public fun RecyclerView.dslItemDecoration(init: DslItemDecoration.() -> Unit) {
+    addItemDecoration(DslItemDecoration().apply {
+        init()
+    })
 }

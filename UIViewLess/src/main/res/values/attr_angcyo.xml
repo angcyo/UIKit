@@ -207,6 +207,7 @@
         <attr name="r_left_color" format="color"/>
         <!--左边竖线的宽度-->
         <attr name="r_left_width" format="dimension"/>
+        <attr name="r_left_round_size" format="dimension"/>
         <!--距离view左边的距离-->
         <attr name="r_left_margin" format="dimension"/>
         <attr name="r_top_margin" format="dimension"/>

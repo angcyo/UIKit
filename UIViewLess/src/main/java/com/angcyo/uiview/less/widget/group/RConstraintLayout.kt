@@ -63,7 +63,7 @@ class RConstraintLayout : ConstraintLayout {
 
     override fun draw(canvas: Canvas) {
         mRBackgroundDrawable?.let {
-            it.bounds = canvas.clipBounds
+            it.bounds.set(0, 0, measuredWidth, measuredHeight)
             it.draw(canvas)
         }
         super.draw(canvas)

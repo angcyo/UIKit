@@ -46,16 +46,19 @@ open class DslAdapter : RBaseAdapter<DslAdapterItem> {
         }
     }
 
+    /**
+     * 布局的type, 就是布局对应的 layout id
+     * */
     override fun getItemLayoutId(viewType: Int): Int {
         return viewType
     }
 
     override fun getItemType(position: Int): Int {
-        return getItemData(position).itemLayoutId
+        return getItemData(position)?.itemLayoutId ?: -1
     }
 
     override fun onBindView(holder: RBaseViewHolder, position: Int, bean: DslAdapterItem?) {
-        bean?.let {
+        getItemData(position)?.let {
             it.itemBind.invoke(holder, position, it)
         }
     }
@@ -67,9 +70,12 @@ open class DslAdapter : RBaseAdapter<DslAdapterItem> {
         return super.getItemCount()
     }
 
-    override fun getItemData(position: Int): DslAdapterItem {
+    override fun getItemData(position: Int): DslAdapterItem? {
         if (dslDateFilter != null) {
-            filterDataList[position]
+            if (position < filterDataList.size) {
+                return filterDataList[position]
+            }
+            return null
         }
         return super.getItemData(position)
     }
@@ -99,6 +105,5 @@ open class DslAdapter : RBaseAdapter<DslAdapterItem> {
      * */
     fun foldItem(item: DslAdapterItem, folder: Boolean = true) {
         dslDateFilter?.filterItem(item, folder)
-        updateFilterDataList()
     }
 }

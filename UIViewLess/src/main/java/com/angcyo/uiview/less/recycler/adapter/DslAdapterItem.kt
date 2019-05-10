@@ -34,7 +34,7 @@ open class DslAdapterItem {
     //</editor-fold>
 
 
-    //<editor-fold desc="分组相关">
+    //<editor-fold desc="分组相关属性">
 
     /**当前item, 是否是分组的头
      *
@@ -46,6 +46,16 @@ open class DslAdapterItem {
      * 当前分组是否 展开
      * */
     var itemGroupExtend = true
+
+    //</editor-fold>
+
+    //<editor-fold desc="悬停相关属性">
+
+    /**
+     * 是否需要悬停, 在使用了 [HoverItemDecoration] 时, 有效
+     * */
+    var itemIsHover = false
+        get() = itemIsGroupHead
 
     //</editor-fold>
 }
