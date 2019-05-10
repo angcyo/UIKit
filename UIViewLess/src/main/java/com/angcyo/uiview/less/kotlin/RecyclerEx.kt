@@ -1,12 +1,6 @@
 package com.angcyo.uiview.less.kotlin
 
-import android.graphics.Canvas
-import android.graphics.Paint
-import android.graphics.Rect
-import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
-import android.view.View
+import android.support.v7.widget.*
 import com.angcyo.uiview.less.kotlin.dsl.DslRecyclerScroll
 import com.angcyo.uiview.less.recycler.DslItemDecoration
 import com.angcyo.uiview.less.recycler.RRecyclerView
@@ -87,4 +81,25 @@ public fun RecyclerView.dslItemDecoration(init: DslItemDecoration.() -> Unit) {
     addItemDecoration(DslItemDecoration().apply {
         init()
     })
+}
+
+
+/**
+ * 取消RecyclerView的默认动画
+ * */
+public fun RecyclerView.noItemAnim() {
+    itemAnimator = null
+}
+
+/**
+ * 取消默认的change动画
+ * */
+public fun RecyclerView.noItemChangeAnim() {
+    if (itemAnimator == null) {
+        itemAnimator = DefaultItemAnimator().apply {
+            supportsChangeAnimations = false
+        }
+    } else if (itemAnimator is SimpleItemAnimator) {
+        (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
+    }
 }
