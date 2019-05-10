@@ -162,7 +162,7 @@ open class HoverItemDecoration : RecyclerView.ItemDecoration() {
     /**下一个悬浮分割线的坐标.*/
     internal val nextDecorationRect = Rect()
     /**分割线的所在位置*/
-    internal var overAdapterPosition = RecyclerView.NO_POSITION
+    var overAdapterPosition = RecyclerView.NO_POSITION
 
     private var tempRect = Rect()
     /**

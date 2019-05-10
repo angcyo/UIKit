@@ -12,17 +12,23 @@ import com.angcyo.uiview.less.recycler.RBaseViewHolder
  */
 open class DslAdapter : RBaseAdapter<DslAdapterItem> {
 
+    var dslDateFilter: DslDateFilter? = null
+
     constructor() : super()
     constructor(context: Context?) : super(context)
     constructor(context: Context?, datas: MutableList<DslAdapterItem>?) : super(context, datas)
 
-    override fun getItemData(position: Int): DslAdapterItem {
-        return super.getItemData(position)
+    /**
+     * 没有过滤过的数据集合
+     * */
+    override fun getAllDatas(): MutableList<DslAdapterItem> {
+        return super.getAllDatas()
     }
 
-    override fun getItemCount(): Int {
-        return super.getItemCount()
-    }
+    /**
+     * 过滤后的数据集合
+     * */
+    fun getFilterDataList(): MutableList<DslAdapterItem> = dslDateFilter!!.filterDataList
 
     override fun getItemLayoutId(viewType: Int): Int {
         return viewType
@@ -38,4 +44,40 @@ open class DslAdapter : RBaseAdapter<DslAdapterItem> {
         }
     }
 
+    override fun getItemCount(): Int {
+        if (dslDateFilter != null) {
+            return getFilterDataList().size
+        }
+        return super.getItemCount()
+    }
+
+    override fun getItemData(position: Int): DslAdapterItem {
+        if (dslDateFilter != null) {
+            getFilterDataList()[position]
+        }
+        return super.getItemData(position)
+    }
+
+    override fun appendData(datas: MutableList<DslAdapterItem>) {
+        super.appendData(datas)
+    }
+
+    override fun resetData(datas: MutableList<DslAdapterItem>) {
+        super.resetData(datas)
+    }
+
+    override fun addLastItem(bean: DslAdapterItem?) {
+        super.addLastItem(bean)
+    }
+
+    override fun addLastItemSafe(bean: DslAdapterItem?) {
+        super.addLastItemSafe(bean)
+    }
+
+    /**
+     * 折叠这个分组
+     * */
+    fun foldItem(item: DslAdapterItem, folder: Boolean = true) {
+        dslDateFilter?.filterItem(item, folder)
+    }
 }
