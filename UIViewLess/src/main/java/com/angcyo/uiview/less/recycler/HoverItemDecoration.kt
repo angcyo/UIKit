@@ -437,6 +437,22 @@ open class HoverItemDecoration : RecyclerView.ItemDecoration() {
 
                 viewHolder.itemView.draw(canvas)
 
+                drawOverShadowDecoration.invoke(canvas, paint, viewHolder, overRect)
+
+                canvas.restore()
+            }
+
+        /**
+         * 绘制分割线下面的阴影, 或者其他而外的信息
+         * */
+        var drawOverShadowDecoration: (
+            canvas: Canvas,
+            paint: Paint,
+            viewHolder: RecyclerView.ViewHolder,
+            overRect: Rect
+        ) -> Unit =
+            { canvas, paint, viewHolder, overRect ->
+
                 if (overRect.top == 0) {
                     //分割线完全显示的情况下, 才绘制阴影
                     val shadowTop = overRect.bottom.toFloat()
@@ -461,8 +477,6 @@ open class HoverItemDecoration : RecyclerView.ItemDecoration() {
                         paint
                     )
                 }
-
-                canvas.restore()
             }
     }
 }
