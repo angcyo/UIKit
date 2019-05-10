@@ -13,10 +13,21 @@ import com.angcyo.uiview.less.recycler.RBaseViewHolder
 open class DslAdapter : RBaseAdapter<DslAdapterItem> {
 
     var dslDateFilter: DslDateFilter? = null
+        set(value) {
+            field = value
+            updateFilterDataList()
+        }
+
+    /**
+     * 缓存过滤后的数据源, 防止每次都计算
+     * */
+    val filterDataList = mutableListOf<DslAdapterItem>()
 
     constructor() : super()
     constructor(context: Context?) : super(context)
-    constructor(context: Context?, datas: MutableList<DslAdapterItem>?) : super(context, datas)
+    constructor(context: Context?, datas: MutableList<DslAdapterItem>?) : super(context, datas) {
+        updateFilterDataList()
+    }
 
     /**
      * 没有过滤过的数据集合
@@ -28,7 +39,12 @@ open class DslAdapter : RBaseAdapter<DslAdapterItem> {
     /**
      * 过滤后的数据集合
      * */
-    fun getFilterDataList(): MutableList<DslAdapterItem> = dslDateFilter!!.filterDataList
+    fun updateFilterDataList() {
+        filterDataList.clear()
+        dslDateFilter?.let {
+            filterDataList.addAll(it.filterDataList)
+        }
+    }
 
     override fun getItemLayoutId(viewType: Int): Int {
         return viewType
@@ -46,32 +62,36 @@ open class DslAdapter : RBaseAdapter<DslAdapterItem> {
 
     override fun getItemCount(): Int {
         if (dslDateFilter != null) {
-            return getFilterDataList().size
+            return filterDataList.size
         }
         return super.getItemCount()
     }
 
     override fun getItemData(position: Int): DslAdapterItem {
         if (dslDateFilter != null) {
-            getFilterDataList()[position]
+            filterDataList[position]
         }
         return super.getItemData(position)
     }
 
     override fun appendData(datas: MutableList<DslAdapterItem>) {
         super.appendData(datas)
+        updateFilterDataList()
     }
 
     override fun resetData(datas: MutableList<DslAdapterItem>) {
         super.resetData(datas)
+        updateFilterDataList()
     }
 
     override fun addLastItem(bean: DslAdapterItem?) {
         super.addLastItem(bean)
+        updateFilterDataList()
     }
 
     override fun addLastItemSafe(bean: DslAdapterItem?) {
         super.addLastItemSafe(bean)
+        updateFilterDataList()
     }
 
     /**
@@ -79,5 +99,6 @@ open class DslAdapter : RBaseAdapter<DslAdapterItem> {
      * */
     fun foldItem(item: DslAdapterItem, folder: Boolean = true) {
         dslDateFilter?.filterItem(item, folder)
+        updateFilterDataList()
     }
 }
