@@ -4,10 +4,7 @@ import android.app.Activity
 import android.graphics.*
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.view.MotionEvent
-import android.view.View
-import android.view.ViewGroup
-import android.view.Window
+import android.view.*
 import android.widget.FrameLayout
 import com.angcyo.uiview.less.kotlin.dp
 
@@ -298,7 +295,9 @@ open class HoverItemDecoration : RecyclerView.ItemDecoration() {
         var result = adapterPosition
         for (i in adapterPosition - 1 downTo 0) {
             if (i == 0) {
-                result = i
+                if (hoverCallback!!.isOverDecorationSame(adapter, adapterPosition, i)) {
+                    result = i
+                }
                 break
             } else if (!hoverCallback!!.isOverDecorationSame(adapter, adapterPosition, i)) {
                 result = i + 1
@@ -377,18 +376,50 @@ open class HoverItemDecoration : RecyclerView.ItemDecoration() {
             adapter.bindViewHolder(holder, overAdapterPosition)
 
             //测量view
-            holder.itemView.apply {
+            measureHoverView.invoke(recyclerView, holder.itemView)
+
+            holder
+        }
+
+        /**自定义layout的分割线, 不使用 adapter中的xml*/
+        val customDecorationOverView: (
+            recyclerView: RecyclerView,
+            adapter: RecyclerView.Adapter<RecyclerView.ViewHolder>,
+            overAdapterPosition: Int
+        ) -> RecyclerView.ViewHolder = { recyclerView, adapter, overAdapterPosition ->
+
+            //拿到分割线对应的itemType
+            val layoutType = decorationOverLayoutType.invoke(overAdapterPosition)
+
+            val itemView = LayoutInflater.from(recyclerView.context).inflate(layoutType, recyclerView, false)
+
+            val holder = RBaseViewHolder(itemView)
+
+            //注意这里的position
+            adapter.bindViewHolder(holder, overAdapterPosition)
+
+            //测量view
+            measureHoverView.invoke(recyclerView, holder.itemView)
+
+            holder
+        }
+
+        /**
+         * 测量 View, 确定宽高和绘制坐标
+         * */
+        var measureHoverView: (parent: RecyclerView, hoverView: View) -> Unit = { parent, hoverView ->
+            hoverView.apply {
                 val params = layoutParams
 
                 val widthSize: Int
                 val widthMode: Int
                 when (params.width) {
                     -1 -> {
-                        widthSize = recyclerView.measuredWidth
+                        widthSize = parent.measuredWidth
                         widthMode = View.MeasureSpec.EXACTLY
                     }
                     else -> {
-                        widthSize = recyclerView.measuredWidth
+                        widthSize = parent.measuredWidth
                         widthMode = View.MeasureSpec.AT_MOST
                     }
                 }
@@ -397,11 +428,11 @@ open class HoverItemDecoration : RecyclerView.ItemDecoration() {
                 val heightMode: Int
                 when (params.height) {
                     -1 -> {
-                        heightSize = recyclerView.measuredWidth
+                        heightSize = parent.measuredWidth
                         heightMode = View.MeasureSpec.EXACTLY
                     }
                     else -> {
-                        heightSize = recyclerView.measuredWidth
+                        heightSize = parent.measuredWidth
                         heightMode = View.MeasureSpec.AT_MOST
                     }
                 }
@@ -417,8 +448,6 @@ open class HoverItemDecoration : RecyclerView.ItemDecoration() {
                 //标准方法3
                 //draw(canvas)
             }
-
-            holder
         }
 
         /**
