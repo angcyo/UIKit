@@ -54,3 +54,14 @@ public fun BaseFragment.normalDialog(config: NormalDialogConfig.() -> Unit) {
         dialogConfig
     ).showCompatDialog()
 }
+
+public fun BaseFragment.normalIosDialog(config: IosDialogConfig.() -> Unit) {
+    val dialogConfig = IosDialogConfig()
+    dialogConfig.config()
+
+    configDialogBuilder(
+        RDialog.build(activity)
+            .setDialogWidth(-1),
+        dialogConfig
+    ).showCompatDialog()
+}
