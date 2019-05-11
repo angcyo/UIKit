@@ -19,7 +19,7 @@ import com.angcyo.uiview.less.kotlin.find
 object TopToast {
     private var toast: Toast? = null
 
-    fun show(tipText: CharSequence, tipImageResId: Int) {
+    fun show(tipText: CharSequence, tipImageResId: Int = -1) {
         show(RApplication.getApp(), tipText, tipImageResId)
     }
 

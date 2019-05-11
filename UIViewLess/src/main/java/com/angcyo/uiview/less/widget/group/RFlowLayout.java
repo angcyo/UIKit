@@ -49,6 +49,12 @@ public class RFlowLayout extends LinearLayout {
     boolean itemEquWidth = false;
 
     /**
+     * item之间, 横竖向间隔.
+     */
+    int itemHorizontalSpace = 0;
+    int itemVerticalSpace = 0;
+
+    /**
      * Instantiates a new Flow radio group.
      *
      * @param context the context
@@ -69,6 +75,8 @@ public class RFlowLayout extends LinearLayout {
         TypedArray array = context.obtainStyledAttributes(attrs, R.styleable.RFlowLayout);
         maxCountLine = array.getInt(R.styleable.RFlowLayout_r_flow_max_line_child_count, maxCountLine);
         itemEquWidth = array.getBoolean(R.styleable.RFlowLayout_r_flow_equ_width, itemEquWidth);
+        itemHorizontalSpace = array.getDimensionPixelOffset(R.styleable.RFlowLayout_r_flow_item_horizontal_space, itemHorizontalSpace);
+        itemVerticalSpace = array.getDimensionPixelOffset(R.styleable.RFlowLayout_r_flow_item_vertical_space, itemVerticalSpace);
         array.recycle();
 
         init();
@@ -80,7 +88,7 @@ public class RFlowLayout extends LinearLayout {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        if (isInEditMode() || getChildCount() == 0) {
+        if (getChildCount() == 0) {
             super.onMeasure(widthMeasureSpec, heightMeasureSpec);
             return;
         }
@@ -126,7 +134,7 @@ public class RFlowLayout extends LinearLayout {
                 }
 
                 width = Math.max(width, lineWidth);
-                height += lineHeight;
+                height += lineHeight + itemVerticalSpace;
                 mLineHeight.add(lineHeight);
                 mAllViews.add(lineViews);
 
@@ -134,7 +142,7 @@ public class RFlowLayout extends LinearLayout {
                 lineHeight = childHeight;
                 lineViews = new ArrayList<>();
             } else {
-                lineWidth += childWidth;
+                lineWidth += childWidth + itemHorizontalSpace;
                 lineHeight = Math.max(childHeight, lineHeight);
             }
             lineViews.add(child);
@@ -162,7 +170,7 @@ public class RFlowLayout extends LinearLayout {
      * 等宽并且maxCountLine>0 的时候, 计算 每个child的需要的宽度, margin 属性, 将使用每一行的第一个child
      */
     private int measureEquChildWidth(List<View> lineViews, int viewWidth) {
-        int consumeWidth = getPaddingLeft() + getPaddingRight();
+        int consumeWidth = getPaddingLeft() + getPaddingRight() + itemHorizontalSpace * Math.max(maxCountLine - 1, 0);
         View firstChild = lineViews.get(0);
         LayoutParams lineViewParams = (LayoutParams) firstChild.getLayoutParams();
 
@@ -189,7 +197,7 @@ public class RFlowLayout extends LinearLayout {
             //等宽并且平分, 当lineViewSize没有达到maxCountLine数量时, 需要考虑计算方式.
             lineChildWidth = measureEquChildWidth(lineViews, viewWidth);
         } else {
-            int consumeWidth = getPaddingLeft() + getPaddingRight();
+            int consumeWidth = getPaddingLeft() + getPaddingRight() + itemHorizontalSpace * Math.max(maxCountLine - 1, 0);
             for (int j = 0; j < lineViewSize; j++) {
                 View lineView = lineViews.get(j);
                 LayoutParams lineViewParams = (LayoutParams) lineView.getLayoutParams();
@@ -208,6 +216,11 @@ public class RFlowLayout extends LinearLayout {
 
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
+        if (getChildCount() == 0) {
+            super.onLayout(changed, l, t, r, b);
+            return;
+        }
+
         int top = getPaddingTop();//开始布局子view的 top距离
         int left = getPaddingLeft();//开始布局子view的 left距离
 
@@ -231,11 +244,11 @@ public class RFlowLayout extends LinearLayout {
                 int bd = td + child.getMeasuredHeight();//不需要加上 params.bottomMargin, 因为在 onMeasure , 中已经加在了 lineHeight 中
                 child.layout(ld, td, rd, bd);
 
-                left += child.getMeasuredWidth() + params.leftMargin + params.rightMargin;//因为在 这里添加了;
+                left += child.getMeasuredWidth() + params.leftMargin + params.rightMargin + itemHorizontalSpace;//因为在 这里添加了;
             }
 
             left = getPaddingLeft();
-            top += lineHeight;
+            top += lineHeight + itemVerticalSpace;
         }
     }
 
