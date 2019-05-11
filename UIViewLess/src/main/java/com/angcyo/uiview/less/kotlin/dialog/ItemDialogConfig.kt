@@ -19,11 +19,6 @@ import com.angcyo.uiview.less.recycler.RBaseViewHolder
 
 open class ItemDialogConfig : BaseDialogConfig() {
 
-    init {
-        positiveButtonText = null
-        negativeButtonText = null
-    }
-
     /**
      * 需要填充的item数据集合
      * */
@@ -31,12 +26,15 @@ open class ItemDialogConfig : BaseDialogConfig() {
 
     override var dialogLayoutId: Int = R.layout.dialog_items_layout
 
+    /**
+     * 填充的item 布局资源
+     * */
     var dialogItemLayoutId = R.layout.dialog_item_text_layout
 
     /**
      * 返回 true, 不会自动调用 dismiss
      * */
-    var onItemClick: (dialog: Dialog, index: Int, item: Any) -> Boolean = { _, _, _ ->
+    open var onItemClick: (dialog: Dialog, index: Int, item: Any) -> Boolean = { _, _, _ ->
         false
     }
 
@@ -87,6 +85,23 @@ open class ItemDialogConfig : BaseDialogConfig() {
     override fun onDialogInit(dialog: Dialog, dialogViewHolder: RBaseViewHolder) {
         super.onDialogInit(dialog, dialogViewHolder)
 
+        inflateItems(dialog, dialogViewHolder)
+
+        initBottomCancelLayout.invoke(dialog, dialogViewHolder)
+    }
+
+    override fun initControlLayout(dialog: Dialog, dialogViewHolder: RBaseViewHolder) {
+        super.initControlLayout(dialog, dialogViewHolder)
+
+        //默认item dialog 不显示标题栏上的 确定/取消 按钮
+        dialogViewHolder.tv(R.id.positive_button)?.visibility = View.GONE
+        dialogViewHolder.tv(R.id.negative_button)?.visibility = View.GONE
+    }
+
+    /**
+     * 填充items
+     * */
+    open fun inflateItems(dialog: Dialog, dialogViewHolder: RBaseViewHolder) {
         dialogViewHolder.group(R.id.item_wrap_layout).apply {
             val layoutInflater = LayoutInflater.from(context)
 
@@ -94,7 +109,5 @@ open class ItemDialogConfig : BaseDialogConfig() {
                 addView(createDialogItemView.invoke(dialog, this, layoutInflater, i, items[i]))
             }
         }
-
-        initBottomCancelLayout.invoke(dialog, dialogViewHolder)
     }
 }

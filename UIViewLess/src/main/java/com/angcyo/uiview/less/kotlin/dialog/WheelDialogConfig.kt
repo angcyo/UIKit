@@ -34,9 +34,9 @@ open class WheelDialogConfig : BaseDialogConfig() {
     override var dialogLayoutId: Int = R.layout.dialog_wheel_single_layout
 
     /**
-     * 选择回调
+     * 选择回调, 返回 true, 则不会自动 调用 dismiss
      * */
-    var onWheelItemSelector: (dialog: Dialog, index: Int, item: Any) -> Unit = { _, _, _ -> }
+    var onWheelItemSelector: (dialog: Dialog, index: Int, item: Any) -> Boolean = { _, _, _ -> false }
 
     var convertItemToString: (item: Any) -> CharSequence =
 
@@ -52,8 +52,10 @@ open class WheelDialogConfig : BaseDialogConfig() {
 
     init {
         positiveButtonListener = { dialog, _ ->
-            dialog.dismiss()
-            onWheelItemSelector.invoke(dialog, selectorIndex, wheelItems[selectorIndex])
+            if (onWheelItemSelector.invoke(dialog, selectorIndex, wheelItems[selectorIndex])) {
+            } else {
+                dialog.dismiss()
+            }
         }
     }
 

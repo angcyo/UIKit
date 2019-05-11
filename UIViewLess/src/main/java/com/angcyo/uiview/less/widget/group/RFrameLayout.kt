@@ -104,7 +104,7 @@ open class RFrameLayout(context: Context, attributeSet: AttributeSet? = null) : 
 
         rBackgroundDrawable = typedArray.getDrawable(R.styleable.RFrameLayout_r_background)
         resetMaxHeight(typedArray.getDimension(R.styleable.RFrameLayout_r_max_height, 0f))
-        //maxHeight = typedArray.getDimension(R.styleable.RFrameLayout_r_max_height, maxHeight)
+        maxHeight = typedArray.getDimension(R.styleable.RFrameLayout_r_max_height, maxHeight.toFloat()).toInt()
 
         mDrawLine = RDrawLine(this, attributeSet)
 
@@ -116,7 +116,7 @@ open class RFrameLayout(context: Context, attributeSet: AttributeSet? = null) : 
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        if (maxHeight > 0) run {
+        if (maxHeight > 0) {
             val heightMode = MeasureSpec.getMode(heightMeasureSpec)
             super.onMeasure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(maxHeight, MeasureSpec.AT_MOST))
             val measuredHeight = measuredHeight

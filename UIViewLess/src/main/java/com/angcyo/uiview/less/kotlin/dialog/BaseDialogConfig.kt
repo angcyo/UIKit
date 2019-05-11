@@ -98,6 +98,10 @@ abstract class BaseDialogConfig {
             text = dialogMessage
         }
 
+        initControlLayout(dialog, dialogViewHolder)
+    }
+
+    open fun initControlLayout(dialog: Dialog, dialogViewHolder: RBaseViewHolder) {
         //确定按钮
         dialogViewHolder.tv(R.id.positive_button)?.apply {
             visibility = if (positiveButtonText == null) View.GONE else View.VISIBLE
@@ -136,6 +140,7 @@ abstract class BaseDialogConfig {
             dialogViewHolder.tv(R.id.control_layout)?.visibility = View.GONE
         }
     }
+
 
     /**
      * 可以设置的监听回调

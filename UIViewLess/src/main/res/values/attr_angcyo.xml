@@ -409,4 +409,10 @@
         <attr name="r_time" format="string"/>
         <attr name="r_show_shot_time" format="boolean"/>
     </declare-styleable>
+
+    <declare-styleable name="RNestedScrollView">
+        <attr name="r_max_height"/>
+        <attr name="r_width_height_ratio"/>
+        <attr name="r_is_aeq_width"/>
+    </declare-styleable>
 </resources>

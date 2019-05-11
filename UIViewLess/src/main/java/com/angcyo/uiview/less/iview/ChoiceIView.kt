@@ -154,7 +154,7 @@ open class ChoiceIView(val viewGroup: ViewGroup, val choiceMode: Int = CHOICE_MO
         }
     }
 
-    fun getSelectedIndexs(): List<Int> {
+    fun getSelectedIndexs(): MutableList<Int> {
         val result = mutableListOf<Int>()
         viewGroup.childs { index, childView ->
             if (childView.isSelected) {
