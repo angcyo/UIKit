@@ -8,5 +8,8 @@ package com.angcyo.uiview.less.kotlin.dialog
  * Copyright (c) 2019 ShenZhen O&M Cloud Co., Ltd. All rights reserved.
  */
 
-open class MenuDialogConfig : BaseDialogConfig() {
+open class MenuDialogConfig : ItemDialogConfig() {
+    init {
+        showBottomCancelLayout = false
+    }
 }

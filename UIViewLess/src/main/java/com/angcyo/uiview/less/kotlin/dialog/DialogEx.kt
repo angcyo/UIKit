@@ -77,3 +77,23 @@ public fun BaseFragment.itemsDialog(config: ItemDialogConfig.() -> Unit) {
         dialogConfig
     ).showCompatDialog()
 }
+
+public fun BaseFragment.menuDialog(config: MenuDialogConfig.() -> Unit) {
+    val dialogConfig = MenuDialogConfig()
+    dialogConfig.config()
+
+    configDialogBuilder(
+        buildBottomDialog(),
+        dialogConfig
+    ).showCompatDialog()
+}
+
+public fun BaseFragment.wheelDialog(config: WheelDialogConfig.() -> Unit) {
+    val dialogConfig = WheelDialogConfig()
+    dialogConfig.config()
+
+    configDialogBuilder(
+        buildBottomDialog(),
+        dialogConfig
+    ).showCompatDialog()
+}
