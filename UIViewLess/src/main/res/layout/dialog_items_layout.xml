@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:background="@drawable/base_white_top_round_bg"
+        android:orientation="vertical"
+        android:layout_height="wrap_content">
+
+    <include android:id="@+id/title_layout"
+             layout="@layout/dialog_base_title_layout"/>
+
+    <LinearLayout
+            android:id="@+id/item_wrap_layout"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:divider="@drawable/base_shape_line_px"
+            android:showDividers="beginning|middle"
+            android:layout_height="wrap_content"/>
+
+    <View
+            android:id="@+id/cancel_layout_line"
+            android:layout_width="match_parent"
+            android:layout_height="4dp"
+            android:background="#E7E7ED"/>
+
+    <include
+            android:id="@+id/cancel_layout"
+            layout="@layout/dialog_item_text_layout"/>
+
+</LinearLayout>

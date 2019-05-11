@@ -37,6 +37,7 @@ abstract class BaseDialogConfig {
      * */
     var neutralButtonText: CharSequence? = null
     var neutralButtonListener: (dialog: Dialog, dialogViewHolder: RBaseViewHolder) -> Unit = { _, _ -> }
+
     open fun neutralButton(
         text: CharSequence? = neutralButtonText,
         listener: (dialog: Dialog, dialogViewHolder: RBaseViewHolder) -> Unit
@@ -65,7 +66,7 @@ abstract class BaseDialogConfig {
      * */
     var positiveButtonText: CharSequence? = "确定"
     var positiveButtonListener: (dialog: Dialog, dialogViewHolder: RBaseViewHolder) -> Unit =
-        { dialog, _ -> dialog.cancel() }
+        { dialog, _ -> dialog.dismiss() }
 
     open fun positiveButton(
         text: CharSequence? = positiveButtonText,
@@ -75,6 +76,10 @@ abstract class BaseDialogConfig {
         positiveButtonListener = listener
     }
 
+    /**
+     * 初始化回调方法
+     * */
+    var dialogInit: (dialog: Dialog, dialogViewHolder: RBaseViewHolder) -> Unit = { _, _ -> }
 
     /**
      * 对话框初始化方法
@@ -123,6 +128,7 @@ abstract class BaseDialogConfig {
             }
         }
 
+        //3个按钮都没有文本, 隐藏底部控制栏
         if (positiveButtonText == null &&
             negativeButtonText == null &&
             neutralButtonText == null
@@ -130,6 +136,12 @@ abstract class BaseDialogConfig {
             dialogViewHolder.tv(R.id.control_layout)?.visibility = View.GONE
         }
     }
+
+    /**
+     * 可以设置的监听回调
+     * */
+    var onDialogCancel: (dialog: Dialog) -> Unit = {}
+    var onDialogDismiss: (dialog: Dialog) -> Unit = {}
 
     /**
      * 当调用dialog.cancel时, 此方法会回调, 并且 onDialogDismiss 也会回调
