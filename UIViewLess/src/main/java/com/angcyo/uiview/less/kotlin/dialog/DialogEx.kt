@@ -4,6 +4,8 @@ import android.app.Dialog
 import android.graphics.Color
 import android.view.Gravity
 import com.angcyo.uiview.less.base.BaseFragment
+import com.angcyo.uiview.less.iview.ChoiceIView
+import com.angcyo.uiview.less.kotlin.dpi
 import com.angcyo.uiview.less.recycler.RBaseViewHolder
 import com.angcyo.uiview.less.utils.RDialog
 
@@ -68,6 +70,9 @@ public fun BaseFragment.normalIosDialog(config: IosDialogConfig.() -> Unit) {
     ).showCompatDialog()
 }
 
+/**
+ * 多选项, 选择对话框, 底部带 取消按钮, 标题栏不带取消
+ * */
 public fun BaseFragment.itemsDialog(config: ItemDialogConfig.() -> Unit) {
     val dialogConfig = ItemDialogConfig()
     dialogConfig.config()
@@ -78,6 +83,9 @@ public fun BaseFragment.itemsDialog(config: ItemDialogConfig.() -> Unit) {
     ).showCompatDialog()
 }
 
+/**
+ * 多选项, 菜单对话框, 底部不带取消按钮, 标题栏不带取消
+ * */
 public fun BaseFragment.menuDialog(config: MenuDialogConfig.() -> Unit) {
     val dialogConfig = MenuDialogConfig()
     dialogConfig.config()
@@ -88,8 +96,74 @@ public fun BaseFragment.menuDialog(config: MenuDialogConfig.() -> Unit) {
     ).showCompatDialog()
 }
 
+/**
+ * 单选对话框, 底部不带取消按钮, 标题栏带取消和确定
+ * */
+public fun BaseFragment.singleChoiceDialog(config: MenuDialogConfig.() -> Unit) {
+    val dialogConfig = MenuDialogConfig()
+    dialogConfig.choiceModel = ChoiceIView.CHOICE_MODE_SINGLE
+    dialogConfig.dialogCancel = false
+    dialogConfig.dialogCanceledOnTouchOutside = false
+    dialogConfig.config()
+
+    configDialogBuilder(
+        buildBottomDialog(),
+        dialogConfig
+    ).showCompatDialog()
+}
+
+/**
+ * 多选对话框, 底部不带取消按钮, 标题栏带取消和确定
+ * */
+public fun BaseFragment.multiChoiceDialog(config: MenuDialogConfig.() -> Unit) {
+    val dialogConfig = MenuDialogConfig()
+    dialogConfig.choiceModel = ChoiceIView.CHOICE_MODE_MULTI
+    dialogConfig.dialogCancel = false
+    dialogConfig.dialogCanceledOnTouchOutside = false
+    dialogConfig.config()
+
+    configDialogBuilder(
+        buildBottomDialog(),
+        dialogConfig
+    ).showCompatDialog()
+}
+
+
+/**
+ * 3D滚轮选择对话框, 标题栏带取消和确定
+ * */
 public fun BaseFragment.wheelDialog(config: WheelDialogConfig.() -> Unit) {
     val dialogConfig = WheelDialogConfig()
+    dialogConfig.config()
+
+    configDialogBuilder(
+        buildBottomDialog(),
+        dialogConfig
+    ).showCompatDialog()
+}
+
+
+/**
+ * 文本输入对话框, 默认是单行, 无限制
+ * */
+public fun BaseFragment.inputDialog(config: InputDialogConfig.() -> Unit) {
+    val dialogConfig = InputDialogConfig()
+    dialogConfig.dialogCancel = false
+    dialogConfig.dialogCanceledOnTouchOutside = false
+    dialogConfig.config()
+
+    configDialogBuilder(
+        buildBottomDialog(),
+        dialogConfig
+    ).showCompatDialog()
+}
+
+public fun BaseFragment.multiInputDialog(config: InputDialogConfig.() -> Unit) {
+    val dialogConfig = InputDialogConfig()
+    dialogConfig.dialogCancel = false
+    dialogConfig.dialogCanceledOnTouchOutside = false
+    dialogConfig.maxInputLength = 2000
+    dialogConfig.inputViewHeight = 100 * dpi
     dialogConfig.config()
 
     configDialogBuilder(
