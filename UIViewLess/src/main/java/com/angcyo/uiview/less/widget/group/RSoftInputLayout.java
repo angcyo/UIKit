@@ -4,14 +4,13 @@ import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Rect;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.WindowInsets;
+import android.view.*;
 import android.view.animation.DecelerateInterpolator;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
@@ -19,6 +18,7 @@ import android.widget.FrameLayout;
 import com.angcyo.lib.L;
 import com.angcyo.uiview.less.RApplication;
 import com.angcyo.uiview.less.iview.ILifecycle;
+import com.angcyo.uiview.less.utils.RUtils;
 import com.angcyo.uiview.less.utils.ScreenUtil;
 import com.orhanobut.hawk.Hawk;
 
@@ -416,7 +416,7 @@ public class RSoftInputLayout extends FrameLayout implements ILifecycle {
         boolean result = false;
         if (getFitsSystemWindows()) {
             result = super.fitSystemWindows(insets);
-            checkOnSizeChanged();
+            checkOnSizeChanged(false);
         } else {
             insets.set(0, 0, 0, 0);
         }
@@ -442,7 +442,7 @@ public class RSoftInputLayout extends FrameLayout implements ILifecycle {
     public boolean isSoftKeyboardShow() {
         int screenHeight = getScreenHeightPixels();
         int keyboardHeight = getSoftKeyboardHeight();
-        return screenHeight != keyboardHeight && keyboardHeight > 50 * ScreenUtil.density();
+        return screenHeight != keyboardHeight && keyboardHeight > 50 * RUtils.density();
     }
 
     /**
@@ -484,14 +484,18 @@ public class RSoftInputLayout extends FrameLayout implements ILifecycle {
             if (isAnimToShow) {
                 animToShow(height, oldHeight);
             } else {
-                checkOnSizeChanged();
+                checkOnSizeChanged(true);
             }
         }
     }
 
-    private void checkOnSizeChanged() {
+    private void checkOnSizeChanged(boolean delay) {
         removeCallbacks(mCheckSizeChanged);
-        post(mCheckSizeChanged);
+        if (delay) {
+            post(mCheckSizeChanged);
+        } else {
+            mCheckSizeChanged.run();
+        }
     }
 
     private void animToShow(int height, int oldHeight) {
@@ -518,7 +522,7 @@ public class RSoftInputLayout extends FrameLayout implements ILifecycle {
             public void onAnimationEnd(Animator animation) {
                 mValueAnimator = null;
                 animShowEmojiHeight = -1;
-                checkOnSizeChanged();
+                checkOnSizeChanged(true);
             }
 
             @Override
@@ -569,6 +573,15 @@ public class RSoftInputLayout extends FrameLayout implements ILifecycle {
 
     public void addOnEmojiLayoutChangeListener(OnEmojiLayoutChangeListener listener) {
         mEmojiLayoutChangeListeners.add(listener);
+
+        if (getContext() instanceof Activity) {
+            Window window = ((Activity) getContext()).getWindow();
+            int softInputMode = window.getAttributes().softInputMode;
+            if ((softInputMode & WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
+                    != WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE) {
+                window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+            }
+        }
     }
 
     public void removeOnEmojiLayoutChangeListener(OnEmojiLayoutChangeListener listener) {
