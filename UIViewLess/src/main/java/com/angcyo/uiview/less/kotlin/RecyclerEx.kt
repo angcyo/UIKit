@@ -1,8 +1,10 @@
 package com.angcyo.uiview.less.kotlin
 
 import android.support.v7.widget.*
+import android.view.View
 import com.angcyo.uiview.less.kotlin.dsl.DslRecyclerScroll
 import com.angcyo.uiview.less.recycler.DslItemDecoration
+import com.angcyo.uiview.less.recycler.RBaseViewHolder
 import com.angcyo.uiview.less.recycler.RRecyclerView
 import com.angcyo.uiview.less.recycler.adapter.DslAdapter
 import com.angcyo.uiview.less.recycler.adapter.DslAdapterItem
@@ -101,5 +103,85 @@ public fun RecyclerView.noItemChangeAnim() {
         }
     } else if (itemAnimator is SimpleItemAnimator) {
         (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
+    }
+}
+
+public fun RecyclerView.eachChildViewHolder(
+    targetView: View? = null,/*指定目标, 则只回调目标前后的ViewHolder*/
+    callback: (
+        beforeViewHolder: RecyclerView.ViewHolder?,
+        viewHolder: RecyclerView.ViewHolder,
+        afterViewHolder: RecyclerView.ViewHolder?
+    ) -> Unit
+) {
+
+    val childCount = childCount
+    for (i in 0 until childCount) {
+        val child = getChildAt(i)
+        val childViewHolder = findContainingViewHolder(child)
+
+        childViewHolder?.let {
+
+            //前一个child
+            var beforeViewHolder: RecyclerView.ViewHolder? = null
+            //后一个child
+            var afterViewHolder: RecyclerView.ViewHolder? = null
+
+            if (i >= 1) {
+                beforeViewHolder = findContainingViewHolder(getChildAt(i - 1))
+            }
+            if (i < childCount - 1) {
+                afterViewHolder = findContainingViewHolder(getChildAt(i + 1))
+            }
+
+            if (targetView != null) {
+                if (targetView == child) {
+                    callback.invoke(beforeViewHolder, it as RBaseViewHolder, afterViewHolder)
+                    return
+                }
+            } else {
+                callback.invoke(beforeViewHolder, it as RBaseViewHolder, afterViewHolder)
+            }
+        }
+    }
+}
+
+public fun RecyclerView.eachChildRViewHolder(
+    targetView: View? = null,/*指定目标, 则只回调目标前后的ViewHolder*/
+    callback: (
+        beforeViewHolder: RBaseViewHolder?,
+        viewHolder: RBaseViewHolder,
+        afterViewHolder: RBaseViewHolder?
+    ) -> Unit
+) {
+
+    val childCount = childCount
+    for (i in 0 until childCount) {
+        val child = getChildAt(i)
+        val childViewHolder = findContainingViewHolder(child)
+
+        childViewHolder?.let {
+
+            //前一个child
+            var beforeViewHolder: RBaseViewHolder? = null
+            //后一个child
+            var afterViewHolder: RBaseViewHolder? = null
+
+            if (i >= 1) {
+                beforeViewHolder = findContainingViewHolder(getChildAt(i - 1)) as RBaseViewHolder?
+            }
+            if (i < childCount - 1) {
+                afterViewHolder = findContainingViewHolder(getChildAt(i + 1)) as RBaseViewHolder?
+            }
+
+            if (targetView != null) {
+                if (targetView == child) {
+                    callback.invoke(beforeViewHolder, it as RBaseViewHolder, afterViewHolder)
+                    return
+                }
+            } else {
+                callback.invoke(beforeViewHolder, it as RBaseViewHolder, afterViewHolder)
+            }
+        }
     }
 }
