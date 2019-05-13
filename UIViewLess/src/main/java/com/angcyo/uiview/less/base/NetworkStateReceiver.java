@@ -51,6 +51,7 @@ public class NetworkStateReceiver extends BroadcastReceiver {
                 @Override
                 public void onAvailable(Network network) {
                     super.onAvailable(network);
+                    //会走 onLinkPropertiesChanged 方法
                     L.w("NetworkStateReceiver: onAvailable([network]) 网络已连接 -> " + network);
                     sNetworkWrapper.network = network;
 
