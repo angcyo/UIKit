@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import com.angcyo.lib.L;
+import com.angcyo.uiview.less.base.BaseAppCompatActivity;
 import com.angcyo.uiview.less.kotlin.ExKt;
 
 import java.util.List;
@@ -99,6 +100,9 @@ public class ActivityHelper {
                         .setSystemUiVisibility(
                                 systemUiVisibility & ~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
             }
+        }
+        if (activity instanceof BaseAppCompatActivity) {
+            ((BaseAppCompatActivity) activity).checkLightStatusBar(light);
         }
     }
 

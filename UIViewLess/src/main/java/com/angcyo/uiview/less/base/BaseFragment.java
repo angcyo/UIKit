@@ -46,10 +46,11 @@ public abstract class BaseFragment extends AbsLifeCycleFragment {
                 if (subscription instanceof SafeSubscriber) {
                     if (((SafeSubscriber) subscription).getActual() instanceof HttpSubscriber) {
                         ((SafeSubscriber) subscription).getActual().onError(new NonetException());
+                        ((SafeSubscriber) subscription).getActual().unsubscribe();
                     }
                 }
             } catch (Exception e) {
-
+                e.printStackTrace();
             }
         }
     }

@@ -321,6 +321,13 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
         this.fragmentSwipeBackLayout = fragmentSwipeBackLayout;
     }
 
+    public void checkLightStatusBar(boolean lightStatusBar) {
+        if (fragmentSwipeBackLayout != null &&
+                Build.VERSION.SDK_INT == Build.VERSION_CODES.LOLLIPOP) {
+            fragmentSwipeBackLayout.setDimStatusBar(lightStatusBar);
+        }
+    }
+
     @Override
     protected void onPostCreate(@Nullable Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);

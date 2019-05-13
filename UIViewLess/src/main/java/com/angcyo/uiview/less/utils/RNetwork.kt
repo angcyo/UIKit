@@ -210,8 +210,19 @@ object RNetwork {
         return booleanArrayOf(isWifiConn, isMobileConn)
     }
 
+    /** wifi连接 */
     fun isWifi(context: Context): Boolean {
         return checkState(context)[0]
+    }
+
+    /** mobile连接*/
+    fun isMobile(context: Context): Boolean {
+        return checkState(context)[1]
+    }
+
+    /** 有网络*/
+    fun isConnect(context: Context): Boolean {
+        return checkState(context)[0] || checkState(context)[1]
     }
 }
 
