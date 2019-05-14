@@ -394,7 +394,7 @@ open class GlideImageView(context: Context, attributeSet: AttributeSet? = null) 
                 isFirstResource: Boolean
             ): Boolean {
                 L.d("onResourceReady -> \n$model\n$url")
-                loadSuccessUrl = url!!
+                onLoadSuccess()
                 return false
             }
 
@@ -405,7 +405,7 @@ open class GlideImageView(context: Context, attributeSet: AttributeSet? = null) 
                 isFirstResource: Boolean
             ): Boolean {
                 L.d("onLoadFailed -> $url")
-                loadSuccessUrl = ""
+                onLoadFailed()
                 return false
             }
         })
@@ -425,6 +425,21 @@ open class GlideImageView(context: Context, attributeSet: AttributeSet? = null) 
                 tag as String
             }
         }
+
+    open fun onLoadSuccess() {
+        loadSuccessUrl = url!!
+    }
+
+    open fun onLoadFailed() {
+        loadSuccessUrl = ""
+        showPlaceholderDrawable()
+    }
+
+    fun showPlaceholderDrawable() {
+        if (!noPlaceholderDrawable && placeholderDrawable != null) {
+            setImageDrawable(placeholderDrawable)
+        }
+    }
 
     fun setTagUrl(url: String?) {
         if (url == null) {

@@ -170,24 +170,28 @@ public class FlatImageView extends GlideImageView {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        Drawable drawable = getDrawable();
-        if (drawable == null) {
-            mOverScroller.abortAnimation();
-            return;
-        }
+        if (startFlat && isReady()) {
+            Drawable drawable = getDrawable();
+            if (drawable == null || drawable == getPlaceholderDrawable()) {
+                mOverScroller.abortAnimation();
+                super.onDraw(canvas);
+                return;
+            }
 
-        canvas.save();
-        canvas.translate(mOverScroller.getCurrX(), mOverScroller.getCurrY());
-        drawable.setBounds(0, 0,
-                drawableWidth(), drawableHeight());
+            canvas.save();
+            canvas.translate(mOverScroller.getCurrX(), mOverScroller.getCurrY());
+            drawable.setBounds(0, 0,
+                    drawableWidth(), drawableHeight());
 //        canvas.translate(200, 200);
-//        super.onDraw(canvas);
+            super.onDraw(canvas);
+//            drawable.draw(canvas);
+            canvas.restore();
 
-        drawable.draw(canvas);
-        canvas.restore();
-
-        drawScrollX = mOverScroller.getCurrX();
-        drawScrollY = mOverScroller.getCurrY();
+            drawScrollX = mOverScroller.getCurrX();
+            drawScrollY = mOverScroller.getCurrY();
+        } else {
+            super.onDraw(canvas);
+        }
     }
 
     public void startFlat(boolean startFlat) {
@@ -199,5 +203,12 @@ public class FlatImageView extends GlideImageView {
 
     private boolean isReady() {
         return getDrawable() != null && getMeasuredHeight() > 0 && getMeasuredWidth() > 0;
+    }
+
+    @Override
+    public void onLoadFailed() {
+        //super.onLoadFailed();
+        showPlaceholderDrawable();
+        setLoadSuccessUrl(getUrl());
     }
 }
