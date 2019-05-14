@@ -208,8 +208,9 @@ public class RFlowLayout extends LinearLayout {
 
         for (int j = 0; j < lineViewSize; j++) {
             View lineView = lineViews.get(j);
-            lineView.measure(MeasureSpec.makeMeasureSpec(lineChildWidth, MeasureSpec.EXACTLY), heightMeasureSpec);
-            lineView.getMeasuredWidth();
+            LayoutParams lineViewParams = (LayoutParams) lineView.getLayoutParams();
+            lineView.measure(MeasureSpec.makeMeasureSpec(lineChildWidth, MeasureSpec.EXACTLY),
+                    getChildMeasureSpec(heightMeasureSpec, 0, lineViewParams.height));
         }
         return lineChildWidth;
     }
