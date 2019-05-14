@@ -206,6 +206,12 @@ public class FlatImageView extends GlideImageView {
     }
 
     @Override
+    public void onLoadSuccess() {
+        super.onLoadSuccess();
+        startFlat(true);
+    }
+
+    @Override
     public void onLoadFailed() {
         //super.onLoadFailed();
         showPlaceholderDrawable();

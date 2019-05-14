@@ -210,11 +210,11 @@ public fun ViewGroup.resetChild(
 }
 
 public fun <T> ViewGroup.resetChild(
-    list: List<T>,
+    list: List<T>?,
     childLayoutId: Int,
     init: (view: View, data: T?, index: Int) -> Unit = { _, _, _ -> }
 ) {
-    resetChild(list.size, list, object : OnAddViewCallback<T>() {
+    resetChild(list?.size ?: 0, list, object : OnAddViewCallback<T>() {
         override fun getLayoutId(): Int = childLayoutId
 
         override fun onInitView(view: View, data: T?, index: Int) {

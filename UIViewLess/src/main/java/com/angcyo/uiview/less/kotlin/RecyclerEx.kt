@@ -45,7 +45,7 @@ public fun DslAdapter.renderItem(count: Int = 1, init: DslAdapterItem.(index: In
     }
 }
 
-public fun DslAdapter.renderItem(list: List<Any>, init: DslAdapterItem.(index: Int, data: Any) -> Unit) {
+public fun <T> DslAdapter.renderItem(list: List<T>, init: DslAdapterItem.(index: Int, data: T) -> Unit) {
     list.forEachIndexed { index, any ->
         val adapterItem = DslAdapterItem()
         adapterItem.itemData = any
