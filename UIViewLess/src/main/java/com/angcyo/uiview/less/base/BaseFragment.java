@@ -15,6 +15,7 @@ import com.angcyo.http.HttpSubscriber;
 import com.angcyo.http.NonetException;
 import com.angcyo.uiview.less.base.helper.FragmentHelper;
 import com.angcyo.uiview.less.recycler.RBaseViewHolder;
+import com.angcyo.uiview.less.utils.RUtils;
 import com.angcyo.uiview.less.widget.group.RSoftInputLayout;
 import rx.Subscription;
 import rx.observers.SafeSubscriber;
@@ -27,7 +28,8 @@ import rx.subscriptions.CompositeSubscription;
  */
 public abstract class BaseFragment extends AbsLifeCycleFragment {
 
-    protected CompositeSubscription mSubscriptions;
+
+    protected CompositeSubscription mSubscriptions = new CompositeSubscription();
 
     public static void addSubscription(CompositeSubscription subscriptions, Subscription subscription,
                                        boolean checkToken, Runnable onCancel) {
@@ -37,8 +39,8 @@ public abstract class BaseFragment extends AbsLifeCycleFragment {
         if (subscriptions != null) {
             subscriptions.add(subscription);
         }
-        if (NetworkStateReceiver.getNetType().value() < 2) {
-            //2G网络以下, 取消网络请求
+        if (RUtils.isNoNet()) {
+            //取消网络请求
             if (onCancel != null) {
                 onCancel.run();
             }

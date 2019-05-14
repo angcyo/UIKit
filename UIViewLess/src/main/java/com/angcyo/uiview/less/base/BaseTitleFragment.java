@@ -149,7 +149,7 @@ public abstract class BaseTitleFragment extends BaseFragment implements AffectUI
      * 创建情感图控制类
      */
     protected AffectUI createAffectUI() {
-        return getUiFragment().createAffectUI(this);
+        return getUiFragment().createAffectUI(this).create();
     }
 
     /**

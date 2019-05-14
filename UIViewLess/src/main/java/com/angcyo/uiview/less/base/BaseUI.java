@@ -25,30 +25,49 @@ import com.angcyo.uiview.less.widget.ImageTextView;
  * Copyright (c) 2019 Shenzhen O&M Cloud Co., Ltd. All rights reserved.
  */
 public class BaseUI {
+    public static UIFragment uiFragment;
+    public static UIAdapterShowStatus uiAdapterShowStatus;
+    public static UIAdapterLoadMore uiAdapterLoadMore;
+
+    static {
+        uiFragment = new DefaultUIFragment();
+        uiAdapterShowStatus = new DefaultUIAdapterShowStatus();
+        uiAdapterLoadMore = new DefaultUIAdapterLoadMore();
+    }
+
+
+    /**
+     * UIFragment 界面定制
+     */
     public interface UIFragment {
         void initBaseTitleLayout(@NonNull BaseTitleFragment titleFragment, @Nullable Bundle arguments);
 
         View createBackItem(@NonNull BaseTitleFragment titleFragment);
 
-        AffectUI createAffectUI(@NonNull BaseTitleFragment titleFragment);
+        AffectUI.Builder createAffectUI(@NonNull BaseTitleFragment titleFragment);
+
+        AffectUI.Builder createAffectUI(@NonNull ViewGroup parent, AffectUI.OnAffectListener affectChangeListener);
     }
 
+    /**
+     * Adapter情感图界面定制
+     */
     public interface UIAdapterShowStatus {
         View createShowState(@NonNull RBaseAdapter baseAdapter, @NonNull Context context, @NonNull ViewGroup parent);
 
         void onBindShowStateView(@NonNull RBaseAdapter baseAdapter, @NonNull RBaseViewHolder holder, int showState, int position);
     }
 
+    /**
+     * 加载更多界面定制
+     */
     public interface UIAdapterLoadMore {
         View createLoadMore(@NonNull RBaseAdapter baseAdapter, @NonNull Context context, @NonNull ViewGroup parent);
 
         void onBindLoadMoreView(@NonNull RBaseAdapter baseAdapter, @NonNull RBaseViewHolder holder, int loadState, int position);
     }
 
-    public static UIFragment uiFragment;
-    public static UIAdapterShowStatus uiAdapterShowStatus;
-    public static UIAdapterLoadMore uiAdapterLoadMore;
-
+    //默认实现
     public static class DefaultUIFragment implements UIFragment {
 
         @Override
@@ -76,17 +95,23 @@ public class BaseUI {
         }
 
         @Override
-        public AffectUI createAffectUI(@NonNull BaseTitleFragment titleFragment) {
-            return AffectUI.build(titleFragment.contentWrapperLayout)
+        public AffectUI.Builder createAffectUI(@NonNull BaseTitleFragment titleFragment) {
+            return createAffectUI(titleFragment.contentWrapperLayout, titleFragment)
+                    .setContentAffect(AffectUI.CONTENT_AFFECT_INVISIBLE);
+        }
+
+        @Override
+        public AffectUI.Builder createAffectUI(@NonNull ViewGroup parent, AffectUI.OnAffectListener affectChangeListener) {
+            return AffectUI.build(parent)
                     .register(AffectUI.AFFECT_LOADING, R.layout.base_affect_loading)
                     .register(AffectUI.AFFECT_ERROR, R.layout.base_affect_error)
                     .register(AffectUI.AFFECT_OTHER, R.layout.base_affect_other)
                     .setContentAffect(AffectUI.CONTENT_AFFECT_INVISIBLE)
-                    .setAffectChangeListener(titleFragment)
-                    .create();
+                    .setAffectChangeListener(affectChangeListener);
         }
     }
 
+    //默认实现
     public static class DefaultUIAdapterShowStatus implements UIAdapterShowStatus {
 
         @Override
@@ -104,6 +129,7 @@ public class BaseUI {
         }
     }
 
+    //默认实现
     public static class DefaultUIAdapterLoadMore implements UIAdapterLoadMore {
 
         @Override
@@ -134,12 +160,6 @@ public class BaseUI {
                 });
             }
         }
-    }
-
-    static {
-        uiFragment = new DefaultUIFragment();
-        uiAdapterShowStatus = new DefaultUIAdapterShowStatus();
-        uiAdapterLoadMore = new DefaultUIAdapterLoadMore();
     }
 
 }

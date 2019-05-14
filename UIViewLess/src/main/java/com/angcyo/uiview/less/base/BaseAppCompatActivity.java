@@ -323,7 +323,8 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
 
     public void checkLightStatusBar(boolean lightStatusBar) {
         if (fragmentSwipeBackLayout != null &&
-                Build.VERSION.SDK_INT == Build.VERSION_CODES.LOLLIPOP) {
+                Build.VERSION.SDK_INT < Build.VERSION_CODES.M &&
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             fragmentSwipeBackLayout.setDimStatusBar(lightStatusBar);
         }
     }

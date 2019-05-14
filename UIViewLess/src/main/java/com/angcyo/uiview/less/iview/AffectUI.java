@@ -46,28 +46,19 @@ public class AffectUI {
     public static final int CONTENT_AFFECT_REMOVE = 4;
 
     int affectStatus = -1;
-
-    public static Builder build(@NonNull ViewGroup parent) {
-        return new Builder(parent);
-    }
-
     Builder builder;
-
     /**
      * 默认使用parent的第一个view, 当做内容
      */
     View contentView;
-
     /**
      * inflate之后的缓存
      */
     SparseArray<View> viewMap = new SparseArray<View>();
-
     /**
      * 支持动态修改此属性
      */
     int contentAffect;
-
     /**
      * 可以临时保存, 切换到情感图需要附加的数据
      * <p>
@@ -79,6 +70,10 @@ public class AffectUI {
         this.builder = builder;
         contentAffect = builder.contentAffect;
         initAffect();
+    }
+
+    public static Builder build(@NonNull ViewGroup parent) {
+        return new Builder(parent);
     }
 
     private void initAffect() {
@@ -172,6 +167,18 @@ public class AffectUI {
                     //没有缓存
                     int layoutId = builder.layoutMap.get(key);
                     View rootView = LayoutInflater.from(builder.parent.getContext()).inflate(layoutId, builder.parent, false);
+
+//                    if (builder.parent instanceof ConstraintLayout) {
+//                        ConstraintLayout.LayoutParams layoutParams = new ConstraintLayout.LayoutParams(-1, -1);
+//                        layoutParams.leftToLeft = ConstraintLayout.LayoutParams.PARENT_ID;
+//                        layoutParams.rightToRight = ConstraintLayout.LayoutParams.PARENT_ID;
+//                        layoutParams.bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID;
+//                        layoutParams.topToTop = ConstraintLayout.LayoutParams.PARENT_ID;
+//                        builder.parent.addView(rootView, layoutParams);
+//                    } else {
+//                        builder.parent.addView(rootView);
+//                    }
+
                     builder.parent.addView(rootView);
 
                     viewMap.put(affect, rootView);
@@ -254,6 +261,22 @@ public class AffectUI {
         return affectStatus;
     }
 
+    /**
+     * 状态切换通知监听
+     */
+    public interface OnAffectListener {
+
+        void onAffectChangeBefore(@NonNull AffectUI affectUI, int fromAffect, int toAffect);
+
+        void onAffectChange(@NonNull AffectUI affectUI, int fromAffect, int toAffect,
+                            @Nullable View fromView, @Nullable View toView);
+
+        /**
+         * 只在第一次inflate的时候, 会调用
+         */
+        void onAffectInitLayout(@NonNull AffectUI affectUI, int affect, @NonNull View rootView);
+    }
+
     public static class Builder {
         /**
          * 容器
@@ -294,21 +317,5 @@ public class AffectUI {
         public AffectUI create() {
             return new AffectUI(this);
         }
-    }
-
-    /**
-     * 状态切换通知监听
-     */
-    public interface OnAffectListener {
-
-        void onAffectChangeBefore(@NonNull AffectUI affectUI, int fromAffect, int toAffect);
-
-        void onAffectChange(@NonNull AffectUI affectUI, int fromAffect, int toAffect,
-                            @Nullable View fromView, @Nullable View toView);
-
-        /**
-         * 只在第一次inflate的时候, 会调用
-         */
-        void onAffectInitLayout(@NonNull AffectUI affectUI, int affect, @NonNull View rootView);
     }
 }

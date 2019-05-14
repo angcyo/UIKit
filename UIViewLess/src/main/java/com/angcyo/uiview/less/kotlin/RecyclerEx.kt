@@ -37,10 +37,21 @@ public fun RecyclerView.dslAdapter(spanCount: Int = 1, init: DslAdapter.() -> Un
     adapter = dslAdapter
 }
 
-public fun DslAdapter.renderItem(init: DslAdapterItem.() -> Unit) {
-    val adapterItem = DslAdapterItem()
-    adapterItem.init()
-    addLastItem(adapterItem)
+public fun DslAdapter.renderItem(count: Int = 1, init: DslAdapterItem.(index: Int) -> Unit) {
+    for (i in 0 until count) {
+        val adapterItem = DslAdapterItem()
+        adapterItem.init(i)
+        addLastItem(adapterItem)
+    }
+}
+
+public fun DslAdapter.renderItem(list: List<Any>, init: DslAdapterItem.(index: Int, data: Any) -> Unit) {
+    list.forEachIndexed { index, any ->
+        val adapterItem = DslAdapterItem()
+        adapterItem.itemData = any
+        adapterItem.init(index, any)
+        addLastItem(adapterItem)
+    }
 }
 
 public fun RecyclerView.onScroll(init: DslRecyclerScroll.() -> Unit) {
@@ -78,13 +89,11 @@ public fun RecyclerView.clearItemDecoration(filter: (RecyclerView.ItemDecoration
     }
 }
 
-
 public fun RecyclerView.dslItemDecoration(init: DslItemDecoration.() -> Unit) {
     addItemDecoration(DslItemDecoration().apply {
         init()
     })
 }
-
 
 /**
  * 取消RecyclerView的默认动画

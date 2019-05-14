@@ -4,6 +4,9 @@ import android.support.annotation.Nullable;
 import com.angcyo.http.log.LogUtil;
 import rx.Subscriber;
 
+import java.net.ConnectException;
+import java.net.UnknownHostException;
+
 /**
  * Email:angcyo@126.com
  *
@@ -12,6 +15,12 @@ import rx.Subscriber;
  */
 public class HttpSubscriber<T> extends Subscriber<T> {
     T data = null;
+
+    public static boolean isNetworkException(Throwable error) {
+        return error instanceof NonetException ||
+                error instanceof ConnectException ||
+                error instanceof UnknownHostException;
+    }
 
     @Override
     public void onStart() {
@@ -52,5 +61,4 @@ public class HttpSubscriber<T> extends Subscriber<T> {
             }
         }
     }
-
 }

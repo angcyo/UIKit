@@ -389,6 +389,11 @@ public class RFlowLayout extends LinearLayout {
         }
     }
 
+    public void setMaxCountLine(int maxCountLine) {
+        this.maxCountLine = maxCountLine;
+        requestLayout();
+    }
+
     public interface OnAddViewListener {
         void onInitView(View view);
     }

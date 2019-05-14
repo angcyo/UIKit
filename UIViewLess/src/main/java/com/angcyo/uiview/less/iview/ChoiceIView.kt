@@ -89,6 +89,13 @@ open class ChoiceIView(val viewGroup: ViewGroup, val choiceMode: Int = CHOICE_MO
         }
 
         childView?.let {
+            if (choiceMode == CHOICE_MODE_SINGLE) {
+                if (it == oldSelectedChildView && !selected) {
+                    //单选模式下， 不允许取消同一个View的选中状态。
+                    return
+                }
+            }
+
             if (selected) {
                 selectedView(it, index)
             } else {
