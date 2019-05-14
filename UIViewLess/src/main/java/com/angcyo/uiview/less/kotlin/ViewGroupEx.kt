@@ -194,6 +194,36 @@ public fun ViewGroup.resetChildCount(newSize: Int, onAddView: (childIndex: Int) 
     }
 }
 
+public fun ViewGroup.resetChild(
+    size: Int,
+    childLayoutId: Int,
+    init: (view: View, data: String?, index: Int) -> Unit = { _, _, _ -> }
+) {
+    resetChild(size, null, object : OnAddViewCallback<String>() {
+        override fun getLayoutId(): Int = childLayoutId
+
+        override fun onInitView(view: View, data: String?, index: Int) {
+            super.onInitView(view, data, index)
+            init.invoke(view, data, index)
+        }
+    })
+}
+
+public fun <T> ViewGroup.resetChild(
+    list: List<T>,
+    childLayoutId: Int,
+    init: (view: View, data: T?, index: Int) -> Unit = { _, _, _ -> }
+) {
+    resetChild(list.size, list, object : OnAddViewCallback<T>() {
+        override fun getLayoutId(): Int = childLayoutId
+
+        override fun onInitView(view: View, data: T?, index: Int) {
+            super.onInitView(view, data, index)
+            init.invoke(view, data, index)
+        }
+    })
+}
+
 public fun <T> ViewGroup.resetChild(size: Int, datas: List<T>? = null, onAddViewCallback: OnAddViewCallback<T>) {
     addView(size, datas, onAddViewCallback)
 }
@@ -426,7 +456,6 @@ open class OnGetViewTextCallback {
         }
         return null
     }
-
 }
 
 abstract class OnAddViewCallback<T> {
