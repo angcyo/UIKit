@@ -104,6 +104,9 @@ public abstract class RPagerAdapter extends PagerAdapter implements ViewPager.On
         int itemType = getItemType(position);
         onItemDestroy((View) object, itemType);
 
+
+        onItemDestroy(((RBaseViewHolder) ((View) object).getTag(R.id.tag)), position, itemType);
+
         container.removeView((View) object);
         mViewCache.put(position, new WeakReference<>((View) object));
     }
@@ -111,7 +114,12 @@ public abstract class RPagerAdapter extends PagerAdapter implements ViewPager.On
     /**
      * 重写销毁布局回调
      */
+    @Deprecated
     protected void onItemDestroy(@NonNull View rootView, int itemType) {
+
+    }
+
+    protected void onItemDestroy(@NonNull RBaseViewHolder viewHolder, int position, int itemType) {
 
     }
 
