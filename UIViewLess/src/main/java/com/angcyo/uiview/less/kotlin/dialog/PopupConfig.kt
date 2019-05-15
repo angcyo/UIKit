@@ -30,6 +30,8 @@ open class PopupConfig {
 
     var xoff: Int = 0
     var yoff: Int = 0
+
+    //此属性 似乎只在 showAtLocation 有效
     var gravity = Gravity.TOP or Gravity.START
 
     /**

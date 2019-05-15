@@ -207,12 +207,14 @@ fun Fragment.popupWindow(anchor: View? = null, config: PopupConfig.() -> Unit): 
             popupConfig.contentView =
                 LayoutInflater.from(context).inflate(popupConfig.layoutId, FrameLayout(context), false)
         }
-        contentView = popupConfig.contentView
+        val view = popupConfig.contentView
 
-        popupConfig.popupViewHolder = RBaseViewHolder(contentView)
+        popupConfig.popupViewHolder = RBaseViewHolder(view)
 
         popupConfig.onPopupInit(window, popupConfig.popupViewHolder!!)
         popupConfig.popupInit(window, popupConfig.popupViewHolder!!)
+
+        contentView = view
     }
 
     if (popupConfig.parent != null) {

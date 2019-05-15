@@ -832,3 +832,27 @@ public fun View.layoutParams(config: ViewGroup.LayoutParams.() -> Unit) {
 public fun <T : View> View.find(id: Int): T? {
     return findViewById<T>(id)
 }
+
+/**
+ * 旋转到多少度
+ * */
+public fun View.rotation(rotation: Float, duration: Long = 300, config: ViewPropertyAnimator.() -> Unit = {}) {
+    animate().apply {
+        rotation(rotation)
+        setDuration(duration)
+        config()
+        start()
+    }
+}
+
+/**
+ * 旋转多少度
+ * */
+public fun View.rotationBy(rotation: Float, duration: Long = 300, config: ViewPropertyAnimator.() -> Unit = {}) {
+    animate().apply {
+        rotationBy(rotation)
+        setDuration(duration)
+        config()
+        start()
+    }
+}
