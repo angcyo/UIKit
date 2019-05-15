@@ -456,4 +456,9 @@
         <!--<item name="android:windowExitAnimation">@anim/base_tran_to_bottom_exit</item>-->
     </style>
 
+    <style name="BasePopupAnim" parent="Animation.AppCompat.DropDownUp">
+        <!--<item name="android:windowEnterAnimation">@anim/base_tran_to_bottom_enter</item>-->
+        <!--<item name="android:windowExitAnimation">@anim/base_tran_to_bottom_exit</item>-->
+    </style>
+
 </resources>
