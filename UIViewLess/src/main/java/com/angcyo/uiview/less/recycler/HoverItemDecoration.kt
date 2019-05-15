@@ -28,11 +28,12 @@ open class HoverItemDecoration : RecyclerView.ItemDecoration() {
 
     val cancelEvent = Runnable {
         overViewHolder?.apply {
+
             itemView.dispatchTouchEvent(
                 MotionEvent.obtain(
                     nowTime(),
                     nowTime(),
-                    MotionEvent.ACTION_CANCEL,
+                    MotionEvent.ACTION_UP,
                     0f,
                     0f,
                     0
