@@ -1,6 +1,9 @@
 package com.angcyo.uiview.less.kotlin
 
-import android.support.v7.widget.*
+import android.support.v7.widget.DefaultItemAnimator
+import android.support.v7.widget.GridLayoutManager
+import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.SimpleItemAnimator
 import android.view.View
 import com.angcyo.uiview.less.kotlin.dsl.DslRecyclerScroll
 import com.angcyo.uiview.less.recycler.DslItemDecoration
@@ -61,14 +64,8 @@ public fun RecyclerView.onScroll(init: DslRecyclerScroll.() -> Unit) {
         override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
             super.onScrolled(recyclerView, dx, dy)
 
-            val layoutManager = recyclerView.layoutManager
-            if (layoutManager is LinearLayoutManager) {
-                dslRecyclerView.firstItemAdapterPosition = layoutManager.findFirstVisibleItemPosition()
-                dslRecyclerView.firstItemCompletelyVisibleAdapterPosition =
-                    layoutManager.findFirstCompletelyVisibleItemPosition()
-            } else {
-
-            }
+            dslRecyclerView.firstItemAdapterPosition = firstItemAdapterPosition()
+            dslRecyclerView.firstItemCompletelyVisibleAdapterPosition = firstItemCompletelyAdapterPosition()
 
             dslRecyclerView.onRecyclerScrolled.invoke(recyclerView, dx, dy)
         }
@@ -203,4 +200,36 @@ public fun RecyclerView.firstItemAdapterPosition(): Int {
         return getChildAdapterPosition(getChildAt(0))
     }
     return RecyclerView.NO_POSITION
+}
+
+/**
+ * 第一个item完全可见所在的Adapter position
+ * */
+public fun RecyclerView.firstItemCompletelyAdapterPosition(): Int {
+    val childCount = childCount
+    var result = RecyclerView.NO_POSITION
+    for (i in 0 until childCount) {
+        val child = getChildAt(i)
+        if (child.top >= 0 && child.left >= 0) {
+            result = getChildAdapterPosition(child)
+            break
+        }
+    }
+    return result
+}
+
+/**
+ * 枚举adapter 中的 item
+ * @param callback 返回true, 终端for 循环
+ * */
+public fun RecyclerView.eachDslAdapterItem(callback: (index: Int, dslItem: DslAdapterItem?) -> Boolean) {
+    adapter?.apply {
+        if (this is DslAdapter) {
+            for (i in 0 until itemCount) {
+                if (callback(i, getItemData(i))) {
+                    break
+                }
+            }
+        }
+    }
 }

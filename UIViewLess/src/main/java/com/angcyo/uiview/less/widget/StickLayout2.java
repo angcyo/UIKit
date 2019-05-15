@@ -122,6 +122,12 @@ public class StickLayout2 extends ViewGroup {
                         if (isFloat() /*&& velocityY < 0*/) {
                             return false;
                         }
+
+                        if (getScrollY() == 0 && velocityY > 0) {
+                            //自身没有滚动,并且fling是手指往下, 则不拦截fling操作
+                            return false;
+                        }
+
                         fling(velocityY);
                         return true;
                     }

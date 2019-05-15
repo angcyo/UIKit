@@ -23,6 +23,11 @@ open class ChoiceIView(val viewGroup: ViewGroup, val choiceMode: Int = CHOICE_MO
     var onChoiceSelector: OnChoiceSelector? = null
 
     /**
+     * 单选模式下, 是否必选一项
+     * */
+    var isRequiredWithSingle = true
+
+    /**
      * 之前选中的index, 只在 单选中有效
      * */
     private var oldSelectedIndex = -1
@@ -37,8 +42,8 @@ open class ChoiceIView(val viewGroup: ViewGroup, val choiceMode: Int = CHOICE_MO
 
             onChoiceSelector?.onInitPosition(childView, index, choiceMode)
 
-            if (onChoiceSelector?.onCanSelector(childView, index, choiceMode) == true) {
-                childView.setOnClickListener {
+            childView.setOnClickListener {
+                if (onChoiceSelector?.onCanSelector(childView, index, choiceMode) == true) {
                     if (it.isSelected) {
                         unSelector(index)
                     } else {
@@ -90,9 +95,12 @@ open class ChoiceIView(val viewGroup: ViewGroup, val choiceMode: Int = CHOICE_MO
 
         childView?.let {
             if (choiceMode == CHOICE_MODE_SINGLE) {
-                if (it == oldSelectedChildView && !selected) {
-                    //单选模式下， 不允许取消同一个View的选中状态。
-                    return
+                if (!selected) {
+                    //取消选中
+                    if (it == oldSelectedChildView && isRequiredWithSingle) {
+                        //单选模式下， 不允许取消同一个View的选中状态。
+                        return
+                    }
                 }
             }
 
