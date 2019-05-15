@@ -141,7 +141,7 @@ open class HoverItemDecoration : RecyclerView.ItemDecoration() {
         overViewHolder?.let {
             if (!overDecorationRect.isEmpty) {
 
-                L.d("...onDrawOverDecoration...")
+                //L.d("...onDrawOverDecoration...")
 
                 addHoverView(it.itemView)
 
@@ -291,7 +291,7 @@ open class HoverItemDecoration : RecyclerView.ItemDecoration() {
     }
 
     fun clearOverDecoration() {
-        L.d("...clearOverDecoration...")
+        //L.d("...clearOverDecoration...")
         overDecorationRect.clear()
         nextDecorationRect.clear()
         removeHoverView()

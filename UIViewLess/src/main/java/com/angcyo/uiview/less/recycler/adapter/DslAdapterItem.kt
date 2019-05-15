@@ -36,11 +36,18 @@ open class DslAdapterItem {
 
     //<editor-fold desc="分组相关属性">
 
-    /**当前item, 是否是分组的头
+    /**
+     * 当前item, 是否是分组的头, 设置了分组, 默认会开启悬停
      *
      * 如果为true, 哪里折叠此分组是, 会 伪删除 这个分组头, 到下一个分组头 中间的 data
      * */
     var itemIsGroupHead = false
+        set(value) {
+            field = value
+            if (value) {
+                itemIsHover = true
+            }
+        }
 
     /**
      * 当前分组是否 展开
@@ -54,8 +61,7 @@ open class DslAdapterItem {
     /**
      * 是否需要悬停, 在使用了 [HoverItemDecoration] 时, 有效
      * */
-    var itemIsHover = false
-        get() = itemIsGroupHead
+    var itemIsHover = itemIsGroupHead
 
     //</editor-fold>
 }

@@ -884,7 +884,10 @@ public class RRecyclerView extends RecyclerView implements CanScrollUpCallBack {
 
     /**
      * 获取第一个可见item的 adapter position
+     *
+     * @see com.angcyo.uiview.less.kotlin.RecyclerExKt#firstItemAdapterPosition(RecyclerView)
      */
+    @Deprecated
     public int getFirstVisibleItemIndex() {
         LayoutManager layoutManager = getLayoutManager();
         if (layoutManager instanceof LinearLayoutManager) {

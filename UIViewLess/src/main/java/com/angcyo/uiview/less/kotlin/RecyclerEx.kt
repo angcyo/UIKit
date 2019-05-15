@@ -194,3 +194,13 @@ public fun RecyclerView.eachChildRViewHolder(
         }
     }
 }
+
+/**
+ * 第一个item所在的Adapter position
+ * */
+public fun RecyclerView.firstItemAdapterPosition(): Int {
+    if (childCount > 0) {
+        return getChildAdapterPosition(getChildAt(0))
+    }
+    return RecyclerView.NO_POSITION
+}

@@ -83,7 +83,7 @@ public class LoopRecyclerView extends RRecyclerView {
     }
 
     @Override
-    public void setAdapter(Adapter adapter) {
+    public void setAdapter(RecyclerView.Adapter adapter) {
         super.setAdapter(adapter);
         mRDrawIndicator.setupLoopRecyclerView(this);
     }
