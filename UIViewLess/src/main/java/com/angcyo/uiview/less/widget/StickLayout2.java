@@ -579,6 +579,9 @@ public class StickLayout2 extends ViewGroup {
         super.onNestedScrollAccepted(child, target, axes);
         isNestedScrollAccepted = true;
         mOverScroller.abortAnimation();
+        if (target instanceof RecyclerView) {
+            lastRecyclerView = (RecyclerView) target;
+        }
     }
 
     @Override

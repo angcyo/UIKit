@@ -454,6 +454,11 @@ public class FragmentSwipeBackLayout extends SwipeBackLayout {
                                     public Boolean invoke(View view, Rect rect) {
                                         return false;
                                     }
+                                }, new Function2<View, Rect, Boolean>() {
+                                    @Override
+                                    public Boolean invoke(View view, Rect rect) {
+                                        return false;
+                                    }
                                 });
                         StringBuilder builder = new StringBuilder("\ntouch on->");
                         if (view == null) {

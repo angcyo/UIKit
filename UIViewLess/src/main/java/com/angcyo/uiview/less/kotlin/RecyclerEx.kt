@@ -20,13 +20,14 @@ import com.angcyo.uiview.less.recycler.adapter.DslAdapterItem
  * Copyright (c) 2019 ShenZhen O&M Cloud Co., Ltd. All rights reserved.
  */
 
-public fun RecyclerView.dslAdapter(init: DslAdapter.() -> Unit) {
+public fun RecyclerView.dslAdapter(init: DslAdapter.() -> Unit): DslAdapter {
     val dslAdapter = DslAdapter()
     dslAdapter.init()
     adapter = dslAdapter
+    return dslAdapter
 }
 
-public fun RecyclerView.dslAdapter(spanCount: Int = 1, init: DslAdapter.() -> Unit) {
+public fun RecyclerView.dslAdapter(spanCount: Int = 1, init: DslAdapter.() -> Unit): DslAdapter {
     val dslAdapter = DslAdapter()
     dslAdapter.init()
 
@@ -37,7 +38,9 @@ public fun RecyclerView.dslAdapter(spanCount: Int = 1, init: DslAdapter.() -> Un
             }
         }
     }
+
     adapter = dslAdapter
+    return dslAdapter
 }
 
 public fun DslAdapter.renderItem(count: Int = 1, init: DslAdapterItem.(index: Int) -> Unit) {
@@ -46,6 +49,13 @@ public fun DslAdapter.renderItem(count: Int = 1, init: DslAdapterItem.(index: In
         adapterItem.init(i)
         addLastItem(adapterItem)
     }
+}
+
+public fun <T> DslAdapter.renderItem(data: T, init: DslAdapterItem.() -> Unit) {
+    val adapterItem = DslAdapterItem()
+    adapterItem.itemData = data
+    adapterItem.init()
+    addLastItem(adapterItem)
 }
 
 public fun <T> DslAdapter.renderItem(list: List<T>, init: DslAdapterItem.(index: Int, data: T) -> Unit) {

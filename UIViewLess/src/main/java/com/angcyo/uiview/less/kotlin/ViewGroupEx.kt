@@ -79,17 +79,19 @@ public fun ViewGroup.getTouchOnRecyclerView(event: MotionEvent): RecyclerView? {
  */
 public fun ViewGroup.findView(
     event: MotionEvent,
-    intercept: (View, Rect) -> Boolean = { _, _ -> false }
+    intercept: (View, Rect) -> Boolean = { _, _ -> false },
+    jumpTarget: (View, Rect) -> Boolean = { _, _ -> false }
 ): View? {
-    return findView(this, event.rawX, event.rawY, getLayoutOffsetTopWidthSoftInput(), intercept)
+    return findView(this, event.rawX, event.rawY, getLayoutOffsetTopWidthSoftInput(), intercept, jumpTarget)
 }
 
 public fun ViewGroup.findView(
     touchRawX: Float,
     touchRawY: Float,
-    intercept: (View, Rect) -> Boolean = { _, _ -> false }
+    intercept: (View, Rect) -> Boolean = { _, _ -> false },
+    jumpTarget: (View, Rect) -> Boolean = { _, _ -> false }
 ): View? {
-    return findView(this, touchRawX, touchRawY, getLayoutOffsetTopWidthSoftInput(), intercept)
+    return findView(this, touchRawX, touchRawY, getLayoutOffsetTopWidthSoftInput(), intercept, jumpTarget)
 }
 
 public fun ViewGroup.findView(
@@ -97,7 +99,10 @@ public fun ViewGroup.findView(
     touchRawX: Float,
     touchRawY: Float,
     offsetTop: Int = 0,
-    intercept: (View, Rect) -> Boolean = { _, _ -> false } /*是否需要拦截View, 拦截后 立马返回*/
+    /*是否需要拦截View, 拦截后 立马返回. 通常用来拦截ViewGroup, 防止枚举目标ViewGroup*/
+    intercept: (View, Rect) -> Boolean = { _, _ -> false },
+    /*找到目标后, 是否需要跳过目标继续搜索*/
+    jumpTarget: (View, Rect) -> Boolean = { _, _ -> false }
 ): View? {
     /**键盘的高度*/
     var touchView: View? = targetView
@@ -117,6 +122,7 @@ public fun ViewGroup.findView(
 //        L.e("call: ------------------end -> ")
         rect.offset(0, -offsetTop)
 
+        //检查当前view, 是否在 touch坐标中
         fun check(view: View): View? {
             if (view.visibility == View.VISIBLE &&
                 view.measuredHeight != 0 &&
@@ -139,20 +145,32 @@ public fun ViewGroup.findView(
         }
 
         if (childAt is ViewGroup && childAt.childCount > 0) {
-            val resultView = childAt.findView(targetView, touchRawX, touchRawY, offsetTop, intercept)
+            val resultView = childAt.findView(targetView, touchRawX, touchRawY, offsetTop, intercept, jumpTarget)
             if (resultView != null && resultView != targetView) {
-                touchView = resultView
-                break
+                if (jumpTarget.invoke(resultView, rect)) {
+
+                } else {
+                    touchView = resultView
+                    break
+                }
             } else {
                 if (checkView != null) {
-                    touchView = checkView
-                    break
+                    if (jumpTarget.invoke(checkView, rect)) {
+
+                    } else {
+                        touchView = checkView
+                        break
+                    }
                 }
             }
         } else {
             if (checkView != null) {
-                touchView = checkView
-                break
+                if (jumpTarget.invoke(checkView, rect)) {
+
+                } else {
+                    touchView = checkView
+                    break
+                }
             }
         }
     }
@@ -166,9 +184,12 @@ public fun ViewGroup.findRecyclerView(
     /**键盘的高度*/
     var touchView: RecyclerView? = null
 
-    val findView = findView(touchRawX, touchRawY) { view, _ ->
-        view is RecyclerView
-    }
+    val findView = findView(touchRawX, touchRawY,
+        { view, _ ->
+            view is RecyclerView
+        }, { view, _ ->
+            view !is RecyclerView
+        })
 
     if (findView is RecyclerView) {
         touchView = findView
