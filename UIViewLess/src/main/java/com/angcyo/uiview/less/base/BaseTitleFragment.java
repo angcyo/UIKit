@@ -351,8 +351,8 @@ public abstract class BaseTitleFragment extends BaseFragment implements AffectUI
 
     @NonNull
     protected View createContentView(@NonNull ViewGroup contentWrapperLayout) {
-        TextView textView = new TextView(contentWrapperLayout.getContext());
-        textView.setText("默认的内容布局\n请重写\ngetContentLayoutId()\n或\ncreateContentView()\n方法, 自定义.");
+        TextView textView = new TextView(contentWrapperLayout.getContext(), null, R.style.BaseMainTextStyle);
+        textView.setText("这里是默认的内容布局\n请重写\ngetContentLayoutId()\n或\ncreateContentView()\n方法, 实现自定义布局.");
         return textView;
     }
     //</editor-fold>
