@@ -1,6 +1,5 @@
 package com.angcyo.uiview.less.base.helper;
 
-import android.content.Context;
 import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.*;
@@ -9,14 +8,14 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.angcyo.uiview.less.kotlin.ViewExKt;
 import com.angcyo.uiview.less.resources.ResUtil;
 import com.angcyo.uiview.less.widget.ImageTextView;
 import com.angcyo.uiview.less.widget.RClickListener;
-
-import java.util.List;
 
 public class ViewGroupHelper {
     View parentView;
@@ -30,33 +29,6 @@ public class ViewGroupHelper {
         return new ViewGroupHelper(parentView);
     }
 
-    public static <T> void resetChild(@NonNull ViewGroup viewGroup, int newSize, @Nullable List<T> datas, @NonNull OnAddViewCallback<T> callback) {
-        resetChildCount(viewGroup, newSize, callback);
-        for (int i = 0; i < viewGroup.getChildCount(); i++) {
-            T data = null;
-            if (datas != null && datas.size() > i) {
-                data = datas.get(i);
-            }
-            callback.onInitView(viewGroup.getChildAt(i), data, i);
-        }
-    }
-
-    public static void resetChildCount(ViewGroup viewGroup, int newSize, OnAddViewCallback callback) {
-        int oldSize = viewGroup.getChildCount();
-        int count = newSize - oldSize;
-        if (count > 0) {
-            //需要补充子View
-            for (int i = 0; i < count; i++) {
-                viewGroup.addView(callback.createView(viewGroup.getContext(), viewGroup));
-            }
-        } else if (count < 0) {
-            //需要移除子View
-            for (int i = Math.abs(count); i < count; i++) {
-                viewGroup.removeViewAt(oldSize - 1 - i);
-            }
-        }
-    }
-
     public ViewGroupHelper addView(@NonNull View itemView) {
         return addView(-1, itemView);
     }
@@ -64,6 +36,13 @@ public class ViewGroupHelper {
     public ViewGroupHelper addView(int index, @NonNull View itemView) {
         if (parentView instanceof ViewGroup) {
             ((ViewGroup) parentView).addView(itemView, index);
+        }
+        return this;
+    }
+
+    public ViewGroupHelper addView(@LayoutRes int layoutId) {
+        if (parentView instanceof ViewGroup) {
+            LayoutInflater.from(parentView.getContext()).inflate(layoutId, (ViewGroup) parentView, true);
         }
         return this;
     }
@@ -340,11 +319,40 @@ public class ViewGroupHelper {
         return null;
     }
 
+    @Nullable
+    public <T extends View> T v(int id) {
+        if (parentView instanceof ViewGroup) {
+            return parentView.findViewById(id);
+        }
+        return null;
+    }
+
+    public ViewGroupHelper setLayoutGravity(int gravity) {
+        if (selectorView != null) {
+            ViewGroup.LayoutParams params = selectorView.getLayoutParams();
+            if (params instanceof FrameLayout.LayoutParams) {
+                ((FrameLayout.LayoutParams) params).gravity = gravity;
+                selectorView.setLayoutParams(params);
+            } else if (params instanceof LinearLayout.LayoutParams) {
+                ((LinearLayout.LayoutParams) params).gravity = gravity;
+                selectorView.setLayoutParams(params);
+            }
+        }
+        return this;
+    }
+
     public ViewGroupHelper setTextBold(boolean bold) {
         if (selectorView instanceof TextView) {
             ViewExKt.addPaintFlags((TextView) selectorView, Paint.FAKE_BOLD_TEXT_FLAG, bold, true);
         } else if (selectorView instanceof ImageTextView) {
             ViewExKt.setPaintFlags(((ImageTextView) selectorView).getTextPaint(), Paint.FAKE_BOLD_TEXT_FLAG, bold);
+        }
+        return this;
+    }
+
+    public ViewGroupHelper setPadding(int padding) {
+        if (selectorView != null) {
+            selectorView.setPadding(padding, padding, padding, padding);
         }
         return this;
     }
@@ -407,17 +415,31 @@ public class ViewGroupHelper {
         return this;
     }
 
-    public static class OnAddViewCallback<T> {
-        public int getLayoutId() {
-            return -1;
+    public ViewGroupHelper setHeight(int height) {
+        if (selectorView != null) {
+            ViewGroup.LayoutParams layoutParams = selectorView.getLayoutParams();
+            layoutParams.height = height;
+            selectorView.setLayoutParams(layoutParams);
         }
+        return this;
+    }
 
-        public View createView(@NonNull Context context, @NonNull ViewGroup viewGroup) {
-            return LayoutInflater.from(context).inflate(getLayoutId(), viewGroup, false);
+    public ViewGroupHelper setWidth(int width) {
+        if (selectorView != null) {
+            ViewGroup.LayoutParams layoutParams = selectorView.getLayoutParams();
+            layoutParams.width = width;
+            selectorView.setLayoutParams(layoutParams);
         }
+        return this;
+    }
 
-        public void onInitView(@NonNull View itemView, @Nullable T data, int index) {
-
+    public ViewGroupHelper setWidthHeight(int width, int height) {
+        if (selectorView != null) {
+            ViewGroup.LayoutParams layoutParams = selectorView.getLayoutParams();
+            layoutParams.width = width;
+            layoutParams.height = height;
+            selectorView.setLayoutParams(layoutParams);
         }
+        return this;
     }
 }

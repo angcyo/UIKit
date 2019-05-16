@@ -97,7 +97,7 @@ class RTabLayout(context: Context, attributeSet: AttributeSet? = null) : ViewGro
             typedArray.getBoolean(R.styleable.RTabLayout_r_auto_set_item_background, autoSetItemBackground)
 
         itemSelectedBackgroundColor = if (isInEditMode) {
-            Color.RED
+            getColor(R.color.colorPrimary)
         } else {
             SkinHelper.getSkin().themeSubColor
         }

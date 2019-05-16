@@ -17,6 +17,7 @@ import com.angcyo.uiview.less.base.helper.FragmentHelper;
 import com.angcyo.uiview.less.base.helper.ViewGroupHelper;
 import com.angcyo.uiview.less.iview.AffectUI;
 import com.angcyo.uiview.less.recycler.RBaseViewHolder;
+import com.angcyo.uiview.less.resources.ResUtil;
 import com.angcyo.uiview.less.widget.group.FragmentContentWrapperLayout;
 import com.angcyo.uiview.less.widget.group.TitleBarLayout;
 
@@ -318,6 +319,22 @@ public abstract class BaseTitleFragment extends BaseFragment implements AffectUI
 
     public void removeTitleShadow() {
         ViewGroupHelper.build(baseViewHolder.itemView).selector(R.id.base_title_shadow_view).remove();
+    }
+
+    /**
+     * 将阴影, 切换成线 展示
+     */
+    public void showTitleLine() {
+        showTitleLine(ResUtil.getColor(R.color.base_line_color), ResUtil.getDimen(R.dimen.base_line_px));
+    }
+
+    public void showTitleLine(int color, int height) {
+        ViewGroupHelper.build(baseViewHolder.itemView)
+                .selector(R.id.base_title_shadow_view)
+                .visible()
+                .setBackgroundColor(color)
+                .setHeight(height)
+        ;
     }
 
     //</editor-fold>
