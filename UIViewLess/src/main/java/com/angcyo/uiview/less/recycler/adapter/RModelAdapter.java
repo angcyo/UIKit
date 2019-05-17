@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.util.ArrayMap;
 import android.view.View;
 import android.widget.CompoundButton;
+import com.angcyo.lib.L;
 import com.angcyo.uiview.less.recycler.RBaseViewHolder;
 import com.angcyo.uiview.less.recycler.RRecyclerView;
 import com.angcyo.uiview.less.utils.RUtils;
@@ -459,7 +460,11 @@ public abstract class RModelAdapter<T> extends RBaseAdapter<T> {
     }
 
     private void addSelectorDataToList(int position) {
-        addSelectorDataToList(getAllDatas().get(position));
+        if (getAllDatas().size() > position) {
+            addSelectorDataToList(getAllDatas().get(position));
+        } else {
+            L.i("被忽略的操作");
+        }
     }
 
     /**
