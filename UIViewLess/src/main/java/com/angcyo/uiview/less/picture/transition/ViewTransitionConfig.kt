@@ -435,8 +435,11 @@ class ViewTransitionConfig {
                 autoClone()
                 diskCacheStrategy(DiskCacheStrategy.ALL)
 
+                var placeholderDrawable: Drawable? = null
                 getImagePlaceholder(position)?.let {
-                    placeholder(it.mutate().constantState?.newDrawable())
+                    placeholderDrawable = it.mutate().constantState?.newDrawable()
+                    placeholder(placeholderDrawable)
+                    error(placeholderDrawable)
                 }
 
                 addListener(object : RequestListener<Drawable> {
