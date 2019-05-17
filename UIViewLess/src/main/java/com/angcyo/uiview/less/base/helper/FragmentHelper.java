@@ -896,13 +896,13 @@ public class FragmentHelper {
         }
 
         public Builder defaultExitAnim() {
-            this.enterAnim = R.anim.base_alpha_exit;
+            this.enterAnim = R.anim.base_no_alpha;
             this.exitAnim = R.anim.base_tran_to_bottom;
             return this;
         }
 
         public Builder defaultEnterAnim() {
-            this.exitAnim = R.anim.base_alpha_exit;
+            this.exitAnim = R.anim.base_no_alpha;
             this.enterAnim = R.anim.base_tran_to_top;
             return this;
         }
