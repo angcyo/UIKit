@@ -5,18 +5,20 @@ import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Rect;
+import android.support.annotation.NonNull;
 import android.text.TextPaint;
 import android.view.View;
 import android.view.ViewGroup;
 import com.angcyo.uiview.less.R;
 import com.angcyo.uiview.less.RApplication;
+import com.angcyo.uiview.less.recycler.RBaseViewHolder;
 
 /**
  * 可以设置top分割线, 和中间分割线样式的{@link Item}
  * Created by angcyo on 2017-03-12.
  */
 
-public abstract class SingleItem implements Item {
+public class SingleItem implements Item {
 
     protected final Rect mDrawRect = new Rect();
     /**
@@ -49,33 +51,13 @@ public abstract class SingleItem implements Item {
     }
 
     public SingleItem(Type type) {
-        mType = type;
-        Resources resources = RApplication.getApp().getResources();
-        switch (mType) {
-            case TOP:
-                this.topOffset = resources.getDimensionPixelSize(R.dimen.base_xhdpi);
-                break;
-            case LINE:
-                this.topOffset = resources.getDimensionPixelSize(R.dimen.base_line);
-                break;
-            case TOP_LINE:
-                this.leftOffset = resources.getDimensionPixelSize(R.dimen.base_xhdpi);
-                this.topOffset = resources.getDimensionPixelSize(R.dimen.base_line);
-                break;
-            case BOTTOM:
-                this.leftOffset = resources.getDimensionPixelSize(R.dimen.base_xhdpi);
-                this.topOffset = 0;
-                this.rightOffset = leftOffset;
-                break;
-            default:
-                break;
-        }
+        setType(type);
     }
 
-    public SingleItem(Type mType, int leftOffset, int rightOffset) {
+    public SingleItem(Type type, int leftOffset, int rightOffset) {
         this.leftOffset = leftOffset;
         this.rightOffset = rightOffset;
-        this.mType = mType;
+        setType(type);
     }
 
     public SingleItem(Type type, int lineColor) {
@@ -133,6 +115,30 @@ public abstract class SingleItem implements Item {
         return this;
     }
 
+    public void setType(Type type) {
+        this.mType = type;
+        Resources resources = RApplication.getApp().getResources();
+        switch (type) {
+            case TOP:
+                this.topOffset = resources.getDimensionPixelSize(R.dimen.base_xhdpi);
+                break;
+            case LINE:
+                this.topOffset = resources.getDimensionPixelSize(R.dimen.base_line);
+                break;
+            case TOP_LINE:
+                this.leftOffset = resources.getDimensionPixelSize(R.dimen.base_xhdpi);
+                this.topOffset = resources.getDimensionPixelSize(R.dimen.base_line);
+                break;
+            case BOTTOM:
+                this.leftOffset = resources.getDimensionPixelSize(R.dimen.base_xhdpi);
+                this.topOffset = 0;
+                this.rightOffset = leftOffset;
+                break;
+            default:
+                break;
+        }
+    }
+
     @Override
     public void setItemOffsets(Rect rect) {
         if (mType == Type.BOTTOM) {
@@ -183,14 +189,19 @@ public abstract class SingleItem implements Item {
         return this;
     }
 
+    @Override
+    public String getTag() {
+        return mTag;
+    }
+
     public SingleItem setTag(String mTag) {
         this.mTag = mTag;
         return this;
     }
 
     @Override
-    public String getTag() {
-        return mTag;
+    public void onBindView(@NonNull RBaseViewHolder holder, int posInData, Item itemDataBean) {
+
     }
 
     public enum Type {

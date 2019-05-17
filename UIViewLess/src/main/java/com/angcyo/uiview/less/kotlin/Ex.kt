@@ -414,3 +414,5 @@ public fun Context.isTablet(): Boolean {
 public fun Rect.set(rectF: RectF) {
     set(rectF.left.toInt(), rectF.top.toInt(), rectF.right.toInt(), rectF.bottom.toInt())
 }
+
+public fun String.toColor(): Int = Color.parseColor(this)
