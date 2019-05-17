@@ -10,6 +10,8 @@ import com.angcyo.uiview.less.recycler.RBaseViewHolder;
  * @date 2019/03/12
  * Copyright (c) 2019 ShenZhen O&M Cloud Co., Ltd. All rights reserved.
  */
+
+@Deprecated
 public class PhotoDataSource {
 
     public int getLayoutId(int position, int itemType) {

@@ -28,7 +28,7 @@ import android.view.GestureDetector;
 /**
  * A zoomable ImageView. See {@link PhotoViewAttacher} for most of the details on how the zooming
  * is accomplished
- *
+ * 2.3.0
  * https://github.com/chrisbanes/PhotoView/
  */
 @SuppressWarnings("unused")

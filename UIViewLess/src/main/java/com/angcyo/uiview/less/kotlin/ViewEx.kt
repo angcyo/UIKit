@@ -856,3 +856,29 @@ public fun View.rotationBy(rotation: Float, duration: Long = 300, config: ViewPr
         start()
     }
 }
+
+public fun View.setPadding(padding: Int) {
+    setPadding(padding, padding, padding, padding)
+}
+
+public fun View.setPaddingVertical(padding: Int) {
+    setPadding(left, padding, right, padding)
+}
+
+public fun View.setPaddingHorizontal(padding: Int) {
+    setPadding(padding, top, padding, bottom)
+}
+
+/**
+ * 判断v, 是否在 view 内
+ * */
+public fun View.isViewIn(v: View): Boolean {
+    if (v.left - scrollX >= 0 &&
+        v.right - scrollX <= measuredWidth &&
+        v.top - scrollY >= 0 &&
+        v.bottom - scrollY == measuredHeight
+    ) {
+        return true
+    }
+    return false
+}

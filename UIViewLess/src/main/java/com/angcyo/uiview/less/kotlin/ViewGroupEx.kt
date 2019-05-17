@@ -494,6 +494,6 @@ abstract class OnAddViewCallback<T> {
     }
 }
 
-public fun ViewGroup.inflate(@LayoutRes id: Int, attachToRoot: Boolean = true) {
-    LayoutInflater.from(context).inflate(id, this, attachToRoot)
+public fun ViewGroup.inflate(@LayoutRes id: Int, attachToRoot: Boolean = true): View {
+    return LayoutInflater.from(context).inflate(id, this, attachToRoot)
 }

@@ -18,6 +18,8 @@ import com.angcyo.uiview.less.utils.RUtils
  * @date 2019/03/12
  * Copyright (c) 2019 ShenZhen O&M Cloud Co., Ltd. All rights reserved.
  */
+
+@Deprecated("")
 object RPhotoPager {
 
     /**
@@ -160,6 +162,7 @@ object RPhotoPager {
     }
 }
 
+@Deprecated("")
 open class RPhotoPagerConfig {
 
     /**

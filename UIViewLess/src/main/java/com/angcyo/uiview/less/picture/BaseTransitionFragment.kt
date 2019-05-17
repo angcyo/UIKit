@@ -51,7 +51,9 @@ open abstract class BaseTransitionFragment : BaseFragment() {
     abstract fun getContentLayoutId(): Int
 
     override fun onBackPressed(activity: Activity): Boolean {
-        doTransitionHide()
+        if (isTransitionAnimEnd) {
+            doTransitionHide()
+        }
         return false
     }
 
@@ -75,6 +77,11 @@ open abstract class BaseTransitionFragment : BaseFragment() {
     //<editor-fold desc="转场动画相关处理">
 
     /**
+     * 动画是否执行结束
+     * */
+    var isTransitionAnimEnd = true
+
+    /**
      * 界面从哪个矩形坐标开始显示, 如果为null, 默认动画是从底部往上平移
      * */
     var showFromRect: Rect? = null
@@ -87,6 +94,7 @@ open abstract class BaseTransitionFragment : BaseFragment() {
             super.onTransitionEnd(transition)
             showTransitionSet?.removeListener(this)
 
+            isTransitionAnimEnd = true
             onTransitionShowEnd()
         }
     }
@@ -96,6 +104,7 @@ open abstract class BaseTransitionFragment : BaseFragment() {
             super.onTransitionEnd(transition)
             hideTransitionSet?.removeListener(this)
 
+            isTransitionAnimEnd = true
             onTransitionHideEnd()
         }
     }
@@ -104,8 +113,10 @@ open abstract class BaseTransitionFragment : BaseFragment() {
      * 开始显示的转场动画
      * */
     open fun doTransitionShow() {
+        isTransitionAnimEnd = false
         onTransitionShowBeforeValues()
         baseViewHolder.post {
+            onCreateShowTransition()
             onTransitionShowAfterValues()
         }
     }
@@ -114,8 +125,10 @@ open abstract class BaseTransitionFragment : BaseFragment() {
      * 开始隐藏的转场动画
      * */
     open fun doTransitionHide() {
+        isTransitionAnimEnd = false
         onTransitionHideBeforeValues()
         baseViewHolder.post {
+            onCreateHideTransition()
             onTransitionHideAfterValues()
         }
     }
@@ -126,19 +139,18 @@ open abstract class BaseTransitionFragment : BaseFragment() {
      * 捕捉动画开始时, 需要的values
      * */
     open fun onTransitionShowBeforeValues() {
-        if (showFromRect != null) {
+        showFromRect?.apply {
             rootLayout.setWidthHeight(showFromRect!!.width(), showFromRect!!.height())
             rootLayout.translationX = showFromRect!!.left.toFloat()
             rootLayout.translationY = showFromRect!!.top.toFloat()
-        } else {
+        }
+
+        if (showFromRect == null) {
             rootLayout.translationY = RUtils.getScreenHeight().toFloat()
         }
     }
 
-    /**
-     * 动画结束后的values
-     * */
-    open fun onTransitionShowAfterValues() {
+    open fun onCreateShowTransition() {
         createShowTransitionSet().apply {
             showTransitionSet = this
             addListener(showTransitionListener)
@@ -147,6 +159,12 @@ open abstract class BaseTransitionFragment : BaseFragment() {
             //流程 captureStartValues->(OnPreDraw回调后)->captureEndValues->(playTransition)createAnimator->runAnimators
             TransitionManager.beginDelayedTransition(rootLayout, this)
         }
+    }
+
+    /**
+     * 动画结束后的values
+     * */
+    open fun onTransitionShowAfterValues() {
         onTransitionHideBeforeValues()
     }
 
@@ -156,13 +174,16 @@ open abstract class BaseTransitionFragment : BaseFragment() {
         rootLayout.translationX = 0f
     }
 
-    open fun onTransitionHideAfterValues() {
+    open fun onCreateHideTransition() {
         createHideTransitionSet().apply {
             hideTransitionSet = this
             addListener(hideTransitionListener)
 
             TransitionManager.beginDelayedTransition(rootLayout, this)
         }
+    }
+
+    open fun onTransitionHideAfterValues() {
         onTransitionShowBeforeValues()
     }
 

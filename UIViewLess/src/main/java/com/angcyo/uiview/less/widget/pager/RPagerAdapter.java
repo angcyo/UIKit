@@ -37,7 +37,7 @@ public abstract class RPagerAdapter extends PagerAdapter implements ViewPager.On
                 view = createView(context, position, itemType);
             }
 
-            view.setTag(R.id.tag, new RBaseViewHolder(view));
+            view.setTag(R.id.tag, new RBaseViewHolder(view, itemType));
         }
 
         if (view.getParent() == null) {

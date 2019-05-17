@@ -23,6 +23,8 @@ import com.github.chrisbanes.photoview.PhotoView
  * @date 2019/03/12
  * Copyright (c) 2019 ShenZhen O&M Cloud Co., Ltd. All rights reserved.
  */
+
+@Deprecated("")
 open class SinglePhotoDataSource<T>(val photos: List<T>) : PhotoDataSource() {
 
     var onItemPhotoClickListener: ((itemView: View, photos: List<T>, position: Int) -> Unit)? = null

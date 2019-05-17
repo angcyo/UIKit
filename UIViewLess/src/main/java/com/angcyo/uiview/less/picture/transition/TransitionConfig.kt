@@ -13,6 +13,8 @@ import com.angcyo.uiview.less.picture.BaseTransitionFragment
  * @date 2019/04/27
  * Copyright (c) 2019 ShenZhen O&M Cloud Co., Ltd. All rights reserved.
  */
+
+@Deprecated("")
 class TransitionConfig {
 
     companion object {

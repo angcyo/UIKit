@@ -352,7 +352,21 @@ public class ViewGroupHelper {
 
     public ViewGroupHelper setPadding(int padding) {
         if (selectorView != null) {
-            selectorView.setPadding(padding, padding, padding, padding);
+            ViewExKt.setPadding(selectorView, padding);
+        }
+        return this;
+    }
+
+    public ViewGroupHelper setPaddingHorizontal(int padding) {
+        if (selectorView != null) {
+            ViewExKt.setPaddingHorizontal(selectorView, padding);
+        }
+        return this;
+    }
+
+    public ViewGroupHelper setPaddingVertical(int padding) {
+        if (selectorView != null) {
+            ViewExKt.setPaddingVertical(selectorView, padding);
         }
         return this;
     }

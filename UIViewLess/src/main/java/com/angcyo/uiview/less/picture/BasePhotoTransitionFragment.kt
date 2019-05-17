@@ -17,6 +17,8 @@ import com.angcyo.uiview.less.recycler.RBaseViewHolder
  * @date 2019/04/27
  * Copyright (c) 2019 ShenZhen O&M Cloud Co., Ltd. All rights reserved.
  */
+
+@Deprecated("")
 open class BasePhotoTransitionFragment : BaseTransitionFragment() {
     protected lateinit var previewImageView: AppCompatImageView
 

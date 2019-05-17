@@ -43,6 +43,8 @@ import java.util.List;
  * @date 2019/03/12
  * Copyright (c) 2019 ShenZhen O&M Cloud Co., Ltd. All rights reserved.
  */
+
+@Deprecated
 public class PhotoPagerFragment extends BaseFragment {
 
     public static final int ANIM_DURATION = 300;
@@ -309,7 +311,7 @@ public class PhotoPagerFragment extends BaseFragment {
 
     protected TransitionSet defaultTransitionSet() {
         TransitionSet transitionSet = new TransitionSet();
-        //transitionSet.addTarget(previewImageView);
+        //transitionSet.addTarget(previewView);
         transitionSet.setDuration(ANIM_DURATION);
         transitionSet.addTransition(new ChangeBounds());
         transitionSet.addTransition(new ChangeTransform());

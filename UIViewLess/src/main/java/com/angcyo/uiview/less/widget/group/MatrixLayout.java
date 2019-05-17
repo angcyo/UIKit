@@ -12,7 +12,6 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.animation.LinearInterpolator;
 import android.widget.FrameLayout;
-import com.angcyo.lib.L;
 
 /**
  * Email:angcyo@126.com
@@ -69,18 +68,39 @@ public class MatrixLayout extends FrameLayout {
                 new GestureDetector.SimpleOnGestureListener() {
                     @Override
                     public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-                        L.e("dx:" + distanceX + " dy:" + distanceY /*+ " " + checkTouchEvent + " " + matrixChange*/);
-                        float moveY = e2.getY() - e1.getY();
-                        float scale = (getMeasuredHeight() - e2.getY()) / (getMeasuredHeight() - e1.getY());
-                        if (scale > maxScale) {
-                            scale = maxScale;
-                        } else if (scale < minScale) {
-                            scale = minScale;
+                        //L.e("dx:" + distanceX + " dy:" + distanceY /*+ " " + checkTouchEvent + " " + matrixChange*/);
+
+                        if (isMatrixChange()) {
+                            doOnScroll(e1, e2, distanceX, distanceY);
+                            return true;
+                        } else {
+                            if (distanceY < 0) {
+                                //手指向下滑动
+                                if (Math.abs(distanceY) > Math.abs(distanceX)) {
+                                    doOnScroll(e1, e2, distanceX, distanceY);
+                                    return true;
+                                }
+                            }
+                            return false;
                         }
-                        setMatrix(scale, e2.getX() - e1.getX(), Math.max(moveY, minTranslateY));
-                        return true;
                     }
                 });
+    }
+
+    private void doOnScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+        if (e1 == null || e2 == null) {
+            //在某些情况下, 这玩意竟然会为空
+            return;
+        }
+
+        float moveY = e2.getY() - e1.getY();
+        float scale = (getMeasuredHeight() - e2.getY()) / (getMeasuredHeight() - e1.getY());
+        if (scale > maxScale) {
+            scale = maxScale;
+        } else if (scale < minScale) {
+            scale = minScale;
+        }
+        setMatrix(scale, e2.getX() - e1.getX(), Math.max(moveY, minTranslateY));
     }
 
     @Override
@@ -223,6 +243,14 @@ public class MatrixLayout extends FrameLayout {
 
     public void setOnMatrixTouchListener(OnMatrixTouchListener onMatrixTouchListener) {
         this.onMatrixTouchListener = onMatrixTouchListener;
+    }
+
+    /**
+     * 恢复默认状态
+     */
+    public void resetMatrix() {
+        matrix.reset();
+        postInvalidate();
     }
 
     public interface OnMatrixTouchListener {

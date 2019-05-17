@@ -3,10 +3,7 @@ package com.angcyo.uiview.less.kotlin
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.Paint
-import android.graphics.Rect
+import android.graphics.*
 import android.text.TextUtils
 import android.util.Base64
 import android.view.MotionEvent
@@ -412,4 +409,8 @@ public fun Context.isPortrait(): Boolean {
 public fun Context.isTablet(): Boolean {
     return (resources.configuration.screenLayout and
             Configuration.SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_LARGE
+}
+
+public fun Rect.set(rectF: RectF) {
+    set(rectF.left.toInt(), rectF.top.toInt(), rectF.right.toInt(), rectF.bottom.toInt())
 }
