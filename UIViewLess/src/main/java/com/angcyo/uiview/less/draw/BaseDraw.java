@@ -14,6 +14,7 @@ import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
+import com.angcyo.uiview.less.R;
 import com.angcyo.uiview.less.skin.SkinHelper;
 
 
@@ -62,8 +63,7 @@ public abstract class BaseDraw {
 
     protected int getBaseColor() {
         if (isInEditMode()) {
-            return Color.RED;
-            //return getColor(R.color.base_dark_red);
+            return getColor(R.color.colorPrimary);
         } else {
             return SkinHelper.getSkin().getThemeSubColor();
         }

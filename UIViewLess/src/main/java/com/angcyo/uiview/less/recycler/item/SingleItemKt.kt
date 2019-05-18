@@ -46,9 +46,40 @@ class SingleItemKt : SingleItem() {
     var itemRightOffset = 0
     var itemBottomOffset = 0
 
+    fun setTopInsert(insert: Int, leftOffset: Int = 0, rightOffset: Int = 0) {
+        itemTopInsert = insert
+        itemRightOffset = rightOffset
+        itemLeftOffset = leftOffset
+    }
+
+    fun setBottomInsert(insert: Int, leftOffset: Int = 0, rightOffset: Int = 0) {
+        itemBottomInsert = insert
+        itemRightOffset = rightOffset
+        itemLeftOffset = leftOffset
+    }
+
+    fun setLeftInsert(insert: Int, topOffset: Int = 0, bottomOffset: Int = 0) {
+        itemLeftInsert = insert
+        itemBottomOffset = bottomOffset
+        itemTopOffset = topOffset
+    }
+
+    fun setRightInsert(insert: Int, topOffset: Int = 0, bottomOffset: Int = 0) {
+        itemRightInsert = insert
+        itemBottomOffset = bottomOffset
+        itemTopOffset = topOffset
+    }
+
     override fun setItemOffsets2(rect: Rect, edge: Int) {
         //super.setItemOffsets2(rect, edge)
         rect.set(itemLeftInsert, itemTopInsert, itemRightInsert, itemBottomInsert)
+    }
+
+    /**
+     * 绘制不同方向的分割线时, 触发的回调, 可以用来设置不同方向分割线的颜色
+     * */
+    var eachDrawItemDecoration: (left: Int, top: Int, right: Int, bottom: Int) -> Unit = { _, _, _, _ ->
+
     }
 
     override fun draw(
@@ -62,6 +93,8 @@ class SingleItemKt : SingleItem() {
         //super.draw(canvas, paint, itemView, offsetRect, itemCount, position)
 
         paint.color = itemDecorationColor
+        onlyDrawOffsetArea = true
+        eachDrawItemDecoration(0, itemTopInsert, 0, 0)
         if (itemTopInsert > 0) {
             if (onlyDrawOffsetArea) {
                 //绘制左右区域
@@ -83,6 +116,10 @@ class SingleItemKt : SingleItem() {
                 canvas.drawRect(mDrawRect, paint)
             }
         }
+
+        paint.color = itemDecorationColor
+        onlyDrawOffsetArea = true
+        eachDrawItemDecoration(0, 0, 0, itemBottomInsert)
         if (itemBottomInsert > 0) {
             if (onlyDrawOffsetArea) {
                 //绘制左右区域
@@ -104,6 +141,10 @@ class SingleItemKt : SingleItem() {
                 canvas.drawRect(mDrawRect, paint)
             }
         }
+
+        paint.color = itemDecorationColor
+        onlyDrawOffsetArea = true
+        eachDrawItemDecoration(itemLeftInsert, 0, 0, 0)
         if (itemLeftInsert > 0) {
             if (onlyDrawOffsetArea) {
                 //绘制上下区域
@@ -125,6 +166,10 @@ class SingleItemKt : SingleItem() {
                 canvas.drawRect(mDrawRect, paint)
             }
         }
+
+        paint.color = itemDecorationColor
+        onlyDrawOffsetArea = true
+        eachDrawItemDecoration(0, 0, itemRightInsert, 0)
         if (itemRightInsert > 0) {
             if (onlyDrawOffsetArea) {
                 //绘制上下区域
