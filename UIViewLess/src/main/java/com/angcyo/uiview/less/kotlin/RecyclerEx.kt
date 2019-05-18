@@ -20,16 +20,51 @@ import com.angcyo.uiview.less.recycler.adapter.DslAdapterItem
  * Copyright (c) 2019 ShenZhen O&M Cloud Co., Ltd. All rights reserved.
  */
 
-public fun RecyclerView.dslAdapter(init: DslAdapter.() -> Unit): DslAdapter {
-    val dslAdapter = DslAdapter()
-    dslAdapter.init()
-    adapter = dslAdapter
-    return dslAdapter
+public fun RecyclerView.dslAdapter(
+    append: Boolean = false, //当已经是adapter时, 是否追加item. 需要先关闭 new
+    new: Boolean = true, //始终创建新的adapter, 为true时, 则append无效
+    init: DslAdapter.() -> Unit
+): DslAdapter {
+
+    var dslAdapter: DslAdapter? = null
+
+    fun newAdapter() {
+        dslAdapter = DslAdapter()
+        dslAdapter!!.init()
+
+        adapter = dslAdapter
+    }
+
+    if (new) {
+        newAdapter()
+    } else {
+        if (adapter is DslAdapter) {
+            dslAdapter = adapter as DslAdapter
+
+            if (!append) {
+                dslAdapter!!.resetData(mutableListOf())
+            }
+
+            dslAdapter!!.init()
+        } else {
+            newAdapter()
+        }
+    }
+
+    return dslAdapter!!
 }
 
-public fun RecyclerView.dslAdapter(spanCount: Int = 1, init: DslAdapter.() -> Unit): DslAdapter {
-    val dslAdapter = DslAdapter()
-    dslAdapter.init()
+/**
+ * 支持网格布局
+ * */
+public fun RecyclerView.dslAdapter(
+    spanCount: Int = 1,
+    append: Boolean = false,
+    new: Boolean = true,
+    init: DslAdapter.() -> Unit
+): DslAdapter {
+
+    val dslAdapter = dslAdapter(append, new, init)
 
     layoutManager = RRecyclerView.GridLayoutManagerWrap(context, spanCount).apply {
         spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
@@ -38,8 +73,6 @@ public fun RecyclerView.dslAdapter(spanCount: Int = 1, init: DslAdapter.() -> Un
             }
         }
     }
-
-    adapter = dslAdapter
     return dslAdapter
 }
 

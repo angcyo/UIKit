@@ -8,6 +8,7 @@ import android.support.annotation.*;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import com.angcyo.lib.L;
@@ -52,6 +53,24 @@ public class FragmentHelper {
                 .parentLayoutId(parentLayout)
                 .allowStateLoss(stateLoss)
                 .doIt();
+    }
+
+    public static List<Fragment> find(@NonNull FragmentManager fragmentManager,
+                                      Class<? extends Fragment>... cls) {
+        List<Fragment> fragmentList = fragmentManager.getFragments();
+        List<Fragment> fragments = new ArrayList<>();
+        for (Class f : cls) {
+            String tag = f.getSimpleName();
+
+            for (Fragment fragment : fragmentList) {
+                String simpleName = fragment.getClass().getSimpleName();
+
+                if (TextUtils.equals(tag, simpleName)) {
+                    fragments.add(fragment);
+                }
+            }
+        }
+        return fragments;
     }
 
     /**
@@ -846,6 +865,12 @@ public class FragmentHelper {
         public Builder setArgs(@NonNull String key, int value) {
             ensureArgs();
             args.putInt(key, value);
+            return this;
+        }
+
+        public Builder setArgs(@NonNull String key, long value) {
+            ensureArgs();
+            args.putLong(key, value);
             return this;
         }
 
