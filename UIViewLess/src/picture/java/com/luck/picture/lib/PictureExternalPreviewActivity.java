@@ -113,7 +113,7 @@ public class PictureExternalPreviewActivity extends PictureBaseActivity implemen
     @Override
     public void onClick(View v) {
         finish();
-        RPicture.baseExitAnim(this);
+        RPicture.INSTANCE.baseExitAnim(this);
     }
 
     public class SimpleFragmentAdapter extends PagerAdapter {
@@ -219,14 +219,14 @@ public class PictureExternalPreviewActivity extends PictureBaseActivity implemen
                     @Override
                     public void onViewTap(View view, float x, float y) {
                         finish();
-                        RPicture.baseExitAnim(PictureExternalPreviewActivity.this);
+                        RPicture.INSTANCE.baseExitAnim(PictureExternalPreviewActivity.this);
                     }
                 });
                 longImg.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         finish();
-                        RPicture.baseExitAnim(PictureExternalPreviewActivity.this);
+                        RPicture.INSTANCE.baseExitAnim(PictureExternalPreviewActivity.this);
                     }
                 });
                 imageView.setOnLongClickListener(new View.OnLongClickListener() {
@@ -401,7 +401,7 @@ public class PictureExternalPreviewActivity extends PictureBaseActivity implemen
     public void onBackPressed() {
         super.onBackPressed();
         finish();
-        RPicture.baseExitAnim(this);
+        RPicture.INSTANCE.baseExitAnim(this);
     }
 
     @Override

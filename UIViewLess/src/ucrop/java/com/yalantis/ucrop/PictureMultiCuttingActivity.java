@@ -62,7 +62,7 @@ import java.util.Locale;
  */
 
 @SuppressWarnings("ConstantConditions")
-public class PictureMultiCuttingActivity extends AppCompatActivity {
+public class PictureMultiCuttingActivity extends BaseImmersiveActivity {
 
     public static final int DEFAULT_COMPRESS_QUALITY = 90;
     public static final Bitmap.CompressFormat DEFAULT_COMPRESS_FORMAT = Bitmap.CompressFormat.PNG;

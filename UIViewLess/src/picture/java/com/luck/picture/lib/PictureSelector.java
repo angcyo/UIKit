@@ -24,6 +24,9 @@ import java.util.List;
  * describe：for PictureSelector's media selection.
  * email：893855882@qq.com
  * data：2017/5/24
+ *
+ * 2.2.3
+ * https://github.com/LuckSiege/PictureSelector
  */
 
 public final class PictureSelector {
@@ -149,7 +152,7 @@ public final class PictureSelector {
             intent.putExtra(PictureConfig.EXTRA_PREVIEW_SELECT_LIST, (Serializable) medias);
             intent.putExtra(PictureConfig.EXTRA_POSITION, position);
             getActivity().startActivity(intent);
-            RPicture.baseEnterAnim(getActivity());
+            RPicture.INSTANCE.baseEnterAnim(getActivity());
         }
     }
 
@@ -167,7 +170,7 @@ public final class PictureSelector {
             intent.putExtra(PictureConfig.EXTRA_POSITION, position);
             intent.putExtra(PictureConfig.DIRECTORY_PATH, directory_path);
             getActivity().startActivity(intent);
-            RPicture.baseEnterAnim(getActivity());
+            RPicture.INSTANCE.baseEnterAnim(getActivity());
         }
     }
 
@@ -181,7 +184,7 @@ public final class PictureSelector {
             Intent intent = new Intent(getActivity(), PictureVideoPlayActivity.class);
             intent.putExtra("video_path", path);
             getActivity().startActivity(intent);
-            RPicture.baseEnterAnim(getActivity());
+            RPicture.INSTANCE.baseEnterAnim(getActivity());
         }
     }
 
@@ -195,7 +198,7 @@ public final class PictureSelector {
             Intent intent = new Intent(getActivity(), PicturePlayAudioActivity.class);
             intent.putExtra("audio_path", path);
             getActivity().startActivity(intent);
-            RPicture.baseEnterAnim(getActivity());
+            RPicture.INSTANCE.baseEnterAnim(getActivity());
         }
     }
 

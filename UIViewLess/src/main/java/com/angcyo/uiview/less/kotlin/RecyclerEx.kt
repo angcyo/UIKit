@@ -276,3 +276,7 @@ public fun RecyclerView.eachDslAdapterItem(callback: (index: Int, dslItem: DslAd
         }
     }
 }
+
+public fun RecyclerView.findViewHolder(position: Int): RBaseViewHolder? {
+    return findViewHolderForAdapterPosition(position) as? RBaseViewHolder
+}

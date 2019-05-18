@@ -492,7 +492,7 @@ public class PictureSelectorActivity extends PictureBaseActivity implements View
             bundle.putBoolean(PictureConfig.EXTRA_BOTTOM_PREVIEW, true);
             startActivity(PicturePreviewActivity.class, bundle,
                     config.selectionMode == PictureConfig.SINGLE ? UCrop.REQUEST_CROP : UCropMulti.REQUEST_MULTI_CROP);
-            RPicture.baseEnterAnim(this);
+            RPicture.INSTANCE.baseEnterAnim(this);
         }
 
         if (id == R.id.id_ll_ok) {
@@ -811,7 +811,7 @@ public class PictureSelectorActivity extends PictureBaseActivity implements View
                 bundle.putInt(PictureConfig.EXTRA_POSITION, position);
                 startActivity(PicturePreviewActivity.class, bundle,
                         config.selectionMode == PictureConfig.SINGLE ? UCrop.REQUEST_CROP : UCropMulti.REQUEST_MULTI_CROP);
-                RPicture.baseEnterAnim(this);
+                RPicture.INSTANCE.baseEnterAnim(this);
                 break;
             case PictureConfig.TYPE_VIDEO:
                 // video
@@ -821,7 +821,7 @@ public class PictureSelectorActivity extends PictureBaseActivity implements View
                 } else {
                     bundle.putString("video_path", media.getPath());
                     startActivity(PictureVideoPlayActivity.class, bundle);
-                    RPicture.baseEnterAnim(this);
+                    RPicture.INSTANCE.baseEnterAnim(this);
                 }
                 break;
             case PictureConfig.TYPE_AUDIO:

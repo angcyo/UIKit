@@ -50,6 +50,8 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
 
     protected FragmentSwipeBackLayout fragmentSwipeBackLayout;
 
+    protected int fragmentParentLayoutId = -1;
+
     //<editor-fold desc="生命周期, 系统的方法">
 
     @Override
@@ -99,10 +101,6 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
 
         int fragmentParentLayoutId = getFragmentParentLayoutId();
 
-        if (fragmentParentLayoutId == -1) {
-            fragmentParentLayoutId = FragmentHelper.getFragmentContainerId(getSupportFragmentManager());
-        }
-
         if (fragmentParentLayoutId != -1) {
             if (!onFragmentBackPressed(fragmentParentLayoutId)) {
                 return;
@@ -133,7 +131,10 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
      */
     @IdRes
     protected int getFragmentParentLayoutId() {
-        return -1;
+        if (fragmentParentLayoutId == -1) {
+            fragmentParentLayoutId = FragmentHelper.getFragmentContainerId(getSupportFragmentManager());
+        }
+        return fragmentParentLayoutId;
     }
 
     //</editor-fold>
@@ -305,7 +306,7 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
         if (lastFragment instanceof AbsFragment) {
             lastFragment.onActivityResult(requestCode, resultCode, data);
         }
-        RPicture.onActivityResult(requestCode, resultCode, data);
+        RPicture.INSTANCE.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override

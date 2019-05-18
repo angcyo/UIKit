@@ -1,7 +1,7 @@
 package com.luck.picture.lib.tools;
 
 import android.content.Context;
-import android.widget.Toast;
+import com.angcyo.uiview.less.utils.TopToast;
 
 /**
  * @author：luck
@@ -12,7 +12,8 @@ import android.widget.Toast;
 public final class ToastManage {
 
     public static void s(Context mContext, String s) {
-        Toast.makeText(mContext.getApplicationContext(), s, Toast.LENGTH_LONG)
-                .show();
+//        Toast.makeText(mContext.getApplicationContext(), s, Toast.LENGTH_LONG)
+//                .show();
+        TopToast.INSTANCE.show(s, -1);
     }
 }

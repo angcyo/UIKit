@@ -425,7 +425,7 @@ public class PictureSelectionModel {
             } else {
                 activity.startActivityForResult(intent, requestCode);
             }
-            RPicture.baseEnterAnim(activity);
+            RPicture.INSTANCE.baseEnterAnim(activity);
         }
     }
 

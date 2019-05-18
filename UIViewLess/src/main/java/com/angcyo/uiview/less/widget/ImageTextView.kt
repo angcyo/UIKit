@@ -11,6 +11,7 @@ import android.util.AttributeSet
 import com.angcyo.uiview.less.R
 import com.angcyo.uiview.less.draw.RDrawNoRead
 import com.angcyo.uiview.less.kotlin.density
+import com.angcyo.uiview.less.kotlin.dpi
 import com.angcyo.uiview.less.kotlin.getDrawCenterCx
 import com.angcyo.uiview.less.kotlin.textWidth
 

@@ -28,6 +28,14 @@ public class AttrsUtils {
         return color;
     }
 
+    public static int getTypeValueColor(Context mContext, int styleId, int attr) {
+        int[] attribute = new int[]{attr};
+        TypedArray array = mContext.obtainStyledAttributes(styleId, attribute);
+        int color = array.getColor(0, -1);
+        array.recycle();
+        return color;
+    }
+
     /**
      * attrs status color or black
      *
@@ -39,6 +47,14 @@ public class AttrsUtils {
         TypedValue typedValue = new TypedValue();
         int[] attribute = new int[]{attr};
         TypedArray array = mContext.obtainStyledAttributes(typedValue.resourceId, attribute);
+        boolean statusFont = array.getBoolean(0, false);
+        array.recycle();
+        return statusFont;
+    }
+
+    public static boolean getTypeValueBoolean(Context mContext, int styleId, int attr) {
+        int[] attribute = new int[]{attr};
+        TypedArray array = mContext.obtainStyledAttributes(styleId, attribute);
         boolean statusFont = array.getBoolean(0, false);
         array.recycle();
         return statusFont;

@@ -60,6 +60,7 @@ public class PictureBaseActivity extends FragmentActivity {
     protected PictureDialog dialog;
     protected PictureDialog compressDialog;
     protected List<LocalMedia> selectionMedias;
+    CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     /**
      * 是否使用沉浸式，子类复写该方法来确定是否采用沉浸式
@@ -202,9 +203,6 @@ public class PictureBaseActivity extends FragmentActivity {
         }
     }
 
-
-    CompositeDisposable compositeDisposable = new CompositeDisposable();
-
     public void addDisposable(@NonNull Disposable disposable) {
         compositeDisposable.add(disposable);
     }
@@ -281,7 +279,7 @@ public class PictureBaseActivity extends FragmentActivity {
                 // 如果是网络图片则不压缩
                 boolean http = PictureMimeType.isHttp(path);
                 boolean eqTrue = !TextUtils.isEmpty(path) && http;
-                image.setCompressed(eqTrue ? false : true);
+                image.setCompressed(!eqTrue);
                 image.setCompressPath(eqTrue ? "" : path);
             }
         }
@@ -461,7 +459,7 @@ public class PictureBaseActivity extends FragmentActivity {
         if (config.camera) {
             overridePendingTransition(0, R.anim.fade_out);
         } else {
-            RPicture.baseExitAnim(this);
+            RPicture.INSTANCE.baseExitAnim(this);
         }
     }
 

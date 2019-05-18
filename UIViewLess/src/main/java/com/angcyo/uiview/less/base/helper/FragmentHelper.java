@@ -433,7 +433,14 @@ public class FragmentHelper {
                 break lastFragment;
             }
         } else if (!fragments.isEmpty()) {
-            lastFragment = fragments.get(fragments.size() - 1);
+            for (int i = fragments.size() - 1; i >= 0; i--) {
+                Fragment fragment = fragments.get(i);
+                if (fragment.getView() == null) {
+                    continue;
+                }
+                lastFragment = fragment;
+                break;
+            }
         }
         return lastFragment;
     }
