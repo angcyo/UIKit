@@ -39,6 +39,9 @@ class ImageTextView(context: Context, attributeSet: AttributeSet? = null) : AppC
             textPaint.textSize = field
         }
 
+    /**
+     * 默认值请在init中设置
+     * */
     var textOffset: Int = 0
         get() {
             if (showText.isNullOrEmpty()) {
@@ -65,9 +68,9 @@ class ImageTextView(context: Context, attributeSet: AttributeSet? = null) : AppC
         val typedArray = context.obtainStyledAttributes(attributeSet, R.styleable.ImageTextView)
         showText = typedArray.getString(R.styleable.ImageTextView_r_show_text)
         showTextSize =
-                typedArray.getDimensionPixelOffset(R.styleable.ImageTextView_r_show_text_size, showTextSize.toInt())
-                    .toFloat()
-        textOffset = typedArray.getDimensionPixelOffset(R.styleable.ImageTextView_r_text_offset, 0)
+            typedArray.getDimensionPixelOffset(R.styleable.ImageTextView_r_show_text_size, showTextSize.toInt())
+                .toFloat()
+        textOffset = typedArray.getDimensionPixelOffset(R.styleable.ImageTextView_r_text_offset, 6 * dpi)
         textShowColor = typedArray.getColor(R.styleable.ImageTextView_r_show_text_color, textShowColor)
         typedArray.recycle()
 
@@ -131,8 +134,10 @@ class ImageTextView(context: Context, attributeSet: AttributeSet? = null) : AppC
 
                 //绘制需要显示的文本文本
                 canvas.drawText(
-                    showText!!, paddingLeft + textOffset - 4 * density + drawWidth / 2 - imageSize / 2,
-                    paddingTop + drawHeight / 2 + textHeight / 2 - textPaint.descent(), textPaint
+                    showText!!,
+                    getDrawCenterCx() - textWidth / 2 + textOffset,//paddingLeft + textOffset - 4 * density + drawWidth / 2 - imageSize / 2,
+                    paddingTop + drawHeight / 2 + textHeight / 2 - textPaint.descent(),
+                    textPaint
                 )
             } else {
                 super.onDraw(canvas)
