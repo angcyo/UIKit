@@ -23,13 +23,14 @@ open class DslAdapterItem {
     //<editor-fold desc="标准属性">
 
     /**布局的xml id, 必须设置.*/
-    var itemLayoutId: Int = -1
+    open var itemLayoutId: Int = -1
 
     /**附加的数据*/
     var itemData: Any? = null
 
     /**界面绑定*/
-    var itemBind: (itemHolder: RBaseViewHolder, itemPosition: Int, adapterItem: DslAdapterItem) -> Unit = { _, _, _ -> }
+    open var itemBind: (itemHolder: RBaseViewHolder, itemPosition: Int, adapterItem: DslAdapterItem) -> Unit =
+        { _, _, _ -> }
 
     //</editor-fold>
 

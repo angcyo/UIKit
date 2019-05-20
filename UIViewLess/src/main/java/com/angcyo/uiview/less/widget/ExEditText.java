@@ -2,6 +2,7 @@ package com.angcyo.uiview.less.widget;
 
 import android.animation.Animator;
 import android.animation.ValueAnimator;
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
@@ -41,6 +42,7 @@ import com.angcyo.uiview.less.utils.RUtils;
 import com.angcyo.uiview.less.utils.Reflect;
 import com.angcyo.uiview.less.widget.group.RSoftInputLayout;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -53,6 +55,8 @@ import java.util.regex.Pattern;
  */
 
 public class ExEditText extends AppCompatEditText {
+
+    static HideSoftInputRunnable hideSoftInputRunnable;
 
     /**
      * @see #onAttachedToWindow()
@@ -135,7 +139,7 @@ public class ExEditText extends AppCompatEditText {
      */
     private int maxCharLength = 0;
     /**
-     * 允许输入溢出
+     * 允许输入溢出, 用于限制输入长度时, 但是却可以输入更多字符
      */
     private boolean allowInputOverflow = false;
     /**
@@ -156,6 +160,11 @@ public class ExEditText extends AppCompatEditText {
      * clear 按钮功能切换成, 显示/隐藏 密码.
      */
     private boolean isPasswordDrawable = false;
+
+    /**
+     * 当失去焦点时, 是否隐藏键盘
+     */
+    private boolean autoHideSoftInputOnLostFocus = false;
 
     public ExEditText(Context context) {
         super(context);
@@ -327,6 +336,7 @@ public class ExEditText extends AppCompatEditText {
         clearDrawable = typedArray.getDrawable(R.styleable.ExEditText_r_clear_drawable);
         showPasswordOnTouch = typedArray.getBoolean(R.styleable.ExEditText_r_show_password_on_touch, showPasswordOnTouch);
         isPasswordDrawable = typedArray.getBoolean(R.styleable.ExEditText_r_is_password_drawable, isPasswordDrawable);
+        autoHideSoftInputOnLostFocus = typedArray.getBoolean(R.styleable.ExEditText_r_auto_hide_soft_input_on_lost_focus, autoHideSoftInputOnLostFocus);
 
         typedArray.recycle();
 
@@ -433,7 +443,21 @@ public class ExEditText extends AppCompatEditText {
 //                    }
 //                });
 //            }
+
+            if (hideSoftInputRunnable != null) {
+                hideSoftInputRunnable.remove();
+            }
+
         } else {
+
+            if (autoHideSoftInputOnLostFocus) {
+                if (hideSoftInputRunnable != null) {
+                    hideSoftInputRunnable.remove();
+                }
+                hideSoftInputRunnable = new HideSoftInputRunnable(this);
+                postDelayed(hideSoftInputRunnable, 60);
+            }
+
             touchDownWithHandle = 0;
             //没有焦点的时候, 检查自动匹配输入
             if (isInputTipPattern()) {
@@ -1920,6 +1944,45 @@ public class ExEditText extends AppCompatEditText {
 //        L.e("call: getContextMenuInfo([])-> ");
 //        return super.getContextMenuInfo();
 //    }
+
+    static class HideSoftInputRunnable implements Runnable {
+        WeakReference<View> decorView;
+
+        public HideSoftInputRunnable(View editText) {
+            Activity activity = (Activity) editText.getContext();
+            activity.getWindow().getDecorView();
+
+            this.decorView = new WeakReference<>(activity.getWindow().getDecorView());
+        }
+
+        private void remove() {
+            if (decorView != null) {
+                if (decorView.get() != null) {
+                    decorView.get().removeCallbacks(this);
+
+                    decorView.clear();
+                    decorView = null;
+                }
+            }
+
+            hideSoftInputRunnable = null;
+        }
+
+        @Override
+        public void run() {
+            if (decorView != null) {
+                View view = decorView.get();
+                if (view != null) {
+
+                    InputMethodManager manager = (InputMethodManager) view.getContext()
+                            .getSystemService(Context.INPUT_METHOD_SERVICE);
+                    manager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+
+                    remove();
+                }
+            }
+        }
+    }
 
     /**
      * 用来监听@字符输入

@@ -175,6 +175,8 @@ public fun TextView.textHeight(): Float = paint.descent() - paint.ascent()
 public fun View.textWidth(paint: Paint?, text: String?): Float = paint?.measureText(text ?: "")
     ?: 0F
 
+public fun String.textWidth(paint: Paint?): Float = paint?.measureText(this) ?: 0F
+
 public fun TextView.textWidth(text: String?): Float = paint.measureText(text ?: "")
 public fun TextView.drawPadding(padding: Int) {
     compoundDrawablePadding = padding
@@ -776,29 +778,27 @@ public fun ImageView.load(url: String?, option: (RequestBuilder<Drawable>.() -> 
 /**
  * 获取View, 相对于手机屏幕的矩形
  * */
-public fun View.getViewRect(): Rect {
+public fun View.getViewRect(result: Rect = Rect()): Rect {
     var offsetX = 0
     var offsetY = 0
 
     //横屏, 并且显示了虚拟导航栏的时候. 需要左边偏移
     //只计算一次
     (context as? Activity)?.let {
-        val decorRect = Rect()
-        it.window.decorView.getGlobalVisibleRect(decorRect)
-        if (decorRect.width() > decorRect.height()) {
+        it.window.decorView.getGlobalVisibleRect(result)
+        if (result.width() > result.height()) {
             //横屏了
             offsetX = -RUtils.navBarHeight(it)
         }
     }
 
-    return getViewRect(offsetX, offsetY)
+    return getViewRect(offsetX, offsetY, result)
 }
 
 /**
  * 获取View, 相对于手机屏幕的矩形, 带皮阿尼一
  * */
-public fun View.getViewRect(offsetX: Int, offsetY: Int): Rect {
-    val r = Rect()
+public fun View.getViewRect(offsetX: Int, offsetY: Int, result: Rect = Rect()): Rect {
     //可见位置的坐标, 超出屏幕的距离会被剃掉
     //image.getGlobalVisibleRect(r)
     val r2 = IntArray(2)
@@ -811,8 +811,8 @@ public fun View.getViewRect(offsetX: Int, offsetY: Int): Rect {
     val left = r2[0] + offsetX
     val top = r2[1] + offsetY
 
-    r.set(left, top, left + measuredWidth, top + measuredHeight)
-    return r
+    result.set(left, top, left + measuredWidth, top + measuredHeight)
+    return result
 }
 
 public fun View.marginLayoutParams(config: ViewGroup.MarginLayoutParams.() -> Unit) {

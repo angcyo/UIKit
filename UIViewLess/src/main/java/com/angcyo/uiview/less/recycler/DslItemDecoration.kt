@@ -14,7 +14,7 @@ import com.angcyo.uiview.less.kotlin.eachChildRViewHolder
  * @date 2019/05/10
  * Copyright (canvas) 2019 ShenZhen O&M Cloud Co., Ltd. All rights reserved.
  */
-class DslItemDecoration(
+open class DslItemDecoration(
     val init: (that: DslItemDecoration) -> Unit = { _ -> },
     val onDrawOver: (that: DslItemDecoration, canvas: Canvas, parent: RecyclerView, state: RecyclerView.State, paint: Paint) -> Unit = { _, _, _, _, _ -> },
     val onDraw: (that: DslItemDecoration, canvas: Canvas, parent: RecyclerView, state: RecyclerView.State, paint: Paint) -> Unit = { _, _, _, _, _ -> },
@@ -31,11 +31,11 @@ class DslItemDecoration(
      * canvas 不为空时, 是 onDrawOver onDraw
      * isOverDraw 控制是否是 onDrawOver
      * */
-    var eachItemDoIt: (
+    open var eachItemDoIt: (
         canvas: Canvas?, parent: RecyclerView, state: RecyclerView.State, outRect: Rect?,
-        beforeViewHolder: RecyclerView.ViewHolder?,
-        viewHolder: RecyclerView.ViewHolder,
-        afterViewHolder: RecyclerView.ViewHolder?,
+        beforeViewHolder: RBaseViewHolder?,
+        viewHolder: RBaseViewHolder,
+        afterViewHolder: RBaseViewHolder?,
         isOverDraw: Boolean
     ) -> Unit =
         { _, _, _, _, _, _, _, _ -> }

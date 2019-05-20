@@ -137,7 +137,7 @@ class ImageTextView(context: Context, attributeSet: AttributeSet? = null) : AppC
                 canvas.drawText(
                     showText!!,
                     getDrawCenterCx() - textWidth / 2 + textOffset,//paddingLeft + textOffset - 4 * density + drawWidth / 2 - imageSize / 2,
-                    paddingTop + drawHeight / 2 + textHeight / 2 - textPaint.descent(),
+                    paddingTop + drawHeight / 2 + textHeight / 2 - textPaint.descent() / 2,
                     textPaint
                 )
             } else {
@@ -146,7 +146,7 @@ class ImageTextView(context: Context, attributeSet: AttributeSet? = null) : AppC
                 //绘制需要显示的文本文本
                 canvas.drawText(
                     showText!!, getDrawCenterCx() - textWidth / 2,
-                    paddingTop + drawHeight / 2 + textHeight / 2 - textPaint.descent(), textPaint
+                    paddingTop + drawHeight / 2 + textHeight / 2 - textPaint.descent() / 2, textPaint
                 )
             }
         } else {
