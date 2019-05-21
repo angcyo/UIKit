@@ -83,6 +83,7 @@ object RNetwork {
                     override fun onAvailable(network: Network) {
                         super.onAvailable(network)
                         L.d("lzp", "onAvailable")
+                        notifyObservers(NetworkType.NETWORK_AVAILABLE)
                     }
 
                     /**
@@ -259,6 +260,7 @@ interface NetStateChangeObserver {
 enum class NetworkType {
     NETWORK_WIFI,
     NETWORK_MOBILE,
+    NETWORK_AVAILABLE,
     NETWORK_UNKNOWN,
     NETWORK_NO
 }
