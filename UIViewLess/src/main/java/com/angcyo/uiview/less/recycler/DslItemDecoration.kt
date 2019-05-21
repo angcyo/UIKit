@@ -6,6 +6,7 @@ import android.graphics.Rect
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import com.angcyo.uiview.less.kotlin.eachChildRViewHolder
+import com.angcyo.uiview.less.recycler.adapter.DslAdapter
 
 /**
  *
@@ -24,6 +25,8 @@ open class DslItemDecoration(
     val paint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
     val tempDrawRect = Rect()
 
+    val tempRect = Rect()
+
     /**
      * 将3个方法, 合一调用. 通过参数, 来区分是那一个方法.
      *
@@ -38,7 +41,38 @@ open class DslItemDecoration(
         afterViewHolder: RBaseViewHolder?,
         isOverDraw: Boolean
     ) -> Unit =
-        { _, _, _, _, _, _, _, _ -> }
+        { canvas, parent, state, outRect,
+          beforeViewHolder, viewHolder, afterViewHolder,
+          isOverDraw ->
+
+            val adapterPosition = viewHolder.adapterPosition
+            if (parent.adapter is DslAdapter) {
+                (parent.adapter as? DslAdapter)?.getItemData(adapterPosition)?.let { item ->
+
+                    //设置分割线占坑大小
+                    outRect?.let {
+                        item.setItemOffsets(it)
+                    }
+
+                    canvas?.let {
+                        if (!isOverDraw) {
+                            //绘制分割线
+                            tempRect.clear()
+                            item.setItemOffsets(tempRect)
+                            item.draw(
+                                it,
+                                paint,
+                                viewHolder.itemView,
+                                tempRect,
+                                parent.adapter?.itemCount ?: 0,
+                                adapterPosition,
+                                tempDrawRect
+                            )
+                        }
+                    }
+                }
+            }
+        }
 
     init {
         init.invoke(this)

@@ -360,9 +360,9 @@ public fun EditText.onEmptyText(listener: (Boolean) -> Unit) {
 }
 
 /**只要文本改变就通知*/
-public fun EditText.onTextChange(listener: (String) -> Unit) {
+public fun EditText.onTextChange(defaultText: CharSequence? = null, listener: (CharSequence) -> Unit) {
     this.addTextChangedListener(object : SingleTextWatcher() {
-        var lastText: String? = null
+        var lastText: CharSequence? = defaultText
 
         override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
             super.onTextChanged(s, start, before, count)
@@ -800,13 +800,13 @@ public fun View.getViewRect(result: Rect = Rect()): Rect {
  * */
 public fun View.getViewRect(offsetX: Int, offsetY: Int, result: Rect = Rect()): Rect {
     //可见位置的坐标, 超出屏幕的距离会被剃掉
-    //image.getGlobalVisibleRect(r)
+    //getGlobalVisibleRect(r)
     val r2 = IntArray(2)
     //val r3 = IntArray(2)
     //相对于屏幕的坐标
     getLocationOnScreen(r2)
     //相对于窗口的坐标
-    //image.getLocationInWindow(r3)
+    //getLocationInWindow(r3)
 
     val left = r2[0] + offsetX
     val top = r2[1] + offsetY
