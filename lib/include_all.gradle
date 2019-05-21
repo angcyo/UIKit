@@ -46,7 +46,7 @@ def includePath(filePath, parent) {
 
             def ignore = false
             ignoreModule.each {
-                ignore = ignore || path.contains(it)
+                ignore = ignore || path == it
             }
 
             if (ignore) {

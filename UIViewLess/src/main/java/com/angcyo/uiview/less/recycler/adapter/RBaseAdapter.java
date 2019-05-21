@@ -78,6 +78,7 @@ public abstract class RBaseAdapter<T> extends RecyclerView.Adapter<RBaseViewHold
      * 保存 itemType 对应的 layout id
      */
     protected SparseIntArray layouts = new SparseIntArray();
+    public RecyclerView recyclerView;
     /**
      * 当前加载状态
      */
@@ -99,6 +100,8 @@ public abstract class RBaseAdapter<T> extends RecyclerView.Adapter<RBaseViewHold
         this(context, null);
     }
 
+    //<editor-fold desc="静态方法区">
+
     public RBaseAdapter(Context context, List<T> datas) {
         this.mAllDatas = datas == null ? new ArrayList<T>() : datas;
         this.mContext = context;
@@ -106,11 +109,13 @@ public abstract class RBaseAdapter<T> extends RecyclerView.Adapter<RBaseViewHold
         registerLayouts(layouts);
     }
 
-    //<editor-fold desc="静态方法区">
-
     public static int getListSize(List list) {
         return list == null ? 0 : list.size();
     }
+
+    //</editor-fold desc="静态方法区">
+
+    //<editor-fold desc="生命周期方法">
 
     /**
      * 使用布局局部刷新
@@ -142,10 +147,6 @@ public abstract class RBaseAdapter<T> extends RecyclerView.Adapter<RBaseViewHold
             }
         }
     }
-
-    //</editor-fold desc="静态方法区">
-
-    //<editor-fold desc="生命周期方法">
 
     @Override
     public void onChildViewAttachedToWindow(@NonNull View view) {
@@ -179,6 +180,10 @@ public abstract class RBaseAdapter<T> extends RecyclerView.Adapter<RBaseViewHold
 //        L.w("onViewDetachedFromWindow");
     }
 
+    //</editor-fold desc="生命周期方法">
+
+    //<editor-fold desc="Adapter 核心方法">
+
     @Override
     public void onViewRecycled(@NonNull RBaseViewHolder holder) {
         super.onViewRecycled(holder);
@@ -189,10 +194,6 @@ public abstract class RBaseAdapter<T> extends RecyclerView.Adapter<RBaseViewHold
             mIShowState = null;
         }
     }
-
-    //</editor-fold desc="生命周期方法">
-
-    //<editor-fold desc="Adapter 核心方法">
 
     @Override
     public int getItemCount() {
@@ -298,15 +299,15 @@ public abstract class RBaseAdapter<T> extends RecyclerView.Adapter<RBaseViewHold
         }
     }
 
+    //</editor-fold desc="Adapter 核心方法">
+
+    //<editor-fold desc="可操作方法">
+
     @Override
     final public void onBindViewHolder(RBaseViewHolder holder, int position, List<Object> payloads) {
         super.onBindViewHolder(holder, position, payloads);
         //L.e("call: onBindViewHolder([holder, position, payloads])-> " + position);
     }
-
-    //</editor-fold desc="Adapter 核心方法">
-
-    //<editor-fold desc="可操作方法">
 
     /**
      * 重写此方法需要和{@link #getItemType(int, Object)}配合使用
@@ -350,7 +351,6 @@ public abstract class RBaseAdapter<T> extends RecyclerView.Adapter<RBaseViewHold
     protected boolean isStateLayout() {
         return mEnableShowState && mShowState != IShowState.NORMAL;
     }
-
 
     @NonNull
     protected RBaseViewHolder createBaseViewHolder(int viewType, View itemView) {
@@ -529,10 +529,7 @@ public abstract class RBaseAdapter<T> extends RecyclerView.Adapter<RBaseViewHold
      * 数据是否为空
      */
     public boolean isItemEmpty() {
-        if (mAllDatas == null || mAllDatas.isEmpty()) {
-            return true;
-        }
-        return false;
+        return mAllDatas == null || mAllDatas.isEmpty();
     }
 
     /**
@@ -557,6 +554,7 @@ public abstract class RBaseAdapter<T> extends RecyclerView.Adapter<RBaseViewHold
         return mAllDatas == null ? 0 : mAllDatas.size();
     }
 
+    //---------------滚动事件的处理--------------------//
 
     /**
      * 当 {@link #getItemLayoutId(int)} 返回0的时候, 会调用此方法
@@ -565,8 +563,6 @@ public abstract class RBaseAdapter<T> extends RecyclerView.Adapter<RBaseViewHold
         return null;
     }
 
-    //---------------滚动事件的处理--------------------//
-
     /**
      * 如果未重写 {@link #registerLayouts(SparseIntArray)}, 请重写此方法
      */
@@ -574,9 +570,9 @@ public abstract class RBaseAdapter<T> extends RecyclerView.Adapter<RBaseViewHold
         return layouts.get(viewType);
     }
 
-    protected abstract void onBindView(@NonNull RBaseViewHolder holder, int position, T bean);
-
     //----------------Item 数据的操作-----------------//
+
+    protected abstract void onBindView(@NonNull RBaseViewHolder holder, int position, T bean);
 
     public void onScrollStateChanged(@NonNull RRecyclerView recyclerView, int newState) {
     }
@@ -936,6 +932,14 @@ public abstract class RBaseAdapter<T> extends RecyclerView.Adapter<RBaseViewHold
         notifyItemRangeChanged(position, getItemCount());
     }
 
+//    /**
+//     * Item悬停库的支持
+//     */
+//    @Override
+//    public List<?> getAdapterData() {
+//        return mAllDatas;
+//    }
+
     /**
      * 自动处理分页加载, 和加载更多的数据
      */
@@ -981,14 +985,6 @@ public abstract class RBaseAdapter<T> extends RecyclerView.Adapter<RBaseViewHold
             }
         }
     }
-
-//    /**
-//     * Item悬停库的支持
-//     */
-//    @Override
-//    public List<?> getAdapterData() {
-//        return mAllDatas;
-//    }
 
     @Deprecated
     public void onUILoadDataSet(int page /*分页*/, int pageSize /*每一页数量*/, int datasSize /*数据数量*/) {
@@ -1098,16 +1094,16 @@ public abstract class RBaseAdapter<T> extends RecyclerView.Adapter<RBaseViewHold
         return mEnableShowState;
     }
 
+    //</editor-fold desc="可操作方法">
+
+    //<editor-fold desc="事件回调">
+
     /**
      * 空布局, 无网络布局, 加载中布局,和错误布局
      */
     public void setEnableShowState(boolean enableShowState) {
         mEnableShowState = enableShowState;
     }
-
-    //</editor-fold desc="可操作方法">
-
-    //<editor-fold desc="事件回调">
 
     public BaseUI.UIAdapterLoadMore getUiAdapterLoadMore() {
         if (uiAdapterLoadMore == null) {
@@ -1120,6 +1116,10 @@ public abstract class RBaseAdapter<T> extends RecyclerView.Adapter<RBaseViewHold
         this.uiAdapterLoadMore = uiAdapterLoadMore;
     }
 
+    //</editor-fold desc="事件回调">
+
+    //<editor-fold desc="页面样式定制">
+
     public BaseUI.UIAdapterShowStatus getUiAdapterShowStatus() {
         if (uiAdapterShowStatus == null) {
             return BaseUI.uiAdapterShowStatus;
@@ -1127,13 +1127,23 @@ public abstract class RBaseAdapter<T> extends RecyclerView.Adapter<RBaseViewHold
         return uiAdapterShowStatus;
     }
 
-    //</editor-fold desc="事件回调">
-
-    //<editor-fold desc="页面样式定制">
-
     public void setUiAdapterShowStatus(BaseUI.UIAdapterShowStatus uiAdapterShowStatus) {
         this.uiAdapterShowStatus = uiAdapterShowStatus;
     }
+
+    @Override
+    public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView) {
+        super.onAttachedToRecyclerView(recyclerView);
+        this.recyclerView = recyclerView;
+    }
+
+    @Override
+    public void onDetachedFromRecyclerView(@NonNull RecyclerView recyclerView) {
+        super.onDetachedFromRecyclerView(recyclerView);
+        this.recyclerView = null;
+    }
+
+    //</editor-fold desc="页面样式定制">
 
     public interface OnAdapterLoadMoreListener<T> {
         void onAdapterLodeMore(@NonNull RBaseAdapter<T> baseAdapter);
@@ -1204,10 +1214,7 @@ public abstract class RBaseAdapter<T> extends RecyclerView.Adapter<RBaseViewHold
             if (oldClass.isAssignableFrom(newClass) || newClass.isAssignableFrom(oldClass)) {
                 return true;
             }
-            if (TextUtils.equals(oldClass.getSimpleName(), newClass.getSimpleName())) {
-                return true;
-            }
-            return false;
+            return TextUtils.equals(oldClass.getSimpleName(), newClass.getSimpleName());
         }
 
         /**
@@ -1225,7 +1232,4 @@ public abstract class RBaseAdapter<T> extends RecyclerView.Adapter<RBaseViewHold
             return false;
         }
     }
-
-    //</editor-fold desc="页面样式定制">
-
 }

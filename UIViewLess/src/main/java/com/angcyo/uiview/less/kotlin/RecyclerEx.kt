@@ -5,6 +5,7 @@ import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.SimpleItemAnimator
 import android.view.View
+import com.angcyo.uiview.less.R
 import com.angcyo.uiview.less.kotlin.dsl.DslRecyclerScroll
 import com.angcyo.uiview.less.recycler.DslItemDecoration
 import com.angcyo.uiview.less.recycler.RBaseViewHolder
@@ -88,6 +89,16 @@ public fun <T> DslAdapter.renderItem(data: T, init: DslAdapterItem.() -> Unit) {
     val adapterItem = DslAdapterItem()
     adapterItem.itemData = data
     adapterItem.init()
+    addLastItem(adapterItem)
+}
+
+/**空的占位item*/
+public fun DslAdapter.renderEmptyItem(height: Int = 120 * dpi) {
+    val adapterItem = DslAdapterItem()
+    adapterItem.itemLayoutId = R.layout.base_empty_item
+    adapterItem.itemBind = { itemHolder, _, _ ->
+        itemHolder.itemView.setHeight(height)
+    }
     addLastItem(adapterItem)
 }
 
