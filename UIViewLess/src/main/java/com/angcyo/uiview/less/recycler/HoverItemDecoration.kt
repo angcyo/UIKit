@@ -24,7 +24,12 @@ open class HoverItemDecoration : RecyclerView.ItemDecoration() {
     internal var recyclerView: RecyclerView? = null
     internal var hoverCallback: HoverCallback? = null
     internal var isDownInHoverItem = false
+
+    /**分割线追加在的容器*/
     internal var windowContent: ViewGroup? = null
+
+    /**需要移除的分割线*/
+    internal val removeViews = arrayListOf<View>()
 
     val cancelEvent = Runnable {
         overViewHolder?.apply {
@@ -100,6 +105,16 @@ open class HoverItemDecoration : RecyclerView.ItemDecoration() {
         }
     }
 
+    private val scrollListener = object : RecyclerView.OnScrollListener() {
+        override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+            super.onScrollStateChanged(recyclerView, newState)
+            if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                //滚动状态结束
+                removeAllHoverView()
+            }
+        }
+    }
+
     /**
      * 调用此方法, 安装悬浮分割线
      * */
@@ -128,7 +143,26 @@ open class HoverItemDecoration : RecyclerView.ItemDecoration() {
             addItemDecoration(this@HoverItemDecoration)
             addOnItemTouchListener(itemTouchListener)
             addOnAttachStateChangeListener(attachStateChangeListener)
+            addOnScrollListener(scrollListener)
         }
+    }
+
+    private fun destroyCallbacks() {
+        this.recyclerView?.apply {
+            removeItemDecoration(this@HoverItemDecoration)
+            removeOnItemTouchListener(itemTouchListener)
+            removeOnAttachStateChangeListener(attachStateChangeListener)
+            removeOnScrollListener(scrollListener)
+        }
+        removeAllHoverView()
+    }
+
+    private fun removeAllHoverView() {
+        removeViews.forEach {
+            (it.parent as? ViewGroup)?.removeView(it)
+        }
+
+        removeViews.clear()
     }
 
     /**
@@ -137,7 +171,9 @@ open class HoverItemDecoration : RecyclerView.ItemDecoration() {
     private fun removeHoverView() {
         overViewHolder?.itemView?.apply {
             dispatchTouchEvent(MotionEvent.obtain(nowTime(), nowTime(), MotionEvent.ACTION_CANCEL, 0f, 0f, 0))
-            (parent as? ViewGroup)?.removeView(this)
+            //(parent as? ViewGroup)?.removeView(this)
+
+            removeViews.add(this)
         }
     }
 
@@ -156,15 +192,6 @@ open class HoverItemDecoration : RecyclerView.ItemDecoration() {
                 }
             )
         }
-    }
-
-    private fun destroyCallbacks() {
-        this.recyclerView?.apply {
-            removeItemDecoration(this@HoverItemDecoration)
-            removeOnItemTouchListener(itemTouchListener)
-            removeOnAttachStateChangeListener(attachStateChangeListener)
-        }
-        removeHoverView()
     }
 
     override fun onDrawOver(canvas: Canvas, parent: RecyclerView, state: RecyclerView.State) {
