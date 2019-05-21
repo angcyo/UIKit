@@ -39,3 +39,8 @@ public fun String.deleteFile() {
 public fun String.saveToFile(data: String, append: Boolean = true) {
     FileUtils.writeFileFromString(this, data, append)
 }
+
+/**获取文件md5值*/
+public fun File.md5(): String {
+    return FileUtils.getFileMD5ToString(this)
+}

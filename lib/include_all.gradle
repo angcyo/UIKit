@@ -46,11 +46,11 @@ def includePath(filePath, parent) {
 
             def ignore = false
             ignoreModule.each {
-                ignore = ignore || path == it
+                ignore = ignore || path == it || parent + ':' + it == path
             }
 
             if (ignore) {
-                println '忽略->' + path
+                println '忽略->' + parent + ':' + path
             } else {
                 //println "->include " + path
                 includeConfig[name] = path
