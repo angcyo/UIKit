@@ -1,6 +1,7 @@
 package com.angcyo.uiview.less.kotlin.dialog
 
 import android.app.Dialog
+import android.content.Context
 import android.graphics.Color
 import android.os.Build
 import android.support.v4.app.Fragment
@@ -21,9 +22,8 @@ import com.angcyo.uiview.less.utils.RDialog
  * @date 2019/05/11
  * Copyright (c) 2019 ShenZhen O&M Cloud Co., Ltd. All rights reserved.
  */
-
-fun Fragment.buildBottomDialog(): RDialog.Builder {
-    return RDialog.build(activity)
+fun Context.buildBottomDialog(): RDialog.Builder {
+    return RDialog.build(this)
         .setCanceledOnTouchOutside(false)
         .setDialogWidth(-1)
         .setDialogHeight(-2)
@@ -53,23 +53,23 @@ private fun configDialogBuilder(builder: RDialog.Builder, dialogConfig: BaseDial
     return builder
 }
 
-fun Fragment.normalDialog(config: NormalDialogConfig.() -> Unit): Dialog {
+fun Context.normalDialog(config: NormalDialogConfig.() -> Unit): Dialog {
     val dialogConfig = NormalDialogConfig()
     dialogConfig.config()
 
     return configDialogBuilder(
-        RDialog.build(activity)
+        RDialog.build(this)
             .setDialogWidth(-1),
         dialogConfig
     ).showCompatDialog()
 }
 
-fun Fragment.normalIosDialog(config: IosDialogConfig.() -> Unit): Dialog {
+fun Context.normalIosDialog(config: IosDialogConfig.() -> Unit): Dialog {
     val dialogConfig = IosDialogConfig()
     dialogConfig.config()
 
     return configDialogBuilder(
-        RDialog.build(activity)
+        RDialog.build(this)
             .setDialogWidth(-1),
         dialogConfig
     ).showCompatDialog()
@@ -78,7 +78,7 @@ fun Fragment.normalIosDialog(config: IosDialogConfig.() -> Unit): Dialog {
 /**
  * 多选项, 选择对话框, 底部带 取消按钮, 标题栏不带取消
  * */
-fun Fragment.itemsDialog(config: ItemDialogConfig.() -> Unit): Dialog {
+fun Context.itemsDialog(config: ItemDialogConfig.() -> Unit): Dialog {
     val dialogConfig = ItemDialogConfig()
     dialogConfig.config()
 
@@ -91,7 +91,7 @@ fun Fragment.itemsDialog(config: ItemDialogConfig.() -> Unit): Dialog {
 /**
  * 多选项, 菜单对话框, 底部不带取消按钮, 标题栏不带取消
  * */
-fun Fragment.menuDialog(config: MenuDialogConfig.() -> Unit): Dialog {
+fun Context.menuDialog(config: MenuDialogConfig.() -> Unit): Dialog {
     val dialogConfig = MenuDialogConfig()
     dialogConfig.config()
 
@@ -104,7 +104,7 @@ fun Fragment.menuDialog(config: MenuDialogConfig.() -> Unit): Dialog {
 /**
  * 单选对话框, 底部不带取消按钮, 标题栏带取消和确定
  * */
-fun Fragment.singleChoiceDialog(config: MenuDialogConfig.() -> Unit): Dialog {
+fun Context.singleChoiceDialog(config: MenuDialogConfig.() -> Unit): Dialog {
     val dialogConfig = MenuDialogConfig()
     dialogConfig.choiceModel = ChoiceIView.CHOICE_MODE_SINGLE
     dialogConfig.dialogCancel = false
@@ -120,7 +120,7 @@ fun Fragment.singleChoiceDialog(config: MenuDialogConfig.() -> Unit): Dialog {
 /**
  * 多选对话框, 底部不带取消按钮, 标题栏带取消和确定
  * */
-fun Fragment.multiChoiceDialog(config: MenuDialogConfig.() -> Unit): Dialog {
+fun Context.multiChoiceDialog(config: MenuDialogConfig.() -> Unit): Dialog {
     val dialogConfig = MenuDialogConfig()
     dialogConfig.choiceModel = ChoiceIView.CHOICE_MODE_MULTI
     dialogConfig.dialogCancel = false
@@ -137,7 +137,7 @@ fun Fragment.multiChoiceDialog(config: MenuDialogConfig.() -> Unit): Dialog {
 /**
  * 3D滚轮选择对话框, 标题栏带取消和确定
  * */
-fun Fragment.wheelDialog(config: WheelDialogConfig.() -> Unit): Dialog {
+fun Context.wheelDialog(config: WheelDialogConfig.() -> Unit): Dialog {
     val dialogConfig = WheelDialogConfig()
     dialogConfig.config()
 
@@ -151,7 +151,7 @@ fun Fragment.wheelDialog(config: WheelDialogConfig.() -> Unit): Dialog {
 /**
  * 文本输入对话框, 默认是单行, 无限制
  * */
-fun Fragment.inputDialog(config: InputDialogConfig.() -> Unit): Dialog {
+fun Context.inputDialog(config: InputDialogConfig.() -> Unit): Dialog {
     val dialogConfig = InputDialogConfig()
     dialogConfig.dialogCancel = false
     dialogConfig.dialogCanceledOnTouchOutside = false
@@ -163,7 +163,7 @@ fun Fragment.inputDialog(config: InputDialogConfig.() -> Unit): Dialog {
     ).showCompatDialog()
 }
 
-fun Fragment.multiInputDialog(config: InputDialogConfig.() -> Unit): Dialog {
+fun Context.multiInputDialog(config: InputDialogConfig.() -> Unit): Dialog {
     val dialogConfig = InputDialogConfig()
     dialogConfig.dialogCancel = false
     dialogConfig.dialogCanceledOnTouchOutside = false
@@ -180,12 +180,12 @@ fun Fragment.multiInputDialog(config: InputDialogConfig.() -> Unit): Dialog {
 /**
  * 展示一个popup window
  * */
-fun Fragment.popupWindow(anchor: View? = null, config: PopupConfig.() -> Unit): PopupWindow {
+fun Context.popupWindow(anchor: View? = null, config: PopupConfig.() -> Unit): PopupWindow {
     val popupConfig = PopupConfig()
     popupConfig.anchor = anchor
     popupConfig.config()
 
-    val window = PopupWindow(context)
+    val window = PopupWindow(this)
 
     window.apply {
 
@@ -205,7 +205,8 @@ fun Fragment.popupWindow(anchor: View? = null, config: PopupConfig.() -> Unit): 
 
         if (popupConfig.layoutId != -1) {
             popupConfig.contentView =
-                LayoutInflater.from(context).inflate(popupConfig.layoutId, FrameLayout(context), false)
+                LayoutInflater.from(this@popupWindow)
+                    .inflate(popupConfig.layoutId, FrameLayout(this@popupWindow), false)
         }
         val view = popupConfig.contentView
 
@@ -226,4 +227,88 @@ fun Fragment.popupWindow(anchor: View? = null, config: PopupConfig.() -> Unit): 
     }
 
     return window
+}
+
+// Fragment
+
+fun Fragment.normalDialog(config: NormalDialogConfig.() -> Unit): Dialog {
+    return context!!.normalDialog(config)
+}
+
+fun Fragment.normalIosDialog(config: IosDialogConfig.() -> Unit): Dialog {
+    return context!!.normalIosDialog(config)
+}
+
+fun Fragment.itemsDialog(config: ItemDialogConfig.() -> Unit): Dialog {
+    return context!!.itemsDialog(config)
+}
+
+fun Fragment.menuDialog(config: MenuDialogConfig.() -> Unit): Dialog {
+    return context!!.menuDialog(config)
+}
+
+fun Fragment.singleChoiceDialog(config: MenuDialogConfig.() -> Unit): Dialog {
+    return context!!.singleChoiceDialog(config)
+}
+
+fun Fragment.multiChoiceDialog(config: MenuDialogConfig.() -> Unit): Dialog {
+    return context!!.multiChoiceDialog(config)
+}
+
+fun Fragment.wheelDialog(config: WheelDialogConfig.() -> Unit): Dialog {
+    return context!!.wheelDialog(config)
+}
+
+fun Fragment.inputDialog(config: InputDialogConfig.() -> Unit): Dialog {
+    return context!!.inputDialog(config)
+}
+
+fun Fragment.multiInputDialog(config: InputDialogConfig.() -> Unit): Dialog {
+    return context!!.multiInputDialog(config)
+}
+
+fun Fragment.popupWindow(anchor: View? = null, config: PopupConfig.() -> Unit): PopupWindow {
+    return context!!.popupWindow(anchor, config)
+}
+
+// RBaseViewHolder
+
+fun RBaseViewHolder.normalDialog(config: NormalDialogConfig.() -> Unit): Dialog {
+    return context!!.normalDialog(config)
+}
+
+fun RBaseViewHolder.normalIosDialog(config: IosDialogConfig.() -> Unit): Dialog {
+    return context!!.normalIosDialog(config)
+}
+
+fun RBaseViewHolder.itemsDialog(config: ItemDialogConfig.() -> Unit): Dialog {
+    return context!!.itemsDialog(config)
+}
+
+fun RBaseViewHolder.menuDialog(config: MenuDialogConfig.() -> Unit): Dialog {
+    return context!!.menuDialog(config)
+}
+
+fun RBaseViewHolder.singleChoiceDialog(config: MenuDialogConfig.() -> Unit): Dialog {
+    return context!!.singleChoiceDialog(config)
+}
+
+fun RBaseViewHolder.multiChoiceDialog(config: MenuDialogConfig.() -> Unit): Dialog {
+    return context!!.multiChoiceDialog(config)
+}
+
+fun RBaseViewHolder.wheelDialog(config: WheelDialogConfig.() -> Unit): Dialog {
+    return context!!.wheelDialog(config)
+}
+
+fun RBaseViewHolder.inputDialog(config: InputDialogConfig.() -> Unit): Dialog {
+    return context!!.inputDialog(config)
+}
+
+fun RBaseViewHolder.multiInputDialog(config: InputDialogConfig.() -> Unit): Dialog {
+    return context!!.multiInputDialog(config)
+}
+
+fun RBaseViewHolder.popupWindow(anchor: View? = null, config: PopupConfig.() -> Unit): PopupWindow {
+    return context!!.popupWindow(anchor, config)
 }
