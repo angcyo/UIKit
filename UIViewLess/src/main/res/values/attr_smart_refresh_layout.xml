@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="RSmartRefreshLayout">
+        <attr name="r_background"/>
+        <attr name="r_background_percent"/>
+
+        <attr name="r_background_bottom" format="reference"/>
+        <attr name="r_background_percent_bottom" format="float"/>
+    </declare-styleable>
+</resources>

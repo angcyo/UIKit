@@ -1,7 +1,11 @@
 package com.angcyo.uiview.less.widget;
 
 import android.content.Context;
+import android.content.res.TypedArray;
+import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
+import com.angcyo.uiview.less.R;
 import com.angcyo.uiview.less.smart.MaterialHeader;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.footer.ClassicsFooter;
@@ -14,19 +18,31 @@ import com.scwang.smartrefresh.layout.footer.ClassicsFooter;
  */
 public class RSmartRefreshLayout extends SmartRefreshLayout {
 
+    private Drawable rBackgroundDrawable;
+    private Drawable rBackgroundDrawableBottom;
+    private float percent = 1f;
+    private float percentBottom = 0.5f;
+
     public RSmartRefreshLayout(Context context) {
-        super(context);
-        initLayout(context);
+        this(context, null);
     }
 
     public RSmartRefreshLayout(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        initLayout(context);
+        this(context, attrs, 0);
     }
 
     public RSmartRefreshLayout(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         initLayout(context);
+
+        TypedArray array = context.obtainStyledAttributes(attrs, R.styleable.RSmartRefreshLayout);
+        rBackgroundDrawable = array.getDrawable(R.styleable.RSmartRefreshLayout_r_background);
+        percent = array.getFloat(R.styleable.RSmartRefreshLayout_r_background_percent, percent);
+
+        rBackgroundDrawableBottom = array.getDrawable(R.styleable.RSmartRefreshLayout_r_background_bottom);
+        percentBottom = array.getFloat(R.styleable.RSmartRefreshLayout_r_background_percent_bottom, percentBottom);
+
+        array.recycle();
     }
 
     private void initLayout(Context context) {
@@ -77,5 +93,46 @@ public class RSmartRefreshLayout extends SmartRefreshLayout {
 
     public boolean isEnableRefresh() {
         return mEnableRefresh;
+    }
+
+    @Override
+    public void draw(Canvas canvas) {
+        if (rBackgroundDrawableBottom != null) {
+            rBackgroundDrawableBottom.setBounds(0, (int) (getMeasuredHeight() - getMeasuredHeight() * percentBottom),
+                    getMeasuredWidth(), getMeasuredHeight());
+            rBackgroundDrawableBottom.draw(canvas);
+        }
+        if (rBackgroundDrawable != null) {
+            rBackgroundDrawable.setBounds(0, 0, getMeasuredWidth(), (int) (getMeasuredHeight() * percent));
+            rBackgroundDrawable.draw(canvas);
+        }
+        super.draw(canvas);
+    }
+
+    public void setRBackgroundDrawable(Drawable drawable) {
+        this.rBackgroundDrawable = drawable;
+        if (drawable != null) {
+            setWillNotDraw(false);
+        }
+        postInvalidate();
+    }
+
+    public void setBackgroundPercent(float percent) {
+        this.percent = percent;
+        postInvalidate();
+    }
+
+
+    public void setRBackgroundDrawableBottom(Drawable drawable) {
+        this.rBackgroundDrawableBottom = drawable;
+        if (drawable != null) {
+            setWillNotDraw(false);
+        }
+        postInvalidate();
+    }
+
+    public void setBackgroundPercentBottom(float percent) {
+        this.percentBottom = percent;
+        postInvalidate();
     }
 }

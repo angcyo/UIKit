@@ -5,6 +5,8 @@
 
     <!--不影响原来背景的背景-->
     <attr name="r_background" format="reference"/>
+    <!--与view高度的百分比-->
+    <attr name="r_background_percent" format="float"/>
     <!--不影响原来measure的padding属性-->
     <attr name="r_paddingLeft" format="dimension"/>
     <attr name="r_paddingRight" format="dimension"/>
