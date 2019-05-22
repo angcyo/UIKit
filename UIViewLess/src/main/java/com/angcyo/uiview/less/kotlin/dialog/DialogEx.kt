@@ -163,6 +163,9 @@ fun Context.inputDialog(config: InputDialogConfig.() -> Unit): Dialog {
     ).showCompatDialog()
 }
 
+/**
+ * 多行文本输入框
+ * */
 fun Context.multiInputDialog(config: InputDialogConfig.() -> Unit): Dialog {
     val dialogConfig = InputDialogConfig()
     dialogConfig.dialogCancel = false
@@ -173,6 +176,22 @@ fun Context.multiInputDialog(config: InputDialogConfig.() -> Unit): Dialog {
 
     return configDialogBuilder(
         buildBottomDialog(),
+        dialogConfig
+    ).showCompatDialog()
+}
+
+/**
+ * 底部网格对话框
+ * */
+fun Context.gridDialog(config: GridDialogConfig.() -> Unit): Dialog {
+    val dialogConfig = GridDialogConfig()
+    dialogConfig.config()
+
+    return configDialogBuilder(
+        RDialog.build(this)
+            .setDialogWidth(-1)
+            .setDialogBgColor(Color.TRANSPARENT)
+            .setDialogGravity(Gravity.BOTTOM),
         dialogConfig
     ).showCompatDialog()
 }
@@ -267,6 +286,10 @@ fun Fragment.multiInputDialog(config: InputDialogConfig.() -> Unit): Dialog {
     return context!!.multiInputDialog(config)
 }
 
+fun Fragment.gridDialog(config: GridDialogConfig.() -> Unit): Dialog {
+    return context!!.gridDialog(config)
+}
+
 fun Fragment.popupWindow(anchor: View? = null, config: PopupConfig.() -> Unit): PopupWindow {
     return context!!.popupWindow(anchor, config)
 }
@@ -307,6 +330,10 @@ fun RBaseViewHolder.inputDialog(config: InputDialogConfig.() -> Unit): Dialog {
 
 fun RBaseViewHolder.multiInputDialog(config: InputDialogConfig.() -> Unit): Dialog {
     return context!!.multiInputDialog(config)
+}
+
+fun RBaseViewHolder.gridDialog(config: GridDialogConfig.() -> Unit): Dialog {
+    return context!!.gridDialog(config)
 }
 
 fun RBaseViewHolder.popupWindow(anchor: View? = null, config: PopupConfig.() -> Unit): PopupWindow {

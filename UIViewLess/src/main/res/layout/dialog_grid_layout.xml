@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             android:layout_width="match_parent"
+             android:layout_margin="@dimen/base_xhdpi"
+             android:layout_height="wrap_content">
+
+    <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:minHeight="100dp"
+            android:layout_height="wrap_content">
+
+        <com.angcyo.uiview.less.recycler.RRecyclerView
+                android:id="@+id/recycler_view"
+                android:background="@drawable/base_white_round_bg"
+                android:layout_width="match_parent"
+                android:overScrollMode="never"
+                android:layout_height="wrap_content"/>
+
+        <TextView
+                android:id="@+id/cancel_button"
+                android:background="@drawable/base_white_round_selector"
+                android:minHeight="50dp"
+                style="@style/BaseMainTextStyle"
+                android:layout_marginTop="@dimen/base_xhdpi"
+                android:gravity="center"
+                android:textColor="@color/base_text_color_dark"
+                android:text="取 消"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+    </LinearLayout>
+
+</FrameLayout>
