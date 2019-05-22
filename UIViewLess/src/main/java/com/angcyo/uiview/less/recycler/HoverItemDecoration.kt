@@ -195,6 +195,10 @@ open class HoverItemDecoration : RecyclerView.ItemDecoration() {
     }
 
     override fun onDrawOver(canvas: Canvas, parent: RecyclerView, state: RecyclerView.State) {
+        if (state.isPreLayout || state.willRunSimpleAnimations()) {
+            return
+        }
+
         checkOverDecoration(parent)
 
         overViewHolder?.let {

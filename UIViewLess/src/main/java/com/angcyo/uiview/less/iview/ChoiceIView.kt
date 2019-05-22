@@ -209,14 +209,14 @@ open class ChoiceIView(val viewGroup: ViewGroup, val choiceMode: Int = CHOICE_MO
          * 选中回调
          * */
         open fun onChoiceSelector(itemView: View, position: Int) {
-
+            itemView.isSelected = true
         }
 
         /**
          * 取消选中回调
          * */
         open fun onChoiceUnSelector(itemView: View, position: Int) {
-
+            itemView.isSelected = false
         }
 
         /**
@@ -236,6 +236,9 @@ open class ChoiceIView(val viewGroup: ViewGroup, val choiceMode: Int = CHOICE_MO
          * */
         open fun onCanUnSelector(itemView: View, position: Int, choiceMode: Int): Boolean = true
 
+        /**
+         * 初始化回调, 用来设置默认选中项
+         * */
         open fun onInitPosition(itemView: View, position: Int, choiceMode: Int) {
 
         }

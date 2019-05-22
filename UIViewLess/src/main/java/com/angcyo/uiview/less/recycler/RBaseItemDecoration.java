@@ -110,6 +110,10 @@ public class RBaseItemDecoration extends RecyclerView.ItemDecoration {
     public void onDraw(Canvas c, RecyclerView parent, RecyclerView.State state) {
         super.onDraw(c, parent, state);
 
+        if (state.isPreLayout() || state.willRunSimpleAnimations()) {
+            return;
+        }
+
         final RecyclerView.LayoutManager manager = parent.getLayoutManager();
 
         int itemCount = manager.getItemCount();

@@ -59,6 +59,7 @@ open class DslAdapter : RBaseAdapter<DslAdapterItem> {
 
     override fun onBindView(holder: RBaseViewHolder, position: Int, bean: DslAdapterItem?) {
         getItemData(position)?.let {
+            it.dslAdapter = this
             it.itemBind.invoke(holder, position, it)
         }
     }

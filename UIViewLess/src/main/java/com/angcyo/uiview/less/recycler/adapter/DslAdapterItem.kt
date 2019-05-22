@@ -16,6 +16,9 @@ import com.angcyo.uiview.less.recycler.RBaseViewHolder
  */
 open class DslAdapterItem {
 
+    /**适配器*/
+    var dslAdapter: DslAdapter? = null
+
     //<editor-fold desc="Grid相关属性">
 
     /**

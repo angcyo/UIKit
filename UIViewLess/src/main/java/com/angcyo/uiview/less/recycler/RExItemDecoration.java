@@ -95,6 +95,10 @@ public class RExItemDecoration extends RecyclerView.ItemDecoration {
 
     @Override
     public void onDraw(Canvas c, RecyclerView parent, RecyclerView.State state) {
+        if (state.isPreLayout() || state.willRunSimpleAnimations()) {
+            return;
+        }
+
         final RecyclerView.LayoutManager manager = parent.getLayoutManager();
         final int firstItem;
         if (manager instanceof StaggeredGridLayoutManager) {

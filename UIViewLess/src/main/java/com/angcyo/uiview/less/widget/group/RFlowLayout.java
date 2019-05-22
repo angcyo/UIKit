@@ -395,6 +395,21 @@ public class RFlowLayout extends LinearLayout {
         requestLayout();
     }
 
+    public void setItemHorizontalSpace(int itemHorizontalSpace) {
+        this.itemHorizontalSpace = itemHorizontalSpace;
+        requestLayout();
+    }
+
+    public void setItemVerticalSpace(int itemVerticalSpace) {
+        this.itemVerticalSpace = itemVerticalSpace;
+        requestLayout();
+    }
+
+    public void setItemEquWidth(boolean itemEquWidth) {
+        this.itemEquWidth = itemEquWidth;
+        requestLayout();
+    }
+
     public interface OnAddViewListener {
         void onInitView(View view);
     }

@@ -46,7 +46,7 @@ open class DslItemDecoration(
           isOverDraw ->
 
             val adapterPosition = viewHolder.adapterPosition
-            if (parent.adapter is DslAdapter) {
+            if (parent.adapter is DslAdapter && adapterPosition != RecyclerView.NO_POSITION) {
                 (parent.adapter as? DslAdapter)?.getItemData(adapterPosition)?.let { item ->
 
                     //设置分割线占坑大小
@@ -54,20 +54,23 @@ open class DslItemDecoration(
                         item.setItemOffsets(it)
                     }
 
-                    canvas?.let {
-                        if (!isOverDraw) {
-                            //绘制分割线
-                            tempRect.clear()
-                            item.setItemOffsets(tempRect)
-                            item.draw(
-                                it,
-                                paint,
-                                viewHolder.itemView,
-                                tempRect,
-                                parent.adapter?.itemCount ?: 0,
-                                adapterPosition,
-                                tempDrawRect
-                            )
+                    if (state.isPreLayout) {
+                    } else {
+                        canvas?.let {
+                            if (!isOverDraw) {
+                                //绘制分割线
+                                tempRect.clear()
+                                item.setItemOffsets(tempRect)
+                                item.draw(
+                                    it,
+                                    paint,
+                                    viewHolder.itemView,
+                                    tempRect,
+                                    parent.adapter?.itemCount ?: 0,
+                                    adapterPosition,
+                                    tempDrawRect
+                                )
+                            }
                         }
                     }
                 }
