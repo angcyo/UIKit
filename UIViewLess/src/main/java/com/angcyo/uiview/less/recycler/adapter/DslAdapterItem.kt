@@ -149,7 +149,7 @@ open class DslAdapterItem {
         //super.draw(canvas, paint, itemView, offsetRect, itemCount, position)
 
         paint.color = itemDecorationColor
-        onlyDrawOffsetArea = true
+        val drawOffsetArea = onlyDrawOffsetArea
         eachDrawItemDecoration(0, itemTopInsert, 0, 0)
         if (itemTopInsert > 0) {
             if (onlyDrawOffsetArea) {
@@ -174,7 +174,7 @@ open class DslAdapterItem {
         }
 
         paint.color = itemDecorationColor
-        onlyDrawOffsetArea = true
+        onlyDrawOffsetArea = drawOffsetArea
         eachDrawItemDecoration(0, 0, 0, itemBottomInsert)
         if (itemBottomInsert > 0) {
             if (onlyDrawOffsetArea) {
@@ -199,7 +199,7 @@ open class DslAdapterItem {
         }
 
         paint.color = itemDecorationColor
-        onlyDrawOffsetArea = true
+        onlyDrawOffsetArea = drawOffsetArea
         eachDrawItemDecoration(itemLeftInsert, 0, 0, 0)
         if (itemLeftInsert > 0) {
             if (onlyDrawOffsetArea) {
@@ -224,7 +224,7 @@ open class DslAdapterItem {
         }
 
         paint.color = itemDecorationColor
-        onlyDrawOffsetArea = true
+        onlyDrawOffsetArea = drawOffsetArea
         eachDrawItemDecoration(0, 0, itemRightInsert, 0)
         if (itemRightInsert > 0) {
             if (onlyDrawOffsetArea) {
@@ -247,7 +247,7 @@ open class DslAdapterItem {
                 canvas.drawRect(drawRect, paint)
             }
         }
-
+        onlyDrawOffsetArea = drawOffsetArea
     }
 
     //</editor-fold desc="表单 分割线配置">
