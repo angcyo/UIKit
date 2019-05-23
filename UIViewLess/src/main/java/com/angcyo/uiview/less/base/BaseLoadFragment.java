@@ -23,7 +23,9 @@ public class BaseLoadFragment extends BaseTitleFragment {
     protected void onInitBaseView(@NonNull RBaseViewHolder viewHolder, @Nullable Bundle arguments,
                                   @Nullable Bundle savedInstanceState) {
         super.onInitBaseView(viewHolder, arguments, savedInstanceState);
-        switchToLoading();
+        if (isFirstNeedLoadData()) {
+            switchToLoading();
+        }
     }
 
     /**
