@@ -248,6 +248,22 @@ fun Context.popupWindow(anchor: View? = null, config: PopupConfig.() -> Unit): P
     return window
 }
 
+/**
+ * 日期选择
+ * */
+fun Context.dateDialog(config: DateDialogConfig.() -> Unit): Dialog {
+    val dialogConfig = DateDialogConfig()
+    dialogConfig.config()
+
+    return configDialogBuilder(
+        RDialog.build(this)
+            .setDialogWidth(-1)
+            .setDialogBgColor(Color.TRANSPARENT)
+            .setDialogGravity(Gravity.BOTTOM),
+        dialogConfig
+    ).showCompatDialog()
+}
+
 // Fragment
 
 fun Fragment.normalDialog(config: NormalDialogConfig.() -> Unit): Dialog {
@@ -294,6 +310,10 @@ fun Fragment.popupWindow(anchor: View? = null, config: PopupConfig.() -> Unit): 
     return context!!.popupWindow(anchor, config)
 }
 
+fun Fragment.dateDialog(config: DateDialogConfig.() -> Unit): Dialog {
+    return context!!.dateDialog(config)
+}
+
 // RBaseViewHolder
 
 fun RBaseViewHolder.normalDialog(config: NormalDialogConfig.() -> Unit): Dialog {
@@ -338,4 +358,8 @@ fun RBaseViewHolder.gridDialog(config: GridDialogConfig.() -> Unit): Dialog {
 
 fun RBaseViewHolder.popupWindow(anchor: View? = null, config: PopupConfig.() -> Unit): PopupWindow {
     return context!!.popupWindow(anchor, config)
+}
+
+fun RBaseViewHolder.dateDialog(config: DateDialogConfig.() -> Unit): Dialog {
+    return context!!.dateDialog(config)
 }
