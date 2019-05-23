@@ -30,14 +30,21 @@ import java.util.List;
  * @author angcyo
  * @date 2018/12/08
  */
-public abstract class BaseRecyclerFragment<T> extends BaseTitleFragment
+public abstract class BaseRecyclerFragment<T> extends BaseLoadFragment
         implements OnRefreshListener, OnLoadMoreListener, RBaseAdapter.OnAdapterLoadMoreListener<T> {
 
+    public static int FIRST_PAGE_INDEX = 1;
     protected RSmartRefreshLayout smartRefreshLayout;
-
     protected RRecyclerView recyclerView;
-
     protected RBaseAdapter<T> baseAdapter;
+    /**
+     * 当前请求完成的页
+     */
+    protected int currentPageIndex = FIRST_PAGE_INDEX;
+    /**
+     * 正在请求的页
+     */
+    protected int requestPageIndex = FIRST_PAGE_INDEX;
 
     @Override
     protected int getContentLayoutId() {
@@ -55,11 +62,6 @@ public abstract class BaseRecyclerFragment<T> extends BaseTitleFragment
     }
 
     public void initRefreshRecyclerView(@Nullable SmartRefreshLayout smartRefreshLayout, @Nullable RRecyclerView recyclerView) {
-        initRefreshView(smartRefreshLayout);
-        initRecyclerView(recyclerView);
-    }
-
-    public void initRefreshView(@Nullable SmartRefreshLayout smartRefreshLayout) {
         if (smartRefreshLayout != null) {
             smartRefreshLayout.setOnRefreshListener(this);
             /*设置加载更多监听之后, 会自动开启加载更多*/
@@ -103,10 +105,6 @@ public abstract class BaseRecyclerFragment<T> extends BaseTitleFragment
             //smartRefreshLayout.setRefreshHeader(new ClassicsHeader(mAttachContext));
             smartRefreshLayout.setRefreshFooter(new ClassicsFooter(mAttachContext));
         }
-
-    }
-
-    protected void initRecyclerView(@Nullable RRecyclerView recyclerView) {
         if (recyclerView != null) {
             baseAdapter = onCreateAdapter(new ArrayList<T>());
             recyclerView.setAdapter(baseAdapter);
@@ -117,7 +115,6 @@ public abstract class BaseRecyclerFragment<T> extends BaseTitleFragment
             //recyclerView.setBackgroundColor(Color.GREEN);
         }
     }
-
 
     /**
      * 禁掉下拉刷新效果
@@ -156,6 +153,8 @@ public abstract class BaseRecyclerFragment<T> extends BaseTitleFragment
         resetAdapterStatus();
     }
 
+    //<editor-fold desc="事件回调">
+
     public void resetRefreshStatus() {
         if (smartRefreshLayout != null) {
             if (smartRefreshLayout.isEnableRefresh()) {
@@ -175,34 +174,16 @@ public abstract class BaseRecyclerFragment<T> extends BaseTitleFragment
         }
     }
 
-    /**
-     * 如果没有数据展示, 才切换到错误情感图
-     */
+    @Override
     public void switchToError() {
         if (baseAdapter != null) {
             if (baseAdapter.getAllDataCount() <= 0) {
-                switchAffectUI(AffectUI.AFFECT_ERROR);
+                super.switchToError();
             }
         } else {
-            switchAffectUI(AffectUI.AFFECT_ERROR);
+            super.switchToError();
         }
     }
-
-    /**
-     * 显示内容
-     */
-    public void switchToContent() {
-        switchAffectUI(AffectUI.AFFECT_CONTENT);
-    }
-
-    /**
-     * 显示加载中
-     */
-    public void switchToLoading() {
-        switchAffectUI(AffectUI.AFFECT_LOADING);
-    }
-
-    //<editor-fold desc="事件回调">
 
     /**
      * 创建适配器
@@ -228,96 +209,6 @@ public abstract class BaseRecyclerFragment<T> extends BaseTitleFragment
         };
     }
 
-    @Override
-    public void onAffectChange(@NonNull AffectUI affectUI, int fromAffect, int toAffect, @Nullable View fromView, @NonNull View toView) {
-        super.onAffectChange(affectUI, fromAffect, toAffect, fromView, toView);
-        if (toAffect == AffectUI.AFFECT_ERROR) {
-            onAffectToError(affectUI, fromAffect, toAffect, fromView, toView);
-        } else if (toAffect == AffectUI.AFFECT_LOADING) {
-            onAffectToLoading(affectUI, fromAffect, toAffect, fromView, toView);
-        }
-    }
-
-    /**
-     * 情感图 显示异常时
-     */
-    protected void onAffectToError(@NonNull AffectUI affectUI, int fromAffect, int toAffect, @Nullable View fromView, @NonNull View toView) {
-        //显示额外的错误信息
-        Object extraObj = affectUI.getExtraObj();
-        if (extraObj != null) {
-            if (extraObj instanceof String) {
-                baseViewHolder.tv(R.id.base_error_tip_view).setText((CharSequence) extraObj);
-            } else if (extraObj instanceof Number) {
-
-            } else {
-                baseViewHolder.tv(R.id.base_error_tip_view).setText(extraObj.toString());
-            }
-        }
-
-        baseViewHolder.click(R.id.base_retry_button, new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                switchAffectUI(AffectUI.AFFECT_LOADING);
-            }
-        });
-    }
-
-    /**
-     * 情感图 显示加载时
-     */
-    protected void onAffectToLoading(@NonNull AffectUI affectUI, int fromAffect, int toAffect, @Nullable View fromView, @NonNull View toView) {
-        boolean needRefresh = false;
-
-        if (firstShowEnd) {
-            if (!isFragmentHide()) {
-                needRefresh = true;
-            }
-        } else {
-            if (isFirstNeedLoadData()) {
-                if (isFragmentInViewPager()) {
-                    //不在此处触发
-                } else {
-                    needRefresh = true;
-                }
-            }
-        }
-
-        if (needRefresh) {
-            int delay = firstShowEnd ? 0 : 160;
-            //切换到加载情感图, 调用刷新数据接口
-            baseViewHolder.postDelay(delay, new Runnable() {
-                @Override
-                public void run() {
-                    onBaseRefresh(null);
-                }
-            });
-        }
-    }
-
-    @Override
-    public void onFragmentFirstShow(@Nullable Bundle bundle) {
-        super.onFragmentFirstShow(bundle);
-
-        boolean needRefresh = false;
-
-        if (isFragmentInViewPager()) {
-            needRefresh = true;
-        } else {
-            if (affectUI == null || affectUI.getAffectStatus() != AffectUI.AFFECT_LOADING) {
-                needRefresh = true;
-            }
-        }
-
-        if (needRefresh && isFirstNeedLoadData()) {
-            baseViewHolder.postDelay(160, new Runnable() {
-                @Override
-                public void run() {
-                    onBaseRefresh(null);
-                }
-            });
-        }
-    }
-
     /**
      * 刷新控件, 刷新事件
      */
@@ -341,6 +232,10 @@ public abstract class BaseRecyclerFragment<T> extends BaseTitleFragment
     public void onAdapterLodeMore(@NonNull final RBaseAdapter<T> adapter) {
         onBaseLoadMore(null, adapter);
     }
+
+    //</editor-fold>
+
+    //<editor-fold desc="分页加载相关">
 
     @Override
     public boolean onAdapterRefresh(@NonNull RBaseAdapter<T> baseAdapter) {
@@ -372,21 +267,10 @@ public abstract class BaseRecyclerFragment<T> extends BaseTitleFragment
         onBaseLoadData();
     }
 
-    //</editor-fold>
-
-    //<editor-fold desc="分页加载相关">
-
-    public static int FIRST_PAGE_INDEX = 1;
-
-    /**
-     * 当前请求完成的页
-     */
-    protected int currentPageIndex = FIRST_PAGE_INDEX;
-    /**
-     * 正在请求的页
-     */
-    protected int requestPageIndex = FIRST_PAGE_INDEX;
-
+    @Override
+    public void onUIDelayLoadData() {
+        onBaseRefresh(null);
+    }
 
     /**
      * 重写此方法, 加载数据
@@ -449,12 +333,5 @@ public abstract class BaseRecyclerFragment<T> extends BaseTitleFragment
     }
 
     //</editor-fold desc="分页加载相关">
-
-    /**
-     * 界面首次显示, 是否需要触发加载数据
-     */
-    protected boolean isFirstNeedLoadData() {
-        return true;
-    }
 
 }
