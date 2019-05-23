@@ -178,7 +178,6 @@
         <activity
                 android:screenOrientation="portrait"
                 android:exported="false"
-                android:theme="@style/BaseTranTheme"
                 android:name="com.luck.picture.lib.PictureSelectorActivity"
                 android:windowSoftInputMode="adjustPan"/>
 
@@ -186,13 +185,11 @@
         <activity
                 android:screenOrientation="portrait"
                 android:exported="false"
-                android:theme="@style/BaseTranTheme"
                 android:name="com.luck.picture.lib.PicturePreviewActivity"/>
 
         <!--视频播放-->
         <activity
                 android:exported="false"
-                android:theme="@style/BaseTranTheme"
                 android:name="com.luck.picture.lib.PictureVideoPlayActivity"
                 android:configChanges="orientation|keyboardHidden|screenSize"
                 android:screenOrientation="sensor"/>
@@ -201,31 +198,26 @@
         <activity
                 android:screenOrientation="portrait"
                 android:exported="false"
-                android:theme="@style/BaseTranTheme"
                 android:name="com.luck.picture.lib.PictureExternalPreviewActivity"/>
 
         <!--图片剪切-->
         <activity
                 android:screenOrientation="portrait"
                 android:exported="false"
-                android:theme="@style/BaseTranTheme"
                 android:name="com.yalantis.ucrop.UCropActivity"/>
 
         <!--多图剪切-->
         <activity
                 android:screenOrientation="portrait"
                 android:exported="false"
-                android:theme="@style/BaseTranTheme"
                 android:name="com.yalantis.ucrop.PictureMultiCuttingActivity"/>
 
         <!--音频播放-->
         <activity
                 android:screenOrientation="portrait"
-                android:theme="@style/BaseTranTheme"
                 android:exported="false"
                 android:name="com.luck.picture.lib.PicturePlayAudioActivity"/>
         <!--end-->
-
 
         <!--录音服务-->
         <service android:name=".media.RecorderService" android:exported="false"/>
