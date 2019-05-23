@@ -8,7 +8,6 @@ import android.support.annotation.ColorInt;
 import com.angcyo.uiview.less.R;
 import com.angcyo.uiview.less.RApplication;
 import com.angcyo.uiview.less.resources.ResUtil;
-import com.angcyo.uiview.skin.MainSkin;
 
 /**
  * Copyright (C) 2016,深圳市红鸟网络科技股份有限公司 All rights reserved.

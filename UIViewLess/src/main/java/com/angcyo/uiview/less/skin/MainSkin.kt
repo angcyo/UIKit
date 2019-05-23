@@ -1,8 +1,7 @@
-package com.angcyo.uiview.skin
+package com.angcyo.uiview.less.skin
 
 import android.content.Context
 import com.angcyo.uiview.less.resources.ResUtil
-import com.angcyo.uiview.less.skin.BaseSkin
 
 /**
  * Created by angcyo on 2017-07-23.
