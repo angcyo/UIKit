@@ -2,6 +2,7 @@ package com.angcyo.http;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.util.ArrayMap;
 import android.util.JsonReader;
 import android.util.Log;
 import com.angcyo.http.type.TypeBuilder;
@@ -662,6 +663,150 @@ public class Json {
             public void addProperty(String property, Character value) {
                 ((JsonObject) originElement).addProperty(property, value);
             }
+        }
+    }
+
+    public static class MapBuilder extends Builder {
+        ArrayMap<String, Object> map;
+
+        public MapBuilder(ArrayMap<String, Object> map) {
+            this.map = map;
+        }
+
+        @Override
+        public Builder ignoreNull(boolean ignoreNull) {
+            return super.ignoreNull(ignoreNull);
+        }
+
+        @Override
+        public Builder autoEnd(boolean autoEnd) {
+            // no op
+            return this;
+        }
+
+        @Override
+        public Builder addJson(@NonNull String key) {
+            // no op
+            return this;
+        }
+
+        @Override
+        public Builder addJson() {
+            // no op
+            return this;
+        }
+
+        @Override
+        public Builder addArray(@NonNull String key) {
+            // no op
+            return this;
+        }
+
+        @Override
+        public Builder addArray() {
+            // no op
+            return this;
+        }
+
+        @Override
+        public Builder addArray(@NonNull String key, @NonNull Call call) {
+            // no op
+            return this;
+        }
+
+        @Override
+        public Builder addArray(@NonNull Call call) {
+            // no op
+            return this;
+        }
+
+        @Override
+        public Builder endAdd() {
+            // no op
+            return this;
+        }
+
+        @Override
+        public Builder add(@NonNull String key, @Nullable Boolean bool) {
+            map.put(key, bool);
+            return this;
+        }
+
+        @Override
+        public Builder add(@NonNull String key, @Nullable Character character) {
+            map.put(key, character);
+            return this;
+        }
+
+        @Override
+        public Builder add(@NonNull String key, @Nullable Number number) {
+            map.put(key, number);
+            return this;
+        }
+
+        @Override
+        public Builder add(@NonNull String key, @Nullable String string) {
+            map.put(key, key);
+            return this;
+        }
+
+        @Override
+        public Builder add(@NonNull String key, @Nullable JsonElement element) {
+            map.put(key, element);
+            return this;
+        }
+
+        @Override
+        public Builder add(@Nullable Boolean bool) {
+            // no op
+            return this;
+        }
+
+        @Override
+        public Builder add(@Nullable Character character) {
+            // no op
+            return this;
+        }
+
+        @Override
+        public Builder add(@Nullable Number number) {
+            // no op
+            return this;
+        }
+
+        @Override
+        public Builder add(@Nullable String string) {
+            // no op
+            return this;
+        }
+
+        @Override
+        public Builder add(@Nullable JsonElement element) {
+            // no op
+            return this;
+        }
+
+        @Override
+        public Builder call(@NonNull Call action) {
+            // no op
+            return this;
+        }
+
+        @Override
+        public Builder endAll() {
+            // no op
+            return this;
+        }
+
+        @Override
+        public JsonElement build() {
+            // no op
+            return super.build();
+        }
+
+        @Override
+        public String get() {
+            return super.get();
         }
     }
 }

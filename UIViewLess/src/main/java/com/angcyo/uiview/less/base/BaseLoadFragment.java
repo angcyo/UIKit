@@ -17,7 +17,7 @@ import com.angcyo.uiview.less.recycler.RBaseViewHolder;
  */
 public class BaseLoadFragment extends BaseTitleFragment {
 
-    public static final int DELAY_TIME = 160;
+    public static final int DELAY_TIME = 300;
 
     @Override
     protected void onInitBaseView(@NonNull RBaseViewHolder viewHolder, @Nullable Bundle arguments,
