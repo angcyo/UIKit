@@ -1,6 +1,7 @@
 package com.angcyo.uiview.less.kotlin.dialog
 
 import android.app.Dialog
+import android.text.InputType
 import android.text.TextUtils
 import android.view.Gravity
 import android.view.View
@@ -64,6 +65,9 @@ open class InputDialogConfig : BaseDialogConfig() {
         false
     }
 
+    /**文本输入类型*/
+    var inputType = InputType.TYPE_CLASS_TEXT
+
     init {
         positiveButtonListener = { dialog, dialogViewHolder ->
             if (onInputResult.invoke(dialog, dialogViewHolder.exV(R.id.edit_text_view).string())) {
@@ -108,6 +112,7 @@ open class InputDialogConfig : BaseDialogConfig() {
             editView.maxLines = 1
         }
 
+        editView.inputType = inputType
         editView.hint = hintInputString
         editView.setInputText(defaultInputString)
 

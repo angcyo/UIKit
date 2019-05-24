@@ -746,7 +746,7 @@ public class Json {
 
         @Override
         public Builder add(@NonNull String key, @Nullable String string) {
-            map.put(key, key);
+            map.put(key, string);
             return this;
         }
 
