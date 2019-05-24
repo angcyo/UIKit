@@ -43,11 +43,17 @@ object RBackground {
         }
 
         override fun onActivityPaused(activity: Activity) {
-            changeItem(activity.hashCode(), activity.javaClass.name, PAUSED)
+            if (activity.isFinishing) {
+            } else {
+                changeItem(activity.hashCode(), activity.javaClass.name, PAUSED)
+            }
         }
 
         override fun onActivityStopped(activity: Activity) {
-            changeItem(activity.hashCode(), activity.javaClass.name, STOPPED)
+            if (activity.isFinishing) {
+            } else {
+                changeItem(activity.hashCode(), activity.javaClass.name, STOPPED)
+            }
         }
 
         override fun onActivityDestroyed(activity: Activity) {
@@ -90,7 +96,7 @@ object RBackground {
     }
 
     fun isBackground(): Boolean {
-        var result = true
+        var result = stack.size() != 0
 
         for (i in 0 until stack.size()) {
             val value = stack.get(stack.keyAt(i))

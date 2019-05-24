@@ -416,3 +416,12 @@ public fun Rect.set(rectF: RectF) {
 }
 
 public fun String.toColor(): Int = Color.parseColor(this)
+
+public fun String.pattern(regex: String): MutableList<String> {
+    val matcher = regex.toPattern().matcher(this)
+    val result = mutableListOf<String>()
+    while (matcher.find()) {
+        result.add(matcher.group())
+    }
+    return result
+}
