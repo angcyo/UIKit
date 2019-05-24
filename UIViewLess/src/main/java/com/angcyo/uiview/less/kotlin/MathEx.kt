@@ -38,7 +38,7 @@ public fun Path.getProgressPath(progress: Float): Path {
     val pathMeasure = PathMeasure(this, false)
 
     //参数startWithMoveTo表示起始点是否使用moveTo方法，通常为True，保证每次截取的Path片段都是正常的、完整的。
-    pathMeasure.getSegment(0f, progress, dst, true)
+    pathMeasure.getSegment(0f, progress * pathMeasure.length, dst, true)
 
     return dst
 }
