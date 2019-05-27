@@ -16,19 +16,40 @@ import com.luck.picture.lib.config.PictureMimeType;
  */
 
 public class LocalMedia implements Parcelable {
+    public static final Parcelable.Creator<LocalMedia> CREATOR = new Parcelable.Creator<LocalMedia>() {
+        @Override
+        public LocalMedia createFromParcel(Parcel source) {
+            return new LocalMedia(source);
+        }
+
+        @Override
+        public LocalMedia[] newArray(int size) {
+            return new LocalMedia[size];
+        }
+    };
+    public int position;
     private String path;
     private String compressPath;
     private String cutPath;
     private long duration;
     private boolean isChecked;
     private boolean isCut;
-    public int position;
     private int num;
     private int mimeType;
     private String pictureType;
     private boolean compressed;
+
+    //angcyo
     private int width;
     private int height;
+    /**
+     * 1558921509 秒
+     */
+    private long modifyTime;
+    /**
+     * 1558921509 秒
+     */
+    private long addTime;
 
     public LocalMedia() {
 
@@ -50,6 +71,18 @@ public class LocalMedia implements Parcelable {
         this.height = height;
     }
 
+    public LocalMedia(String path, long duration, int mimeType, String pictureType,
+                      int width, int height, long modifyTime, long addTime) {
+        this.path = path;
+        this.duration = duration;
+        this.mimeType = mimeType;
+        this.pictureType = pictureType;
+        this.width = width;
+        this.height = height;
+        this.modifyTime = modifyTime;
+        this.addTime = addTime;
+    }
+
     public LocalMedia(String path, long duration,
                       boolean isChecked, int position, int num, int mimeType) {
         this.path = path;
@@ -58,6 +91,24 @@ public class LocalMedia implements Parcelable {
         this.position = position;
         this.num = num;
         this.mimeType = mimeType;
+    }
+
+    protected LocalMedia(Parcel in) {
+        this.position = in.readInt();
+        this.path = in.readString();
+        this.compressPath = in.readString();
+        this.cutPath = in.readString();
+        this.duration = in.readLong();
+        this.isChecked = in.readByte() != 0;
+        this.isCut = in.readByte() != 0;
+        this.num = in.readInt();
+        this.mimeType = in.readInt();
+        this.pictureType = in.readString();
+        this.compressed = in.readByte() != 0;
+        this.width = in.readInt();
+        this.height = in.readInt();
+        this.modifyTime = in.readLong();
+        this.addTime = in.readLong();
     }
 
     public String getPictureType() {
@@ -102,7 +153,6 @@ public class LocalMedia implements Parcelable {
     public void setDuration(long duration) {
         this.duration = duration;
     }
-
 
     public boolean isChecked() {
         return isChecked;
@@ -215,46 +265,20 @@ public class LocalMedia implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(this.position);
         dest.writeString(this.path);
         dest.writeString(this.compressPath);
         dest.writeString(this.cutPath);
         dest.writeLong(this.duration);
         dest.writeByte(this.isChecked ? (byte) 1 : (byte) 0);
         dest.writeByte(this.isCut ? (byte) 1 : (byte) 0);
-        dest.writeInt(this.position);
         dest.writeInt(this.num);
         dest.writeInt(this.mimeType);
         dest.writeString(this.pictureType);
         dest.writeByte(this.compressed ? (byte) 1 : (byte) 0);
         dest.writeInt(this.width);
         dest.writeInt(this.height);
+        dest.writeLong(this.modifyTime);
+        dest.writeLong(this.addTime);
     }
-
-    protected LocalMedia(Parcel in) {
-        this.path = in.readString();
-        this.compressPath = in.readString();
-        this.cutPath = in.readString();
-        this.duration = in.readLong();
-        this.isChecked = in.readByte() != 0;
-        this.isCut = in.readByte() != 0;
-        this.position = in.readInt();
-        this.num = in.readInt();
-        this.mimeType = in.readInt();
-        this.pictureType = in.readString();
-        this.compressed = in.readByte() != 0;
-        this.width = in.readInt();
-        this.height = in.readInt();
-    }
-
-    public static final Parcelable.Creator<LocalMedia> CREATOR = new Parcelable.Creator<LocalMedia>() {
-        @Override
-        public LocalMedia createFromParcel(Parcel source) {
-            return new LocalMedia(source);
-        }
-
-        @Override
-        public LocalMedia[] newArray(int size) {
-            return new LocalMedia[size];
-        }
-    };
 }
