@@ -124,7 +124,7 @@ public class MatrixLayout extends FrameLayout {
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
-        if (needTouchEvent()) {
+        if (needTouchEvent(ev)) {
             return gestureDetectorCompat.onTouchEvent(ev);
         }
 
@@ -233,12 +233,12 @@ public class MatrixLayout extends FrameLayout {
         return !drawRectF.equals(viewRectF);
     }
 
-    private boolean needTouchEvent() {
+    private boolean needTouchEvent(MotionEvent ev) {
         boolean matrixChange = isMatrixChange();
         boolean checkTouchEvent = checkTouchEvent();
         boolean handle = checkTouchEvent || matrixChange;
 
-        return handle;
+        return handle && ev.getPointerCount() == 1;
     }
 
     public void setOnMatrixTouchListener(OnMatrixTouchListener onMatrixTouchListener) {

@@ -62,6 +62,16 @@ class ViewTransitionConfig {
         viewHolder: RBaseViewHolder,
         arguments: Bundle?,
         savedInstanceState: Bundle?
+    ) -> Unit = { fragment, viewHolder, arguments, savedInstanceState ->
+        onInitFragmentView(fragment, viewHolder, arguments, savedInstanceState)
+    }
+
+    /**默认实现*/
+    var onInitFragmentView: (
+        fragment: ViewTransitionFragment,
+        viewHolder: RBaseViewHolder,
+        arguments: Bundle?,
+        savedInstanceState: Bundle?
     ) -> Unit =
         { fragment, _, _, _ ->
             if (BuildConfig.DEBUG && fragment !is PagerTransitionFragment) {

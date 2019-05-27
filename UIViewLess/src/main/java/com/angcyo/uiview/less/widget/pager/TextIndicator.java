@@ -74,6 +74,9 @@ public class TextIndicator extends AppCompatTextView implements ViewPager.OnPage
     }
 
     public void setupViewPager(ViewPager viewPager) {
+        if (mViewPager != null) {
+            mViewPager.removeOnPageChangeListener(this);
+        }
         mViewPager = viewPager;
         mViewPager.addOnPageChangeListener(this);
         initView();
