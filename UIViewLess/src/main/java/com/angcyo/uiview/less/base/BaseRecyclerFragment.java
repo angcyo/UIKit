@@ -101,7 +101,8 @@ public abstract class BaseRecyclerFragment<T> extends BaseLoadFragment
             smartRefreshLayout.setEnableFooterFollowWhenLoadFinished(true);
 
             //android 原生样式
-            smartRefreshLayout.setRefreshHeader(new MaterialHeader(mAttachContext));
+            smartRefreshLayout.setRefreshHeader(new MaterialHeader(mAttachContext)
+                    .setColorSchemeResources(R.color.colorPrimary, R.color.colorPrimaryDark));
             //关闭内容跟随移动, 更像原生样式
             smartRefreshLayout.setEnableHeaderTranslationContent(false);
 

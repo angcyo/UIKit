@@ -4,7 +4,7 @@
     <!--View Group-->
 
     <!--不影响原来背景的背景-->
-    <attr name="r_background" format="reference"/>
+    <attr name="r_background" format="reference|color"/>
     <!--与view高度的百分比-->
     <attr name="r_background_percent" format="float"/>
     <!--不影响原来measure的padding属性-->

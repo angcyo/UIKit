@@ -46,7 +46,7 @@ open class InputDialogConfig : BaseDialogConfig() {
     /**
      * 默认是否显示键盘
      * */
-    var showSoftInput = false
+    var showSoftInput = true
 
     /**
      * 是否允许输入为空
@@ -80,7 +80,6 @@ open class InputDialogConfig : BaseDialogConfig() {
 
     override fun onDialogInit(dialog: Dialog, dialogViewHolder: RBaseViewHolder) {
         super.onDialogInit(dialog, dialogViewHolder)
-
 
         val editView = dialogViewHolder.v<ExEditText>(R.id.edit_text_view)
         val indicatorView = dialogViewHolder.v<TextIndicator>(R.id.single_text_indicator_view)

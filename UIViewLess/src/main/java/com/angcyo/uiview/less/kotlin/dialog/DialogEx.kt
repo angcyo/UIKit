@@ -163,6 +163,20 @@ fun Context.inputDialog(config: InputDialogConfig.() -> Unit): Dialog {
     ).showCompatDialog()
 }
 
+/**多输入框*/
+fun Context.inputMultiDialog(config: InputMultiDialogConfig.() -> Unit): Dialog {
+    val dialogConfig = InputMultiDialogConfig()
+    dialogConfig.dialogCancel = false
+    dialogConfig.dialogCanceledOnTouchOutside = false
+    dialogConfig.config()
+
+    return configDialogBuilder(
+        buildBottomDialog(),
+        dialogConfig
+    ).showCompatDialog()
+}
+
+
 /**
  * 多行文本输入框
  * */
@@ -298,6 +312,10 @@ fun Fragment.inputDialog(config: InputDialogConfig.() -> Unit): Dialog {
     return context!!.inputDialog(config)
 }
 
+fun Fragment.inputMultiDialog(config: InputMultiDialogConfig.() -> Unit): Dialog {
+    return context!!.inputMultiDialog(config)
+}
+
 fun Fragment.multiInputDialog(config: InputDialogConfig.() -> Unit): Dialog {
     return context!!.multiInputDialog(config)
 }
@@ -346,6 +364,10 @@ fun RBaseViewHolder.wheelDialog(config: WheelDialogConfig.() -> Unit): Dialog {
 
 fun RBaseViewHolder.inputDialog(config: InputDialogConfig.() -> Unit): Dialog {
     return context!!.inputDialog(config)
+}
+
+fun RBaseViewHolder.inputMultiDialog(config: InputMultiDialogConfig.() -> Unit): Dialog {
+    return context!!.inputMultiDialog(config)
 }
 
 fun RBaseViewHolder.multiInputDialog(config: InputDialogConfig.() -> Unit): Dialog {

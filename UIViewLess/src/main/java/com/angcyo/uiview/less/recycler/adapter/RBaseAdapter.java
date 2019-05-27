@@ -42,25 +42,23 @@ public abstract class RBaseAdapter<T> extends RecyclerView.Adapter<RBaseViewHold
     public static final int ITEM_SINGLE_LINE = 0x1_000_000_0;
 
     public static final int ITEM_TYPE_LOAD_MORE = 666 | ITEM_SINGLE_LINE;
-    public static final int ITEM_TYPE_SHOW_STATE = 667;
+    public static final int ITEM_TYPE_SHOW_STATE = 667 | ITEM_SINGLE_LINE;
+    public RecyclerView recyclerView;
     protected List<T> mAllDatas;
     protected Context mContext;
     /**
      * 是否激活加载更多
      */
     protected boolean mEnableLoadMore = false;
-
     /**
      * 当调用setLoadMoreEnd时, 是否自动开启mEnableLoadMore
      */
     protected boolean mAutoEnableLoadMore = true;
-
     /**
      * 激活加载到倒数第几个item时, 回调加载更多, 此值需要mEnableLoadMore=true
      * -1, 表示关闭
      */
     protected int mEnableLoadMoreWithLastIndex = -1;
-
     protected ILoadMore mLoadMoreView;
     protected OnAdapterLoadMoreListener<T> mLoadMoreListener;
     /**
@@ -78,7 +76,6 @@ public abstract class RBaseAdapter<T> extends RecyclerView.Adapter<RBaseViewHold
      * 保存 itemType 对应的 layout id
      */
     protected SparseIntArray layouts = new SparseIntArray();
-    public RecyclerView recyclerView;
     /**
      * 当前加载状态
      */

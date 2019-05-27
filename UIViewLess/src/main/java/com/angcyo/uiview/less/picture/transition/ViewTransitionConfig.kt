@@ -38,6 +38,8 @@ import java.lang.ref.WeakReference
 
 class ViewTransitionConfig {
 
+    var fragmentLayoutId = R.layout.base_pager_transition_layout
+
     /**
      * 背景动画开始的颜色
      * */
@@ -406,6 +408,14 @@ class ViewTransitionConfig {
      * 绑定页面
      * */
     var bindPagerItemView: (
+        fragment: PagerTransitionFragment, adapter: RPagerAdapter,
+        viewHolder: RBaseViewHolder, position: Int, itemType: Int
+    ) -> Unit = { fragment, adapter, viewHolder, position, itemType ->
+        onBindPagerItemView(fragment, adapter, viewHolder, position, itemType)
+    }
+
+    /**默认实现*/
+    var onBindPagerItemView: (
         fragment: PagerTransitionFragment, adapter: RPagerAdapter,
         viewHolder: RBaseViewHolder, position: Int, itemType: Int
     ) -> Unit = { fragment, adapter, viewHolder, position, itemType ->

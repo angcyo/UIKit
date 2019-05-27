@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:background="@drawable/base_white_top_round_bg"
+        android:orientation="vertical"
+        android:layout_height="wrap_content">
+
+    <include android:id="@+id/title_layout"
+             layout="@layout/dialog_base_title_layout"/>
+
+    <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="@color/line_color"/>
+
+    <LinearLayout
+            android:id="@+id/input_wrapper_layout"
+            android:showDividers="middle"
+            android:orientation="vertical"
+            android:dividerPadding="@dimen/base_xhdpi"
+            android:divider="@drawable/base_shape_line_px"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+        <!--<include layout="@layout/dialog_input_multi_item"/>-->
+        <!--<include layout="@layout/dialog_input_multi_item"/>-->
+        <!--<include layout="@layout/dialog_input_multi_item"/>-->
+        <!--<include layout="@layout/dialog_input_multi_item"/>-->
+        <!--<include layout="@layout/dialog_input_multi_item"/>-->
+        <!--<include layout="@layout/dialog_input_multi_item"/>-->
+
+    </LinearLayout>
+
+</LinearLayout>

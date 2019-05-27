@@ -30,7 +30,11 @@ public class RSpan extends SpanUtils {
         return new RSpan();
     }
 
-    public static RSpan get(String text) {
+    public static RSpan get(CharSequence text) {
+        return (RSpan) new RSpan().append(text);
+    }
+
+    public static RSpan build(CharSequence text) {
         return (RSpan) new RSpan().append(text);
     }
 

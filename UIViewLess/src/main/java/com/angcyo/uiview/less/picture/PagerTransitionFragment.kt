@@ -18,9 +18,11 @@ import com.angcyo.uiview.less.widget.pager.RViewPager
 
 open class PagerTransitionFragment : ViewTransitionFragment() {
 
-    lateinit var viewPager: RViewPager
+    init {
+        transitionConfig.fragmentLayoutId = R.layout.base_pager_transition_layout
+    }
 
-    override fun getContentLayoutId(): Int = R.layout.base_pager_transition_layout
+    lateinit var viewPager: RViewPager
 
     override fun onInitBaseView(viewHolder: RBaseViewHolder, arguments: Bundle?, savedInstanceState: Bundle?) {
         super.onInitBaseView(viewHolder, arguments, savedInstanceState)
@@ -29,7 +31,6 @@ open class PagerTransitionFragment : ViewTransitionFragment() {
         viewPager.setPageTransformer(true, null)
         viewPager.adapter = object : RPagerAdapter() {
             override fun getCount(): Int = transitionConfig.getPagerCount(this@PagerTransitionFragment, this)
-
 
             override fun getItemType(position: Int): Int =
                 transitionConfig.getPagerItemType(this@PagerTransitionFragment, this, position)

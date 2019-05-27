@@ -134,6 +134,17 @@ open class DslAdapterItem {
 
     }
 
+    /**自定义绘制*/
+    var onDraw: ((
+        canvas: Canvas,
+        paint: Paint,
+        itemView: View,
+        offsetRect: Rect,
+        itemCount: Int,
+        position: Int,
+        drawRect: Rect
+    ) -> Unit)? = null
+
     /**
      * 分割线支持需要[DslItemDecoration]
      * */
@@ -147,6 +158,11 @@ open class DslAdapterItem {
         drawRect: Rect
     ) {
         //super.draw(canvas, paint, itemView, offsetRect, itemCount, position)
+
+        onDraw?.let {
+            it(canvas, paint, itemView, offsetRect, itemCount, position, drawRect)
+            return
+        }
 
         paint.color = itemDecorationColor
         val drawOffsetArea = onlyDrawOffsetArea

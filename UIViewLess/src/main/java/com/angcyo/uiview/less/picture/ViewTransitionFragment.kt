@@ -31,7 +31,7 @@ open class ViewTransitionFragment : BaseTransitionFragment() {
      * */
     var transitionConfig = ViewTransitionConfig()
 
-    override fun getContentLayoutId(): Int = R.layout.base_view_transition_layout
+    override fun getContentLayoutId(): Int = transitionConfig.fragmentLayoutId
 
     override fun onInitBaseView(viewHolder: RBaseViewHolder, arguments: Bundle?, savedInstanceState: Bundle?) {
         super.onInitBaseView(viewHolder, arguments, savedInstanceState)

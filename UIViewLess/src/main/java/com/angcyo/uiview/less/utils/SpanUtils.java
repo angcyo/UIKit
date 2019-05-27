@@ -1029,16 +1029,18 @@ public class SpanUtils {
                          @IntRange(from = 0) final int end,
                          final float x, final int top, final int y, final int bottom,
                          @NonNull final Paint paint) {
-            Paint.Style style = paint.getStyle();
-            int color = paint.getColor();
+            if (color != Color.TRANSPARENT) {
+                Paint.Style style = paint.getStyle();
+                int color = paint.getColor();
 
-            paint.setStyle(Paint.Style.FILL);
-            paint.setColor(this.color);
+                paint.setStyle(Paint.Style.FILL);
+                paint.setColor(this.color);
 
-            canvas.drawRect(x, top, x + width, bottom, paint);
+                canvas.drawRect(x, top, x + width, bottom, paint);
 
-            paint.setStyle(style);
-            paint.setColor(color);
+                paint.setStyle(style);
+                paint.setColor(color);
+            }
         }
     }
 
