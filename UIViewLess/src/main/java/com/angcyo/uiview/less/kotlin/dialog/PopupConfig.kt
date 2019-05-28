@@ -32,7 +32,7 @@ open class PopupConfig {
     var yoff: Int = 0
 
     //此属性 似乎只在 showAtLocation 有效
-    var gravity = Gravity.TOP or Gravity.START
+    var gravity = Gravity.TOP or Gravity.START or Gravity.LEFT
 
     /**
      * 标准属性

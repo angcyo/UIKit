@@ -4,6 +4,7 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Rect
+import android.support.annotation.LayoutRes
 import android.view.View
 import com.angcyo.uiview.less.recycler.RBaseViewHolder
 
@@ -267,4 +268,46 @@ open class DslAdapterItem {
     }
 
     //</editor-fold desc="表单 分割线配置">
+}
+
+/**
+ * 将list结构体, 打包成dslItem
+ * */
+public fun List<Any>.toDslItemList(
+    @LayoutRes layoutId: Int = -1,
+    config: DslAdapterItem.() -> Unit = {}
+): MutableList<DslAdapterItem> {
+    return toDslItemList(DslAdapterItem::class.java, layoutId, config)
+}
+
+public fun List<Any>.toDslItemList(
+    dslItem: Class<out DslAdapterItem>,
+    @LayoutRes layoutId: Int = -1,
+    config: DslAdapterItem.() -> Unit = {}
+): MutableList<DslAdapterItem> {
+    return toDslItemList(itemFactory = { _, item ->
+        dslItem.newInstance().apply {
+            if (layoutId != -1) {
+                itemLayoutId = layoutId
+            }
+            config()
+        }
+    })
+}
+
+public fun List<Any>.toDslItemList(
+    itemBefore: (itemList: MutableList<DslAdapterItem>, index: Int, item: Any) -> Unit = { _, _, _ -> },
+    itemFactory: (index: Int, item: Any) -> DslAdapterItem,
+    itemAfter: (itemList: MutableList<DslAdapterItem>, index: Int, item: Any) -> Unit = { _, _, _ -> }
+): MutableList<DslAdapterItem> {
+    val result = mutableListOf<DslAdapterItem>()
+
+    forEachIndexed { index, any ->
+        itemBefore(result, index, any)
+        val item = itemFactory(index, any)
+        item.itemData = any
+        result.add(item)
+        itemAfter(result, index, any)
+    }
+    return result
 }

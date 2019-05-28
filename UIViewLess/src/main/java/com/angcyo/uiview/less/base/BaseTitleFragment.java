@@ -116,7 +116,10 @@ public abstract class BaseTitleFragment extends BaseFragment implements AffectUI
                 getFragmentManager() != null &&
                 getFragmentManager().getFragments().size() > 1) {
             //添加返回按钮
-            addLeftItem(createBackItem());
+            View backItem = createBackItem();
+            if (backItem != null) {
+                addLeftItem(backItem);
+            }
         }
     }
 
@@ -229,6 +232,7 @@ public abstract class BaseTitleFragment extends BaseFragment implements AffectUI
     /**
      * 创建返回按钮
      */
+    @Nullable
     protected View createBackItem() {
         return getUiFragment().createBackItem(this);
     }

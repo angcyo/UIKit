@@ -141,7 +141,9 @@ open class HoverItemDecoration : RecyclerView.ItemDecoration() {
     private fun setupCallbacks() {
         this.recyclerView?.apply {
             addItemDecoration(this@HoverItemDecoration)
-            addOnItemTouchListener(itemTouchListener)
+            if (hoverCallback?.enableTouchEvent == true) {
+                addOnItemTouchListener(itemTouchListener)
+            }
             addOnAttachStateChangeListener(attachStateChangeListener)
             addOnScrollListener(scrollListener)
         }
@@ -206,9 +208,11 @@ open class HoverItemDecoration : RecyclerView.ItemDecoration() {
 
                 //L.d("...onDrawOverDecoration...")
 
-                addHoverView(it.itemView)
+                if (hoverCallback?.enableTouchEvent == true) {
+                    addHoverView(it.itemView)
+                }
 
-                if (it.itemView.parent != null) {
+                if (it.itemView.parent != null || hoverCallback?.enableTouchEvent == false) {
                     hoverCallback?.drawOverDecoration?.invoke(canvas, paint, it, overDecorationRect)
                 }
             }
@@ -409,6 +413,9 @@ open class HoverItemDecoration : RecyclerView.ItemDecoration() {
 
     class HoverCallback {
 
+        /**激活touch手势*/
+        var enableTouchEvent = true
+
         /**
          * 当前的 位置 是否有 悬浮分割线
          * */
@@ -555,10 +562,15 @@ open class HoverItemDecoration : RecyclerView.ItemDecoration() {
 
                 viewHolder.itemView.draw(canvas)
 
-                drawOverShadowDecoration.invoke(canvas, paint, viewHolder, overRect)
+                if (enableDrawShadow) {
+                    drawOverShadowDecoration.invoke(canvas, paint, viewHolder, overRect)
+                }
 
                 canvas.restore()
             }
+
+        /**是否激活阴影绘制*/
+        var enableDrawShadow = true
 
         /**
          * 绘制分割线下面的阴影, 或者其他而外的信息
