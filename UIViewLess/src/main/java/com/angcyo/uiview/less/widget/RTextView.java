@@ -426,6 +426,11 @@ public class RTextView extends AppCompatTextView {
                 text = "";
             }
         }
+
+        if (TextUtils.isEmpty(text)) {
+            return;
+        }
+
         if (mScrollTextPaint == null) {
             mScrollTextPaint = new TextPaint(getPaint());
             //mScrollTextPaint.setTextAlign(Paint.Align.LEFT);
