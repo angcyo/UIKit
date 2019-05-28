@@ -5,6 +5,7 @@ import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.ColorInt;
+import android.support.v4.graphics.ColorUtils;
 import com.angcyo.uiview.less.R;
 import com.angcyo.uiview.less.RApplication;
 import com.angcyo.uiview.less.resources.ResUtil;
@@ -69,8 +70,18 @@ public class SkinHelper {
      * @param alpha [0..255] 值越小,越透明
      */
     public static int getTranColor(@ColorInt int color, int alpha) {
-        return Color.argb(alpha, Color.red(color), Color.green(color), Color.blue(color));
+        //return Color.argb(alpha, Color.red(color), Color.green(color), Color.blue(color));
+
+        return ColorUtils.setAlphaComponent(color, alpha);
     }
+
+//    public static int setAlphaComponent(@ColorInt int color,
+//                                        @IntRange(from = 0x0, to = 0xFF) int alpha) {
+//        if (alpha < 0 || alpha > 255) {
+//            throw new IllegalArgumentException("alpha must be between 0 and 255.");
+//        }
+//        return (color & 0x00ffffff) | (alpha << 24);
+//    }
 
     /**
      * 主题颜色的文本selector

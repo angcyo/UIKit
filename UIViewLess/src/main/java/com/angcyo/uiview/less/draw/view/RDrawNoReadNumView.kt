@@ -11,7 +11,7 @@ import com.angcyo.uiview.less.draw.RDrawNoReadNum
  * @date 2019/04/27
  * Copyright (c) 2019 ShenZhen O&M Cloud Co., Ltd. All rights reserved.
  */
-class RDrawNoReadNumView(context: Context, attributeSet: AttributeSet? = null) :
+open class RDrawNoReadNumView(context: Context, attributeSet: AttributeSet? = null) :
     BaseDrawView<RDrawNoReadNum>(context, attributeSet) {
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {

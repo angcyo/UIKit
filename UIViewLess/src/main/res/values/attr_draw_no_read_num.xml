@@ -24,6 +24,7 @@
         <attr name="r_draw_text_color"/>
         <attr name="r_draw_border"/>
         <attr name="r_draw_background_color"/>
+        <attr name="r_draw_background_color_enable" format="boolean"/>
         <attr name="r_draw_border_color"/>
         <attr name="r_draw_border_width"/>
         <attr name="r_draw_keep_circle"/>

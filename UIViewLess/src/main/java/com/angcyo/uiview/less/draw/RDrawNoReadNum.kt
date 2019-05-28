@@ -22,6 +22,7 @@ class RDrawNoReadNum(view: View) : BaseDraw(view) {
     var textSize = 9f
     var textColor = Color.WHITE
     var backgroundColor = Color.parseColor("#FF3622")
+    var drawBackgroundColor = true
 
     var drawBorder = true
 
@@ -78,6 +79,7 @@ class RDrawNoReadNum(view: View) : BaseDraw(view) {
 
         drawBorder = typedArray.getBoolean(R.styleable.RDrawNoReadNum_r_draw_border, drawBorder)
         keepCircle = typedArray.getBoolean(R.styleable.RDrawNoReadNum_r_draw_keep_circle, keepCircle)
+        drawBackgroundColor = typedArray.getBoolean(R.styleable.RDrawNoReadNum_r_draw_background_color_enable, drawBackgroundColor)
         readNumString = typedArray.getString(R.styleable.RDrawNoReadNum_r_draw_read_num_string)
 
         typedArray.recycle()
@@ -152,10 +154,12 @@ class RDrawNoReadNum(view: View) : BaseDraw(view) {
 
         readNumString?.let {
 
-            //绘制背景
-            mBasePaint.style = Paint.Style.FILL
-            mBasePaint.color = backgroundColor
-            canvas.drawPath(drawPath, mBasePaint)
+            if (drawBackgroundColor) {
+                //绘制背景
+                mBasePaint.style = Paint.Style.FILL
+                mBasePaint.color = backgroundColor
+                canvas.drawPath(drawPath, mBasePaint)
+            }
 
             if (drawBorder) {
                 //绘制边框
