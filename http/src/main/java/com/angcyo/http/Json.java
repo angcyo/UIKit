@@ -375,20 +375,22 @@ public class Json {
          * 结束新对象, 有多少个add操作, 就需要有多少个end操作
          */
         public Builder endAdd() {
-            JsonElement pop = subElementStack.pop();
+            if (!subElementStack.isEmpty()) {
+                JsonElement pop = subElementStack.pop();
+                if (pop instanceof WrapJsonElement) {
+                    JsonElement origin = ((WrapJsonElement) pop).originElement;
+                    JsonElement parent = ((WrapJsonElement) pop).parentElement;
+                    String key = ((WrapJsonElement) pop).key;
 
-            if (pop instanceof WrapJsonElement) {
-                JsonElement origin = ((WrapJsonElement) pop).originElement;
-                JsonElement parent = ((WrapJsonElement) pop).parentElement;
-                String key = ((WrapJsonElement) pop).key;
-
-                if (isArray(parent)) {
-                    operateElement(parent, origin, ignoreNull);
-                } else {
-                    operateElement(parent, key, origin, ignoreNull);
+                    if (isArray(parent)) {
+                        operateElement(parent, origin, ignoreNull);
+                    } else {
+                        operateElement(parent, key, origin, ignoreNull);
+                    }
                 }
+            }else{
+                Log.w(TAG, "不合法的操作, 请检查!");
             }
-
             return this;
         }
 
