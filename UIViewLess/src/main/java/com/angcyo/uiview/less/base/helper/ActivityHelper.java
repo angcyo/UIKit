@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import com.angcyo.lib.L;
+import com.angcyo.uiview.less.R;
 import com.angcyo.uiview.less.base.BaseAppCompatActivity;
 import com.angcyo.uiview.less.kotlin.ExKt;
 
@@ -301,6 +302,7 @@ public class ActivityHelper {
         Bundle bundle;
         int enterAnim = -1;
         int exitAnim = -1;
+        int requestCode = -1;
 
         public Builder(@NonNull Context context) {
             this.context = context;
@@ -372,6 +374,18 @@ public class ActivityHelper {
             return this;
         }
 
+        public Builder defaultExitAnim() {
+            this.enterAnim = R.anim.base_no_alpha;
+            this.exitAnim = R.anim.base_tran_to_bottom;
+            return this;
+        }
+
+        public Builder defaultEnterAnim() {
+            this.exitAnim = R.anim.base_no_alpha;
+            this.enterAnim = R.anim.base_tran_to_top;
+            return this;
+        }
+
         /**
          * 无动画效果
          */
@@ -388,7 +402,12 @@ public class ActivityHelper {
             if (intent == null) {
                 L.e("必要的参数不合法,请检查参数:" + "\n1->intent:" + intent + " ×");
             } else {
-                context.startActivity(intent);
+
+                if (requestCode != -1 && context instanceof Activity) {
+                    ((Activity) context).startActivityForResult(intent, requestCode);
+                } else {
+                    context.startActivity(intent);
+                }
 
                 if (context instanceof Activity) {
                     if (enterAnim != -1 || exitAnim != -1) {
@@ -400,6 +419,11 @@ public class ActivityHelper {
         }
 
         public Intent doIt() {
+            return start();
+        }
+
+        public Intent doIt(int requestCode) {
+            this.requestCode = requestCode;
             return start();
         }
 
