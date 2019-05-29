@@ -677,21 +677,25 @@ public class RRecyclerView extends RecyclerView implements CanScrollUpCallBack {
      * 滚动结束后时的速率
      */
     public float getLastVelocity() {
-        Object mViewFlinger = Reflect.getMember(RecyclerView.class, this, "mViewFlinger");
-        Object mScroller = Reflect.getMember(mViewFlinger, "mScroller");
         float currVelocity = 0f;
-        if (mScroller instanceof OverScroller) {
-            currVelocity = ((OverScroller) mScroller).getCurrVelocity();
-        } else if (mScroller instanceof ScrollerCompat) {
-            currVelocity = ((ScrollerCompat) mScroller).getCurrVelocity();
-        } else {
-            throw new IllegalArgumentException("未兼容的mScroller类型:" + mScroller.getClass().getSimpleName());
-        }
+        try {
+            Object mViewFlinger = Reflect.getMember(RecyclerView.class, this, "mViewFlinger");
+            Object mScroller = Reflect.getMember(mViewFlinger, "mScroller");
+            if (mScroller instanceof OverScroller) {
+                currVelocity = ((OverScroller) mScroller).getCurrVelocity();
+            } else if (mScroller instanceof ScrollerCompat) {
+                currVelocity = ((ScrollerCompat) mScroller).getCurrVelocity();
+            } else {
+                //throw new IllegalArgumentException("未兼容的mScroller类型:" + mScroller.getClass().getSimpleName());
+            }
 
-        if (Float.isNaN(currVelocity)) {
-            currVelocity = mLastVelocity;
-        } else {
-            mLastVelocity = currVelocity;
+            if (Float.isNaN(currVelocity)) {
+                currVelocity = mLastVelocity;
+            } else {
+                mLastVelocity = currVelocity;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return currVelocity;
     }

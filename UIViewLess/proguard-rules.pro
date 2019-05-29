@@ -55,10 +55,6 @@
     java.lang.Object readResolve();
 }
 
-#不混淆实现android.os.Parcelable的类
--keep class * implements android.os.Parcelable
--keep class * implements java.io.Serializable
-
 #Fragment不需要在AndroidManifest.xml中注册，需要额外保护下
 -keep class * extends android.support.v4.app.Fragment
 -keep class * extends android.app.Fragment
@@ -75,6 +71,7 @@
 -keep class * extends FileProvider {*;}
 
 -keep class * extends Activity {*;}
+-keep class android.view.View
 -keep class * extends View {*;}
 -keep class com.luck.picture.lib.rxbus2.**{*;}
 
@@ -108,3 +105,8 @@
 # 保持所有Bean类
 -keep class com.angcyo.**.**Bean {*;}
 -keep class com.wayto.**.**Bean {*;}
+
+#-keep class android.support.v4.widget.ScrollerCompat
+#-keep class android.widget.OverScroller
+-keep class android.support.v7.widget.RecyclerView {*;}
+-keep class android.support.v4.view.ViewPager {*;}

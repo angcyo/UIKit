@@ -58,7 +58,7 @@
 -dontwarn rx.internal.util.**
 -keep class rx.**{*;}
 
-#-keep class retrofit2.**{*;}
+-keep class retrofit2.**{*;}
 -keep class retrofit2.Retrofit
 -keep class retrofit2.RequestFactory
 -keep class retrofit2.HttpServiceMethod
