@@ -38,8 +38,10 @@ public abstract class RBaseAdapter<T> extends RecyclerView.Adapter<RBaseViewHold
 
     /**
      * 具有此标识的的item type, 会在GridLayoutManager中, 全行显示
+     * <p>
+     * 第4位的最高字节  0x8000 = 32,768
      */
-    public static final int ITEM_SINGLE_LINE = 0x1_000_000_0;
+    public static final int ITEM_SINGLE_LINE = 0x8_000;
 
     public static final int ITEM_TYPE_LOAD_MORE = 666 | ITEM_SINGLE_LINE;
     public static final int ITEM_TYPE_SHOW_STATE = 667 | ITEM_SINGLE_LINE;

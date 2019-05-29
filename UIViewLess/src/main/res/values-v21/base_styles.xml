@@ -18,6 +18,11 @@
         <item name="android:windowBackground">@color/theme_color_primary</item>
     </style>
 
+    <!--透明状态栏主题, 多用于启动页, 透明状态栏会影响 dialog中 EditText弹出键盘-->
+    <style name="BaseTranStatusTheme" parent="BaseWhiteAppTheme">
+        <item name="android:windowTranslucentStatus">true</item>
+    </style>
+
     <style name="BaseTranTheme" parent="BaseAppTheme">
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:windowIsTranslucent">true</item>

@@ -35,6 +35,7 @@ public class FlatImageView extends GlideImageView {
     private int scrollState = STATE_FORWARD;
 
     private int scrollDuration = 5000;
+    private long startScrollTime = 0L;
 
     public FlatImageView(Context context) {
         super(context, null);
@@ -49,23 +50,27 @@ public class FlatImageView extends GlideImageView {
         super.computeScroll();
 
         if (startFlat && isReady()) {
-            if (mOverScroller.computeScrollOffset() && startFlat) {
+            long nowTime = System.currentTimeMillis();
+
+            boolean reverse = false;
+            if (mOverScroller.computeScrollOffset() || nowTime - startScrollTime < scrollDuration) {
 
                 postInvalidate();
 
-//            if (targetScrollX > 0 || targetScrollY > 0) {
-//                if (mOverScroller.getCurrX() >= 0 ||
-//                        mOverScroller.getCurrY() >= 0) {
-//                    forward();
-//                }
-//            } else if (targetScrollX < 0 || targetScrollY < 0) {
-//                if (mOverScroller.getCurrX() <= targetScrollX ||
-//                        mOverScroller.getCurrY() <= targetScrollY) {
-//                    //反向滚动
-//                    backward();
-//                }
-//            }
+                if (targetScrollX != 0) {
+                    if (Math.abs(mOverScroller.getCurrX()) >= Math.abs(targetScrollX)) {
+                        reverse = true;
+                    }
+                } else if (targetScrollY != 0) {
+                    if (Math.abs(mOverScroller.getCurrY()) >= Math.abs(targetScrollY)) {
+                        reverse = true;
+                    }
+                }
             } else {
+                reverse = true;
+            }
+
+            if (reverse) {
                 if (scrollState == STATE_FORWARD) {
                     backward();
                 } else {
@@ -93,8 +98,8 @@ public class FlatImageView extends GlideImageView {
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         super.onLayout(changed, left, top, right, bottom);
-        setRight(drawableWidth());
-        setBottom(drawableHeight());
+        setRight(Math.max(drawableWidth(), getMeasuredWidth()));
+        setBottom(Math.max(drawableHeight(), getMeasuredHeight()));
     }
 
     @Override
@@ -148,6 +153,7 @@ public class FlatImageView extends GlideImageView {
     }
 
     private void startScroller() {
+        startScrollTime = System.currentTimeMillis();
         mOverScroller.startScroll(((int) drawScrollX), (int) drawScrollY, targetScrollX, targetScrollY, scrollDuration);
         postInvalidate();
     }
@@ -181,7 +187,7 @@ public class FlatImageView extends GlideImageView {
             canvas.save();
             canvas.translate(mOverScroller.getCurrX(), mOverScroller.getCurrY());
             drawable.setBounds(0, 0,
-                    drawableWidth(), drawableHeight());
+                    getRight(), getBottom());
 //        canvas.translate(200, 200);
             super.onDraw(canvas);
 //            drawable.draw(canvas);
