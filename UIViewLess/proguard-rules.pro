@@ -110,3 +110,4 @@
 #-keep class android.widget.OverScroller
 -keep class android.support.v7.widget.RecyclerView {*;}
 -keep class android.support.v4.view.ViewPager {*;}
+-keep class android.widget.ArrayAdapter {*;}
