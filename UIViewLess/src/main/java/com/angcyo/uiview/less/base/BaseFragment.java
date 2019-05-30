@@ -191,6 +191,9 @@ public abstract class BaseFragment extends AbsLifeCycleFragment {
     }
 
     public void addSubscription(Subscription subscription, boolean checkToken) {
+        if (mSubscriptions == null || mSubscriptions.isUnsubscribed()) {
+            mSubscriptions = new CompositeSubscription();
+        }
         addSubscription(mSubscriptions, subscription, checkToken, new Runnable() {
             @Override
             public void run() {

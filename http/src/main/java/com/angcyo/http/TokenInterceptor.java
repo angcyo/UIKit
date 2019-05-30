@@ -48,7 +48,7 @@ public class TokenInterceptor implements Interceptor {
     public Response intercept(Chain chain) throws IOException {
         Request originRequest = chain.request();
 
-        if (tokenListener == null) {
+        if (tokenListener == null || tokenListener.ignoreRequest(originRequest)) {
             return chain.proceed(originRequest);
         }
 
@@ -96,7 +96,7 @@ public class TokenInterceptor implements Interceptor {
 
             BufferedSource source = responseBody.source();
             source.request(Long.MAX_VALUE);
-            Buffer buffer = source.buffer();
+            Buffer buffer = source.getBuffer();
 
             responseBodyBuilder.append(buffer.clone().readString(charset));
         }
@@ -126,7 +126,7 @@ public class TokenInterceptor implements Interceptor {
 
             try {
                 countDownLatch.await();
-            } catch (InterruptedException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
 
@@ -151,6 +151,11 @@ public class TokenInterceptor implements Interceptor {
     public interface OnTokenListener {
 
         /**
+         * 是否要忽略这个请求
+         */
+        boolean ignoreRequest(@NonNull Request originRequest);
+
+        /**
          * 设置token
          */
         Request initToken(@NonNull Request originRequest);
@@ -170,6 +175,11 @@ public class TokenInterceptor implements Interceptor {
     }
 
     public static class TokenListenerAdapter implements OnTokenListener {
+
+        @Override
+        public boolean ignoreRequest(@NonNull Request originRequest) {
+            return false;
+        }
 
         @Override
         public Request initToken(@NonNull Request originRequest) {

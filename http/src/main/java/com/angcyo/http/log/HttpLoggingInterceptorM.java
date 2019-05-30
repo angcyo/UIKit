@@ -293,7 +293,7 @@ public final class HttpLoggingInterceptorM implements Interceptor {
             } else {
                 BufferedSource source = responseBody.source();
                 source.request(Long.MAX_VALUE); // Buffer the entire body.
-                Buffer buffer = source.buffer();
+                Buffer buffer = source.getBuffer();
 
                 if (logResponse) {
                     Charset charset = UTF8;

@@ -4,6 +4,8 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -98,8 +100,10 @@ public class LocalMediaLoader {
     public void loadAllMedia(final LocalMediaLoadListener imageLoadListener) {
         activity.getSupportLoaderManager().initLoader(type, null,
                 new LoaderManager.LoaderCallbacks<Cursor>() {
+
+                    @NonNull
                     @Override
-                    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+                    public Loader<Cursor> onCreateLoader(int id, @Nullable Bundle args) {
                         CursorLoader cursorLoader = null;
                         switch (id) {
                             case PictureConfig.TYPE_ALL:
@@ -139,40 +143,40 @@ public class LocalMediaLoader {
                     }
 
                     @Override
-                    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+                    public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor cursor) {
                         try {
                             List<LocalMediaFolder> imageFolders = new ArrayList<>();
                             LocalMediaFolder allImageFolder = new LocalMediaFolder();
                             List<LocalMedia> latelyImages = new ArrayList<>();
-                            if (data != null) {
-                                int count = data.getCount();
+                            if (cursor != null) {
+                                int count = cursor.getCount();
                                 if (count > 0) {
-                                    data.moveToFirst();
+                                    cursor.moveToFirst();
                                     do {
-                                        String path = data.getString
-                                                (data.getColumnIndexOrThrow(PROJECTION[1]));
+                                        String path = cursor.getString
+                                                (cursor.getColumnIndexOrThrow(PROJECTION[1]));
 
-                                        String pictureType = data.getString
-                                                (data.getColumnIndexOrThrow(PROJECTION[2]));
+                                        String pictureType = cursor.getString
+                                                (cursor.getColumnIndexOrThrow(PROJECTION[2]));
 
-                                        int w = data.getInt
-                                                (data.getColumnIndexOrThrow(PROJECTION[3]));
+                                        int w = cursor.getInt
+                                                (cursor.getColumnIndexOrThrow(PROJECTION[3]));
 
-                                        int h = data.getInt
-                                                (data.getColumnIndexOrThrow(PROJECTION[4]));
+                                        int h = cursor.getInt
+                                                (cursor.getColumnIndexOrThrow(PROJECTION[4]));
 
-                                        int duration = data.getInt
-                                                (data.getColumnIndexOrThrow(PROJECTION[5]));
+                                        int duration = cursor.getInt
+                                                (cursor.getColumnIndexOrThrow(PROJECTION[5]));
 
                                         long addTime = 0L;
                                         long modifyTime = 0L;
-                                        int columnIndex = data.getColumnIndex(PROJECTION[6]);
+                                        int columnIndex = cursor.getColumnIndex(PROJECTION[6]);
                                         if (columnIndex != -1) {
-                                            addTime = data.getLong(columnIndex);
+                                            addTime = cursor.getLong(columnIndex);
                                         }
-                                        columnIndex = data.getColumnIndex(PROJECTION[7]);
+                                        columnIndex = cursor.getColumnIndex(PROJECTION[7]);
                                         if (columnIndex != -1) {
-                                            modifyTime = data.getLong(columnIndex);
+                                            modifyTime = cursor.getLong(columnIndex);
                                         }
 
                                         LocalMedia image = new LocalMedia
@@ -185,7 +189,7 @@ public class LocalMediaLoader {
                                         latelyImages.add(image);
                                         int imageNum = allImageFolder.getImageNum();
                                         allImageFolder.setImageNum(imageNum + 1);
-                                    } while (data.moveToNext());
+                                    } while (cursor.moveToNext());
 
                                     if (latelyImages.size() > 0) {
                                         sortFolder(imageFolders);
@@ -203,6 +207,8 @@ public class LocalMediaLoader {
                                     // 如果没有相册
                                     imageLoadListener.loadComplete(imageFolders);
                                 }
+                            } else {
+                                imageLoadListener.loadComplete(imageFolders);
                             }
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -210,7 +216,7 @@ public class LocalMediaLoader {
                     }
 
                     @Override
-                    public void onLoaderReset(Loader<Cursor> loader) {
+                    public void onLoaderReset(@NonNull Loader<Cursor> loader) {
                     }
                 });
     }

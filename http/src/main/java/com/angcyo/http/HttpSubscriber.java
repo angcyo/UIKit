@@ -5,6 +5,8 @@ import com.angcyo.http.log.LogUtil;
 import rx.Subscriber;
 
 import java.net.ConnectException;
+import java.net.NoRouteToHostException;
+import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 
 /**
@@ -19,6 +21,8 @@ public class HttpSubscriber<T> extends Subscriber<T> {
     public static boolean isNetworkException(Throwable error) {
         return error instanceof NonetException ||
                 error instanceof ConnectException ||
+                error instanceof SocketTimeoutException ||
+                error instanceof NoRouteToHostException ||
                 error instanceof UnknownHostException;
     }
 

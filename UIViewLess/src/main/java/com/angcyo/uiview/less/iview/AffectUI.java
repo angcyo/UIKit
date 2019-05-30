@@ -38,6 +38,11 @@ public class AffectUI {
     public static final int AFFECT_OTHER = 8;
 
     /**
+     * 空数据
+     */
+    public static final int AFFECT_EMPTY = 16;
+
+    /**
      * 当切换到非内容情感时, 内容布局的显示方式, 默认invisible
      */
     public static final int CONTENT_AFFECT_NONE = 0;

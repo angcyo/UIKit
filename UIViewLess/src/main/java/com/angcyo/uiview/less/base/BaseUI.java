@@ -106,6 +106,7 @@ public class BaseUI {
                     .register(AffectUI.AFFECT_LOADING, R.layout.base_affect_loading)
                     .register(AffectUI.AFFECT_ERROR, R.layout.base_affect_error)
                     .register(AffectUI.AFFECT_OTHER, R.layout.base_affect_other)
+                    .register(AffectUI.AFFECT_EMPTY, R.layout.base_empty_layout)
                     .setContentAffect(AffectUI.CONTENT_AFFECT_INVISIBLE)
                     .setAffectChangeListener(affectChangeListener);
         }
