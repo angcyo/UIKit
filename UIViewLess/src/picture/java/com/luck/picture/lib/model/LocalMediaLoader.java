@@ -98,7 +98,7 @@ public class LocalMediaLoader {
     }
 
     public void loadAllMedia(final LocalMediaLoadListener imageLoadListener) {
-        activity.getSupportLoaderManager().initLoader(type, null,
+        LoaderManager.getInstance(activity).initLoader(type, null,
                 new LoaderManager.LoaderCallbacks<Cursor>() {
 
                     @NonNull
