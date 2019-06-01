@@ -283,8 +283,15 @@ public class Root {
     }
 
     public static String createTimeFileName(String format) {
+        return createTimeFileName(format, "");
+    }
+
+    public static String createTimeFileName(String format, String suffix) {
         String dataTime = RCrashHandler.getDataTime(format);
-        return dataTime;
+        if (suffix == null) {
+            suffix = "";
+        }
+        return dataTime + suffix;
     }
 
     /**

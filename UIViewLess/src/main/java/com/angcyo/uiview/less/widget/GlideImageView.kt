@@ -107,6 +107,7 @@ open class GlideImageView(context: Context, attributeSet: AttributeSet? = null) 
         defaultPlaceholderDrawable = typedArray.getDrawable(R.styleable.GlideImageView_r_placeholder_drawable)
         noPlaceholderDrawable =
             typedArray.getBoolean(R.styleable.GlideImageView_r_no_placeholder_drawable, noPlaceholderDrawable)
+        originalSize = typedArray.getBoolean(R.styleable.GlideImageView_r_load_original_size, originalSize)
 
         if (defaultPlaceholderDrawable != null) {
             placeholderDrawable = defaultPlaceholderDrawable
