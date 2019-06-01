@@ -17,6 +17,7 @@ import com.angcyo.uiview.less.utils.Reflect
 import com.angcyo.uiview.less.utils.utilcode.utils.FileUtils
 import java.io.ByteArrayOutputStream
 import java.io.File
+import java.io.FileOutputStream
 import java.net.URLEncoder
 import java.util.regex.Pattern
 import kotlin.random.Random
@@ -315,6 +316,7 @@ public fun MotionEvent.isClickEvent(context: Context, downX: Float, downY: Float
             (Math.abs(this.x - downX) <= touchSlop && Math.abs(this.y - downY) <= touchSlop)
 }
 
+/**将图片转成字节数组*/
 public fun Bitmap.toBytes(format: Bitmap.CompressFormat = Bitmap.CompressFormat.PNG, quality: Int = 100): ByteArray? {
     var out: ByteArrayOutputStream? = null
     var bytes: ByteArray? = null
@@ -332,11 +334,38 @@ public fun Bitmap.toBytes(format: Bitmap.CompressFormat = Bitmap.CompressFormat.
     return bytes
 }
 
+/**
+ * 将图片转成base64字符串
+ * */
 public fun Bitmap.toBase64(format: Bitmap.CompressFormat = Bitmap.CompressFormat.PNG, quality: Int = 100): String {
     var result = ""
     toBytes(format, quality)?.let {
         result = Base64.encodeToString(it, Base64.NO_WRAP /*去掉/n符*/)
     }
+    return result
+}
+
+/**保存图片到指定文件*/
+public fun Bitmap.save(
+    filePath: String,
+    format: Bitmap.CompressFormat = Bitmap.CompressFormat.PNG,
+    quality: Int = 100
+): Boolean {
+    var result = true
+    try {
+        val outputFile = File(filePath)
+        if (!outputFile.exists()) {
+            result = outputFile.createNewFile()
+        }
+        val fileOutputStream = FileOutputStream(outputFile)
+        compress(format, quality, fileOutputStream)
+        fileOutputStream.flush()
+        fileOutputStream.close()
+    } catch (e: Exception) {
+        e.printStackTrace()
+        result = false
+    }
+
     return result
 }
 
