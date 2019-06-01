@@ -65,8 +65,16 @@ public class Root {
             builder.append("\n");
             builder.append(displayMetrics.xdpi).append("×").append(displayMetrics.ydpi);
 
-            double x = Math.pow(displayMetrics.widthPixels / displayMetrics.xdpi, 2);
-            double y = Math.pow(displayMetrics.heightPixels / displayMetrics.ydpi, 2);
+            float width = displayMetrics.widthPixels / displayMetrics.xdpi;
+            float height = displayMetrics.heightPixels / displayMetrics.ydpi;
+
+            builder.append(" ");
+            builder.append(RUtils.decimal(width, 3, true))
+                    .append("×")
+                    .append(RUtils.decimal(height, 3, true));
+
+            double x = Math.pow(width, 2);
+            double y = Math.pow(height, 2);
             // 屏幕尺寸
             double screenInches = Math.sqrt(x + y);
             builder.append(" ");

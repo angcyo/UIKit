@@ -37,6 +37,7 @@
     <!--标题上, 每个item的大小, 一般指的是宽度-->
     <dimen name="base_title_bar_item_size">40dp</dimen>
     <dimen name="base_item_size">48dp</dimen>
+    <dimen name="base_item_info_height">48dp</dimen>
 
     <!--对话框默认两边的距离-->
     <dimen name="base_dialog_margin">30dp</dimen>

@@ -194,7 +194,7 @@
     <!--标准的Item Info 样式-->
     <style name="BaseItemInfoStyle">
         <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">@dimen/base_item_size</item>
+        <item name="android:layout_height">@dimen/base_item_info_height</item>
         <item name="android:background">@drawable/base_white_bg_selector</item>
         <item name="android:paddingLeft">@dimen/base_xhdpi</item>
         <item name="android:paddingRight">@dimen/base_xhdpi</item>
