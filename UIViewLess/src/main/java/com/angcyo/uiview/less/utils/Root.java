@@ -5,6 +5,7 @@ import android.os.Build;
 import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
+import android.util.DisplayMetrics;
 import com.angcyo.lib.L;
 import com.angcyo.uiview.less.RApplication;
 import com.angcyo.uiview.less.RCrashHandler;
@@ -38,19 +39,19 @@ public class Root {
         builder.append(ResUtil.getThemeString(RApplication.getApp(), "build_time")).append(" on ");
         builder.append(ResUtil.getThemeString(RApplication.getApp(), "os_name")).append("\n");
 
-        builder.append(RUtils.getScreenWidth(activity)).append("×").append(RUtils.getScreenHeight(activity));
-        builder.append(" ");
-        builder.append(RUtils.getContentViewHeight(activity));
-        builder.append("/");
-        int decorViewHeight = RUtils.getDecorViewHeight(activity);
-        int decorViewWidth = RUtils.getDecorViewWidth(activity);
-        builder.append(decorViewHeight);
-        builder.append(" ");
+        DisplayMetrics displayMetrics = null;
+        if (activity != null) {
+            displayMetrics = activity.getResources().getDisplayMetrics();
 
-        float density = ScreenUtil.density();
-        builder.append((int) (decorViewWidth / density)).append("/").append((int) (decorViewHeight / density)).append("/");
-        builder.append(ScreenUtil.getDensityDpi()).append(" ");
-        builder.append(density).append(" ");
+            builder.append(displayMetrics.widthPixels).append("×").append(displayMetrics.heightPixels);
+            builder.append(" ");
+            builder.append(" ch:");
+            builder.append(RUtils.getContentViewHeight(activity));
+            builder.append(" ");
+            builder.append(" dh:");
+            builder.append(RUtils.getDecorViewHeight(activity));
+            builder.append(" ");
+        }
 
         builder.append(Build.VERSION.RELEASE).append("/");
         builder.append(Build.VERSION.SDK_INT).append(" ");
@@ -58,6 +59,23 @@ public class Root {
         if (activity != null) {
             builder.append(RUtils.getStatusBarHeight(activity)).append("/");
             builder.append(RUtils.getNavBarHeight(activity)).append("");
+        }
+
+        if (displayMetrics != null) {
+            builder.append("\n");
+            builder.append(displayMetrics.xdpi).append("×").append(displayMetrics.ydpi);
+
+            double x = Math.pow(displayMetrics.widthPixels / displayMetrics.xdpi, 2);
+            double y = Math.pow(displayMetrics.heightPixels / displayMetrics.ydpi, 2);
+            // 屏幕尺寸
+            double screenInches = Math.sqrt(x + y);
+            builder.append(" ");
+            builder.append(RUtils.decimal((float) screenInches, 3, true));
+
+            builder.append(" dpi:");
+            builder.append(RUtils.getDensityDpi()).append(" ");
+            builder.append(" dp:");
+            builder.append(RUtils.density()).append(" ");
         }
 
         builder.append("\n");
