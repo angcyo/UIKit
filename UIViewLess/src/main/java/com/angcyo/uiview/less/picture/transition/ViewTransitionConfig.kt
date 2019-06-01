@@ -326,6 +326,13 @@ class ViewTransitionConfig {
 
     //<editor-fold desc="ViewPager相关处理">
 
+    companion object {
+        /**图片*/
+        const val MEDIA_TYPE_IMAGE = 1
+        /**视频*/
+        const val MEDIA_TYPE_VIDEO = 2
+    }
+
     /**
      * 默认显示第几页
      * viewPager.setCurrentItem()
@@ -347,7 +354,12 @@ class ViewTransitionConfig {
     /**
      * 获取指定位置的图片url地址
      * */
+    @Deprecated("使用[onGetPagerMediaUrl]")
     var onGetPagerImageUrl: (position: Int) -> String? = { null }
+
+    var onGetPagerMediaUrl: (position: Int) -> String? = { onGetPagerImageUrl(it) }
+
+    var onGetMediaType: (position: Int) -> Int = { MEDIA_TYPE_IMAGE }
 
     /**
      * 获取指定位置对应的View, 用于设置 ImagePlaceholder , 和 fromRect
@@ -448,7 +460,7 @@ class ViewTransitionConfig {
         }
 
         //加载图片
-        val data = onGetPagerImageUrl(position)
+        val data = onGetPagerMediaUrl(position)
         if (data is String) {
             photoView.load(data) {
                 dontAnimate()

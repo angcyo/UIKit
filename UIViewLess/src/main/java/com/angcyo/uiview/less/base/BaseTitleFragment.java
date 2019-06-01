@@ -370,7 +370,7 @@ public abstract class BaseTitleFragment extends BaseFragment implements AffectUI
 
     @Override
     public void onAffectChange(@NonNull AffectUI affectUI, int fromAffect, int toAffect,
-                               @Nullable View fromView, @NonNull View toView) {
+                               @Nullable View fromView, @Nullable View toView) {
     }
 
     @Override

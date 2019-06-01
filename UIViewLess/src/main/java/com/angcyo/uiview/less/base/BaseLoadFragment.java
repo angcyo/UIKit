@@ -50,7 +50,7 @@ public class BaseLoadFragment extends BaseTitleFragment {
     }
 
     @Override
-    public void onAffectChange(@NonNull AffectUI affectUI, int fromAffect, int toAffect, @Nullable View fromView, @NonNull View toView) {
+    public void onAffectChange(@NonNull AffectUI affectUI, int fromAffect, int toAffect, @Nullable View fromView, @Nullable View toView) {
         super.onAffectChange(affectUI, fromAffect, toAffect, fromView, toView);
         if (toAffect == AffectUI.AFFECT_ERROR) {
             onAffectToError(affectUI, fromAffect, toAffect, fromView, toView);
@@ -62,7 +62,7 @@ public class BaseLoadFragment extends BaseTitleFragment {
     /**
      * 情感图 显示异常时
      */
-    protected void onAffectToError(@NonNull AffectUI affectUI, int fromAffect, int toAffect, @Nullable View fromView, @NonNull View toView) {
+    protected void onAffectToError(@NonNull AffectUI affectUI, int fromAffect, int toAffect, @Nullable View fromView, @Nullable View toView) {
         //显示额外的错误信息
         Object extraObj = affectUI.getExtraObj();
         if (extraObj != null) {
@@ -88,7 +88,7 @@ public class BaseLoadFragment extends BaseTitleFragment {
      */
     protected void onAffectToLoading(@NonNull AffectUI affectUI,
                                      int fromAffect, int toAffect,
-                                     @Nullable View fromView, @NonNull View toView) {
+                                     @Nullable View fromView, @Nullable View toView) {
         boolean needRefresh = false;
 
         if (firstShowEnd) {
