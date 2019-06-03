@@ -5,14 +5,18 @@
              android:layout_width="match_parent"
              android:layout_height="wrap_content">
 
-    <android.support.v7.widget.AppCompatTextView
+    <com.angcyo.uiview.less.widget.RTextView
             android:id="@+id/item_text_view"
             tools:text="标题"
             style="@style/BaseMainTextStyle"
             android:layout_gravity="center"
             android:gravity="center"
             android:textColor="@color/base_main_text_color_selector"
+            tools:r_left_drawable="@drawable/ic_delete_photo"
+            android:drawablePadding="@dimen/base_xhdpi"
             android:layout_width="match_parent"
+            android:paddingLeft="@dimen/base_xxhdpi"
+            android:paddingRight="@dimen/base_xxhdpi"
             android:minHeight="@dimen/dialog_item_height"
             android:layout_height="wrap_content"/>
 

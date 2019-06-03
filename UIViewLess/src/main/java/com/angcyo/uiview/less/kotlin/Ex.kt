@@ -389,6 +389,10 @@ public fun String.copy() {
     RUtils.copyText(this)
 }
 
+public fun CharSequence.copy() {
+    RUtils.copyText(this)
+}
+
 public fun String.toBitmap(context: Context): Bitmap {
     return RUtils.textToBitmap(context, this)
 }
