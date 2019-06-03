@@ -542,7 +542,7 @@ public abstract class RBaseAdapter<T> extends RecyclerView.Adapter<RBaseViewHold
         return getItemType(position, data);
     }
 
-    public int getItemType(int position, T data) {
+    public int getItemType(int position, @Nullable T data) {
         return 0;
     }
 
@@ -571,7 +571,7 @@ public abstract class RBaseAdapter<T> extends RecyclerView.Adapter<RBaseViewHold
 
     //----------------Item 数据的操作-----------------//
 
-    protected abstract void onBindView(@NonNull RBaseViewHolder holder, int position, T bean);
+    protected abstract void onBindView(@NonNull RBaseViewHolder holder, int position, @Nullable T bean);
 
     public void onScrollStateChanged(@NonNull RRecyclerView recyclerView, int newState) {
     }

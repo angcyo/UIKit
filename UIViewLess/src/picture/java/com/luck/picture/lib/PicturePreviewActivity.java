@@ -134,8 +134,10 @@ public class PicturePreviewActivity extends PictureBaseActivity implements
                         boolean toEqual = PictureMimeType.
                                 mimeToEqual(pictureType, image.getPictureType());
                         if (!toEqual) {
-                            ToastManage.s(mContext, getString(R.string.picture_rule));
-                            return;
+                            if (config.enableCrop) {
+                                ToastManage.s(mContext, getString(R.string.picture_rule));
+                                return;
+                            }
                         }
                     }
                     // 刷新图片列表中图片状态

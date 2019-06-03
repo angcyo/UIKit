@@ -35,7 +35,13 @@ public class LocalMedia implements Parcelable {
     private boolean isChecked;
     private boolean isCut;
     private int num;
-    private int mimeType;
+    /**
+     * @see PictureConfig#TYPE_ALL
+     * @see PictureConfig#TYPE_AUDIO
+     * @see PictureConfig#TYPE_IMAGE
+     * @see PictureConfig#TYPE_VIDEO
+     */
+    private int mimeType = PictureConfig.TYPE_IMAGE;
     private String pictureType;
     private boolean compressed;
 
@@ -53,6 +59,11 @@ public class LocalMedia implements Parcelable {
 
     public LocalMedia() {
 
+    }
+
+    public LocalMedia(String path, int mimeType) {
+        this.path = path;
+        this.mimeType = mimeType;
     }
 
     public LocalMedia(String path, long duration, int mimeType, String pictureType) {
@@ -256,6 +267,10 @@ public class LocalMedia implements Parcelable {
             return getCutPath();
         }
         return getPath();
+    }
+
+    public String getLoadUrl() {
+        return getFilePath();
     }
 
     @Override

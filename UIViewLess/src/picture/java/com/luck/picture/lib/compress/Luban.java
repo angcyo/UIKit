@@ -10,7 +10,6 @@ import android.support.annotation.UiThread;
 import android.support.annotation.WorkerThread;
 import android.text.TextUtils;
 import android.util.Log;
-
 import com.luck.picture.lib.config.PictureMimeType;
 import com.luck.picture.lib.entity.LocalMedia;
 import com.luck.picture.lib.tools.PictureFileUtils;
@@ -150,7 +149,22 @@ public class Luban implements Handler.Callback {
                     }
                 });
             } else {
-                mCompressListener.onError(new IllegalArgumentException("can not read the path : " + path));
+                //2019-6-3
+                File targetFile = new File(path);
+                if (targetFile.canRead()) {
+                    index++;
+                    if (medias != null && medias.size() > 0) {
+                        LocalMedia media = medias.get(index);
+                        media.setCompressed(false);
+                        media.setCompressPath("");
+                        boolean isLast = index == medias.size() - 1;
+                        if (isLast) {
+                            mHandler.sendMessage(mHandler.obtainMessage(MSG_COMPRESS_MULTIPLE_SUCCESS, medias));
+                        }
+                    }
+                } else {
+                    mCompressListener.onError(new IllegalArgumentException("can not read the path : " + path));
+                }
             }
             iterator.remove();
         }
@@ -178,6 +192,12 @@ public class Luban implements Handler.Callback {
                         new Engine(path, getImageCacheFile(context, Checker.checkSuffix(path))).compress() :
                         new File(path);
                 results.add(result);
+            } else {
+                //2019-6-3, 不是图片格式, 直接返回
+                File targetFile = new File(path);
+                if (targetFile.canRead()) {
+                    results.add(new File(path));
+                }
             }
             iterator.remove();
         }
@@ -198,6 +218,8 @@ public class Luban implements Handler.Callback {
                 break;
             case MSG_COMPRESS_ERROR:
                 mCompressListener.onError((Throwable) msg.obj);
+                break;
+            default:
                 break;
         }
         return false;

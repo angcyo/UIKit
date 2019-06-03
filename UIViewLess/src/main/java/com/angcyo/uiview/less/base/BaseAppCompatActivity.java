@@ -109,7 +109,7 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
 
         if (needMoreTaskToBack()) {
             moveTaskToBack();
-        } else {
+        } else if (checkBackPressed()) {
             super.onBackPressed();
         }
     }
@@ -141,6 +141,13 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
 
     protected boolean needMoreTaskToBack() {
         return false;
+    }
+
+    /**
+     * 是否可以back
+     */
+    protected boolean checkBackPressed() {
+        return true;
     }
 
     public void moveTaskToBack() {
