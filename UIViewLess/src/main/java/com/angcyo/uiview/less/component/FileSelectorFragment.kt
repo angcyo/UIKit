@@ -100,8 +100,8 @@ open class FileSelectorFragment : BaseFragment() {
             adapter = object : RBaseAdapter<FileItem>(mAttachContext) {
                 override fun getItemLayoutId(viewType: Int): Int = R.layout.base_fragment_file_selector_item
 
-                override fun onBindView(holder: RBaseViewHolder, position: Int, item: FileItem) {
-                    val bean = item.file
+                override fun onBindView(holder: RBaseViewHolder, position: Int, item: FileItem?) {
+                    val bean = item!!.file
                     holder.tv(R.id.base_name_view).text = bean.name
                     holder.tv(R.id.base_time_view).text = formatTime(bean.lastModified())
 

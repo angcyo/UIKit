@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+    <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_margin="5dp"
+            android:layout_height="wrap_content">
+
+        <com.angcyo.uiview.less.widget.GlideImageView
+                android:id="@+id/image_view"
+                android:layout_width="match_parent"
+                android:scaleType="centerCrop"
+                app:r_show_type="ROUND"
+                app:r_round_radius="@dimen/base_round_radius"
+                android:layout_height="0dp"
+                app:r_load_original_size="true"
+                app:r_placeholder_drawable="@drawable/image_placeholder"
+                app:layout_constraintDimensionRatio="1:1"/>
+
+        <android.support.v7.widget.AppCompatImageView
+                android:id="@+id/play_video_view"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:visibility="gone"
+                tools:visibility="visible"
+                app:srcCompat="@drawable/ic_video_play"
+                android:layout_width="40dp"
+                android:layout_height="40dp"/>
+    </android.support.constraint.ConstraintLayout>
+
+    <android.support.v7.widget.AppCompatImageView
+            android:id="@+id/delete_image_view"
+            android:layout_gravity="right"
+            android:scaleType="fitCenter"
+            android:padding="1dp"
+            android:background="@drawable/base_image_remove_circle_selector"
+            app:srcCompat="@drawable/ic_image_remove"
+            android:layout_width="20dp"
+            android:layout_height="20dp"/>
+
+</FrameLayout>

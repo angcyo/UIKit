@@ -13,21 +13,31 @@ import com.angcyo.uiview.less.picture.transition.ViewTransitionConfig
  */
 
 object RPager {
-    fun start(fragmentManager: FragmentManager?, init: (ViewTransitionConfig.() -> Unit) = {}) {
+    fun start(
+        fragmentManager: FragmentManager?,
+        transitionFragment: ViewTransitionFragment,
+        init: (ViewTransitionConfig.() -> Unit) = {}
+    ) {
         FragmentHelper.build(fragmentManager)
             .noAnim()
-            .showFragment(ViewTransitionFragment().apply {
+            .showFragment(transitionFragment.apply {
                 transitionConfig.init()
             })
             .doIt()
     }
 
+    fun start(fragmentManager: FragmentManager?, init: (ViewTransitionConfig.() -> Unit) = {}) {
+        start(fragmentManager, ViewTransitionFragment(), init)
+    }
+
     fun pager(fragmentManager: FragmentManager?, init: (ViewTransitionConfig.() -> Unit) = {}) {
-        FragmentHelper.build(fragmentManager)
-            .noAnim()
-            .showFragment(PagerTransitionFragment().apply {
-                transitionConfig.init()
-            })
-            .doIt()
+        start(fragmentManager, PagerTransitionFragment(), init)
+    }
+
+    fun localMedia(
+        fragmentManager: FragmentManager?,
+        init: (LocalMediaTransitionFragment.LocalMediaTransitionConfig.() -> Unit) = {}
+    ) {
+        start(fragmentManager, LocalMediaTransitionFragment(), init as ViewTransitionConfig.() -> Unit)
     }
 }

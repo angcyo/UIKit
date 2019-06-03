@@ -41,8 +41,15 @@ public class LocalMedia implements Parcelable {
      * @see PictureConfig#TYPE_IMAGE
      * @see PictureConfig#TYPE_VIDEO
      */
+
+    /**
+     * 媒体选择时的类型
+     */
     private int mimeType = PictureConfig.TYPE_IMAGE;
-    private String pictureType;
+    /**
+     * 媒体返回的类型
+     */
+    private String pictureType = "image/jpeg";
     private boolean compressed;
 
     //angcyo
@@ -59,6 +66,10 @@ public class LocalMedia implements Parcelable {
 
     public LocalMedia() {
 
+    }
+
+    public LocalMedia(String path) {
+        this.path = path;
     }
 
     public LocalMedia(String path, int mimeType) {
@@ -221,15 +232,18 @@ public class LocalMedia implements Parcelable {
     }
 
     public boolean isImageType() {
-        return mimeType == PictureMimeType.ofImage();
+        return mimeType == PictureMimeType.ofImage() ||
+                getPictureType().toLowerCase().startsWith("image");
     }
 
     public boolean isVideoType() {
-        return mimeType == PictureMimeType.ofVideo();
+        return mimeType == PictureMimeType.ofVideo() ||
+                getPictureType().toLowerCase().startsWith("video");
     }
 
     public boolean isAudioType() {
-        return mimeType == PictureMimeType.ofAudio();
+        return mimeType == PictureMimeType.ofAudio() ||
+                getPictureType().toLowerCase().startsWith("audio");
     }
 
     public boolean isCompressed() {

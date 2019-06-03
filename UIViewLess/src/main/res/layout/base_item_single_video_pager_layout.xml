@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/base_item_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    <com.angcyo.uiview.less.media.play.TextureVideoView
+            android:id="@+id/video_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+    <com.github.chrisbanes.photoview.PhotoView
+            android:id="@+id/base_photo_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+    </com.github.chrisbanes.photoview.PhotoView>
+
+    <android.support.v7.widget.AppCompatImageView
+            android:id="@+id/play_video_view"
+            android:layout_gravity="center"
+            android:visibility="visible"
+            tools:visibility="visible"
+            app:srcCompat="@drawable/ic_video_play"
+            android:layout_width="60dp"
+            android:layout_height="60dp"/>
+
+    <com.angcyo.uiview.less.widget.RArcLoadingView
+            android:id="@+id/base_video_loading_view"
+            android:layout_width="22dp"
+            android:layout_gravity="center"
+            app:r_arc_width="2dp"
+            android:visibility="gone"
+            android:padding="2dp"
+            android:layout_height="22dp"/>
+
+</FrameLayout>
