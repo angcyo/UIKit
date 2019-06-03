@@ -62,6 +62,7 @@ open class MenuDialogConfig : ItemDialogConfig() {
         super.initControlLayout(dialog, dialogViewHolder)
 
         if (choiceModel > 0) {
+            dialogViewHolder.visible(R.id.title_layout, true)
             dialogViewHolder.tv(R.id.positive_button)?.visibility = View.VISIBLE
             dialogViewHolder.tv(R.id.negative_button)?.visibility = View.VISIBLE
         }

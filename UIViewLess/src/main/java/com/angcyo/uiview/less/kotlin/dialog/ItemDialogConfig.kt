@@ -1,13 +1,18 @@
 package com.angcyo.uiview.less.kotlin.dialog
 
 import android.app.Dialog
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import android.widget.TextView
 import com.angcyo.uiview.less.R
 import com.angcyo.uiview.less.kotlin.clickIt
+import com.angcyo.uiview.less.kotlin.getColor
+import com.angcyo.uiview.less.kotlin.getDrawable
 import com.angcyo.uiview.less.recycler.RBaseViewHolder
+import com.angcyo.uiview.less.widget.RTextView
 
 /**
  *
@@ -23,6 +28,12 @@ open class ItemDialogConfig : BaseDialogConfig() {
      * 需要填充的item数据集合
      * */
     var items = mutableListOf<Any>()
+
+    /**对应的图标*/
+    var itemIcons = mutableListOf<Int>()
+
+    /**文本的重力*/
+    var itemTextGravity = Gravity.CENTER
 
     override var dialogLayoutId: Int = R.layout.dialog_items_layout
 
@@ -45,8 +56,20 @@ open class ItemDialogConfig : BaseDialogConfig() {
         { dialog, parent, inflater, index, item ->
             val view = inflater.inflate(dialogItemLayoutId, parent, false)
 
-            if (item is CharSequence) {
-                view.findViewById<TextView>(R.id.item_text_view).text = item
+            view.findViewById<RTextView>(R.id.item_text_view)?.apply {
+                gravity = itemTextGravity
+
+                if (index in 0 until itemIcons.size) {
+                    if (gravity and Gravity.HORIZONTAL_GRAVITY_MASK == Gravity.CENTER_HORIZONTAL) {
+                        setTextLeftDrawable(itemIcons[index])
+                    } else {
+                        setLeftIco(itemIcons[index])
+                    }
+                }
+
+                if (item is CharSequence) {
+                    text = item
+                }
             }
 
             view.clickIt {
@@ -96,13 +119,31 @@ open class ItemDialogConfig : BaseDialogConfig() {
         //默认item dialog 不显示标题栏上的 确定/取消 按钮
         dialogViewHolder.tv(R.id.positive_button)?.visibility = View.GONE
         dialogViewHolder.tv(R.id.negative_button)?.visibility = View.GONE
+
+        //此时如果标题为空, 隐藏title layout
+        dialogViewHolder.visible(R.id.title_layout, dialogTitle != null)
     }
+
+    /**item之间的分割线控制*/
+    var showItemDividers = LinearLayout.SHOW_DIVIDER_BEGINNING or LinearLayout.SHOW_DIVIDER_MIDDLE
+    var showDividerDrawable = getDrawable(R.drawable.base_shape_line_px)
 
     /**
      * 填充items
      * */
     open fun inflateItems(dialog: Dialog, dialogViewHolder: RBaseViewHolder) {
         dialogViewHolder.group(R.id.item_wrap_layout).apply {
+            (this as? LinearLayout)?.apply {
+
+                //标题栏隐藏时, 去掉顶部的分割线
+                showDividers =
+                    if (dialogViewHolder.view(R.id.title_layout).visibility == View.GONE)
+                        (showItemDividers and LinearLayout.SHOW_DIVIDER_BEGINNING.inv())
+                    else showItemDividers
+
+                dividerDrawable = showDividerDrawable
+            }
+
             val layoutInflater = LayoutInflater.from(context)
 
             for (i in 0 until items.size) {

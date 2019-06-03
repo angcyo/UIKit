@@ -607,8 +607,8 @@ public class RTextView extends AppCompatTextView {
                 canvas.translate(getMeasuredWidth() / 2 -
                                 ViewExKt.textWidth(this, String.valueOf(getText())) / 2 -
                                 textLeftDrawable.getIntrinsicWidth() -
-                                getCompoundDrawablePadding(),
-                        getMeasuredHeight() / 2 - textLeftDrawable.getIntrinsicHeight() / 2);
+                                getCompoundDrawablePadding() - leftDrawableOffsetX,
+                        getMeasuredHeight() / 2 - textLeftDrawable.getIntrinsicHeight() / 2 + leftDrawableOffsetY);
 
                 textLeftDrawable.draw(canvas);
 

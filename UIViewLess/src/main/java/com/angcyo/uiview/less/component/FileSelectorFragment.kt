@@ -18,6 +18,7 @@ import com.angcyo.uiview.less.recycler.RBaseViewHolder
 import com.angcyo.uiview.less.recycler.adapter.RBaseAdapter
 import com.angcyo.uiview.less.recycler.widget.IShowState
 import com.angcyo.uiview.less.skin.SkinHelper
+import com.angcyo.uiview.less.utils.RSpan
 import com.angcyo.uiview.less.utils.Root
 import com.angcyo.uiview.less.utils.utilcode.utils.MD5
 import com.angcyo.uiview.less.widget.group.RLinearLayout
@@ -101,13 +102,19 @@ open class FileSelectorFragment : BaseFragment() {
                 override fun getItemLayoutId(viewType: Int): Int = R.layout.base_fragment_file_selector_item
 
                 override fun onBindView(holder: RBaseViewHolder, position: Int, item: FileItem?) {
-                    val bean = item!!.file
+                    if (item == null) {
+                        return
+                    }
+                    val bean = item.file
                     holder.tv(R.id.base_name_view).text = bean.name
                     holder.tv(R.id.base_time_view).text = formatTime(bean.lastModified())
 
                     //权限信息
-                    holder.tv(R.id.base_auth_view).text =
-                        "${if (bean.isDirectory) "d" else "-"}${if (bean.canExecute()) "e" else "-"}${if (bean.canRead()) "r" else "-"}${if (bean.canWrite()) "w" else "-"}"
+                    holder.tv(R.id.base_auth_view).text = RSpan.get(if (bean.isDirectory) "d" else "-")
+                        .append(if (bean.canExecute()) "e" else "-")
+                        .append(if (bean.canRead()) "r" else "-")
+                        .append(if (bean.canWrite()) "w" else "-")
+                        .create()
 
                     holder.tv(R.id.base_md5_view).visibility = View.GONE
 
