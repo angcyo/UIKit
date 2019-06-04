@@ -40,17 +40,25 @@ public class Root {
         builder.append(ResUtil.getThemeString(RApplication.getApp(), "os_name")).append("\n");
 
         DisplayMetrics displayMetrics = null;
+
+        int decorViewHeight = 0;
+        int contentViewHeight = 0;
         if (activity != null) {
             displayMetrics = activity.getResources().getDisplayMetrics();
 
             builder.append(displayMetrics.widthPixels).append("×").append(displayMetrics.heightPixels);
             builder.append(" ");
             builder.append(" ch:");
-            builder.append(RUtils.getContentViewHeight(activity));
+            contentViewHeight = RUtils.getContentViewHeight(activity);
+            builder.append(contentViewHeight);
             builder.append(" ");
             builder.append(" dh:");
-            builder.append(RUtils.getDecorViewHeight(activity));
+            decorViewHeight = RUtils.getDecorViewHeight(activity);
+            builder.append(decorViewHeight);
             builder.append(" ");
+
+            builder.append(displayMetrics.densityDpi).append("/");
+            builder.append(displayMetrics.density).append(" ");
         }
 
         builder.append(Build.VERSION.RELEASE).append("/");
@@ -69,21 +77,26 @@ public class Root {
             float height = displayMetrics.heightPixels / displayMetrics.ydpi;
 
             builder.append(" ");
-            builder.append(RUtils.decimal(width, 3, true))
+            builder.append(RUtils.decimal(width, 2, true))
                     .append("×")
-                    .append(RUtils.decimal(height, 3, true));
+                    .append(RUtils.decimal(height, 2, true));
 
             double x = Math.pow(width, 2);
             double y = Math.pow(height, 2);
             // 屏幕尺寸
             double screenInches = Math.sqrt(x + y);
             builder.append(" ");
-            builder.append(RUtils.decimal((float) screenInches, 3, true));
+            builder.append(RUtils.decimal((float) screenInches, 2, true));
 
-            builder.append(" dpi:");
-            builder.append(RUtils.getDensityDpi()).append(" ");
-            builder.append(" dp:");
-            builder.append(RUtils.density()).append(" ");
+            float widthDp = displayMetrics.widthPixels / displayMetrics.density;
+            float heightDp = displayMetrics.heightPixels / displayMetrics.density;
+            float decorHeightDp = decorViewHeight / displayMetrics.density;
+            builder.append(" ");
+            builder.append(RUtils.decimal(widthDp, 2, true))
+                    .append("×")
+                    .append(RUtils.decimal(heightDp, 2, true))
+                    .append("/")
+                    .append(RUtils.decimal(decorHeightDp, 2, true));
         }
 
         builder.append("\n");

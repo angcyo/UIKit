@@ -8,6 +8,7 @@ import android.text.TextUtils
 import android.text.format.Formatter
 import android.view.Gravity
 import android.view.View
+import android.webkit.MimeTypeMap
 import android.widget.HorizontalScrollView
 import android.widget.LinearLayout
 import com.angcyo.http.HttpSubscriber
@@ -149,14 +150,17 @@ open class FileSelectorFragment : BaseFragment() {
                         bean.isFile -> {
                             holder.glideImgV(R.id.base_image_view).apply {
                                 reset()
-                                if (item.imageType == Ok.ImageType.UNKNOWN) {
+                                if (item.imageType == Ok.ImageType.UNKNOWN &&
+                                    item.mimeType?.startsWith("video") == false
+                                ) {
                                     setImageResource(R.mipmap.base_file_32)
                                 } else {
                                     url = bean.absolutePath
                                 }
                             }
                             if (bean.canRead()) {
-                                holder.tv(R.id.base_tip_view).text = formatFileSize(bean.length())
+                                holder.tv(R.id.base_tip_view).text =
+                                    "${formatFileSize(bean.length())} ${item.mimeType ?: ""}"
                             }
 
                             //MD5值
@@ -321,7 +325,8 @@ open class FileSelectorFragment : BaseFragment() {
                         FileItem(
                             it,
                             Ok.ImageType.of(Ok.ImageTypeUtil.getImageType(it)),
-                            if (config.showFileMd5) MD5.getStreamMD5(it.absolutePath) else ""
+                            if (config.showFileMd5) MD5.getStreamMD5(it.absolutePath) else "",
+                            MimeTypeMap.getSingleton().getMimeTypeFromExtension(MimeTypeMap.getFileExtensionFromUrl(it.absolutePath))
                         )
                     }
                     items
@@ -345,7 +350,7 @@ open class FileSelectorFragment : BaseFragment() {
     }
 }
 
-data class FileItem(val file: File, val imageType: Ok.ImageType, val fileMd5: String = "")
+data class FileItem(val file: File, val imageType: Ok.ImageType, val fileMd5: String = "", val mimeType: String? = null)
 
 open class FileSelectorConfig {
 
