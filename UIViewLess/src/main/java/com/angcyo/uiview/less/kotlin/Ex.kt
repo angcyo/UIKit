@@ -4,10 +4,12 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.*
+import android.net.Uri
 import android.text.TextUtils
 import android.util.Base64
 import android.view.MotionEvent
 import android.view.ViewConfiguration
+import android.webkit.MimeTypeMap
 import com.angcyo.http.Http
 import com.angcyo.http.Json
 import com.angcyo.uiview.less.resources.ResUtil
@@ -457,4 +459,15 @@ public fun String.pattern(regex: String): MutableList<String> {
         result.add(matcher.group())
     }
     return result
+}
+
+/**url中的参数获取*/
+public fun String.queryParameter(key: String): String? {
+    val uri = Uri.parse(this)
+    return uri.getQueryParameter(key)
+}
+
+/**获取url或者文件扩展名 对应的mimeType*/
+public fun String.mimeType(): String? {
+    return MimeTypeMap.getSingleton().getMimeTypeFromExtension(MimeTypeMap.getFileExtensionFromUrl(this))
 }
