@@ -150,12 +150,13 @@ open class FileSelectorFragment : BaseFragment() {
                         bean.isFile -> {
                             holder.glideImgV(R.id.base_image_view).apply {
                                 reset()
-                                if (item.imageType == Ok.ImageType.UNKNOWN &&
-                                    item.mimeType?.startsWith("video") == false
+
+                                if (item.imageType != Ok.ImageType.UNKNOWN ||
+                                    item.mimeType?.startsWith("video") == true
                                 ) {
-                                    setImageResource(R.mipmap.base_file_32)
-                                } else {
                                     url = bean.absolutePath
+                                } else {
+                                    setImageResource(R.mipmap.base_file_32)
                                 }
                             }
                             if (bean.canRead()) {
