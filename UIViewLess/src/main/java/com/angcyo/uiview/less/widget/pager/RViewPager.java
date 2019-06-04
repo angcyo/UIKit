@@ -64,12 +64,7 @@ public class RViewPager extends ViewPager {
             }
         });
 
-        addOnPageChangeListener(new OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int i, float v, int i1) {
-
-            }
-
+        addOnPageChangeListener(new SimpleOnPageChangeListener() {
             @Override
             public void onPageSelected(int i) {
                 if (heightMeasureMode != MeasureSpec.EXACTLY) {
@@ -80,11 +75,6 @@ public class RViewPager extends ViewPager {
                         }
                     });
                 }
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int i) {
-
             }
         });
     }
@@ -197,6 +187,10 @@ public class RViewPager extends ViewPager {
 
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
+        if (!isEnabled()) {
+            return true;
+        }
+
         try {
             if (mOrientation == LinearLayout.VERTICAL) {
                 return mGestureDetectorCompat.onTouchEvent(ev)
@@ -212,6 +206,9 @@ public class RViewPager extends ViewPager {
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
+        if (!isEnabled()) {
+            return false;
+        }
         try {
             if (mOrientation == LinearLayout.VERTICAL) {
                 return super.onInterceptTouchEvent(swapTouchEvent(ev));

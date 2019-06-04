@@ -287,6 +287,13 @@ public class LocalMedia implements Parcelable {
         return getFilePath();
     }
 
+    /**
+     * 返回无有效的展示地址
+     */
+    public boolean isUrlEmpty() {
+        return TextUtils.isEmpty(getLoadUrl());
+    }
+
     @Override
     public int describeContents() {
         return 0;

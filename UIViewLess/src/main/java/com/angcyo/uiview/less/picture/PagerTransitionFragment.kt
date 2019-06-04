@@ -59,6 +59,8 @@ open class PagerTransitionFragment : ViewTransitionFragment() {
                 )
             }
         })
+
+        viewPager.isEnabled = transitionConfig.enablePager
     }
 
     private fun transitionAnimStart() {

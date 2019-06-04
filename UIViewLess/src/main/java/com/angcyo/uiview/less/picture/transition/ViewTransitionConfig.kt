@@ -353,9 +353,15 @@ open class ViewTransitionConfig {
      * */
     var currentPagerIndex = startPagerIndex
 
+    /**是否要激活翻页*/
+    var enablePager = true
+
     /**自动关联RecyclerView*/
     var pagerCount = 0
         get() {
+            if (field > 0) {
+                return field
+            }
             val getRecyclerView = onGetRecyclerView()
             if (getRecyclerView != null) {
                 return if (getRecyclerView.adapter is RBaseAdapter<*>) {
