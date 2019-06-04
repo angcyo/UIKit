@@ -3,23 +3,31 @@ package com.angcyo.uiview.less.component
 import android.graphics.Color
 import android.os.Bundle
 import android.os.SystemClock
+import android.support.v4.app.FragmentManager
 import android.text.TextUtils
 import android.text.format.Formatter
+import android.view.Gravity
 import android.view.View
 import android.widget.HorizontalScrollView
+import android.widget.LinearLayout
 import com.angcyo.http.HttpSubscriber
 import com.angcyo.http.Ok
 import com.angcyo.http.RFunc
 import com.angcyo.http.Rx
 import com.angcyo.uiview.less.R
 import com.angcyo.uiview.less.base.BaseFragment
+import com.angcyo.uiview.less.base.helper.FragmentHelper
+import com.angcyo.uiview.less.kotlin.dialog.menuDialog
 import com.angcyo.uiview.less.kotlin.minValue
 import com.angcyo.uiview.less.recycler.RBaseViewHolder
 import com.angcyo.uiview.less.recycler.adapter.RBaseAdapter
 import com.angcyo.uiview.less.recycler.widget.IShowState
 import com.angcyo.uiview.less.skin.SkinHelper
 import com.angcyo.uiview.less.utils.RSpan
+import com.angcyo.uiview.less.utils.RUtils
 import com.angcyo.uiview.less.utils.Root
+import com.angcyo.uiview.less.utils.TopToast
+import com.angcyo.uiview.less.utils.utilcode.utils.FileUtils
 import com.angcyo.uiview.less.utils.utilcode.utils.MD5
 import com.angcyo.uiview.less.widget.group.RLinearLayout
 import com.angcyo.uiview.less.widget.group.TouchBackLayout
@@ -35,6 +43,15 @@ import java.util.*
  * Copyright (c) 2019 ShenZhen O&M Cloud Co., Ltd. All rights reserved.
  */
 open class FileSelectorFragment : BaseFragment() {
+
+    companion object {
+        fun show(fragmentManager: FragmentManager?, config: FileSelectorConfig.() -> Unit) {
+            FragmentHelper.build(fragmentManager)
+                .showFragment(FileSelectorFragment().fileSelectorConfig(config))
+                .defaultEnterAnim()
+                .doIt()
+        }
+    }
 
     private var config = FileSelectorConfig()
 
@@ -160,7 +177,7 @@ open class FileSelectorFragment : BaseFragment() {
 
                     fun selectorItemView(itemView: RLinearLayout, selector: Boolean) {
                         if (selector) {
-                            itemView.setRBackgroundDrawable(SkinHelper.getSkin().getThemeTranColor(0x60))
+                            itemView.setRBackgroundDrawable(SkinHelper.getSkin().getThemeTranColor(0x30))
                         } else {
                             itemView.setRBackgroundDrawable(Color.TRANSPARENT)
                         }
@@ -195,20 +212,32 @@ open class FileSelectorFragment : BaseFragment() {
                     if (config.showFileMenu) {
                         if (bean.isFile) {
                             itemView.setOnLongClickListener {
-                                //                                val file = File(bean.absolutePath)
-//                                UIBottomItemDialog.build()
-//                                    .addItem("打开") {
-//                                        RUtils.openFile(mContext, file)
-//                                    }
-//                                    .addItem("删除") {
-//                                        FileUtils.deleteFile(file)
-//                                        resetPath(file.path)
-//                                        setSelectorFilePath("")
-//                                    }
-//                                    .addItem("分享") {
-//                                        RUtils.shareFile(mActivity, bean.absolutePath)
-//                                    }
-//                                    .showDialog(mParentILayout)
+                                val file = File(bean.absolutePath)
+                                menuDialog {
+                                    itemTextGravity = Gravity.CENTER_VERTICAL
+                                    showItemDividers = LinearLayout.SHOW_DIVIDER_NONE
+                                    items = mutableListOf("打开", "删除", "分享")
+                                    itemIcons = mutableListOf(
+                                        R.drawable.ic_file_open,
+                                        R.drawable.ic_file_delete,
+                                        R.drawable.ic_file_share
+                                    )
+                                    onItemClick = { _, index, _ ->
+                                        when (index) {
+                                            0 -> RUtils.openFile(mContext, file)
+                                            1 -> {
+                                                if (FileUtils.deleteFile(file)) {
+                                                    resetPath(file.path, true)
+                                                    setSelectorFilePath("")
+                                                } else {
+                                                    TopToast.show("删除失败!")
+                                                }
+                                            }
+                                            2 -> RUtils.shareFile(mAttachContext, bean.absolutePath)
+                                        }
+                                        false
+                                    }
+                                }
                                 false
                             }
                         }
@@ -220,7 +249,7 @@ open class FileSelectorFragment : BaseFragment() {
 
     override fun onFragmentFirstShow(bundle: Bundle?) {
         super.onFragmentFirstShow(bundle)
-        loadPath(config.targetPath, 260)
+        loadPath(config.targetPath, 360)
     }
 
     private fun formatTime(time: Long): String = config.simpleFormat.format(time)
@@ -232,13 +261,12 @@ open class FileSelectorFragment : BaseFragment() {
         baseViewHolder.view(R.id.base_selector_button).isEnabled = File(config.selectorFilePath).exists()
     }
 
-    private fun resetPath(path: String) {
+    private fun resetPath(path: String, force: Boolean = false) {
         //L.e("call: resetPath -> $path")
         config.targetPath = path
-        if (baseViewHolder.tv(R.id.current_file_path_view).text.toString() == config.targetPath) {
+        if (!force && baseViewHolder.tv(R.id.current_file_path_view).text.toString() == config.targetPath) {
             return
         }
-
         loadPath(path)
     }
 
