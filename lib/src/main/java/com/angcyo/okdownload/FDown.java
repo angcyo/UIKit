@@ -232,7 +232,7 @@ public class FDown {
      * 获取文件名, 在url中
      */
     private static String getFileNameFromUrl(String url) {
-        String fileName = "unknown";
+        String fileName = System.currentTimeMillis() + ".unknown";
         try {
 
             String nameFrom = getFileNameFrom(url);

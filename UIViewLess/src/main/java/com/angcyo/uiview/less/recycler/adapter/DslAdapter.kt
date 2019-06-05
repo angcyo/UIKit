@@ -37,7 +37,7 @@ open class DslAdapter : RBaseAdapter<DslAdapterItem> {
     }
 
     /**获取有效过滤后的数据集合*/
-    fun getVaildFilterDataList(): MutableList<DslAdapterItem> {
+    fun getValidFilterDataList(): MutableList<DslAdapterItem> {
         return if (dslDateFilter == null && filterDataList.isEmpty()) {
             allDatas
         } else {
@@ -115,5 +115,22 @@ open class DslAdapter : RBaseAdapter<DslAdapterItem> {
      * */
     fun foldItem(item: DslAdapterItem, folder: Boolean = true) {
         dslDateFilter?.filterItem(item, folder)
+    }
+
+    /**支持过滤数据源*/
+    fun notifyItemChanged(item: DslAdapterItem?, useFilterList: Boolean = false) {
+        if (item == null) {
+            return
+        }
+        val indexOf = getDataList(useFilterList).indexOf(item)
+
+        if (indexOf > -1) {
+            notifyItemChanged(indexOf)
+        }
+    }
+
+    /**获取数据列表*/
+    fun getDataList(useFilterList: Boolean): MutableList<DslAdapterItem> {
+        return if (useFilterList) getValidFilterDataList() else allDatas
     }
 }

@@ -294,6 +294,22 @@ public class LocalMedia implements Parcelable {
         return TextUtils.isEmpty(getLoadUrl());
     }
 
+    public void setModifyTime(long modifyTime) {
+        this.modifyTime = modifyTime;
+    }
+
+    public void setAddTime(long addTime) {
+        this.addTime = addTime;
+    }
+
+    public long getModifyTime() {
+        return modifyTime;
+    }
+
+    public long getAddTime() {
+        return addTime;
+    }
+
     @Override
     public int describeContents() {
         return 0;

@@ -53,6 +53,7 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
     protected int fragmentParentLayoutId = -1;
 
     //<editor-fold desc="生命周期, 系统的方法">
+    long lastBackTime = 0L;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -109,8 +110,14 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
 
         if (needMoreTaskToBack()) {
             moveTaskToBack();
-        } else if (checkBackPressed()) {
-            super.onBackPressed();
+        } else {
+            if (needCheckBackPressed()) {
+                if (checkBackPressed()) {
+                    super.onBackPressed();
+                }
+            } else {
+                super.onBackPressed();
+            }
         }
     }
 
@@ -126,6 +133,8 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
                 .back(this);
     }
 
+    //</editor-fold>
+
     /**
      * Fragment所在的ViewGroup id
      */
@@ -137,8 +146,6 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
         return fragmentParentLayoutId;
     }
 
-    //</editor-fold>
-
     protected boolean needMoreTaskToBack() {
         return false;
     }
@@ -147,7 +154,22 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
      * 是否可以back
      */
     protected boolean checkBackPressed() {
-        return true;
+        long nowTime = System.currentTimeMillis();
+        if (nowTime - lastBackTime < 1_000L) {
+            return true;
+        } else {
+            lastBackTime = nowTime;
+            onBackPressedTime();
+            return false;
+        }
+    }
+
+    protected void onBackPressedTime() {
+        Tip.tip("再按一次, 退出程序!");
+    }
+
+    protected boolean needCheckBackPressed() {
+        return false;
     }
 
     public void moveTaskToBack() {

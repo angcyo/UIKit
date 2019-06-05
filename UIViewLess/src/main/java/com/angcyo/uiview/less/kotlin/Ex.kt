@@ -379,6 +379,12 @@ public fun Bitmap.share(context: Context, shareQQ: Boolean = false, chooser: Boo
     RUtils.shareBitmap(context, this, shareQQ, chooser)
 }
 
+/**将base64字符串, 转换成图片*/
+public fun String.toBitmap(): Bitmap {
+    val bytes = Base64.decode(this, Base64.NO_WRAP)
+    return bytes.toBitmap()
+}
+
 public fun String.share(context: Context, shareQQ: Boolean = false, chooser: Boolean = true) {
     RUtils.shareText(context, null, this, shareQQ, chooser)
 }

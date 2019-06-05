@@ -649,9 +649,18 @@ public abstract class RBaseAdapter<T> extends RecyclerView.Adapter<RBaseViewHold
                     mAllDatas.remove(position);
                     notifyItemRemoved(position);
                     notifyItemRangeChanged(position, size - position);
+
+                    onDeleteItemEnd(position);
                 }
             }
         }
+    }
+
+    /**
+     * Item删除成功结束后
+     */
+    protected void onDeleteItemEnd(int position) {
+
     }
 
     /**
