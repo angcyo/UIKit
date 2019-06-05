@@ -321,6 +321,7 @@
         <attr name="r_show_password_on_touch" format="boolean"/>
         <attr name="r_is_password_drawable" format="boolean"/>
         <attr name="r_auto_hide_soft_input_on_lost_focus" format="boolean"/>
+        <attr name="r_auto_hide_soft_input_on_detached" format="boolean"/>
     </declare-styleable>
 
     <declare-styleable name="JumpAdProgressBar">

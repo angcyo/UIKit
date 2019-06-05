@@ -165,6 +165,10 @@ public class ExEditText extends AppCompatEditText {
      * 当失去焦点时, 是否隐藏键盘
      */
     private boolean autoHideSoftInputOnLostFocus = false;
+    /**
+     * 当onDetachedFromWindow时, 是否隐藏键盘
+     */
+    private boolean autoHideSoftInputOnDetached = false;
 
     public ExEditText(Context context) {
         super(context);
@@ -337,6 +341,7 @@ public class ExEditText extends AppCompatEditText {
         showPasswordOnTouch = typedArray.getBoolean(R.styleable.ExEditText_r_show_password_on_touch, showPasswordOnTouch);
         isPasswordDrawable = typedArray.getBoolean(R.styleable.ExEditText_r_is_password_drawable, isPasswordDrawable);
         autoHideSoftInputOnLostFocus = typedArray.getBoolean(R.styleable.ExEditText_r_auto_hide_soft_input_on_lost_focus, autoHideSoftInputOnLostFocus);
+        autoHideSoftInputOnDetached = typedArray.getBoolean(R.styleable.ExEditText_r_auto_hide_soft_input_on_detached, autoHideSoftInputOnDetached);
 
         typedArray.recycle();
 
@@ -412,6 +417,9 @@ public class ExEditText extends AppCompatEditText {
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         isAttached = false;
+        if (autoHideSoftInputOnDetached) {
+            new HideSoftInputRunnable(this).run();
+        }
     }
 
     @Override

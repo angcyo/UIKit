@@ -300,12 +300,23 @@ public fun List<Any>.toDslItemList(
     itemFactory: (index: Int, item: Any) -> DslAdapterItem,
     itemAfter: (itemList: MutableList<DslAdapterItem>, index: Int, item: Any) -> Unit = { _, _, _ -> }
 ): MutableList<DslAdapterItem> {
-    val result = mutableListOf<DslAdapterItem>()
+    return toAnyList(itemBefore, { index, any ->
+        val item = itemFactory(index, any)
+        item.itemData = any
+        item
+    }, itemAfter)
+}
+
+public fun <T> List<Any>.toAnyList(
+    itemBefore: (itemList: MutableList<T>, index: Int, item: Any) -> Unit = { _, _, _ -> },
+    itemFactory: (index: Int, item: Any) -> T,
+    itemAfter: (itemList: MutableList<T>, index: Int, item: Any) -> Unit = { _, _, _ -> }
+): MutableList<T> {
+    val result = mutableListOf<T>()
 
     forEachIndexed { index, any ->
         itemBefore(result, index, any)
         val item = itemFactory(index, any)
-        item.itemData = any
         result.add(item)
         itemAfter(result, index, any)
     }

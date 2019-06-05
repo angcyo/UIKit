@@ -42,8 +42,10 @@ open class RAddAdapter<T> : RBaseAdapter<T>() {
 
         return if (isMax()) {
             maxItemCount
-        } else {
+        } else if (showAddItem) {
             itemCount + 1
+        } else {
+            itemCount
         }
     }
 
