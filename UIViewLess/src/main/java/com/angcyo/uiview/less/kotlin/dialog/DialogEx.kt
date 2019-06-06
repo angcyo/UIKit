@@ -5,6 +5,7 @@ import android.content.Context
 import android.graphics.Color
 import android.os.Build
 import android.support.v4.app.Fragment
+import android.text.InputType
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -186,6 +187,8 @@ fun Context.multiInputDialog(config: InputDialogConfig.() -> Unit): Dialog {
     dialogConfig.dialogCanceledOnTouchOutside = false
     dialogConfig.maxInputLength = 2000
     dialogConfig.inputViewHeight = 100 * dpi
+    /**多行输入时, 需要 [InputType.TYPE_TEXT_FLAG_MULTI_LINE] 否则输入框, 不能输入 回车 */
+    dialogConfig.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE
     dialogConfig.config()
 
     return configDialogBuilder(

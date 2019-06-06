@@ -28,6 +28,7 @@ import com.angcyo.uiview.less.recycler.RBaseViewHolder
 import com.angcyo.uiview.less.recycler.RRecyclerView
 import com.angcyo.uiview.less.resources.ResUtil
 import com.angcyo.uiview.less.utils.RUtils
+import com.angcyo.uiview.less.utils.Reflect
 import com.angcyo.uiview.less.utils.ScreenUtil.density
 import com.angcyo.uiview.less.widget.*
 import com.angcyo.uiview.less.widget.group.RSoftInputLayout
@@ -881,4 +882,12 @@ public fun View.isViewIn(v: View): Boolean {
         return true
     }
     return false
+}
+
+/**清空所有[TextWatcher]*/
+public fun TextView.clearListeners() {
+    //private ArrayList<TextWatcher> mListeners;
+    val mListeners: ArrayList<Any>? =
+        Reflect.getMember(TextView::class.java, this, "mListeners") as? ArrayList<Any>
+    mListeners?.clear()
 }

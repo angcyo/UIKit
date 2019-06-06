@@ -1,12 +1,12 @@
 package com.angcyo.uiview.less.recycler
 
+
 import android.app.Activity
 import android.graphics.*
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.*
 import android.widget.FrameLayout
-import com.angcyo.lib.L
 import com.angcyo.uiview.less.kotlin.dp
 import com.angcyo.uiview.less.kotlin.getViewRect
 import com.angcyo.uiview.less.kotlin.nowTime
@@ -61,7 +61,7 @@ open class HoverItemDecoration : RecyclerView.ItemDecoration() {
             }
 
             if (isDownInHoverItem) {
-                L.i("onInterceptTouchEvent:$event")
+                //L.i("onInterceptTouchEvent:$event")
                 onTouchEvent(recyclerView, event)
             }
 
@@ -69,26 +69,32 @@ open class HoverItemDecoration : RecyclerView.ItemDecoration() {
         }
 
         override fun onTouchEvent(recyclerView: RecyclerView, event: MotionEvent) {
-            L.w("onTouchEvent:$event")
+            //L.w("onTouchEvent:$event")
 
             if (isDownInHoverItem) {
                 overViewHolder?.apply {
+                    if (hoverCallback?.enableDrawableState == true) {
+                        if (event.actionMasked == MotionEvent.ACTION_DOWN) {
+                            //有些时候, 可能收不到 up/cancel 事件, 延时发送cancel事件, 解决一些 界面drawable的bug
+                            recyclerView.postDelayed(cancelEvent, 160L)
+                        } else {
+                            recyclerView.removeCallbacks(cancelEvent)
+                        }
 
-                    if (event.actionMasked == MotionEvent.ACTION_DOWN) {
-                        //有些时候, 可能收不到 up/cancel 事件, 延时发送cancel事件, 解决一些 界面drawable的bug
-                        recyclerView.postDelayed(cancelEvent, 160L)
-                    } else {
-                        recyclerView.removeCallbacks(cancelEvent)
-                    }
-
-                    //一定要调用dispatchTouchEvent, 否则ViewGroup里面的子View, 不会响应touchEvent
-                    itemView.dispatchTouchEvent(event)
-                    if (itemView is ViewGroup) {
-                        if ((itemView as ViewGroup).onInterceptTouchEvent(event)) {
+                        //一定要调用dispatchTouchEvent, 否则ViewGroup里面的子View, 不会响应touchEvent
+                        itemView.dispatchTouchEvent(event)
+                        if (itemView is ViewGroup) {
+                            if ((itemView as ViewGroup).onInterceptTouchEvent(event)) {
+                                itemView.onTouchEvent(event)
+                            }
+                        } else {
                             itemView.onTouchEvent(event)
                         }
                     } else {
-                        itemView.onTouchEvent(event)
+                        //没有Drawable状态, 需要手动控制touch事件, 因为系统已经管理不了 itemView了
+                        if (event.actionMasked == MotionEvent.ACTION_UP) {
+                            itemView.performClick()
+                        }
                     }
                 }
             }
@@ -136,6 +142,18 @@ open class HoverItemDecoration : RecyclerView.ItemDecoration() {
                 windowContent = window.findViewById(Window.ID_ANDROID_CONTENT)
             }
         }
+    }
+
+    /**卸载分割线*/
+    fun detachedFromRecyclerView() {
+        hoverCallback = null
+
+        if (this.recyclerView != null) {
+            this.destroyCallbacks()
+        }
+        isDownInHoverItem = false
+        windowContent = null
+        recyclerView = null
     }
 
     private fun setupCallbacks() {
@@ -207,13 +225,12 @@ open class HoverItemDecoration : RecyclerView.ItemDecoration() {
             if (!overDecorationRect.isEmpty) {
 
                 //L.d("...onDrawOverDecoration...")
+                hoverCallback?.apply {
+                    if (enableTouchEvent && enableDrawableState) {
+                        addHoverView(it.itemView)
+                    }
 
-                if (hoverCallback?.enableTouchEvent == true) {
-                    addHoverView(it.itemView)
-                }
-
-                if (it.itemView.parent != null || hoverCallback?.enableTouchEvent == false) {
-                    hoverCallback?.drawOverDecoration?.invoke(canvas, paint, it, overDecorationRect)
+                    drawOverDecoration.invoke(canvas, paint, it, overDecorationRect)
                 }
             }
         }
@@ -242,7 +259,7 @@ open class HoverItemDecoration : RecyclerView.ItemDecoration() {
      * */
     internal fun checkOverDecoration(parent: RecyclerView) {
         childViewHolder(parent, 0)?.let { viewHolder ->
-            var firstChildAdapterPosition = viewHolder.adapterPosition
+            val firstChildAdapterPosition = viewHolder.adapterPosition
 
             if (firstChildAdapterPosition != RecyclerView.NO_POSITION) {
 
@@ -358,7 +375,6 @@ open class HoverItemDecoration : RecyclerView.ItemDecoration() {
     }
 
     fun clearOverDecoration() {
-        //L.d("...clearOverDecoration...")
         overDecorationRect.clear()
         nextDecorationRect.clear()
         removeHoverView()
@@ -415,6 +431,9 @@ open class HoverItemDecoration : RecyclerView.ItemDecoration() {
 
         /**激活touch手势*/
         var enableTouchEvent = true
+
+        /**激活drawable点击效果, 此功能需要先 激活 touch 手势*/
+        var enableDrawableState = enableTouchEvent
 
         /**
          * 当前的 位置 是否有 悬浮分割线
