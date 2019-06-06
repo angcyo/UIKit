@@ -333,6 +333,14 @@ public class RBaseViewHolder extends RecyclerView.ViewHolder {
         return rxtv(resId);
     }
 
+    public AutoEditText auto(@IdRes int resId) {
+        return v(resId);
+    }
+
+    public REditText ret(@IdRes int resId) {
+        return v(resId);
+    }
+
     public TextView tV(String idName) {
         return (TextView) v(idName);
     }
