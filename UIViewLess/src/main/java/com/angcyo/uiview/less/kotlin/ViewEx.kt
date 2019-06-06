@@ -1,6 +1,8 @@
 package com.angcyo.uiview.less.kotlin
 
 
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.app.Activity
 import android.content.res.Resources
@@ -10,6 +12,7 @@ import android.graphics.Paint
 import android.graphics.Rect
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
+import android.support.design.widget.TextInputLayout
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.GestureDetectorCompat
 import android.support.v4.view.ViewCompat
@@ -17,11 +20,9 @@ import android.text.InputFilter
 import android.text.TextUtils
 import android.util.TypedValue
 import android.view.*
+import android.view.animation.DecelerateInterpolator
 import android.view.animation.LinearInterpolator
-import android.widget.CompoundButton
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.TextView
+import android.widget.*
 import com.angcyo.uiview.less.RApplication
 import com.angcyo.uiview.less.draw.RDrawNoRead
 import com.angcyo.uiview.less.recycler.RBaseViewHolder
@@ -31,6 +32,7 @@ import com.angcyo.uiview.less.utils.RUtils
 import com.angcyo.uiview.less.utils.Reflect
 import com.angcyo.uiview.less.utils.ScreenUtil.density
 import com.angcyo.uiview.less.widget.*
+import com.angcyo.uiview.less.widget.ExEditText.isPhone
 import com.angcyo.uiview.less.widget.group.RSoftInputLayout
 import com.angcyo.uiview.less.widget.rsen.RGestureDetector
 import com.bumptech.glide.Glide
@@ -439,6 +441,19 @@ public fun RRecyclerView.onSizeChanged(listener: (w: Int, h: Int, oldw: Int, old
  */
 public fun View.error() {
     //Anim.band(this)
+
+    val mAnimatorSet = AnimatorSet()
+
+    mAnimatorSet.playTogether(
+        ObjectAnimator.ofFloat(this, "scaleX", 1f, 1.25f, 0.75f, 1.15f, 1f),
+        ObjectAnimator.ofFloat(this, "scaleY", 1f, 0.75f, 1.25f, 0.85f, 1f)
+    )
+
+    mAnimatorSet.interpolator = DecelerateInterpolator()
+    mAnimatorSet.duration = 300
+    mAnimatorSet.start()
+
+    requestFocus()
 }
 
 public fun View.visible() {
@@ -470,27 +485,63 @@ public fun TextView.string(trim: Boolean = true): String {
 }
 
 /**
+ * 获取键盘的高度
+ */
+public fun View.getSoftKeyboardHeight(): Int {
+    val screenHeight = getScreenHeightPixels()
+    val rect = Rect()
+    getWindowVisibleDisplayFrame(rect)
+    val visibleBottom = rect.bottom
+    return screenHeight - visibleBottom
+}
+
+/**
+ * 屏幕高度(不包含虚拟导航键盘的高度)
+ */
+public fun View.getScreenHeightPixels(): Int {
+    return resources.displayMetrics.heightPixels
+}
+
+/**
+ * 判断键盘是否显示
+ */
+public fun View.isSoftKeyboardShow(): Boolean {
+    val screenHeight = getScreenHeightPixels()
+    val keyboardHeight = getSoftKeyboardHeight()
+    return screenHeight != keyboardHeight && keyboardHeight > 100
+}
+
+/**
  * 返回结果表示是否为空
  */
 public fun EditText.checkEmpty(checkPhone: Boolean = false): Boolean {
     if (isEmpty()) {
         error()
         requestFocus()
+
+        if (!isSoftKeyboardShow()) {
+            if (parent is FrameLayout && parent.parent is TextInputLayout) {
+                postDelayed({ RSoftInputLayout.showSoftInput(this) }, 200)
+            } else {
+                RSoftInputLayout.showSoftInput(this)
+            }
+        }
+
         return true
     }
     if (checkPhone) {
-//        if (isPhone()) {
-//
-//        } else {
-//            error()
-//            requestFocus()
-//            return true
-//        }
+        if (isPhone(string())) {
+
+        } else {
+            error()
+            requestFocus()
+            return true
+        }
     }
     return false
 }
 
-public fun EditText.setInputText(text: String?) {
+public fun EditText.setInputText(text: CharSequence?) {
     this.setText(text)
     setSelection(text?.length ?: 0)
 }

@@ -1953,7 +1953,7 @@ public class ExEditText extends AppCompatEditText {
 //        return super.getContextMenuInfo();
 //    }
 
-    static class HideSoftInputRunnable implements Runnable {
+    public static class HideSoftInputRunnable implements Runnable {
         WeakReference<View> decorView;
 
         public HideSoftInputRunnable(View editText) {
@@ -1963,7 +1963,7 @@ public class ExEditText extends AppCompatEditText {
             this.decorView = new WeakReference<>(activity.getWindow().getDecorView());
         }
 
-        private void remove() {
+        public void remove() {
             if (decorView != null) {
                 if (decorView.get() != null) {
                     decorView.get().removeCallbacks(this);

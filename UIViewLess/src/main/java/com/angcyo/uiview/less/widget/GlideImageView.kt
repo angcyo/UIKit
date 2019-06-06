@@ -428,7 +428,7 @@ open class GlideImageView(context: Context, attributeSet: AttributeSet? = null) 
         }
 
     open fun onLoadSuccess() {
-        loadSuccessUrl = url!!
+        loadSuccessUrl = url ?: ""
     }
 
     open fun onLoadFailed() {

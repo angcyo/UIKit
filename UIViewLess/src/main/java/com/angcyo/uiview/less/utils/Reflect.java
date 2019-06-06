@@ -211,6 +211,14 @@ public class Reflect {
         }
 
         Class<?> clazz = obj.getClass();
+        setFieldValue(obj, clazz, fieldName, value);
+    }
+
+    public static void setFieldValue(Object obj, Class clazz, String fieldName, Object value) {
+        if (obj == null || TextUtils.isEmpty(fieldName) || clazz == null) {
+            return;
+        }
+
         while (clazz != Object.class) {
             try {
                 Field field = clazz.getDeclaredField(fieldName);

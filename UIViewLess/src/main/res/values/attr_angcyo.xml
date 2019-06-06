@@ -288,11 +288,39 @@
         <attr name="r_use_skin_style"/>
     </declare-styleable>
 
+    <!--是否显示删除按钮-->
+    <attr name="r_show_clear" format="boolean"/>
+    <attr name="r_clear_drawable" format="reference"/>
+    <attr name="r_is_password_drawable" format="boolean"/>
+    <attr name="r_show_password_on_touch" format="boolean"/>
+    <attr name="r_is_no_edit_mode" format="boolean"/>
+    <attr name="r_request_focus_on_touch" format="boolean"/>
+
+    <attr name="r_auto_hide_soft_input_on_lost_focus" format="boolean"/>
+    <attr name="r_auto_hide_soft_input_on_detached" format="boolean"/>
+    <declare-styleable name="ClearEditText">
+        <attr name="r_show_clear"/>
+        <attr name="r_clear_drawable"/>
+        <attr name="r_is_password_drawable"/>
+        <attr name="r_show_password_on_touch"/>
+    </declare-styleable>
+    <declare-styleable name="REditText">
+        <attr name="r_is_no_edit_mode"/>
+        <attr name="r_request_focus_on_touch"/>
+        <attr name="r_auto_hide_soft_input_on_lost_focus"/>
+        <attr name="r_auto_hide_soft_input_on_detached"/>
+    </declare-styleable>
+
     <declare-styleable name="ExEditText">
         <attr name="r_left_text"/>
         <attr name="r_hint_text"/>
         <attr name="r_left_text_color"/>
         <attr name="r_left_text_offset"/>
+
+        <attr name="r_show_clear"/>
+        <attr name="r_clear_drawable"/>
+        <attr name="r_is_password_drawable"/>
+        <attr name="r_show_password_on_touch"/>
 
         <!--允许输入最大的数字-->
         <attr name="r_max_number" format="float"/>
@@ -303,8 +331,7 @@
         <attr name="r_show_content_menu"/>
         <!--是否过滤Emoji表情-->
         <attr name="r_filter_emoji" format="boolean"/>
-        <!--是否显示删除按钮-->
-        <attr name="r_show_clear" format="boolean"/>
+
         <!--检查输入的数字的有效性, 需要inputType的支持-->
         <attr name="r_check_input_number" format="boolean"/>
         <attr name="r_use_char_length_filter" format="boolean"/>
@@ -314,14 +341,11 @@
         <!--获取到焦点时, 光标移至末尾-->
         <attr name="r_on_focus_selection_last" format="boolean"/>
 
-        <attr name="r_is_no_edit_mode" format="boolean"/>
-        <attr name="r_request_focus_on_touch" format="boolean"/>
+        <attr name="r_is_no_edit_mode"/>
+        <attr name="r_request_focus_on_touch"/>
 
-        <attr name="r_clear_drawable" format="reference"/>
-        <attr name="r_show_password_on_touch" format="boolean"/>
-        <attr name="r_is_password_drawable" format="boolean"/>
-        <attr name="r_auto_hide_soft_input_on_lost_focus" format="boolean"/>
-        <attr name="r_auto_hide_soft_input_on_detached" format="boolean"/>
+        <attr name="r_auto_hide_soft_input_on_lost_focus"/>
+        <attr name="r_auto_hide_soft_input_on_detached"/>
     </declare-styleable>
 
     <declare-styleable name="JumpAdProgressBar">
