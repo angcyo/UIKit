@@ -158,7 +158,7 @@ class ExpandRecordLayout(context: Context, attributeSet: AttributeSet? = null) :
         RectF()
     }
 
-    var outCircleColor: Int = Color.parseColor("#F0F0F0")
+    var outCircleColor: Int = Color.parseColor("#80F0F0F0")
     var circleColor: Int = if (isInEditMode) Color.RED else SkinHelper.getSkin().themeColorPrimary
     var progressColor: Int = if (isInEditMode) Color.RED else SkinHelper.getSkin().themeColorPrimary
 
