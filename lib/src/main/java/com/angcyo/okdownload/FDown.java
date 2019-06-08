@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.util.ArrayMap;
 import android.text.TextUtils;
 import com.angcyo.lib.L;
 import com.liulishuo.okdownload.*;
@@ -20,6 +21,7 @@ import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * https://github.com/lingochamp/okdownload 1.0.5 2018-11-27
@@ -71,11 +73,54 @@ public class FDown {
         //OkDownload.setSingletonInstance(builder.build());
     }
 
-    public static DownloadTask down(String url, DownloadListener listener) {
+    /**
+     * 需要监听所有下载任务回调
+     */
+    public static void listener(FDownListener listener) {
+        if (listener == null) {
+            return;
+        }
+        HostListener.instance().allListener.add(listener);
+    }
+
+    public static void removeListener(FDownListener listener) {
+        if (listener == null) {
+            return;
+        }
+        HostListener.instance().allListener.remove(listener);
+    }
+
+    /**
+     * 监听指定url的任务回调
+     */
+    public static void listener(String url, FDownListener listener) {
+        if (listener == null || url == null) {
+            return;
+        }
+        CopyOnWriteArraySet<FDownListener> listeners = HostListener.instance().mapListener.get(url);
+        if (listeners == null) {
+            listeners = new CopyOnWriteArraySet<>();
+            HostListener.instance().mapListener.put(url, listeners);
+        }
+        listeners.add(listener);
+    }
+
+    public static void removeListener(String url, FDownListener listener) {
+        if (listener == null || url == null) {
+            return;
+        }
+        CopyOnWriteArraySet<FDownListener> listeners = HostListener.instance().mapListener.get(url);
+        if (listeners != null) {
+            listeners.remove(listener);
+        }
+    }
+
+
+    public static DownloadTask down(String url, FDownListener listener) {
         return down(url, new File(defaultDownloadPath(url)), listener);
     }
 
-    public static DownloadTask down(String url, String filePath, DownloadListener listener) {
+    public static DownloadTask down(String url, String filePath, FDownListener listener) {
         return down(url, new File(filePath), listener);
     }
 
@@ -128,23 +173,25 @@ public class FDown {
         }
     }
 
-    public static DownloadTask down(String url, File targetFile, DownloadListener listener) {
+    public static DownloadTask down(String url, File targetFile, FDownListener listener) {
+        //listener(url, listener);
+
         DownloadTask task = newTask(url, targetFile);
 
         DownloadTask sameTask = OkDownload.with().downloadDispatcher().findSameTask(task);
         if (sameTask != null) {
             DownloadListener sameTaskListener = sameTask.getListener();
             L.i("已有相同的任务在执行:" + StatusUtil.getStatus(sameTask) + " " + sameTaskListener);
-            if (sameTaskListener instanceof HostUnifiedListenerManager.HostDownloadListener) {
-                ((HostUnifiedListenerManager.HostDownloadListener) sameTaskListener)
-                        .getUnifiedListenerManager()
-                        .attachListener(sameTask, listener);
-            }
+//            if (sameTaskListener instanceof HostUnifiedListenerManager.HostDownloadListener) {
+//                ((HostUnifiedListenerManager.HostDownloadListener) sameTaskListener)
+//                        .getUnifiedListenerManager()
+//                        .attachListener(sameTask, listener);
+//            }
             return sameTask;
         }
 
         // all attach or detach is based on the id of Task in fact.
-        HostUnifiedListenerManager manager = new HostUnifiedListenerManager();
+        //HostUnifiedListenerManager manager = new HostUnifiedListenerManager();
 
         //        DownloadListener listener1 = new DownloadListener1();
         //        DownloadListener listener2 = new DownloadListener2();
@@ -158,18 +205,34 @@ public class FDown {
         //        manager.detachListener(task, listener2);
 
         // all listeners added for this task will be removed when task is end.
-        manager.addAutoRemoveListenersWhenTaskEnd(task.getId());//任务结束后, 自动清理Listener
+        //manager.addAutoRemoveListenersWhenTaskEnd(task.getId());//任务结束后, 自动清理Listener
 
         // enqueue task to start.
         //manager.enqueueTaskWithUnifiedListener(task, listener3);
 
         //manager.attachListener(task, listener4);
 
-        manager.attachListener(task, listener);
+        //manager.attachListener(task, listener);
 
-        task.enqueue(manager.getHostListener());
+        down(task, listener);
 
         return task;
+    }
+
+    public static void down(DownloadTask task) {
+        down(task, null);
+    }
+
+    public static void down(DownloadTask task, FDownListener listener) {
+        listener(task.getUrl(), listener);
+
+        DownloadTask sameTask = OkDownload.with().downloadDispatcher().findSameTask(task);
+        if (sameTask != null) {
+            DownloadListener sameTaskListener = sameTask.getListener();
+            L.i("已有相同的任务在执行:" + StatusUtil.getStatus(sameTask) + " " + sameTaskListener);
+            return;
+        }
+        task.enqueue(HostListener.instance());
     }
 
     /**
@@ -292,9 +355,35 @@ public class FDown {
 
 
     /**
-     * 监听事件, 主线程回调
+     * 计算任务增量 速率
      */
-    public static class FDownListener implements DownloadListener {
+    public static String calcTaskSpeed(@NonNull DownloadTask task, long increaseBytes) {
+        String speed = FileUtils.formatFileSize((long) (increaseBytes * 1f / task.getMinIntervalMillisCallbackProcess() * 1000));
+        return speed;
+    }
+
+    /**
+     * 所有下载任务, 统一使用一个监听器
+     */
+    public static class HostListener implements DownloadListener {
+
+        public static HostListener instance() {
+            return Holder.listener;
+        }
+
+        /**
+         * 分发所有任务回调
+         */
+        public CopyOnWriteArraySet<FDownListener> allListener = new CopyOnWriteArraySet<>();
+
+        /**
+         * 指定下载地址, 关联
+         */
+        public ArrayMap<String, CopyOnWriteArraySet<FDownListener>> mapListener = new ArrayMap<>();
+
+        private static class Holder {
+            static final HostListener listener = new HostListener();
+        }
 
         @Override
         public void taskStart(@NonNull DownloadTask task) {
@@ -305,7 +394,6 @@ public class FDown {
             }
             L.d(TAG, "准备下载:\n" + task.getUrl() + "->" + name);
             onTaskStart(task);
-
         }
 
         @Override
@@ -354,6 +442,9 @@ public class FDown {
 
                 onTaskProgress(task, totalLength, totalOffset, percent, increaseBytes);
 
+                //计算每秒多少
+                String sp = calcTaskSpeed(task, increaseBytes) + "/s";
+
                 StringBuilder builder = new StringBuilder();
                 builder.append("\n下载进度:");
                 builder.append(task.getUrl());
@@ -373,7 +464,8 @@ public class FDown {
                 builder.append(" 新增:");
                 builder.append(increaseBytes);
                 builder.append(" ");
-                builder.append(FileUtils.formatFileSize(increaseBytes));
+
+                builder.append(sp);
 
                 L.d(TAG, builder.toString());
             }
@@ -405,7 +497,17 @@ public class FDown {
         }
 
         public void onTaskStart(@NonNull DownloadTask task) {
+            notifyTaskStart(allListener, task);
+            notifyTaskStart(mapListener.get(task.getUrl()), task);
+        }
 
+        protected void notifyTaskStart(CopyOnWriteArraySet<FDownListener> listeners, @NonNull DownloadTask task) {
+            if (listeners == null || listeners.isEmpty()) {
+                return;
+            }
+            for (FDownListener listener : listeners) {
+                listener.onTaskStart(task);
+            }
         }
 
         public void onTaskProgress(@NonNull DownloadTask task,
@@ -413,13 +515,39 @@ public class FDown {
                                    long totalOffset /*当前下载量*/,
                                    int percent /*百分比*/,
                                    long increaseBytes /*本次下载量, 速度的意思*/) {
+            notifyTaskProgress(allListener, task, totalLength, totalOffset, percent, increaseBytes);
+            notifyTaskProgress(mapListener.get(task.getUrl()), task, totalLength, totalOffset, percent, increaseBytes);
+        }
 
+        protected void notifyTaskProgress(CopyOnWriteArraySet<FDownListener> listeners, @NonNull DownloadTask task,
+                                          long totalLength /*总大小*/,
+                                          long totalOffset /*当前下载量*/,
+                                          int percent /*百分比*/,
+                                          long increaseBytes /*本次下载量, 速度的意思*/) {
+            if (listeners == null || listeners.isEmpty()) {
+                return;
+            }
+            for (FDownListener fDownListener : listeners) {
+                fDownListener.onTaskProgress(task, totalLength, totalOffset, percent, increaseBytes);
+            }
         }
 
         public void onTaskEnd(@NonNull DownloadTask task,
                               boolean isCompleted /*是否下载完成*/,
                               @Nullable Exception realCause /*失败才有值*/) {
+            notifyTaskEnd(allListener, task, isCompleted, realCause);
+            notifyTaskEnd(mapListener.get(task.getUrl()), task, isCompleted, realCause);
+        }
 
+        protected void notifyTaskEnd(CopyOnWriteArraySet<FDownListener> listeners, @NonNull DownloadTask task,
+                                     boolean isCompleted /*是否下载完成*/,
+                                     @Nullable Exception realCause /*失败才有值*/) {
+            if (listeners == null || listeners.isEmpty()) {
+                return;
+            }
+            for (FDownListener fDownListener : listeners) {
+                fDownListener.onTaskEnd(task, isCompleted, realCause);
+            }
         }
     }
 }

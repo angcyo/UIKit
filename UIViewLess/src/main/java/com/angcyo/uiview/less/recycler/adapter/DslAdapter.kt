@@ -1,6 +1,8 @@
 package com.angcyo.uiview.less.recycler.adapter
 
 import android.content.Context
+import android.view.View
+import com.angcyo.uiview.less.kotlin.findViewHolder
 import com.angcyo.uiview.less.recycler.RBaseViewHolder
 
 /**
@@ -132,5 +134,37 @@ open class DslAdapter : RBaseAdapter<DslAdapterItem> {
     /**获取数据列表*/
     fun getDataList(useFilterList: Boolean): MutableList<DslAdapterItem> {
         return if (useFilterList) getValidFilterDataList() else allDatas
+    }
+
+    override fun onViewAttachedToWindow(holder: RBaseViewHolder) {
+        super.onViewAttachedToWindow(holder)
+        if (holder.adapterPosition in 0 until itemCount) {
+            getItemData(holder.adapterPosition)?.onItemViewAttachedToWindow?.invoke(holder)
+        }
+    }
+
+    override fun onViewDetachedFromWindow(holder: RBaseViewHolder) {
+        super.onViewDetachedFromWindow(holder)
+        if (holder.adapterPosition in 0 until itemCount) {
+            getItemData(holder.adapterPosition)?.onItemViewDetachedToWindow?.invoke(holder)
+        }
+    }
+
+    override fun onChildViewAttachedToWindow(view: View, adapterPosition: Int, layoutPosition: Int) {
+        super.onChildViewAttachedToWindow(view, adapterPosition, layoutPosition)
+        if (adapterPosition in 0 until itemCount) {
+            recyclerView?.findViewHolder(adapterPosition)?.let {
+                getItemData(adapterPosition)?.onItemChildViewAttachedToWindow?.invoke(it, adapterPosition)
+            }
+        }
+    }
+
+    override fun onChildViewDetachedFromWindow(view: View, adapterPosition: Int, layoutPosition: Int) {
+        super.onChildViewDetachedFromWindow(view, adapterPosition, layoutPosition)
+        if (adapterPosition in 0 until itemCount) {
+            recyclerView?.findViewHolder(adapterPosition)?.let {
+                getItemData(adapterPosition)?.onItemChildViewDetachedFromWindow?.invoke(it, adapterPosition)
+            }
+        }
     }
 }

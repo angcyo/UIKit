@@ -41,6 +41,22 @@ open class DslAdapterItem {
     open var itemBind: (itemHolder: RBaseViewHolder, itemPosition: Int, adapterItem: DslAdapterItem) -> Unit =
         { _, _, _ -> }
 
+    var onItemViewAttachedToWindow: (itemHolder: RBaseViewHolder) -> Unit = {
+
+    }
+
+    var onItemViewDetachedToWindow: (itemHolder: RBaseViewHolder) -> Unit = {
+
+    }
+
+    var onItemChildViewDetachedFromWindow: (itemHolder: RBaseViewHolder, itemPosition: Int) -> Unit = { _, _ ->
+
+    }
+
+    var onItemChildViewAttachedToWindow: (itemHolder: RBaseViewHolder, itemPosition: Int) -> Unit = { _, _ ->
+
+    }
+
     //</editor-fold>
 
 

@@ -147,6 +147,11 @@ public abstract class RBaseAdapter<T> extends RecyclerView.Adapter<RBaseViewHold
         }
     }
 
+    /**
+     * 此方法一定会回调, 不管 view 对应的 holder 是否为空
+     *
+     * @see RecyclerView#dispatchChildAttached
+     */
     @Override
     public void onChildViewAttachedToWindow(@NonNull View view) {
         ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
@@ -167,14 +172,19 @@ public abstract class RBaseAdapter<T> extends RecyclerView.Adapter<RBaseViewHold
         }
     }
 
+    /**
+     * 此方法会保证 holder 不为空
+     *
+     * @see RecyclerView#dispatchChildAttached
+     */
     @Override
-    public void onViewAttachedToWindow(RBaseViewHolder holder) {
+    public void onViewAttachedToWindow(@NonNull RBaseViewHolder holder) {
         super.onViewAttachedToWindow(holder);
 //        L.w("onViewAttachedToWindow");
     }
 
     @Override
-    public void onViewDetachedFromWindow(RBaseViewHolder holder) {
+    public void onViewDetachedFromWindow(@NonNull RBaseViewHolder holder) {
         super.onViewDetachedFromWindow(holder);
 //        L.w("onViewDetachedFromWindow");
     }

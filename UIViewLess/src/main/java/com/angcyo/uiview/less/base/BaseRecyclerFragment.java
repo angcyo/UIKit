@@ -8,6 +8,7 @@ import com.angcyo.uiview.less.R;
 import com.angcyo.uiview.less.iview.AffectUI;
 import com.angcyo.uiview.less.recycler.RBaseViewHolder;
 import com.angcyo.uiview.less.recycler.RRecyclerView;
+import com.angcyo.uiview.less.recycler.adapter.DslAdapter;
 import com.angcyo.uiview.less.recycler.adapter.RBaseAdapter;
 import com.angcyo.uiview.less.recycler.widget.IShowState;
 import com.angcyo.uiview.less.smart.MaterialHeader;
@@ -36,6 +37,7 @@ public abstract class BaseRecyclerFragment<T> extends BaseLoadFragment
     protected RSmartRefreshLayout smartRefreshLayout;
     protected RRecyclerView recyclerView;
     protected RBaseAdapter<T> baseAdapter;
+    protected DslAdapter baseDslAdapter;
     /**
      * 当前请求完成的页
      */
@@ -115,6 +117,9 @@ public abstract class BaseRecyclerFragment<T> extends BaseLoadFragment
     public void initRecyclerView(@Nullable RRecyclerView recyclerView) {
         if (recyclerView != null) {
             baseAdapter = onCreateAdapter(new ArrayList<T>());
+            if (baseAdapter instanceof DslAdapter) {
+                baseDslAdapter = (DslAdapter) baseAdapter;
+            }
             recyclerView.setAdapter(baseAdapter);
 
             if (baseAdapter != null) {
