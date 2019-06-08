@@ -610,7 +610,17 @@ public class TextureVideoView extends TextureView
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
         release(true);
+        if (isPlaying()) {
+            if (mMediaPlayerCallback != null) {
+                mMediaPlayerCallback.onPlayStateChanged(mMediaPlayer, STATE_PLAYBACK_COMPLETED);
+            }
+        }
     }
 
     public void setScaletype(ScalableType scalableType) {
