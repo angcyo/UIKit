@@ -14,8 +14,27 @@ public class FDownListener {
 
     String uuid;
 
+    /**
+     * 当任务end之后, 移除listener
+     * 暂停/取消/完成 都会触发end
+     */
+    boolean removeOnTaskEnd;
+
     public FDownListener() {
+        this(true);
+    }
+
+    public FDownListener(boolean removeOnTaskEnd) {
         uuid = UUID.randomUUID().toString();
+        this.removeOnTaskEnd = removeOnTaskEnd;
+    }
+
+    public boolean isRemoveOnTaskEnd() {
+        return removeOnTaskEnd;
+    }
+
+    public void setRemoveOnTaskEnd(boolean removeOnTaskEnd) {
+        this.removeOnTaskEnd = removeOnTaskEnd;
     }
 
     @Override

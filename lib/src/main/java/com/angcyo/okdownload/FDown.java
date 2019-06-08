@@ -545,8 +545,17 @@ public class FDown {
             if (listeners == null || listeners.isEmpty()) {
                 return;
             }
+            CopyOnWriteArraySet<FDownListener> removeSet = new CopyOnWriteArraySet<>();
             for (FDownListener fDownListener : listeners) {
                 fDownListener.onTaskEnd(task, isCompleted, realCause);
+                if (fDownListener.isRemoveOnTaskEnd()) {
+                    removeSet.add(fDownListener);
+                }
+            }
+
+            for (FDownListener fDownListener : removeSet) {
+                removeListener(fDownListener);
+                removeListener(task.getUrl(), fDownListener);
             }
         }
     }
