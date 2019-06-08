@@ -5,6 +5,7 @@ import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.*;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.view.View;
@@ -56,7 +57,7 @@ public class SimpleProgressBar extends View {
     private ValueAnimator animator;
 
     /**
-     * 使用渐变进度, 只在 incertitudeProgress = true && mProgressStyle = STYLE_RECT 时, 有效
+     * 使用渐变进度, 只在 incertitudeProgress = false && mProgressStyle = STYLE_RECT 时, 有效
      */
     private boolean isGradientProgress = false;
     private int gradientProgressStartColor = -1;
@@ -67,6 +68,8 @@ public class SimpleProgressBar extends View {
 
     public SimpleProgressBar(Context context, AttributeSet attrs) {
         super(context, attrs);
+
+        init();
 
         mProgressWidth = (int) (getDensity() * 3);
         mProgressBgColor = Color.parseColor("#40000000");
@@ -87,7 +90,6 @@ public class SimpleProgressBar extends View {
 
         typedArray.recycle();
 
-        init();
     }
 
     public float getDensity() {
@@ -97,7 +99,7 @@ public class SimpleProgressBar extends View {
     private void init() {
         if (mProgressColor == -1) {
             if (isInEditMode()) {
-                mProgressColor = Color.BLUE;
+                mProgressColor = ContextCompat.getColor(getContext(), R.color.colorPrimary);
                 mProgress = 100;
             } else {
                 mProgressColor = SkinHelper.getSkin().getThemeSubColor();
@@ -105,7 +107,7 @@ public class SimpleProgressBar extends View {
         }
         if (gradientProgressStartColor == -1) {
             if (isInEditMode()) {
-                gradientProgressStartColor = Color.GREEN;
+                gradientProgressStartColor = ContextCompat.getColor(getContext(), R.color.colorPrimaryDark);
                 mProgress = 100;
             } else {
                 gradientProgressStartColor = SkinHelper.getSkin().getThemeColor();
