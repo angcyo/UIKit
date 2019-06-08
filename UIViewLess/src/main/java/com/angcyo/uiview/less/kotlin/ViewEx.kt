@@ -220,6 +220,16 @@ public fun View.atmostMeasure(size: Int): Int = View.MeasureSpec.makeMeasureSpec
 
 public fun View.atmostMeasure(size: Float): Int = this.atmostMeasure(size.toInt())
 
+/**Match_Parent*/
+public fun exactly(size: Int): Int = View.MeasureSpec.makeMeasureSpec(size, View.MeasureSpec.EXACTLY)
+
+public fun exactly(size: Float): Int = exactly(size.toInt())
+
+/**Wrap_Content*/
+public fun atmost(size: Int): Int = View.MeasureSpec.makeMeasureSpec(size, View.MeasureSpec.AT_MOST)
+
+public fun atmost(size: Float): Int = atmost(size.toInt())
+
 public fun View.setOnRClickListener(listener: View.OnClickListener?) {
     if (listener == null) {
         this.isClickable = false
