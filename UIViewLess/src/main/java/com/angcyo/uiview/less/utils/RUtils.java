@@ -91,6 +91,7 @@ public class RUtils {
             {".bin", "application/octet-stream"},
             {".bmp", "image/bmp"},
             {".c", "text/plain"},
+            {".log", "text/plain"},
             {".class", "application/octet-stream"},
             {".conf", "text/plain"},
             {".cpp", "text/plain"},
