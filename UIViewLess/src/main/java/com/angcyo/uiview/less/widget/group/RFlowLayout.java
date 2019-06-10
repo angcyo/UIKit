@@ -131,6 +131,19 @@ public class RFlowLayout extends LinearLayout {
                 if (itemEquWidth) {
                     //margin,padding 消耗的宽度
                     childWidth = measureLineEquWidth(lineViews, measureWidth, heightMeasureSpec) + params.leftMargin + params.rightMargin;
+
+                    int maxChildHeight = 0;
+
+                    if (lineViews.isEmpty()) {
+                        maxChildHeight = childHeight;
+                    } else {
+                        for (int j = 0; j < lineViews.size(); j++) {
+                            View childAt = lineViews.get(j);
+                            maxChildHeight = Math.max(maxChildHeight, childAt.getMeasuredHeight());
+                        }
+                    }
+
+                    lineHeight = maxChildHeight;
                 }
 
                 width = Math.max(width, lineWidth);
