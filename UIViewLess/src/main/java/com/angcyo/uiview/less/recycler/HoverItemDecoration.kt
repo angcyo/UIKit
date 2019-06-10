@@ -304,7 +304,7 @@ open class HoverItemDecoration : RecyclerView.ItemDecoration() {
                             val overView = firstViewHolder.itemView
                             tempRect.set(overView.left, overView.top, overView.right, overView.bottom)
 
-                            val nextViewHolder = childViewHolder(parent, findGridNextChildIndex())
+                            val nextViewHolder = findNextDecoration(parent, adapter, tempRect.height())
                             if (nextViewHolder != null) {
                                 //紧挨着的下一个child也有分割线, 监测是否需要上推
 
@@ -350,15 +350,55 @@ open class HoverItemDecoration : RecyclerView.ItemDecoration() {
         }
     }
 
+    /**查找下一个满足条件的分割线Holder*/
+    fun findNextDecoration(
+        parent: RecyclerView,
+        adapter: RecyclerView.Adapter<*>,
+        decorationHeight: Int,
+        offsetIndex: Int = 1
+    ): RecyclerView.ViewHolder? {
+        var result: RecyclerView.ViewHolder? = null
+        if (hoverCallback != null) {
+            val callback: HoverCallback = hoverCallback!!
+            val childIndex = findNextChildIndex(offsetIndex)
+            if (childIndex != RecyclerView.NO_POSITION) {
+                val childViewHolder = childViewHolder(parent, childIndex)
+                if (childViewHolder != null) {
+
+                    if (callback.haveOverDecoration.invoke(adapter, childViewHolder.adapterPosition)) {
+                        //如果下一个item 具有分割线
+                        result = childViewHolder
+                    } else {
+                        //不具有分割线
+                        if (childViewHolder.itemView.bottom < decorationHeight) {
+                            //item的高度, 没有分割线那么高, 继续往下查找
+                            result = findNextDecoration(parent, adapter, decorationHeight, offsetIndex + 1)
+                        } else {
+
+                        }
+                    }
+                }
+            }
+        }
+        return result
+    }
+
     /**
      * 查找GridLayoutManager中, 下一个具有全屏样式的child索引
+     * @param decorationHeight 当前已经绘制的分割线的高度, 如果下一个item的高度, 不足时, 将会继续往下查找
      * */
-    internal fun findGridNextChildIndex(): Int {
-        var result = 1
+    fun findNextChildIndex(offsetIndex: Int = 1): Int {
+        var result = offsetIndex
+        result = findGridNextChildIndex(result)
+        return result
+    }
+
+    fun findGridNextChildIndex(offsetIndex: Int): Int {
+        var result = offsetIndex
         recyclerView?.layoutManager?.apply {
             if (this is GridLayoutManager) {
 
-                for (i in 1 until recyclerView!!.childCount) {
+                for (i in offsetIndex until recyclerView!!.childCount) {
                     childViewHolder(recyclerView!!, i)?.let {
                         if (it.adapterPosition != RecyclerView.NO_POSITION) {
                             if (spanSizeLookup?.getSpanSize(it.adapterPosition) == this.spanCount) {
