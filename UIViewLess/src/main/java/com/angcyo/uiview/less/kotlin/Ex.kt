@@ -17,10 +17,12 @@ import com.angcyo.uiview.less.skin.SkinHelper
 import com.angcyo.uiview.less.utils.RUtils
 import com.angcyo.uiview.less.utils.Reflect
 import com.angcyo.uiview.less.utils.utilcode.utils.FileUtils
+import okhttp3.ResponseBody
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.net.URLEncoder
+import java.nio.charset.Charset
 import java.util.regex.Pattern
 import kotlin.random.Random
 
@@ -476,4 +478,16 @@ public fun String.queryParameter(key: String): String? {
 /**获取url或者文件扩展名 对应的mimeType*/
 public fun String.mimeType(): String? {
     return MimeTypeMap.getSingleton().getMimeTypeFromExtension(MimeTypeMap.getFileExtensionFromUrl(this))
+}
+
+/**读取body中的字符串*/
+public fun ResponseBody?.readString(charsetName: String = "UTF-8"): String {
+    if (this == null) {
+        return ""
+    }
+    val source = source()
+    source.request(Long.MAX_VALUE)
+    val buffer = source.buffer
+    val charset: Charset = Charset.forName(charsetName)
+    return buffer.clone().readString(charset)
 }
