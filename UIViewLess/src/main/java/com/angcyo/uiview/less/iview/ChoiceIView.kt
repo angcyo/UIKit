@@ -43,7 +43,7 @@ open class ChoiceIView(val viewGroup: ViewGroup, val choiceMode: Int = CHOICE_MO
             onChoiceSelector?.onInitPosition(childView, index, choiceMode)
 
             childView.setOnClickListener {
-                if (onChoiceSelector?.onCanSelector(childView, index, choiceMode) == true) {
+                if (onChoiceSelector?.onCanSelector(childView, index, choiceMode, true) == true) {
                     if (it.isSelected) {
                         unSelector(index)
                     } else {
@@ -74,7 +74,7 @@ open class ChoiceIView(val viewGroup: ViewGroup, val choiceMode: Int = CHOICE_MO
         choice(index, false)
     }
 
-    private fun choice(index: Int, selected: Boolean) {
+    fun choice(index: Int, selected: Boolean, notify: Boolean = true) {
         val size = viewGroup.childCount
 
         var childView: View? = null
@@ -143,9 +143,13 @@ open class ChoiceIView(val viewGroup: ViewGroup, val choiceMode: Int = CHOICE_MO
                     unSelectedView(childView, index)
                 }
             }
-            onChoiceSelector?.onChoiceChange(getSelectedIndexs())
+            if (notify) {
+                onChoiceSelector?.onChoiceChange(getSelectedIndexs())
+            }
         } else if (childView != null) {
-            onChoiceSelector?.onChoiceChange(getSelectedIndexs())
+            if (notify) {
+                onChoiceSelector?.onChoiceChange(getSelectedIndexs())
+            }
         }
     }
 
@@ -229,7 +233,8 @@ open class ChoiceIView(val viewGroup: ViewGroup, val choiceMode: Int = CHOICE_MO
         /**
          * 是否可以选中
          * */
-        open fun onCanSelector(itemView: View, position: Int, choiceMode: Int): Boolean = true
+        open fun onCanSelector(itemView: View, position: Int, choiceMode: Int, fromClick: Boolean = false): Boolean =
+            true
 
         /**
          * 是否可以取消选中
