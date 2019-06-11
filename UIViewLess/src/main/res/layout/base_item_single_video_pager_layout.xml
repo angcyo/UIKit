@@ -28,13 +28,22 @@
             android:layout_width="60dp"
             android:layout_height="60dp"/>
 
-    <com.angcyo.uiview.less.widget.RArcLoadingView
-            android:id="@+id/base_video_loading_view"
-            android:layout_width="22dp"
-            android:layout_gravity="center"
-            app:r_arc_width="2dp"
-            android:visibility="gone"
-            android:padding="2dp"
-            android:layout_height="22dp"/>
+    <!--<com.wayto.ui.draw.view.RArcLoadingView-->
+    <!--android:id="@+id/base_video_loading_view"-->
+    <!--android:layout_width="22dp"-->
+    <!--android:layout_gravity="center"-->
+    <!--app:r_arc_width="2dp"-->
+    <!--android:visibility="gone"-->
+    <!--android:padding="2dp"-->
+    <!--android:layout_height="22dp"/>-->
+
+    <com.angcyo.uiview.less.draw.view.HSProgressView
+            android:id="@+id/hs_progress_view"
+            android:layout_width="match_parent"
+            android:layout_gravity="bottom"
+            android:layout_marginLeft="@dimen/base_xxhdpi"
+            android:layout_marginRight="@dimen/base_xxhdpi"
+            android:layout_marginBottom="@dimen/action_bar_height"
+            android:layout_height="3dp"/>
 
 </FrameLayout>

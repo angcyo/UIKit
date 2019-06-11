@@ -145,6 +145,10 @@ public class FDown {
 //        return task;
 //    }
 
+    public static DownloadTask newTask(String url) {
+        return newTask(url, new File(defaultDownloadPath(url)));
+    }
+
     public static DownloadTask newTask(String url, File targetFile) {
         DownloadTask task = new DownloadTask.Builder(url, targetFile)
                 //.setFilename(filename)  //强制文件名
@@ -171,6 +175,10 @@ public class FDown {
         } else {
             return sameTask;
         }
+    }
+
+    public static DownloadTask get(String url) {
+        return get(url, new File(defaultDownloadPath(url)));
     }
 
     public static DownloadTask down(String url, File targetFile, FDownListener listener) {
@@ -264,6 +272,9 @@ public class FDown {
         return isCompleted;
     }
 
+    public static boolean isCompleted(String url) {
+        return isCompleted(get(url));
+    }
 
     public static Status isCompletedOrUnknown(DownloadTask task) {
         Status status = StatusUtil.isCompletedOrUnknown(task);
@@ -367,22 +378,17 @@ public class FDown {
      */
     public static class HostListener implements DownloadListener {
 
-        public static HostListener instance() {
-            return Holder.listener;
-        }
-
         /**
          * 分发所有任务回调
          */
         public CopyOnWriteArraySet<FDownListener> allListener = new CopyOnWriteArraySet<>();
-
         /**
          * 指定下载地址, 关联
          */
         public ArrayMap<String, CopyOnWriteArraySet<FDownListener>> mapListener = new ArrayMap<>();
 
-        private static class Holder {
-            static final HostListener listener = new HostListener();
+        public static HostListener instance() {
+            return Holder.listener;
         }
 
         @Override
@@ -553,6 +559,10 @@ public class FDown {
                     removeListener(task.getUrl(), fDownListener);
                 }
             }
+        }
+
+        private static class Holder {
+            static final HostListener listener = new HostListener();
         }
     }
 }

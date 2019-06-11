@@ -13,8 +13,11 @@ import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.widget.ImageView
 import com.angcyo.lib.L
+import com.angcyo.okdownload.FDown
+import com.angcyo.okdownload.FDownListener
 import com.angcyo.uiview.less.BuildConfig
 import com.angcyo.uiview.less.R
+import com.angcyo.uiview.less.draw.view.HSProgressView
 import com.angcyo.uiview.less.kotlin.*
 import com.angcyo.uiview.less.media.play.TextureVideoView
 import com.angcyo.uiview.less.picture.BaseTransitionFragment
@@ -22,6 +25,7 @@ import com.angcyo.uiview.less.picture.PagerTransitionFragment
 import com.angcyo.uiview.less.picture.ViewTransitionFragment
 import com.angcyo.uiview.less.recycler.RBaseViewHolder
 import com.angcyo.uiview.less.recycler.adapter.RBaseAdapter
+import com.angcyo.uiview.less.utils.RNetwork
 import com.angcyo.uiview.less.utils.RUtils
 import com.angcyo.uiview.less.widget.group.MatrixLayout
 import com.angcyo.uiview.less.widget.pager.RPagerAdapter
@@ -30,6 +34,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.github.chrisbanes.photoview.PhotoView
+import com.liulishuo.okdownload.DownloadTask
 import java.io.File
 import java.lang.ref.WeakReference
 
@@ -450,6 +455,7 @@ open class ViewTransitionConfig {
             (fragment.previewView as? ImageView)?.setImageDrawable(getImagePlaceholder(position))
 
             lastVideoView?.stop()
+            FDown.cancel(lastVideoDownTaskIt)
         }
 
     var getPagerCount: (fragment: PagerTransitionFragment, adapter: RPagerAdapter) -> Int = { _, _ ->
@@ -481,6 +487,7 @@ open class ViewTransitionConfig {
     }
 
     private var lastVideoView: TextureVideoView? = null
+    private var lastVideoDownTaskIt = 0
 
     /**默认实现*/
     var onBindPagerItemView: (
@@ -506,9 +513,9 @@ open class ViewTransitionConfig {
         }
 
         //加载图片
-        val data = onGetPagerMediaUrl(position)
-        if (data is String) {
-            photoView.load(data) {
+        val urlData = onGetPagerMediaUrl(position)
+        if (urlData is String) {
+            photoView.load(urlData) {
                 dontAnimate()
                 autoClone()
                 diskCacheStrategy(DiskCacheStrategy.ALL)
@@ -553,10 +560,10 @@ open class ViewTransitionConfig {
                 val videoView: TextureVideoView = viewHolder.v(R.id.video_view)
                 videoView.setRepeatPlay(false)
 
-                if (data.isFileExists()) {
-                    videoView.setVideoURI(RUtils.getFileUri(RUtils.getApp(), File(data)))
+                if (urlData.isFileExists()) {
+                    videoView.setVideoURI(RUtils.getFileUri(RUtils.getApp(), File(urlData)))
                 } else {
-                    videoView.setVideoPath(data)
+                    videoView.setVideoPath(urlData)
                 }
 
                 videoView.setMediaPlayerCallback(object : TextureVideoView.SimpleMediaPlayerCallback() {
@@ -573,7 +580,7 @@ open class ViewTransitionConfig {
                     override fun onPlayStateChanged(mp: MediaPlayer?, newState: Int) {
                         super.onPlayStateChanged(mp, newState)
                         if (newState == TextureVideoView.STATE_PLAYING) {
-                            viewHolder.gone(R.id.base_video_loading_view)
+                            viewHolder.gone(R.id.hs_progress_view)
                             viewHolder.gone(R.id.base_photo_view)
                             viewHolder.gone(R.id.play_video_view)
                         } else {
@@ -597,18 +604,63 @@ open class ViewTransitionConfig {
                 }
 
                 viewHolder.click(R.id.play_video_view) {
-                    viewHolder.visible(R.id.base_video_loading_view)
-
-                    if (videoView.targetState == TextureVideoView.STATE_PAUSED) {
-                        videoView.resume()
-                    } else {
-                        videoView.start()
+                    if (RNetwork.isMobile(viewHolder.itemView.context)) {
+                        toast_tip("正在使用移动数据观看")
                     }
 
-                    lastVideoView = videoView
+                    viewHolder.gone(R.id.play_video_view)
+
+                    if (FDown.isCompleted(urlData)) {
+                        //视频已经下载好了
+                        playVideo(viewHolder, getVideoLocalPath(urlData))
+                    } else {
+                        //开始下载视频
+
+                        viewHolder.v<HSProgressView>(R.id.hs_progress_view).apply {
+                            visibility = View.VISIBLE
+                            startAnimator()
+                        }
+
+                        downVideo(urlData) {
+                            playVideo(viewHolder, it)
+                        }
+                    }
                 }
             }
         }
+    }
+
+    /**获取本地缓存的视频路径*/
+    open fun getVideoLocalPath(url: String): String {
+        return FDown.defaultDownloadPath(url)
+    }
+
+    /**下载视频*/
+    open fun downVideo(url: String, callback: (path: String) -> Unit) {
+        lastVideoDownTaskIt = FDown.down(url, object : FDownListener() {
+            override fun onTaskEnd(task: DownloadTask, isCompleted: Boolean, realCause: Exception?) {
+                super.onTaskEnd(task, isCompleted, realCause)
+                if (isCompleted) {
+                    callback.invoke(task.file!!.absolutePath)
+                }
+            }
+        }).id
+    }
+
+    /**播放视频*/
+    open fun playVideo(viewHolder: RBaseViewHolder, path: String) {
+        val videoView: TextureVideoView = viewHolder.v(R.id.video_view)
+        viewHolder.gone(R.id.play_video_view)
+
+        videoView.setVideoURI(RUtils.getFileUri(RUtils.getApp(), File(path)))
+
+        if (videoView.targetState == TextureVideoView.STATE_PAUSED) {
+            videoView.resume()
+        } else {
+            videoView.start()
+        }
+
+        lastVideoView = videoView
     }
 
     //</editor-fold desc="ViewPager相关处理">
