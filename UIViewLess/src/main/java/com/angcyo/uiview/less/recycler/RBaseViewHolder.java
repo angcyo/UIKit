@@ -32,6 +32,7 @@ import com.orhanobut.hawk.Hawk;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.List;
 
 /**
  * 通用ViewHolder
@@ -334,6 +335,19 @@ public class RBaseViewHolder extends RecyclerView.ViewHolder {
     }
 
     public AutoEditText auto(@IdRes int resId) {
+        return v(resId);
+    }
+
+    public AutoEditText auto(@IdRes int resId, List<String> dataList) {
+        return auto(resId, dataList, false);
+    }
+
+    public AutoEditText auto(@IdRes int resId, List<String> dataList, boolean showOnFocus) {
+        AutoEditText auto = auto(resId);
+        if (auto != null) {
+            //auto.setAdapter(new RArrayAdapter<>(getContext(), dataList));
+            auto.setDataList(dataList, showOnFocus);
+        }
         return v(resId);
     }
 
