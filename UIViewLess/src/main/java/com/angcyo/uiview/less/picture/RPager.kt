@@ -30,10 +30,57 @@ object RPager {
         start(fragmentManager, ViewTransitionFragment(), init)
     }
 
+    /**
+     * 简单使用:
+     * <code>
+     *     pagerCount = bean.attachments?.size ?: 0
+     *     onGetPagerMediaUrl = { position ->
+     *      bean.attachments[position].url ?: ""
+     *    }
+     * </code>
+     *
+     * 单图联动查看:
+     * <pre>
+     *   RPager.pager(parentFragmentManager()) {
+     *      onGetTargetView = {
+     *       view
+     *     }
+     *   }
+     * </pre>
+     *
+     * 单图联动(在简单使用的基础上):
+     * <pre>
+     *     onGetTargetView = {
+     *       holder.giv(R.id.task_work_order_pic)
+     *     }
+     *
+     * </pre>
+     * RecyclerView联动(在简单使用的基础上):
+     * <pre>
+     *     onGetRecyclerView = {
+     *        recyclerView
+     *     }
+     * </pre>
+     *
+     * */
     fun pager(fragmentManager: FragmentManager?, init: (ViewTransitionConfig.() -> Unit) = {}) {
         start(fragmentManager, PagerTransitionFragment(), init)
     }
 
+    /**
+     * <pre>
+     * RPager.localMedia(fragmentManager) {
+     *      localMediaList = allDatas
+     *      startPagerIndex = startIndex
+     *      enablePager = true
+     *      onGetRecyclerView = {
+     *       recyclerView
+     *        }
+     *      }
+     *
+     * </pre>
+     *
+     * */
     fun localMedia(
         fragmentManager: FragmentManager?,
         init: (LocalMediaTransitionFragment.LocalMediaTransitionConfig.() -> Unit) = {}
