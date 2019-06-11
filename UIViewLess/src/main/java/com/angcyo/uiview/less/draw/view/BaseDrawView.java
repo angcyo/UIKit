@@ -143,4 +143,8 @@ public class BaseDrawView<T extends BaseDraw> extends View {
             baseDraw.onDraw(canvas);
         }
     }
+
+    public T getBaseDraw() {
+        return baseDraw;
+    }
 }

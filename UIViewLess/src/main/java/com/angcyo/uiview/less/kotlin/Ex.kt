@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.*
 import android.net.Uri
+import android.support.v4.math.MathUtils
 import android.text.TextUtils
 import android.util.Base64
 import android.view.MotionEvent
@@ -458,6 +459,10 @@ public fun Rect.set(rectF: RectF) {
     set(rectF.left.toInt(), rectF.top.toInt(), rectF.right.toInt(), rectF.bottom.toInt())
 }
 
+public fun RectF.set(left: Int, top: Int, right: Int, bottom: Int) {
+    set(left.toFloat(), top.toFloat(), right.toFloat(), bottom.toFloat())
+}
+
 public fun String.toColor(): Int = Color.parseColor(this)
 
 public fun String.pattern(regex: String): MutableList<String> {
@@ -490,4 +495,17 @@ public fun ResponseBody?.readString(charsetName: String = "UTF-8"): String {
     val buffer = source.buffer
     val charset: Charset = Charset.forName(charsetName)
     return buffer.clone().readString(charset)
+}
+
+/**
+ * 返回一个颜色的透明颜色,
+ *
+ * @param alpha [0..255] 值越小,越透明
+ */
+public fun Int.alpha(alpha: Int): Int {
+    return SkinHelper.getTranColor(this, MathUtils.clamp(alpha, 0, 255))
+}
+
+public fun Int.alpha(alpha: Float): Int {
+    return alpha(alpha.toInt())
 }
