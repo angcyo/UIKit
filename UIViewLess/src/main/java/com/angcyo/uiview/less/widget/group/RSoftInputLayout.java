@@ -86,7 +86,7 @@ public class RSoftInputLayout extends FrameLayout implements ILifecycle {
     private Runnable mCheckSizeChanged = new Runnable() {
         @Override
         public void run() {
-            onSizeChanged(-1, -1, 0, 0);
+            onSizeChanged(-1, -1, getMeasuredWidth(), getMeasuredHeight());
         }
     };
 
@@ -374,7 +374,7 @@ public class RSoftInputLayout extends FrameLayout implements ILifecycle {
                     " viewHeight:" + getMeasuredHeight() +
                     " contentHeight:" + contentLayout.getMeasuredHeight());
         }
-        if (!isInEditMode()) {
+        if (!isInEditMode() && oldw > 0 && oldh > 0) {
             notifyEmojiLayoutChangeListener(isEmojiShow, isKeyboardShow,
                     isKeyboardShow ? getSoftKeyboardHeight() : showEmojiHeight);
         }
@@ -425,7 +425,7 @@ public class RSoftInputLayout extends FrameLayout implements ILifecycle {
 
     @Override
     public WindowInsets onApplyWindowInsets(WindowInsets insets) {
-        if (getFitsSystemWindows()) {
+        if (getFitsSystemWindows() && enableSoftInput) {
             return super.onApplyWindowInsets(insets);
         } else {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
