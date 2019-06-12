@@ -186,7 +186,7 @@ object RNetwork {
             //获取所有网络连接的信息
             val networks = connMgr.allNetworks
             //用于存放网络连接信息
-            val sb = StringBuilder()
+            //val sb = StringBuilder()
             //通过循环将网络信息逐个取出来
 
             for (i in networks.indices) {
@@ -196,6 +196,7 @@ object RNetwork {
                 if ("WIFI".equals(networkInfo.typeName, ignoreCase = true)) {
                     isWifiConn = networkInfo.isConnected
                 } else if ("MOBILE".equals(networkInfo.typeName, ignoreCase = true)) {
+                    //现在的手机, 在wifi 连接的时候, mobile 也会是连接状态
                     isMobileConn = networkInfo.isConnected
                 }
             }
@@ -218,7 +219,9 @@ object RNetwork {
 
     /** mobile连接*/
     fun isMobile(context: Context): Boolean {
-        return checkState(context)[1]
+        val checkState = checkState(context)
+        //wifi 未连接的情况下, mobile 连接
+        return !checkState[0] && checkState[1]
     }
 
     /** 有网络*/

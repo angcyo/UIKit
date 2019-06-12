@@ -564,6 +564,10 @@ open class ViewTransitionConfig {
                     videoView.setVideoURI(RUtils.getFileUri(RUtils.getApp(), File(urlData)))
                 } else {
                     videoView.setVideoPath(urlData)
+
+                    if (!FDown.isCompleted(urlData) && RNetwork.isMobile(viewHolder.itemView.context)) {
+                        toast_tip("正在使用移动数据")
+                    }
                 }
 
                 videoView.setMediaPlayerCallback(object : TextureVideoView.SimpleMediaPlayerCallback() {
@@ -604,10 +608,6 @@ open class ViewTransitionConfig {
                 }
 
                 viewHolder.click(R.id.play_video_view) {
-                    if (RNetwork.isMobile(viewHolder.itemView.context)) {
-                        toast_tip("正在使用移动数据观看")
-                    }
-
                     viewHolder.gone(R.id.play_video_view)
 
                     if (FDown.isCompleted(urlData)) {
