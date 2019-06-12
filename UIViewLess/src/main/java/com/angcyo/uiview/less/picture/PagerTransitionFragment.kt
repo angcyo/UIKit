@@ -64,7 +64,7 @@ open class PagerTransitionFragment : ViewTransitionFragment() {
         viewPager.isEnabled = transitionConfig.enablePager
 
         if (transitionConfig.enablePager && transitionConfig.pagerCount > 1) {
-            viewHolder.v<TextIndicator>(R.id.base_text_indicator_view).setupViewPager(viewPager)
+            viewHolder.v<TextIndicator>(R.id.base_text_indicator_view)?.setupViewPager(viewPager)
         }
     }
 

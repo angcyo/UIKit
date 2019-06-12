@@ -136,12 +136,12 @@ open class ClearEditText : AppCompatAutoCompleteTextView {
         isAttached = true
     }
 
-    override fun setText(text: CharSequence, type: TextView.BufferType) {
+    override fun setText(text: CharSequence?, type: BufferType?) {
         super.setText(text, type)
         //checkEdit(isFocused());
     }
 
-    override fun onTextChanged(text: CharSequence, start: Int, lengthBefore: Int, lengthAfter: Int) {
+    override fun onTextChanged(text: CharSequence?, start: Int, lengthBefore: Int, lengthAfter: Int) {
         super.onTextChanged(text, start, lengthBefore, lengthAfter)
         checkEdit(isFocused)
     }
