@@ -112,7 +112,7 @@ public class RSoftInputLayout extends FrameLayout implements ILifecycle {
         manager.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
-    public static void showSoftInput(View view) {
+    public static void showSoftInput(@NonNull View view) {
         view.requestFocus();
         InputMethodManager manager = (InputMethodManager) view.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
         manager.showSoftInput(view, 0);

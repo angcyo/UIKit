@@ -28,7 +28,6 @@ import rx.subscriptions.CompositeSubscription;
  */
 public abstract class BaseFragment extends AbsLifeCycleFragment {
 
-
     protected CompositeSubscription mSubscriptions = new CompositeSubscription();
 
     public static void addSubscription(CompositeSubscription subscriptions, Subscription subscription,
@@ -131,7 +130,6 @@ public abstract class BaseFragment extends AbsLifeCycleFragment {
         }
     }
 
-
     //<editor-fold defaultstate="collapsed" desc="网络请求管理">
 
     /**
@@ -145,7 +143,18 @@ public abstract class BaseFragment extends AbsLifeCycleFragment {
                 RSoftInputLayout.hideSoftInput(focus);
             } else if (focus != null) {
                 RSoftInputLayout.hideSoftInput(focus);
+            } else {
+                RSoftInputLayout.hideSoftInput(fragmentRootView);
             }
+        }
+    }
+
+    /**
+     * 显示键盘, 尽量使用 EditText
+     */
+    public void showSoftInput(View view) {
+        if (view != null) {
+            RSoftInputLayout.showSoftInput(view);
         }
     }
 
@@ -172,6 +181,20 @@ public abstract class BaseFragment extends AbsLifeCycleFragment {
         }
 
         builder.back(getActivity());
+    }
+
+    @Override
+    public void onFragmentFirstShow(@Nullable Bundle bundle) {
+        super.onFragmentFirstShow(bundle);
+        if (baseViewHolder != null) {
+            View focus = baseViewHolder.itemView.findFocus();
+
+            if (focus instanceof EditText) {
+
+            } else {
+                hideSoftInput();
+            }
+        }
     }
 
     @Override
