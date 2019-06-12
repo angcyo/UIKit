@@ -7,6 +7,7 @@ import android.content.Context
 import android.graphics.*
 import android.support.v4.view.GestureDetectorCompat
 import android.support.v4.view.MotionEventCompat
+import android.text.TextUtils
 import android.util.AttributeSet
 import android.view.*
 import android.view.MotionEvent.*
@@ -52,6 +53,13 @@ class ExpandRecordLayout(context: Context, attributeSet: AttributeSet? = null) :
 
     /**是否绘制圆圈, 如果不绘制, 就是标准的底部折叠, 展开布局*/
     var drawCircle = true
+
+    /**需要绘制的提示文本*/
+    var drawTipString = ""
+        set(value) {
+            field = value
+            postInvalidate()
+        }
 
     init {
         val typedArray = context.obtainStyledAttributes(attributeSet, R.styleable.ExpandRecordLayout)
@@ -288,10 +296,10 @@ class ExpandRecordLayout(context: Context, attributeSet: AttributeSet? = null) :
                 outCircleRect.inset(progressWidth / 2, progressWidth / 2)
 
                 paint.strokeWidth = 0f
-                paint.color = progressColor
-
                 paint.style = Paint.Style.FILL_AND_STROKE
+
                 //绘制进度文本
+                paint.color = progressColor
                 val time = "${(progressAnimator.currentPlayTime / 1000.0).toInt()} s"
                 canvas.drawText(time, cx - paint.measureText(time) / 2, outCircleRect.top - textOffset, paint)
 
@@ -299,6 +307,19 @@ class ExpandRecordLayout(context: Context, attributeSet: AttributeSet? = null) :
                 paint.style = Paint.Style.STROKE
                 paint.strokeWidth = progressWidth
                 canvas.drawArc(outCircleRect, -90f, progress, false, paint)
+            } else {
+                //绘制提示文本
+                paint.strokeWidth = 0f
+                paint.style = Paint.Style.FILL_AND_STROKE
+                paint.color = Color.WHITE
+                if (!TextUtils.isEmpty(drawTipString) && !isLongPress) {
+                    canvas.drawText(
+                        drawTipString,
+                        cx - paint.measureText(drawTipString) / 2,
+                        outCircleRect.top - 2 * textOffset,
+                        paint
+                    )
+                }
             }
         }
     }
