@@ -7,6 +7,7 @@ import com.angcyo.uiview.less.R
 import com.angcyo.uiview.less.recycler.RBaseViewHolder
 import com.angcyo.uiview.less.widget.pager.RPagerAdapter
 import com.angcyo.uiview.less.widget.pager.RViewPager
+import com.angcyo.uiview.less.widget.pager.TextIndicator
 
 /**
  *
@@ -61,9 +62,14 @@ open class PagerTransitionFragment : ViewTransitionFragment() {
         })
 
         viewPager.isEnabled = transitionConfig.enablePager
+
+        if (transitionConfig.enablePager && transitionConfig.pagerCount > 1) {
+            viewHolder.v<TextIndicator>(R.id.base_text_indicator_view).setupViewPager(viewPager)
+        }
     }
 
     private fun transitionAnimStart() {
+        baseViewHolder.gone(R.id.base_text_indicator_view)
         if (transitionConfig.transitionAnimView(this) == previewView) {
             previewView?.visibility = View.VISIBLE
             //viewPager.visibility = View.GONE //用GONE属性, 在加载大一点的图片时会闪.
@@ -77,6 +83,10 @@ open class PagerTransitionFragment : ViewTransitionFragment() {
     }
 
     private fun transitionAnimEnd() {
+        if (transitionConfig.enablePager && transitionConfig.pagerCount > 1) {
+            baseViewHolder.visible(R.id.base_text_indicator_view)
+        }
+
         if (transitionConfig.pagerCount > 0) {
             previewView?.visibility = View.GONE
             viewPager.visibility = View.VISIBLE
