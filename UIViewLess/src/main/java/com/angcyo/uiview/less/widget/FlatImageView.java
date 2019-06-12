@@ -37,6 +37,11 @@ public class FlatImageView extends GlideImageView {
     private int scrollDuration = 5000;
     private long startScrollTime = 0L;
 
+    /**
+     * Drawable高度与View高度, 相差多少像素时, 激活flat
+     */
+    private int flatThresholdValue = 200;
+
     public FlatImageView(Context context) {
         super(context, null);
     }
@@ -208,7 +213,9 @@ public class FlatImageView extends GlideImageView {
     }
 
     private boolean isReady() {
-        return getDrawable() != null && getMeasuredHeight() > 0 && getMeasuredWidth() > 0;
+        return getDrawable() != null &&
+                getMeasuredHeight() > 0 && getMeasuredWidth() > 0 &&
+                (drawableHeight() - getMeasuredHeight() > flatThresholdValue);
     }
 
     @Override
