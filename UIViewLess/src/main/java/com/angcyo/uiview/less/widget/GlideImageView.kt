@@ -443,8 +443,9 @@ open class GlideImageView(context: Context, attributeSet: AttributeSet? = null) 
     }
 
     fun setTagUrl(url: String?) {
-        if (url == null) {
+        if (TextUtils.isEmpty(url)) {
             setTag(R.id.tag_url, "")
+            loadSuccessUrl = ""
         } else {
             setTag(R.id.tag_url, url)
         }
