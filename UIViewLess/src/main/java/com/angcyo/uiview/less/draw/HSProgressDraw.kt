@@ -5,6 +5,7 @@ import android.graphics.Color
 import android.util.AttributeSet
 import android.view.View
 import android.view.animation.DecelerateInterpolator
+import com.angcyo.uiview.less.R
 import com.angcyo.uiview.less.kotlin.alpha
 import com.angcyo.uiview.less.kotlin.set
 
@@ -26,6 +27,13 @@ class HSProgressDraw(view: View) : RSectionDraw(view) {
 
     override fun initAttribute(attr: AttributeSet?) {
         super.initAttribute(attr)
+        val typedArray = obtainStyledAttributes(attr, R.styleable.HSProgressDraw)
+        progressColor = typedArray.getColor(R.styleable.HSProgressDraw_r_progress_color, progressColor)
+        typedArray.recycle()
+
+        if (isInEditMode) {
+            setProgress(50)
+        }
     }
 
     override fun onDrawProgressSection(

@@ -4,6 +4,7 @@ import android.graphics.Color
 import android.os.Bundle
 import android.os.SystemClock
 import android.support.v4.app.FragmentManager
+import android.support.v4.util.ArrayMap
 import android.text.TextUtils
 import android.text.format.Formatter
 import android.view.Gravity
@@ -13,11 +14,11 @@ import android.widget.HorizontalScrollView
 import android.widget.LinearLayout
 import com.angcyo.http.HttpSubscriber
 import com.angcyo.http.Ok
-import com.angcyo.http.RFunc
 import com.angcyo.http.Rx
 import com.angcyo.uiview.less.R
 import com.angcyo.uiview.less.base.BaseFragment
 import com.angcyo.uiview.less.base.helper.FragmentHelper
+import com.angcyo.uiview.less.draw.view.HSProgressView
 import com.angcyo.uiview.less.kotlin.dialog.menuDialog
 import com.angcyo.uiview.less.kotlin.minValue
 import com.angcyo.uiview.less.recycler.RBaseViewHolder
@@ -32,6 +33,8 @@ import com.angcyo.uiview.less.utils.utilcode.utils.FileUtils
 import com.angcyo.uiview.less.utils.utilcode.utils.MD5
 import com.angcyo.uiview.less.widget.group.RLinearLayout
 import com.angcyo.uiview.less.widget.group.TouchBackLayout
+import rx.android.schedulers.AndroidSchedulers
+import rx.schedulers.Schedulers
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -55,6 +58,8 @@ open class FileSelectorFragment : BaseFragment() {
     }
 
     private var config = FileSelectorConfig()
+
+    private val md5CacheMap = ArrayMap<String, String>()
 
     override fun getLayoutId(): Int {
         return R.layout.base_fragment_file_selector
@@ -296,11 +301,14 @@ open class FileSelectorFragment : BaseFragment() {
     }
 
     private fun getFileList(path: String, delay: Long = 0L, onFileList: (List<FileItem>) -> Unit) {
-        Rx.base(object : RFunc<List<FileItem>>() {
-            override fun onFuncCall(): List<FileItem> {
-                val file = File(path)
+        onCancelSubscriptions()
+        addSubscription(Rx.just(path)
+            .map {
+                val file = File(it)
                 val result: List<FileItem> = if (file.exists() && file.isDirectory && file.canRead()) {
                     val list = file.listFiles().asList()
+
+                    //排序, 文件夹在上面
                     Collections.sort(list) { o1, o2 ->
                         when {
                             (o1.isDirectory && o2.isDirectory) || (o1.isFile && o2.isFile) -> o1.name.toLowerCase().compareTo(
@@ -326,8 +334,12 @@ open class FileSelectorFragment : BaseFragment() {
                         FileItem(
                             it,
                             Ok.ImageType.of(Ok.ImageTypeUtil.getImageType(it)),
-                            if (config.showFileMd5) MD5.getStreamMD5(it.absolutePath) else "",
-                            MimeTypeMap.getSingleton().getMimeTypeFromExtension(MimeTypeMap.getFileExtensionFromUrl(it.absolutePath))
+                            "",//异步加载 /*if (config.showFileMd5) MD5.getStreamMD5(it.absolutePath) else "",*/
+                            MimeTypeMap.getSingleton().getMimeTypeFromExtension(
+                                MimeTypeMap.getFileExtensionFromUrl(
+                                    it.absolutePath
+                                )
+                            )
                         )
                     }
                     items
@@ -339,19 +351,55 @@ open class FileSelectorFragment : BaseFragment() {
                     SystemClock.sleep(delay)
                 }
 
-                return result
+                result
             }
+            .observeOn(AndroidSchedulers.mainThread())
+            .flatMap {
+                onFileList.invoke(it)
 
-        }, object : HttpSubscriber<List<FileItem>>() {
-            override fun onSucceed(bean: List<FileItem>) {
-                super.onSucceed(bean)
-                onFileList.invoke(bean)
+                Rx.from(it)
             }
-        })
+            .observeOn(Schedulers.io())
+            .map {
+                if (config.showFileMd5) {
+                    val targetPath = it.file.absolutePath
+                    it.fileMd5 = md5CacheMap[targetPath] ?: ""
+                    if (TextUtils.isEmpty(it.fileMd5)) {
+                        it.fileMd5 = MD5.getStreamMD5(it.file.absolutePath)
+
+                        md5CacheMap[targetPath] = it.fileMd5
+                    }
+                }
+                it
+            }
+            .observeOn(AndroidSchedulers.mainThread())
+            .map {
+                (baseViewHolder.reV(R.id.base_recycler_view)?.adapter as? RBaseAdapter<FileItem>)?.notifyItemChanged(
+                    it
+                )
+                it
+            }
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(object : HttpSubscriber<FileItem>() {
+                override fun onStart() {
+                    super.onStart()
+                    baseViewHolder.v<HSProgressView>(R.id.progress_view).apply {
+                        visibility = View.VISIBLE
+                        startAnimator()
+                    }
+                }
+
+                override fun onEnd(data: FileItem?, error: Throwable?) {
+                    super.onEnd(data, error)
+                    baseViewHolder.invisible(R.id.progress_view)
+                }
+            })
+        )
     }
 }
 
-data class FileItem(val file: File, val imageType: Ok.ImageType, val fileMd5: String = "", val mimeType: String? = null)
+data class FileItem(val file: File, val imageType: Ok.ImageType, var fileMd5: String = "", val mimeType: String? = null)
 
 open class FileSelectorConfig {
 

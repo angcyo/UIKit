@@ -2,6 +2,7 @@
 <com.angcyo.uiview.less.widget.group.TouchBackLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/base_touch_back_layout"
         android:layout_width="match_parent"
         android:background="@color/transparent_dark20"
@@ -54,6 +55,12 @@
                         android:text="选择"/>
 
             </LinearLayout>
+
+            <com.angcyo.uiview.less.draw.view.HSProgressView
+                    android:id="@+id/progress_view"
+                    app:r_progress_color="@color/colorPrimary"
+                    android:layout_width="match_parent"
+                    android:layout_height="3dp"/>
 
             <com.angcyo.uiview.less.recycler.RRecyclerView
                     android:id="@+id/base_recycler_view"
