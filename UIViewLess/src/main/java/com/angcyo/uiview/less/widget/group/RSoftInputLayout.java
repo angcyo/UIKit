@@ -126,13 +126,23 @@ public class RSoftInputLayout extends FrameLayout implements ILifecycle {
         return screenHeight - visibleBottom;
     }
 
+    public boolean isEnableSoftInput() {
+        return enableSoftInput;
+    }
+
     public void setEnableSoftInput(boolean enableSoftInput) {
+        if (this.enableSoftInput == enableSoftInput) {
+            return;
+        }
+
         this.enableSoftInput = enableSoftInput;
         if (enableSoftInput) {
             setFitsSystemWindows();
         } else {
             setFitsSystemWindows(false);
         }
+
+        requestLayout();
     }
 
     public void setAnimToShow(boolean animToShow) {
@@ -272,7 +282,7 @@ public class RSoftInputLayout extends FrameLayout implements ILifecycle {
         //如果键盘显示了, 那么内容的高度=总高度-键盘的高度
         if (softKeyboardShow) {
             isEmojiShow = false;
-            if (RApplication.isLollipop()) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 contentLayoutHeight = maxHeight - keyboardHeight;
             } else {
                 contentLayoutHeight = maxHeight;
