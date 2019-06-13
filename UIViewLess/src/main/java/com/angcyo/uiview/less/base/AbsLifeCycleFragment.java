@@ -171,11 +171,8 @@ public abstract class AbsLifeCycleFragment extends AbsFragment implements IFragm
         L.i(this.getClass().getSimpleName() +
                 " view:" + (getView() == null ? "×" : "√") +
                 " viewHolder:" + (baseViewHolder == null ? "×" : "√"));
-        if (firstShowEnd) {
-            onFragmentNotFirstShow(null);
-        }
+        onFragmentShow(null);
     }
-
 
     @CallSuper
     @Override
