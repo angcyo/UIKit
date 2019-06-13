@@ -422,6 +422,12 @@ open class HoverItemDecoration : RecyclerView.ItemDecoration() {
         overAdapterPosition = RecyclerView.NO_POSITION
     }
 
+    /**更新分割线*/
+    fun refreshItemDecoration() {
+        overAdapterPosition = RecyclerView.NO_POSITION
+        recyclerView?.postInvalidate()
+    }
+
     /**
      * 查找指定位置类型相同的分割线, 最开始的adapterPosition
      * */

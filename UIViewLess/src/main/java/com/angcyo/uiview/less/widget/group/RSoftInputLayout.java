@@ -456,6 +456,9 @@ public class RSoftInputLayout extends FrameLayout implements ILifecycle {
      * 判断键盘是否显示
      */
     public boolean isSoftKeyboardShow() {
+        if (isInEditMode()) {
+            return false;
+        }
         int screenHeight = getScreenHeightPixels();
         int keyboardHeight = getSoftKeyboardHeight();
         return screenHeight != keyboardHeight && keyboardHeight > 50 * RUtils.density();

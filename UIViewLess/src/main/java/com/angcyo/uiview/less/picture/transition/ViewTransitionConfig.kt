@@ -610,7 +610,10 @@ open class ViewTransitionConfig {
                 viewHolder.click(R.id.play_video_view) {
                     viewHolder.gone(R.id.play_video_view)
 
-                    if (FDown.isCompleted(urlData)) {
+                    if (urlData.isFileExists()) {
+                        //本地视频
+                        playVideo(viewHolder, urlData)
+                    } else if (FDown.isCompleted(urlData)) {
                         //视频已经下载好了
                         playVideo(viewHolder, getVideoLocalPath(urlData))
                     } else {

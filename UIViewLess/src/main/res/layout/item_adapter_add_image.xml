@@ -5,10 +5,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-    <android.support.constraint.ConstraintLayout
+    <com.angcyo.uiview.less.widget.group.RConstraintLayout
             android:background="@drawable/base_dark_round_selector"
             android:layout_width="match_parent"
             android:layout_margin="5dp"
+            app:r_background="#E8E8E8"
             android:layout_height="wrap_content">
 
         <com.angcyo.uiview.less.widget.GlideImageView
@@ -24,9 +25,11 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/ic_add_image"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:layout_width="0dp"
+                app:layout_constraintWidth_percent="0.4"
+                app:layout_constraintHeight_percent="0.4"
+                android:layout_height="0dp"/>
 
-    </android.support.constraint.ConstraintLayout>
+    </com.angcyo.uiview.less.widget.group.RConstraintLayout>
 
 </FrameLayout>
