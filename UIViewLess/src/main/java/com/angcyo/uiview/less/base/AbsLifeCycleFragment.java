@@ -171,6 +171,9 @@ public abstract class AbsLifeCycleFragment extends AbsFragment implements IFragm
         L.i(this.getClass().getSimpleName() +
                 " view:" + (getView() == null ? "×" : "√") +
                 " viewHolder:" + (baseViewHolder == null ? "×" : "√"));
+        if (firstShowEnd) {
+            onFragmentNotFirstShow(null);
+        }
     }
 
 
@@ -226,15 +229,20 @@ public abstract class AbsLifeCycleFragment extends AbsFragment implements IFragm
         return !isFragmentVisible;
     }
 
+    @Nullable
+    @Override
+    public IFragment getLastFragment() {
+        return iLastFragment;
+    }
+
     @Override
     public void setLastFragment(@Nullable IFragment iFragment) {
         iLastFragment = iFragment;
     }
 
-    @Nullable
     @Override
-    public IFragment getLastFragment() {
-        return iLastFragment;
+    public boolean isFragmentInViewPager() {
+        return isInViewPager;
     }
 
     @Override
@@ -243,11 +251,6 @@ public abstract class AbsLifeCycleFragment extends AbsFragment implements IFragm
         if (isInViewPager) {
             isFragmentVisible = false;
         }
-    }
-
-    @Override
-    public boolean isFragmentInViewPager() {
-        return isInViewPager;
     }
 
     /**

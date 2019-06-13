@@ -61,10 +61,11 @@ open abstract class BaseTransitionFragment : BaseFragment() {
      * 无动画移除Fragment
      * */
     open fun noAnimRemoveFragment() {
-        FragmentHelper.build(parentFragmentManager())
-            .noAnim()
-            .remove(this)
-            .doIt()
+//        FragmentHelper.build(parentFragmentManager())
+//            .noAnim()
+//            .remove(this)
+//            .doIt()
+        backFragment(false, false)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

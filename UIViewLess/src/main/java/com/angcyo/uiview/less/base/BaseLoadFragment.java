@@ -43,6 +43,13 @@ public class BaseLoadFragment extends BaseTitleFragment {
     }
 
     /**
+     * 显示空数据
+     */
+    public void switchToEmpty() {
+        switchAffectUI(AffectUI.AFFECT_EMPTY);
+    }
+
+    /**
      * 显示加载中
      */
     public void switchToLoading() {
