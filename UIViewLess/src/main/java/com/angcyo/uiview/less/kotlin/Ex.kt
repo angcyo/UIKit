@@ -465,12 +465,49 @@ public fun RectF.set(left: Int, top: Int, right: Int, bottom: Int) {
 
 public fun String.toColor(): Int = Color.parseColor(this)
 
-public fun String.pattern(regex: String): MutableList<String> {
-    val matcher = regex.toPattern().matcher(this)
+public fun CharSequence?.patternList(regex: String?): MutableList<String> {
     val result = mutableListOf<String>()
-    while (matcher.find()) {
-        result.add(matcher.group())
+    if (this == null) {
+        return result
     }
+    regex?.let {
+        val matcher = regex.toPattern().matcher(this)
+        while (matcher.find()) {
+            result.add(matcher.group())
+        }
+    }
+    return result
+}
+
+public fun CharSequence?.pattern(regex: String?): Boolean {
+    if (this == null) {
+        return false
+    }
+    if (regex == null) {
+        return !TextUtils.isEmpty(this)
+    }
+    val matcher = regex.toPattern().matcher(this)
+    return matcher.matches()
+}
+
+public fun CharSequence?.pattern(regexList: Iterable<String>): Boolean {
+    if (this == null) {
+        return false
+    }
+
+    if (!regexList.iterator().hasNext()) {
+        return !TextUtils.isEmpty(this)
+    }
+
+    var result = false
+
+    regexList.forEach {
+        result = this.pattern(it)
+        if (result) {
+            return@forEach
+        }
+    }
+
     return result
 }
 
