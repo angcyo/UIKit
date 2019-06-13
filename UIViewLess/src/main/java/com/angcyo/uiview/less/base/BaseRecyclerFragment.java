@@ -133,8 +133,15 @@ public abstract class BaseRecyclerFragment<T> extends BaseLoadFragment
      * 禁掉下拉刷新效果
      */
     public void disableRefreshAffect() {
+        disableRefreshAffect(true);
+    }
+
+    /**
+     * @param disable false 可以开启下拉刷新控件
+     */
+    public void disableRefreshAffect(boolean disable) {
         if (smartRefreshLayout != null) {
-            smartRefreshLayout.setEnableRefresh(false);
+            smartRefreshLayout.setEnableRefresh(!disable);
             smartRefreshLayout.setEnableLoadMore(false);
             smartRefreshLayout.setEnableOverScrollDrag(false);
             smartRefreshLayout.setEnablePureScrollMode(false);

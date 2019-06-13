@@ -20,7 +20,7 @@ import com.angcyo.uiview.less.recycler.adapter.RBaseAdapter
 
 open class BaseDslRecyclerFragment : BaseRecyclerFragment<DslAdapterItem>() {
     val hoverItemDecoration = HoverItemDecoration()
-    val dslItemDslAdapterItem = DslItemDecoration()
+    val baseDslItemDecoration = DslItemDecoration()
 
     override fun onCreateAdapter(datas: MutableList<DslAdapterItem>?): RBaseAdapter<DslAdapterItem> {
         return DslAdapter(mAttachContext, datas).apply {
@@ -40,7 +40,7 @@ open class BaseDslRecyclerFragment : BaseRecyclerFragment<DslAdapterItem>() {
 
     open fun initDslRecyclerView(recyclerView: RRecyclerView?) {
         recyclerView?.apply {
-            addItemDecoration(dslItemDslAdapterItem)
+            addItemDecoration(baseDslItemDecoration)
             hoverItemDecoration.attachToRecyclerView(this)
         }
     }

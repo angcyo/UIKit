@@ -14,12 +14,9 @@ import android.view.*;
 import android.view.animation.DecelerateInterpolator;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
-
 import com.angcyo.lib.L;
-import com.angcyo.uiview.less.RApplication;
 import com.angcyo.uiview.less.iview.ILifecycle;
 import com.angcyo.uiview.less.utils.RUtils;
-import com.angcyo.uiview.less.utils.ScreenUtil;
 import com.orhanobut.hawk.Hawk;
 
 import java.util.HashSet;
@@ -118,8 +115,17 @@ public class RSoftInputLayout extends FrameLayout implements ILifecycle {
         manager.showSoftInput(view, 0);
     }
 
-    public static int getSoftKeyboardHeight(View view) {
-        int screenHeight = view.getResources().getDisplayMetrics().heightPixels;
+    public static int getSoftKeyboardHeight(@NonNull View view) {
+        Context context = view.getContext();
+        int screenHeight = 0;
+        if (context instanceof Activity) {
+            Window window = ((Activity) context).getWindow();
+            screenHeight = window.findViewById(Window.ID_ANDROID_CONTENT).getMeasuredHeight();
+        } else {
+            screenHeight = view.getResources().getDisplayMetrics().heightPixels;
+            screenHeight += RUtils.getStatusBarHeight(context);
+        }
+
         Rect rect = new Rect();
         view.getWindowVisibleDisplayFrame(rect);
         int visibleBottom = rect.bottom;
