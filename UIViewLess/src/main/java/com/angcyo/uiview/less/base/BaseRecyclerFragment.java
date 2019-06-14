@@ -141,10 +141,7 @@ public abstract class BaseRecyclerFragment<T> extends BaseLoadFragment
      */
     public void disableRefreshAffect(boolean disable) {
         if (smartRefreshLayout != null) {
-            smartRefreshLayout.setEnableRefresh(!disable);
-            smartRefreshLayout.setEnableLoadMore(false);
-            smartRefreshLayout.setEnableOverScrollDrag(false);
-            smartRefreshLayout.setEnablePureScrollMode(false);
+            smartRefreshLayout.disableRefreshAffect(disable);
         }
     }
 
@@ -153,15 +150,7 @@ public abstract class BaseRecyclerFragment<T> extends BaseLoadFragment
      */
     public void enableRefreshAffect() {
         if (smartRefreshLayout != null) {
-            //激活越界滚动
-            smartRefreshLayout.setEnableOverScrollDrag(true);
-            //纯滚动模式, 需要激活越界滚动才有效
-            smartRefreshLayout.setEnablePureScrollMode(true);
-
-            smartRefreshLayout.setEnableLoadMoreWhenContentNotFull(true);
-            smartRefreshLayout.setEnableLoadMore(true);
-            smartRefreshLayout.setEnableFooterTranslationContent(true);
-            smartRefreshLayout.setEnableHeaderTranslationContent(true);
+            smartRefreshLayout.enableRefreshAffect();
         }
     }
 
@@ -319,15 +308,24 @@ public abstract class BaseRecyclerFragment<T> extends BaseLoadFragment
     /**
      * 调用此方法, 设置数据
      */
-    public void onBaseLoadEnd(List<T> datas, int pageSize) {
-        currentPageIndex = requestPageIndex;
-        if (affectUI != null) {
-            affectUI.showAffect(AffectUI.AFFECT_CONTENT);
-        }
-        resetRefreshStatus();
-        if (baseAdapter != null) {
-            baseAdapter.setShowState(IShowState.NORMAL);
-            baseAdapter.loadMoreEnd(datas, requestPageIndex, pageSize);
+    public void onBaseLoadEnd(@Nullable List<T> datas, int pageSize) {
+        onBaseLoadEnd(datas, pageSize, null);
+
+    }
+
+    public void onBaseLoadEnd(@Nullable List<T> datas, int pageSize, @Nullable Throwable error) {
+        if (error != null) {
+            onBaseLoadError(error);
+        } else {
+            currentPageIndex = requestPageIndex;
+            if (affectUI != null) {
+                affectUI.showAffect(AffectUI.AFFECT_CONTENT);
+            }
+            resetRefreshStatus();
+            if (baseAdapter != null) {
+                baseAdapter.setShowState(IShowState.NORMAL);
+                baseAdapter.loadMoreEnd(datas, requestPageIndex, pageSize);
+            }
         }
     }
 

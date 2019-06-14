@@ -135,4 +135,35 @@ public class RSmartRefreshLayout extends SmartRefreshLayout {
         this.percentBottom = percent;
         postInvalidate();
     }
+
+    /**
+     * 禁掉下拉刷新效果
+     */
+    public void disableRefreshAffect() {
+        disableRefreshAffect(true);
+    }
+
+    /**
+     * @param disable false 可以开启下拉刷新控件
+     */
+    public void disableRefreshAffect(boolean disable) {
+        setEnableRefresh(!disable);
+        setEnableLoadMore(false);
+        setEnableOverScrollDrag(false);
+        setEnablePureScrollMode(false);
+    }
+
+    /**
+     * 启用纯下拉刷新效果
+     */
+    public void enableRefreshAffect() {
+        //激活越界滚动
+        setEnableOverScrollDrag(true);
+        //纯滚动模式, 需要激活越界滚动才有效
+        setEnablePureScrollMode(true);
+        setEnableLoadMoreWhenContentNotFull(true);
+        setEnableLoadMore(true);
+        setEnableFooterTranslationContent(true);
+        setEnableHeaderTranslationContent(true);
+    }
 }
