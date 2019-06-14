@@ -285,6 +285,18 @@ public class PictureImageGridAdapter extends RecyclerView.Adapter<RecyclerView.V
                 }
             }
         }
+
+        if (maxSelectNum == 1 && !isChecked) {
+            //多选模式, 但是 max 又是1. 特殊的单选模式
+
+            //1.取消之前选中的item, 如果有
+            if (!selectImages.isEmpty()) {
+                selectImages.clear();
+                notifyItemRangeChanged(0, getItemCount());
+            }
+            //2.选中新的
+        }
+
         if (selectImages.size() >= maxSelectNum && !isChecked) {
             boolean eqImg = pictureType.startsWith(PictureConfig.IMAGE);
             String str = eqImg ? context.getString(R.string.picture_message_max_num, maxSelectNum)

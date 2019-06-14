@@ -150,6 +150,17 @@ public class PicturePreviewActivity extends PictureBaseActivity implements
                         isChecked = false;
                         check.setSelected(false);
                     }
+
+                    if (config.maxSelectNum == 1 && isChecked) {
+                        //多选模式, 但是 max 又是1. 特殊的单选模式
+
+                        //1.取消之前选中的item, 如果有
+                        if (!selectImages.isEmpty()) {
+                            selectImages.clear();
+                        }
+                        //2.选中新的
+                    }
+
                     if (selectImages.size() >= config.maxSelectNum && isChecked) {
                         ToastManage.s(mContext, getString(R.string.picture_message_max_num, config.maxSelectNum));
                         check.setSelected(false);
