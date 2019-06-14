@@ -16,6 +16,7 @@ import com.angcyo.uiview.less.BuildConfig;
 import com.angcyo.uiview.less.R;
 import com.angcyo.uiview.less.RApplication;
 import com.angcyo.uiview.less.base.IFragment;
+import com.angcyo.uiview.less.utils.RLogFile;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -215,8 +216,10 @@ public class FragmentHelper {
             builder.append("\n");
         }
 
-        L.w(TAG, builder.toString());
-        return builder.toString();
+        String string = builder.toString();
+        RLogFile.logFile("ui.log", string);
+        L.w(TAG, string);
+        return string;
     }
 
     public static void logFragment(@Nullable Fragment fragment, @Nullable StringBuilder builder) {

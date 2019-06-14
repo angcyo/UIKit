@@ -77,6 +77,21 @@ public fun RecyclerView.dslAdapter(
     return dslAdapter
 }
 
+public fun <Item : DslAdapterItem> DslAdapter.renderCustomItem(item: Item, init: Item.() -> Unit) {
+    item.init()
+    addLastItem(item)
+}
+
+public fun <Item : DslAdapterItem, Data> DslAdapter.renderCustomItem(
+    item: Item,
+    data: Data? = null,
+    init: Item.() -> Unit
+) {
+    item.itemData = data
+    item.init()
+    addLastItem(item)
+}
+
 public fun DslAdapter.renderItem(count: Int = 1, init: DslAdapterItem.(index: Int) -> Unit) {
     for (i in 0 until count) {
         val adapterItem = DslAdapterItem()

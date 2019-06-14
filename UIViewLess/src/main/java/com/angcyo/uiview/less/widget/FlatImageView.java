@@ -213,9 +213,12 @@ public class FlatImageView extends GlideImageView {
     }
 
     private boolean isReady() {
+        boolean checkThreshold = drawableHeight() - getMeasuredHeight() > flatThresholdValue ||
+                drawableWidth() - getMeasuredWidth() > flatThresholdValue;
+
         return getDrawable() != null &&
                 getMeasuredHeight() > 0 && getMeasuredWidth() > 0 &&
-                (drawableHeight() - getMeasuredHeight() > flatThresholdValue);
+                checkThreshold;
     }
 
     @Override

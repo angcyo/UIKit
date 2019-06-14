@@ -58,11 +58,21 @@ public class RBaseViewHolder extends RecyclerView.ViewHolder {
         this.viewType = viewType;
     }
 
-
     /**
      * 填充两个字段相同的数据对象
      */
-    public static void fill(Object from, Object to) {
+    public static void fill(@Nullable Object from, @Nullable Object to) {
+        fill(from, to, false);
+    }
+
+    /**
+     * @param ignoreNull 如果是null, 是否需要忽略
+     */
+    public static void fill(@Nullable Object from, @Nullable Object to, boolean ignoreNull) {
+        if (from == null || to == null) {
+            return;
+        }
+
         Field[] fromFields = from.getClass().getDeclaredFields();
         Field[] toFields = to.getClass().getDeclaredFields();
         for (Field f : fromFields) {
@@ -73,14 +83,19 @@ public class RBaseViewHolder extends RecyclerView.ViewHolder {
                     try {
                         f.setAccessible(true);
                         t.setAccessible(true);
-                        t.set(to, f.get(from));
-                    } catch (IllegalAccessException e) {
+
+                        Object fromValue = f.get(from);
+
+                        if (ignoreNull && fromValue == null) {
+                        } else {
+                            t.set(to, fromValue);
+                        }
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                     break;
                 }
             }
-
         }
     }
 
