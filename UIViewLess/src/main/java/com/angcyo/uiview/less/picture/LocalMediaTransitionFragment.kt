@@ -20,6 +20,10 @@ open class LocalMediaTransitionFragment : PagerTransitionFragment() {
         var localMediaList = mutableListOf<LocalMedia>()
 
         init {
+            getPagerCount = { _, _ ->
+                Math.max(pagerCount, localMediaList.size)
+            }
+
             onGetPagerMediaUrl = {
                 localMediaList[it].loadUrl
             }

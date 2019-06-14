@@ -68,6 +68,7 @@ object RPager {
     }
 
     /**
+     * //全功能启动pager
      * <pre>
      * RPager.localMedia(fragmentManager) {
      *      localMediaList = allDatas
@@ -80,6 +81,20 @@ object RPager {
      *
      * </pre>
      *
+     * //默认中间动画启动pager
+     * <pre>
+     *   RPager.localMedia(fragmentManger) {
+     *      localMediaList = mutableListOf(LocalMedia(url))
+     *   }
+     * </pre>
+     *
+     * //单图简单联动启动pager
+     * <pre>
+     *   RPager.localMedia(fragmentManger) {
+     *     localMediaList = mutableListOf(LocalMedia(url))
+     *     onGetTargetView = { view }
+     *  }
+     * </pre>
      * */
     fun localMedia(
         fragmentManager: FragmentManager?,

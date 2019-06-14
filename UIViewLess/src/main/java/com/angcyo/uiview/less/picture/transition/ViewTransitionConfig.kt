@@ -156,7 +156,7 @@ open class ViewTransitionConfig {
      * 转场动画作用的view
      * */
     var transitionAnimView: (fragment: ViewTransitionFragment) -> View? = { fragment ->
-        if (fragment is PagerTransitionFragment && pagerCount > 0) {
+        if (fragment is PagerTransitionFragment && getPagerCount(fragment, null) > 0) {
             if (fromViewWeak?.get() == null) {
                 fragment.viewPager
             } else {
@@ -284,7 +284,7 @@ open class ViewTransitionConfig {
             var result = true
             if (fragment.isTransitionAnimEnd) {
                 if (fragment is PagerTransitionFragment) {
-                    result = pagerCount <= 0
+                    result = getPagerCount(fragment, null) <= 0
 
                     for (i in 0 until fragment.viewPager.childCount) {
                         val childView = fragment.viewPager.getChildAt(i)
@@ -397,7 +397,7 @@ open class ViewTransitionConfig {
         if (getRecyclerView != null) {
             getRecyclerView.scrollToPosition(it)
             (getRecyclerView.findViewHolderForAdapterPosition(it) as? RBaseViewHolder)?.view(onGetImageViewId())
-        } else if (pagerCount > 0) {
+        } else if (getPagerCount(null, null) > 0) {
             if (currentPagerIndex == startPagerIndex) {
                 fromViewWeak?.get()
             } else {
@@ -458,7 +458,7 @@ open class ViewTransitionConfig {
             FDown.cancel(lastVideoDownTaskIt)
         }
 
-    var getPagerCount: (fragment: PagerTransitionFragment, adapter: RPagerAdapter) -> Int = { _, _ ->
+    var getPagerCount: (fragment: PagerTransitionFragment?, adapter: RPagerAdapter?) -> Int = { _, _ ->
         pagerCount
     }
 
