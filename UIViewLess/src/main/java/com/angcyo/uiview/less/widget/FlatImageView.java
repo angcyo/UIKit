@@ -3,6 +3,7 @@ package com.angcyo.uiview.less.widget;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.animation.LinearInterpolator;
 import android.widget.OverScroller;
@@ -43,11 +44,12 @@ public class FlatImageView extends GlideImageView {
     private int flatThresholdValue = 200;
 
     public FlatImageView(Context context) {
-        super(context, null);
+        this(context, null);
     }
 
     public FlatImageView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        setOriginalSize(true);
     }
 
     @Override
@@ -83,12 +85,13 @@ public class FlatImageView extends GlideImageView {
                 }
             }
         }
-
-
     }
 
     @Override
     public void setImageDrawable(@Nullable Drawable drawable) {
+        if (!TextUtils.isEmpty(getLoadSuccessUrl()) && getDrawable() != null) {
+            setScaleType(ScaleType.FIT_XY);
+        }
         super.setImageDrawable(drawable);
         if (startFlat && isReady() && !mOverScroller.computeScrollOffset()) {
             forward();
@@ -103,14 +106,15 @@ public class FlatImageView extends GlideImageView {
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         super.onLayout(changed, left, top, right, bottom);
-        setRight(Math.max(drawableWidth(), getMeasuredWidth()));
-        setBottom(Math.max(drawableHeight(), getMeasuredHeight()));
+        if (isReady()) {
+            setRight(Math.max(drawableWidth(), getMeasuredWidth()));
+            setBottom(Math.max(drawableHeight(), getMeasuredHeight()));
+        }
     }
 
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
-        setScaleType(ScaleType.FIT_XY);
     }
 
     @Override
@@ -190,7 +194,17 @@ public class FlatImageView extends GlideImageView {
             }
 
             canvas.save();
-            canvas.translate(mOverScroller.getCurrX(), mOverScroller.getCurrY());
+
+            int offsetX = 0;
+            int offsetY = 0;
+
+            if (isVerticalScroller()) {
+                offsetX = (drawableWidth() - getMeasuredWidth()) / 2;
+            } else {
+                offsetY = (drawableHeight() - getMeasuredHeight()) / 2;
+            }
+
+            canvas.translate(mOverScroller.getCurrX() - offsetX, mOverScroller.getCurrY() - offsetY);
             drawable.setBounds(0, 0,
                     getRight(), getBottom());
 //        canvas.translate(200, 200);
