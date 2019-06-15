@@ -253,7 +253,7 @@ public abstract class AbsLifeCycleFragment extends AbsFragment implements IFragm
     /**
      * 需要显示的标题
      */
-    public String getFragmentTitle() {
+    public CharSequence getFragmentTitle() {
         return this.getClass().getSimpleName();
     }
 

@@ -87,6 +87,7 @@ public class SimpleProgressBar extends View {
         setProgressStyle(typedArray.getInt(R.styleable.SimpleProgressBar_r_progress_style, STYLE_RECT));
         incertitudeProgress = typedArray.getBoolean(R.styleable.SimpleProgressBar_r_incertitude_progress, incertitudeProgress);
         isGradientProgress = typedArray.getBoolean(R.styleable.SimpleProgressBar_r_progress_gradient, isGradientProgress);
+        autoHide = typedArray.getBoolean(R.styleable.SimpleProgressBar_r_progress_auto_hide, autoHide);
 
         typedArray.recycle();
 
@@ -139,6 +140,10 @@ public class SimpleProgressBar extends View {
                     })
                     .start();
         } else {
+            if (getVisibility() != View.VISIBLE) {
+                setVisibility(View.VISIBLE);
+            }
+
             if (getTranslationY() == -getMeasuredHeight()) {
                 ViewCompat.animate(this).translationY(0).setDuration(300).start();
             }

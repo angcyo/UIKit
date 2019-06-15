@@ -22,6 +22,7 @@ import okhttp3.ResponseBody
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
+import java.net.URLDecoder
 import java.net.URLEncoder
 import java.nio.charset.Charset
 import java.util.regex.Pattern
@@ -526,6 +527,20 @@ public fun String.queryParameter(key: String): String? {
 /**获取url或者文件扩展名 对应的mimeType*/
 public fun String.mimeType(): String? {
     return MimeTypeMap.getSingleton().getMimeTypeFromExtension(MimeTypeMap.getFileExtensionFromUrl(this))
+}
+
+public fun String?.decode(): String? {
+    if (TextUtils.isEmpty(this)) {
+        return this
+    }
+
+    val decode = try {
+        URLDecoder.decode(this, "UTF-8")
+    } catch (e: Exception) {
+        this
+    }
+
+    return decode
 }
 
 /**读取body中的字符串*/

@@ -201,7 +201,7 @@ public abstract class BaseTitleFragment extends BaseFragment implements AffectUI
     /**
      * 设置显示的标题
      */
-    public void setTitleString(@NonNull String title) {
+    public void setTitleString(@NonNull CharSequence title) {
         titleControl().selector(R.id.base_title_view).setText(title);
     }
 

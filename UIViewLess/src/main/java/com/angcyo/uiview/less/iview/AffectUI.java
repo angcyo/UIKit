@@ -319,6 +319,11 @@ public class AffectUI {
             return this;
         }
 
+        public Builder setParent(ViewGroup parent) {
+            this.parent = parent;
+            return this;
+        }
+
         public AffectUI create() {
             return new AffectUI(this);
         }

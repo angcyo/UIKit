@@ -428,6 +428,10 @@ public class RBaseViewHolder extends RecyclerView.ViewHolder {
         return (EditText) v(resId);
     }
 
+    public EditText ev(@IdRes int resId) {
+        return eV(resId);
+    }
+
     public ExEditText exV(@IdRes int resId) {
         return (ExEditText) v(resId);
     }

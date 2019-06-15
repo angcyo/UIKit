@@ -17,7 +17,9 @@ import com.liulishuo.okdownload.core.cause.ResumeFailedCause;
 import com.liulishuo.okdownload.core.dispatcher.DownloadDispatcher;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
+import java.net.URLDecoder;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -254,6 +256,11 @@ public class FDown {
         OkDownload.with().downloadDispatcher().cancel(id);
     }
 
+    public static void cancel(String url) {
+        DownloadTask downloadTask = get(url);
+        OkDownload.with().downloadDispatcher().cancel(downloadTask.getId());
+    }
+
     /**
      * 获取任务状态
      */
@@ -298,8 +305,19 @@ public class FDown {
     }
 
     public static String defaultDownloadPath(String url) {
+        String decode;
+        if (TextUtils.isEmpty(url)) {
+            decode = String.valueOf(System.currentTimeMillis());
+        } else {
+            try {
+                decode = URLDecoder.decode(url, "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+                decode = url;
+            }
+        }
         return Environment.getExternalStorageDirectory().getAbsolutePath()
-                + File.separator + app.getPackageName() + "/FDown/" + getFileNameFromUrl(url);
+                + File.separator + app.getPackageName() + "/FDown/" + getFileNameFromUrl(decode);
     }
 
     /**

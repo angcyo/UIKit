@@ -129,12 +129,16 @@ public class ViewGroupHelper {
         return this;
     }
 
-    public ViewGroupHelper setText(String text) {
+    public ViewGroupHelper setText(CharSequence text) {
         if (selectorView != null) {
             if (selectorView instanceof TextView) {
                 ((TextView) selectorView).setText(text);
             } else if (selectorView instanceof ImageTextView) {
-                ((ImageTextView) selectorView).setShowText(text);
+                if (text == null) {
+                    ((ImageTextView) selectorView).setShowText("");
+                } else {
+                    ((ImageTextView) selectorView).setShowText(text.toString());
+                }
             }
         }
         return this;

@@ -4,7 +4,11 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.math.MathUtils;
+import android.support.v4.view.GestureDetectorCompat;
 import android.util.AttributeSet;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
 import com.angcyo.uiview.less.R;
@@ -37,15 +41,17 @@ public class FragmentContentWrapperLayout extends FrameLayout {
      * 标题浮动在内容的上面
      */
     public static final int CONTENT_BACK_OF_TITLE = CONTENT_BOTTOM_OF_TITLE << 1;
-
+    GestureDetectorCompat gestureDetectorCompat;
     /**
      * 内容布局的状态
      */
     private int contentLayoutState = CONTENT_BOTTOM_OF_TITLE;
-
     private int titleViewIndex = 1;
-    @Deprecated
     private int contentViewIndex = 0;
+    /**
+     * 是否监听touch时间, 折叠标题栏
+     */
+    private boolean collapsingTitle = false;
 
     public FragmentContentWrapperLayout(@NonNull Context context) {
         this(context, null);
@@ -97,17 +103,22 @@ public class FragmentContentWrapperLayout extends FrameLayout {
         int maxChildHeight = 0;
         for (int i = 0; i < getChildCount(); i++) {
             View childAt = getChildAt(i);
-            if (childAt == titleView) {
+            if (childAt.getVisibility() == View.GONE) {
                 continue;
             }
 
-            if (childAt.getVisibility() != View.GONE) {
+            if (childAt == titleView) {
+                continue;
+            }
+            if (childAt == contentView() && collapsingTitle) {
+                measureChildWithMargins(childAt, widthMeasureSpec, 0,
+                        MeasureSpec.makeMeasureSpec(heightSize + titleViewHeight(), heightMode), heightUsed);
+            } else {
                 //测量内容宽高
                 measureChildWithMargins(childAt, widthMeasureSpec, 0, heightMeasureSpec, heightUsed);
-
-                maxWidth = Math.max(maxWidth, childAt.getMeasuredWidth() + marginHorizontal(childAt));
-                maxChildHeight = Math.max(maxChildHeight, childAt.getMeasuredHeight() + marginVertical(childAt));
             }
+            maxWidth = Math.max(maxWidth, childAt.getMeasuredWidth() + marginHorizontal(childAt));
+            maxChildHeight = Math.max(maxChildHeight, childAt.getMeasuredHeight() + marginVertical(childAt));
         }
 
         if (widthMode != View.MeasureSpec.EXACTLY) {
@@ -124,7 +135,6 @@ public class FragmentContentWrapperLayout extends FrameLayout {
         }
 
         setMeasuredDimension(widthSize, heightSize);
-
     }
 
     @Override
@@ -178,7 +188,6 @@ public class FragmentContentWrapperLayout extends FrameLayout {
         return null;
     }
 
-    @Deprecated
     private View contentView() {
         if (getChildCount() > contentViewIndex) {
             return getChildAt(contentViewIndex);
@@ -217,4 +226,77 @@ public class FragmentContentWrapperLayout extends FrameLayout {
             requestLayout();
         }
     }
+
+    public void setCollapsingTitle(boolean collapsingTitle) {
+        this.collapsingTitle = collapsingTitle;
+        if (collapsingTitle) {
+            gestureDetectorCompat = new GestureDetectorCompat(getContext(), new GestureDetector.SimpleOnGestureListener() {
+                @Override
+                public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+                    if (Math.abs(distanceX) > Math.abs(distanceY)) {
+                        return false;
+                    }
+
+                    int scrollY = getScrollY();
+                    int titleViewHeight = titleViewHeight();
+
+                    //是否需要处理这个touch事件
+                    boolean handle = true;
+                    if (distanceY > 0) {
+                        //手指向上
+                        if (scrollY >= titleViewHeight) {
+                            //已经滚动到最大值
+                            handle = false;
+                        } else {
+                            scrollBy(0, (int) distanceY);
+                        }
+                    } else if (distanceY < 0) {
+                        //手指向下
+                        if (scrollY <= 0) {
+                            //已经滚动到最小值
+                            handle = false;
+                        } else {
+                            scrollBy(0, (int) distanceY);
+                        }
+                    } else {
+                        handle = false;
+                    }
+                    return handle;
+                }
+            });
+        } else {
+            scrollTo(0, 0);
+            gestureDetectorCompat = null;
+        }
+        requestLayout();
+    }
+
+    protected int titleViewHeight() {
+        View view = titleView();
+        if (view == null) {
+            return 0;
+        }
+        return view.getMeasuredHeight();
+    }
+
+    @Override
+    public void scrollTo(int x, int y) {
+        super.scrollTo(x, MathUtils.clamp(y, 0, titleViewHeight()));
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        if (collapsingTitle) {
+            if (gestureDetectorCompat != null &&
+                    ev.getPointerCount() == 1 &&
+                    gestureDetectorCompat.onTouchEvent(ev) &&
+                    ev.getActionMasked() == MotionEvent.ACTION_MOVE) {
+                return true;
+            } else {
+                return super.dispatchTouchEvent(ev);
+            }
+        }
+        return super.dispatchTouchEvent(ev);
+    }
+
 }
