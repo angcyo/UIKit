@@ -86,7 +86,7 @@ public class ConstUtils {
     /**
      * 正则：电话号码
      */
-    public static final String REGEX_TEL           = "^0\\d{2,3}[- ]?\\d{7,8}";
+    public static final String REGEX_TEL           = "^0\\d{2,3}[- ]?\\d{7,8}$";
     /**
      * 正则：身份证号码15位
      */
