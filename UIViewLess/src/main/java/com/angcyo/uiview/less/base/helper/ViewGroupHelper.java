@@ -95,6 +95,14 @@ public class ViewGroupHelper {
         return visible(View.VISIBLE);
     }
 
+    public ViewGroupHelper visible(boolean visible) {
+        if (visible) {
+            return visible(View.VISIBLE);
+        } else {
+            return gone();
+        }
+    }
+
     public ViewGroupHelper invisible() {
         return visible(View.INVISIBLE);
     }
