@@ -91,6 +91,7 @@ public class RBaseViewHolder extends RecyclerView.ViewHolder {
                             t.set(to, fromValue);
                         }
                     } catch (Exception e) {
+                        L.e("操作字段名:" + tName);
                         e.printStackTrace();
                     }
                     break;
