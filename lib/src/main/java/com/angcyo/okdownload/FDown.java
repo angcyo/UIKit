@@ -169,6 +169,9 @@ public class FDown {
      * 获取一个已经存在的任务, 如果不存在则创建新的任务
      */
     public static DownloadTask get(String url, File targetFile) {
+        if (TextUtils.isEmpty(url)) {
+            return null;
+        }
         DownloadTask task = newTask(url, targetFile);
 
         DownloadTask sameTask = OkDownload.with().downloadDispatcher().findSameTask(task);
@@ -257,6 +260,9 @@ public class FDown {
     }
 
     public static void cancel(String url) {
+        if (TextUtils.isEmpty(url)) {
+            return;
+        }
         DownloadTask downloadTask = get(url);
         OkDownload.with().downloadDispatcher().cancel(downloadTask.getId());
     }
