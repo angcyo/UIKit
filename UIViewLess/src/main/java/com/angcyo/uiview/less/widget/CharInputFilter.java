@@ -6,6 +6,7 @@ import android.text.Spanned;
 import android.text.TextUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -15,75 +16,77 @@ import java.util.List;
 public class CharInputFilter implements InputFilter {
 
     /**
-     * 默认允许所有输入
-     */
-    private int filterModel = 0xFF;
-
-    /**
      * 允许中文输入
      */
     public static final int MODEL_CHINESE = 1;
-
     /**
      * 允许输入大小写字母
      */
     public static final int MODEL_CHAR_LETTER = 2;
-
     /**
      * 允许输入数字
      */
     public static final int MODEL_NUMBER = 4;
-
     /**
      * 允许输入Ascii码表的[33-126]的字符
      */
     public static final int MODEL_ASCII_CHAR = 8;
-
     /**
      * callback过滤模式
      */
     public static final int MODEL_CALLBACK = 16;
-
     /**
      * 身份证号码
      */
     public static final int MODEL_ID_CARD = 32;
-
     /**
      * 允许输入空格 ASCII 码 32
      */
     public static final int MODEL_SPACE = 64;
-
     /**
      * 允许非 emoji 字符输入, 即过滤emoji
      */
     public static final int MODEL_NOT_EMOJI = 128;
-
+    List<OnFilterCallback> callbacks;
+    /**
+     * 默认允许所有输入
+     */
+    private int filterModel = 0xFF;
     /**
      * 限制输入的最大字符数, 小于0不限制
      */
     private int maxInputLength = -1;
 
-    List<OnFilterCallback> callbacks;
-
     public CharInputFilter() {
     }
 
     public CharInputFilter(int filterModel) {
-        this.filterModel = filterModel;
+        this(filterModel, -1);
+    }
+
+    public CharInputFilter(int filterModel, char[] allowChar) {
+        this(filterModel, -1, allowChar);
     }
 
     public CharInputFilter(int filterModel, int maxInputLength) {
-        this.filterModel = filterModel;
-        this.maxInputLength = maxInputLength;
+        this(filterModel, maxInputLength, null);
     }
 
-    public void setFilterModel(int filterModel) {
+    /**
+     * @param allowChar 额外允许输入的 char 字符数组
+     */
+    public CharInputFilter(int filterModel, int maxInputLength, final char[] allowChar) {
         this.filterModel = filterModel;
-    }
-
-    public void setMaxInputLength(int maxInputLength) {
         this.maxInputLength = maxInputLength;
+
+        if (allowChar != null && allowChar.length > 0) {
+            addFilterCallback(new OnFilterCallback() {
+                @Override
+                public boolean onFilterAllow(CharSequence source, char c, int cIndex, Spanned dest, int dstart, int dend) {
+                    return Arrays.binarySearch(allowChar, c) >= 0;
+                }
+            });
+        }
     }
 
     /**
@@ -127,6 +130,13 @@ public class CharInputFilter implements InputFilter {
         return 32 == c;
     }
 
+    public void setFilterModel(int filterModel) {
+        this.filterModel = filterModel;
+    }
+
+    public void setMaxInputLength(int maxInputLength) {
+        this.maxInputLength = maxInputLength;
+    }
 
     /**
      * 将 dest 字符串中[dstart, dend] 位置对应的字符串, 替换成 source 字符串中 [start, end] 位置对应的字符串.

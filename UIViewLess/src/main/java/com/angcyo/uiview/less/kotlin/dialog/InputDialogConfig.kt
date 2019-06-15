@@ -1,6 +1,7 @@
 package com.angcyo.uiview.less.kotlin.dialog
 
 import android.app.Dialog
+import android.text.InputFilter
 import android.text.InputType
 import android.text.TextUtils
 import android.view.Gravity
@@ -68,6 +69,9 @@ open class InputDialogConfig : BaseDialogConfig() {
     /**文本输入类型*/
     var inputType = InputType.TYPE_CLASS_TEXT
 
+    /**输入框过滤器*/
+    var inputFilterList = mutableListOf<InputFilter>()
+
     init {
         positiveButtonListener = { dialog, dialogViewHolder ->
             if (onInputResult.invoke(dialog, dialogViewHolder.exV(R.id.edit_text_view).string())) {
@@ -90,6 +94,11 @@ open class InputDialogConfig : BaseDialogConfig() {
                 null
             }
             dialogViewHolder.enable(R.id.base_save_button, !TextUtils.isEmpty(defaultInputString))
+        }
+
+        //过滤器
+        inputFilterList.forEach {
+            editView.addFilter(it)
         }
 
         if (useCharLengthFilter) {

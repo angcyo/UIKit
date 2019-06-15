@@ -479,30 +479,36 @@ public fun CharSequence?.patternList(regex: String?): MutableList<String> {
     return result
 }
 
-public fun CharSequence?.pattern(regex: String?): Boolean {
+public fun CharSequence?.pattern(regex: String?, allowEmpty: Boolean = true): Boolean {
     if (this == null) {
         return false
     }
     if (regex == null) {
+        if (allowEmpty) {
+            return true
+        }
         return !TextUtils.isEmpty(this)
     }
     val matcher = regex.toPattern().matcher(this)
     return matcher.matches()
 }
 
-public fun CharSequence?.pattern(regexList: Iterable<String>): Boolean {
+public fun CharSequence?.pattern(regexList: Iterable<String>, allowEmpty: Boolean = true): Boolean {
     if (this == null) {
         return false
     }
 
     if (!regexList.iterator().hasNext()) {
+        if (allowEmpty) {
+            return true
+        }
         return !TextUtils.isEmpty(this)
     }
 
     var result = false
 
     regexList.forEach {
-        result = this.pattern(it)
+        result = this.pattern(it, allowEmpty)
         if (result) {
             return@forEach
         }
