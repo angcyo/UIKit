@@ -60,16 +60,26 @@ public class FlatImageView extends GlideImageView {
             long nowTime = System.currentTimeMillis();
 
             boolean reverse = false;
-            if (mOverScroller.computeScrollOffset() || nowTime - startScrollTime < scrollDuration) {
+
+            //L.i("x:" + mOverScroller.getCurrX() + " y:" + mOverScroller.getCurrY());
+
+            boolean computeScrollOffset = mOverScroller.computeScrollOffset();
+
+            int currX = mOverScroller.getCurrX();
+            int currY = mOverScroller.getCurrY();
+
+            if (currX > 0 || currY > 0) {
+                reverse = true;
+            } else if (computeScrollOffset || nowTime - startScrollTime < scrollDuration) {
 
                 postInvalidate();
 
                 if (targetScrollX != 0) {
-                    if (Math.abs(mOverScroller.getCurrX()) >= Math.abs(targetScrollX)) {
+                    if (Math.abs(currX) >= Math.abs(targetScrollX)) {
                         reverse = true;
                     }
                 } else if (targetScrollY != 0) {
-                    if (Math.abs(mOverScroller.getCurrY()) >= Math.abs(targetScrollY)) {
+                    if (Math.abs(currY) >= Math.abs(targetScrollY)) {
                         reverse = true;
                     }
                 }
@@ -140,9 +150,11 @@ public class FlatImageView extends GlideImageView {
 
         if (isVerticalScroller()) {
             targetScrollX = 0;
+            drawScrollX = 0;
             targetScrollY = -drawableHeight() + getMeasuredHeight();
         } else {
             targetScrollY = 0;
+            drawScrollY = 0;
             targetScrollX = -drawableWidth() + getMeasuredWidth();
         }
         startScroller();
@@ -153,9 +165,11 @@ public class FlatImageView extends GlideImageView {
 
         if (isVerticalScroller()) {
             targetScrollX = 0;
+            drawScrollX = 0;
             targetScrollY = drawableHeight() - getMeasuredHeight();
         } else {
             targetScrollY = 0;
+            drawScrollY = 0;
             targetScrollX = drawableWidth() - getMeasuredWidth();
         }
         startScroller();
@@ -193,6 +207,9 @@ public class FlatImageView extends GlideImageView {
                 return;
             }
 
+            drawScrollX = mOverScroller.getCurrX();
+            drawScrollY = mOverScroller.getCurrY();
+
             canvas.save();
 
             int offsetX = 0;
@@ -204,7 +221,7 @@ public class FlatImageView extends GlideImageView {
                 offsetY = (drawableHeight() - getMeasuredHeight()) / 2;
             }
 
-            canvas.translate(mOverScroller.getCurrX() - offsetX, mOverScroller.getCurrY() - offsetY);
+            canvas.translate(Math.min(drawScrollX, 0) - offsetX, Math.min(drawScrollY, 0) - offsetY);
             drawable.setBounds(0, 0,
                     getRight(), getBottom());
 //        canvas.translate(200, 200);
@@ -212,8 +229,7 @@ public class FlatImageView extends GlideImageView {
 //            drawable.draw(canvas);
             canvas.restore();
 
-            drawScrollX = mOverScroller.getCurrX();
-            drawScrollY = mOverScroller.getCurrY();
+
         } else {
             super.onDraw(canvas);
         }
