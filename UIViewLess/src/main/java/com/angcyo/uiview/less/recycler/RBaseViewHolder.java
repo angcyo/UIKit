@@ -32,6 +32,7 @@ import com.orhanobut.hawk.Hawk;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.List;
 
 /**
@@ -85,13 +86,19 @@ public class RBaseViewHolder extends RecyclerView.ViewHolder {
                         t.setAccessible(true);
 
                         Object fromValue = f.get(from);
-
+                        
                         if (ignoreNull && fromValue == null) {
                         } else {
-                            t.set(to, fromValue);
+                            Type fGenericType = f.getGenericType();
+                            Type tGenericType = t.getGenericType();
+
+                            if (fGenericType == tGenericType) {
+                                t.set(to, fromValue);
+                            } else {
+                                L.e("操作字段名:" + tName + " 类型不匹配, From:" + fGenericType + " To:" + tGenericType);
+                            }
                         }
                     } catch (Exception e) {
-                        L.e("操作字段名:" + tName);
                         e.printStackTrace();
                     }
                     break;
