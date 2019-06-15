@@ -829,6 +829,7 @@ public abstract class RBaseAdapter<T> extends RecyclerView.Adapter<RBaseViewHold
         notifyItemRangeChanged(startPosition, getItemCount());
     }
 
+    @NonNull
     public List<T> getAllDatas() {
         if (this.mAllDatas == null) {
             this.mAllDatas = new ArrayList<>();
