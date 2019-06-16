@@ -9,6 +9,7 @@
 
     <android.support.v7.widget.AppCompatTextView
             android:id="@+id/text_view"
+            style="@style/BaseMainTextStyle"
             android:padding="@dimen/base_xhdpi"
             android:layout_width="match_parent"
             android:minHeight="@dimen/base_item_size"
