@@ -508,10 +508,19 @@ public fun CharSequence?.pattern(regexList: Iterable<String>, allowEmpty: Boolea
 
     var result = false
 
+// 有BUG的代码, if 条件永远不会为true, 虽然你已经给 result 赋值了true
+//    regexList.forEach {
+//        result = this.pattern(it, allowEmpty)
+//        if (result) {
+//            return@forEach
+//        }
+//    }
+
     regexList.forEach {
-        result = this.pattern(it, allowEmpty)
-        if (result) {
-            return result
+        //闭包外面声明的变量, 虽然已经修改了, 但是修改后的值, 不影响 if 条件判断
+        if (this.pattern(it, allowEmpty)) {
+            result = true
+            return@forEach
         }
     }
 
