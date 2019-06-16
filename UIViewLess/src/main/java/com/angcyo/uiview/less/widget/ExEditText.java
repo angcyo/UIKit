@@ -33,7 +33,6 @@ import android.widget.TextView;
 import com.angcyo.lib.Anim;
 import com.angcyo.lib.L;
 import com.angcyo.uiview.less.R;
-import com.angcyo.uiview.less.RApplication;
 import com.angcyo.uiview.less.kotlin.ExKt;
 import com.angcyo.uiview.less.kotlin.ViewExKt;
 import com.angcyo.uiview.less.resources.RAnimatorListener;
@@ -49,6 +48,8 @@ import java.util.Locale;
 import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static com.angcyo.uiview.less.resources.ResUtil.getColor;
 
 /**
  * Created by angcyo on 2016-11-20.
@@ -1841,7 +1842,7 @@ public class ExEditText extends AppCompatEditText {
         @Override
         public void updateDrawState(TextPaint ds) {
             //设置背景色
-            ds.bgColor = RApplication.getApp().getResources().getColor(R.color.theme_color_primary_dark_tran3);
+            ds.bgColor = getColor(R.color.theme_color_primary_dark_tran3);
             //设置前景色
             //ds.setColor(getResources().getColor(R.color.theme_color_accent));
         }
