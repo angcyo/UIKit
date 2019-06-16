@@ -511,7 +511,7 @@ public fun CharSequence?.pattern(regexList: Iterable<String>, allowEmpty: Boolea
     regexList.forEach {
         result = this.pattern(it, allowEmpty)
         if (result) {
-            return@forEach
+            return result
         }
     }
 
