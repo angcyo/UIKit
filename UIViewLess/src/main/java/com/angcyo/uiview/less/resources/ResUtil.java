@@ -485,7 +485,11 @@ public class ResUtil {
 //        int backgroundColor = array.getColor(0, 0xFF00FF);
 //        int textColor = array.getColor(1, 0xFF00FF);
 //        array.recycle();
-        return ContextCompat.getColor(context, getThemeIdentifier(context, name, "color"));
+        int identifier = getThemeIdentifier(context, name, "color");
+        if (identifier == 0) {
+            return Color.TRANSPARENT;
+        }
+        return ContextCompat.getColor(context, identifier);
     }
 
     public static float getThemeDimen(Context context, String name) {
@@ -495,12 +499,23 @@ public class ResUtil {
 
     public static String getThemeString(Context context, String name) {
         int id = getThemeIdentifier(context, name, "string");
+        if (id == 0) {
+            return "";
+        }
         return context.getResources().getString(id);
     }
 
     public static Drawable getThemeDrawable(Context context, String name) {
         int id = getThemeIdentifier(context, name, "drawable");
         return ContextCompat.getDrawable(context, id);
+    }
+
+    /**
+     * R.id.name  对应的资源值
+     */
+    public static int getThemeId(Context context, String name) {
+        int id = getThemeIdentifier(context, name, "id");
+        return id;
     }
 
     /**
