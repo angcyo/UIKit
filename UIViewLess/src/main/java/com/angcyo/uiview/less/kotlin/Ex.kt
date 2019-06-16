@@ -481,6 +481,13 @@ public fun CharSequence?.patternList(regex: String?): MutableList<String> {
 }
 
 public fun CharSequence?.pattern(regex: String?, allowEmpty: Boolean = true): Boolean {
+
+    if (TextUtils.isEmpty(this)) {
+        if (allowEmpty) {
+            return true
+        }
+    }
+
     if (this == null) {
         return false
     }
@@ -495,6 +502,12 @@ public fun CharSequence?.pattern(regex: String?, allowEmpty: Boolean = true): Bo
 }
 
 public fun CharSequence?.pattern(regexList: Iterable<String>, allowEmpty: Boolean = true): Boolean {
+    if (TextUtils.isEmpty(this)) {
+        if (allowEmpty) {
+            return true
+        }
+    }
+
     if (this == null) {
         return false
     }
