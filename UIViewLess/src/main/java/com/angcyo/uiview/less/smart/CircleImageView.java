@@ -41,7 +41,7 @@ public class CircleImageView extends android.support.v7.widget.AppCompatImageVie
     protected static final float SHADOW_RADIUS = 3.5f;
     protected static final int SHADOW_ELEVATION = 4;
 
-//    private Animation.AnimationListener mListener;
+    //    private Animation.AnimationListener mListener;
     int mShadowRadius;
 
     public CircleImageView(Context context, int color) {
@@ -54,7 +54,7 @@ public class CircleImageView extends android.support.v7.widget.AppCompatImageVie
         mShadowRadius = (int) (density * SHADOW_RADIUS);
 
         ShapeDrawable circle;
-        if (android.os.Build.VERSION.SDK_INT >= 21) {
+        if (Build.VERSION.SDK_INT >= 21) {
             circle = new ShapeDrawable(new OvalShape());
             thisView.setElevation(SHADOW_ELEVATION * density);
         } else {
@@ -71,7 +71,6 @@ public class CircleImageView extends android.support.v7.widget.AppCompatImageVie
         if (Build.VERSION.SDK_INT >= 16) {
             thisView.setBackground(circle);
         } else {
-            //noinspection deprecation
             thisView.setBackgroundDrawable(circle);
         }
     }
@@ -152,13 +151,13 @@ public class CircleImageView extends android.support.v7.widget.AppCompatImageVie
             final View thisView = CircleImageView.this;
             final int viewWidth = thisView.getWidth();
             final int viewHeight = thisView.getHeight();
-            canvas.drawCircle(viewWidth / 2, viewHeight / 2, viewWidth / 2, mShadowPaint);
-            canvas.drawCircle(viewWidth / 2, viewHeight / 2, viewWidth / 2 - mShadowRadius, paint);
+            canvas.drawCircle(viewWidth / 2f, viewHeight / 2f, viewWidth / 2f, mShadowPaint);
+            canvas.drawCircle(viewWidth / 2f, viewHeight / 2f, viewWidth / 2f - mShadowRadius, paint);
         }
 
         private void updateRadialGradient(int diameter) {
-            mRadialGradient = new RadialGradient(diameter / 2, diameter / 2,
-                    mShadowRadius, new int[] { FILL_SHADOW_COLOR, Color.TRANSPARENT },
+            mRadialGradient = new RadialGradient(diameter / 2f, diameter / 2f,
+                    mShadowRadius, new int[]{FILL_SHADOW_COLOR, Color.TRANSPARENT},
                     null, Shader.TileMode.CLAMP);
             mShadowPaint.setShader(mRadialGradient);
         }

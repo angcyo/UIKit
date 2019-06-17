@@ -108,9 +108,11 @@ public abstract class BaseRecyclerFragment<T> extends BaseLoadFragment
             //关闭内容跟随移动, 更像原生样式
             smartRefreshLayout.setEnableHeaderTranslationContent(false);
 
+            //加载更多使用 adapter 中的回调
+
             //ios的下拉刷新样式
             //smartRefreshLayout.setRefreshHeader(new ClassicsHeader(mAttachContext));
-            smartRefreshLayout.setRefreshFooter(new ClassicsFooter(mAttachContext));
+            //smartRefreshLayout.setRefreshFooter(new ClassicsFooter(mAttachContext));
         }
     }
 
