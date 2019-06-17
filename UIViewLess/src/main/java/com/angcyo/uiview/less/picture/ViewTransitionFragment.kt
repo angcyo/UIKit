@@ -19,7 +19,7 @@ import com.angcyo.uiview.less.widget.group.MatrixLayout
  * Copyright (c) 2019 ShenZhen O&M Cloud Co., Ltd. All rights reserved.
  */
 
-open class ViewTransitionFragment : BaseTransitionFragment() {
+open class ViewTransitionFragment : BaseTransitionFragment(), MatrixLayout.OnMatrixTouchListener {
 
     /**
      * 支持任意view的过渡效果
@@ -38,42 +38,7 @@ open class ViewTransitionFragment : BaseTransitionFragment() {
 
         previewView = viewHolder.v(R.id.base_preview_view)
 
-        viewHolder.v<MatrixLayout>(R.id.base_matrix_layout)
-            ?.setOnMatrixTouchListener(object : MatrixLayout.OnMatrixTouchListener {
-                override fun checkTouchEvent(matrixLayout: MatrixLayout): Boolean {
-                    return transitionConfig.checkMatrixTouchEvent(this@ViewTransitionFragment, matrixLayout)
-                }
-
-                override fun onMatrixChange(
-                    matrixLayout: MatrixLayout,
-                    matrix: Matrix,
-                    fromRect: RectF,
-                    toRect: RectF
-                ) {
-                    transitionConfig.onMatrixChange(
-                        this@ViewTransitionFragment,
-                        matrixLayout,
-                        matrix,
-                        fromRect,
-                        toRect
-                    )
-                }
-
-                override fun onTouchEnd(
-                    matrixLayout: MatrixLayout,
-                    matrix: Matrix,
-                    fromRect: RectF,
-                    toRect: RectF
-                ): Boolean {
-                    return transitionConfig.onMatrixTouchEnd(
-                        this@ViewTransitionFragment,
-                        matrixLayout,
-                        matrix,
-                        fromRect,
-                        toRect
-                    )
-                }
-            })
+        viewHolder.v<MatrixLayout>(R.id.base_matrix_layout)?.setOnMatrixTouchListener(this)
 
         transitionConfig.initFragmentView(this, viewHolder, arguments, savedInstanceState)
     }
@@ -126,4 +91,41 @@ open class ViewTransitionFragment : BaseTransitionFragment() {
         return argbEvaluator!!.evaluate(fraction, startValue, endValue)
     }
 
+    //<editor-fold desc="Matrix属性">
+
+    override fun checkTouchEvent(matrixLayout: MatrixLayout): Boolean {
+        return transitionConfig.checkMatrixTouchEvent(this@ViewTransitionFragment, matrixLayout)
+    }
+
+    override fun onMatrixChange(
+        matrixLayout: MatrixLayout,
+        matrix: Matrix,
+        fromRect: RectF,
+        toRect: RectF
+    ) {
+        transitionConfig.onMatrixChange(
+            this@ViewTransitionFragment,
+            matrixLayout,
+            matrix,
+            fromRect,
+            toRect
+        )
+    }
+
+    override fun onTouchEnd(
+        matrixLayout: MatrixLayout,
+        matrix: Matrix,
+        fromRect: RectF,
+        toRect: RectF
+    ): Boolean {
+        return transitionConfig.onMatrixTouchEnd(
+            this@ViewTransitionFragment,
+            matrixLayout,
+            matrix,
+            fromRect,
+            toRect
+        )
+    }
+
+    //</editor-fold desc="Matrix属性">
 }

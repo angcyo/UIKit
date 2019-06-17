@@ -281,29 +281,7 @@ open class ViewTransitionConfig {
      * */
     var checkMatrixTouchEvent: (fragment: ViewTransitionFragment, matrixLayout: MatrixLayout) -> Boolean =
         { fragment, _ ->
-            var result = true
-            if (fragment.isTransitionAnimEnd) {
-                if (fragment is PagerTransitionFragment) {
-                    result = getPagerCount(fragment, null) <= 0
-
-                    for (i in 0 until fragment.viewPager.childCount) {
-                        val childView = fragment.viewPager.getChildAt(i)
-
-                        if (childView != null) {
-                            if (fragment.viewPager.isViewIn(childView)) {
-                                val photoView: PhotoView? = childView.v(R.id.base_photo_view)
-
-                                result = (photoView != null && photoView.scale <= 1)
-
-                                break
-                            }
-                        }
-                    }
-                }
-            } else {
-                result = false
-            }
-            result
+            fragment.isTransitionAnimEnd
         }
 
     /**

@@ -20,6 +20,7 @@ object RPager {
     ) {
         FragmentHelper.build(fragmentManager)
             .noAnim()
+            .hideBeforeIndex(2)
             .showFragment(transitionFragment.apply {
                 transitionConfig.init()
             })
