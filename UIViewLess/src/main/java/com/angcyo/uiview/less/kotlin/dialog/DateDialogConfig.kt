@@ -77,7 +77,7 @@ open class DateDialogConfig : BaseDialogConfig() {
 
     init {
         positiveButtonListener = { dialog, _ ->
-            if (onDateSelectListener.invoke(dialog, WheelTime.dateFormat.parse(wheelTime!!.time))) {
+            if (wheelTime != null && onDateSelectListener.invoke(dialog, WheelTime.dateFormat.parse(wheelTime?.time))) {
             } else {
                 dialog.dismiss()
             }
@@ -90,8 +90,19 @@ open class DateDialogConfig : BaseDialogConfig() {
         initWheelTime(dialog, dialogViewHolder.view(R.id.time_picker))
     }
 
+    /**设置当前默认时间*/
     fun setDate(time: String, pattern: String) {
         date = getCalendar(time, pattern)
+    }
+
+    /**设置开始时间*/
+    fun setStartDate(time: String, pattern: String) {
+        startDate = getCalendar(time, pattern)
+    }
+
+    /**设置结束时间*/
+    fun setEntDate(time: String, pattern: String) {
+        endDate = getCalendar(time, pattern)
     }
 
     private var wheelTime: WheelTime? = null //自定义控件
@@ -180,7 +191,7 @@ open class DateDialogConfig : BaseDialogConfig() {
      * 设置可以选择的时间范围, 要在setTime之前调用才有效果
      */
     private fun setRangDate() {
-        wheelTime!!.setRangDate(startDate, endDate)
+        wheelTime?.setRangDate(startDate, endDate)
         initDefaultSelectedDate()
     }
 
