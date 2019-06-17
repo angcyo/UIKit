@@ -19,6 +19,12 @@ abstract class BaseDialogConfig {
     open var dialogLayoutId = R.layout.dialog_normal_layout
 
     var dialogCancel = true
+        set(value) {
+            field = value
+            if (!value) {
+                dialogCanceledOnTouchOutside = false
+            }
+        }
 
     var dialogCanceledOnTouchOutside = true
 

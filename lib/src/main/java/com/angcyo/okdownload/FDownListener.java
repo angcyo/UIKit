@@ -13,6 +13,7 @@ import java.util.UUID;
 public class FDownListener {
 
     String uuid;
+    String url;
 
     /**
      * 当任务end之后, 移除listener
@@ -25,8 +26,21 @@ public class FDownListener {
     }
 
     public FDownListener(boolean removeOnTaskEnd) {
+        this(null, removeOnTaskEnd);
+    }
+
+    public FDownListener(String url, boolean removeOnTaskEnd) {
         uuid = UUID.randomUUID().toString();
         this.removeOnTaskEnd = removeOnTaskEnd;
+        this.url = url;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     public boolean isRemoveOnTaskEnd() {

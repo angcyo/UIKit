@@ -107,6 +107,27 @@ public class FDown {
         listeners.add(listener);
     }
 
+    /**
+     * 根据url, 拿到已经设置过的listener, 如果有
+     */
+    @Nullable
+    public static FDownListener getListener(String url) {
+        FDownListener result = null;
+        if (url == null) {
+            return result;
+        }
+        CopyOnWriteArraySet<FDownListener> listeners = HostListener.instance().mapListener.get(url);
+        if (listeners != null) {
+            for (FDownListener listener : listeners) {
+                if (TextUtils.equals(url, listener.url)) {
+                    result = listener;
+                    break;
+                }
+            }
+        }
+        return result;
+    }
+
     public static void removeListener(String url, FDownListener listener) {
         if (listener == null || url == null) {
             return;
@@ -545,8 +566,12 @@ public class FDown {
                                    long totalOffset /*当前下载量*/,
                                    int percent /*百分比*/,
                                    long increaseBytes /*本次下载量, 速度的意思*/) {
-            notifyTaskProgress(allListener, task, totalLength, totalOffset, percent, increaseBytes);
-            notifyTaskProgress(mapListener.get(task.getUrl()), task, totalLength, totalOffset, percent, increaseBytes);
+            if (isCompleted(task)) {
+                //如果已经完成了, 不通知进度回调
+            } else {
+                notifyTaskProgress(allListener, task, totalLength, totalOffset, percent, increaseBytes);
+                notifyTaskProgress(mapListener.get(task.getUrl()), task, totalLength, totalOffset, percent, increaseBytes);
+            }
         }
 
         protected void notifyTaskProgress(CopyOnWriteArraySet<FDownListener> listeners, @NonNull DownloadTask task,

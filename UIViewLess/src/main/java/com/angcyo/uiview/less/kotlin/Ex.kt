@@ -15,8 +15,10 @@ import com.angcyo.http.Http
 import com.angcyo.http.Json
 import com.angcyo.uiview.less.resources.ResUtil
 import com.angcyo.uiview.less.skin.SkinHelper
+import com.angcyo.uiview.less.utils.H5
 import com.angcyo.uiview.less.utils.RUtils
 import com.angcyo.uiview.less.utils.Reflect
+import com.angcyo.uiview.less.utils.utilcode.utils.EncodeUtils
 import com.angcyo.uiview.less.utils.utilcode.utils.FileUtils
 import okhttp3.ResponseBody
 import java.io.ByteArrayOutputStream
@@ -588,4 +590,20 @@ public fun Int.alpha(alpha: Int): Int {
 
 public fun Int.alpha(alpha: Float): Int {
     return alpha(alpha.toInt())
+}
+
+/**删除html元素*/
+public fun String?.delHTMLTag(): String {
+    if (TextUtils.isEmpty(this)) {
+        return ""
+    }
+    return H5.delHTMLTag(this)
+}
+
+/**将html格式文本, 转成span*/
+public fun String?.fromHtml(): CharSequence {
+    if (TextUtils.isEmpty(this)) {
+        return ""
+    }
+    return EncodeUtils.htmlDecode(this)
 }
