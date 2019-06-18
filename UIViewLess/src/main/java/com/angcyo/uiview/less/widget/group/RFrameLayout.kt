@@ -104,7 +104,7 @@ open class RFrameLayout(context: Context, attributeSet: AttributeSet? = null) : 
 
         rBackgroundDrawable = typedArray.getDrawable(R.styleable.RFrameLayout_r_background)
         resetMaxHeight(typedArray.getDimension(R.styleable.RFrameLayout_r_max_height, 0f))
-        maxHeight = typedArray.getDimension(R.styleable.RFrameLayout_r_max_height, maxHeight.toFloat()).toInt()
+        //maxHeight = typedArray.getDimension(R.styleable.RFrameLayout_r_max_height, maxHeight.toFloat()).toInt()
 
         mDrawLine = RDrawLine(this, attributeSet)
 

@@ -5,6 +5,7 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.os.Build;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -21,14 +22,13 @@ import android.widget.LinearLayout;
 import android.widget.OverScroller;
 import com.angcyo.lib.L;
 import com.angcyo.uiview.less.R;
-import com.angcyo.uiview.less.RApplication;
 import com.angcyo.uiview.less.draw.RDrawIndicator;
 import com.angcyo.uiview.less.kotlin.ViewExKt;
 import com.angcyo.uiview.less.recycler.adapter.RBaseAdapter;
 import com.angcyo.uiview.less.resources.AnimUtil;
 import com.angcyo.uiview.less.skin.SkinHelper;
+import com.angcyo.uiview.less.utils.RUtils;
 import com.angcyo.uiview.less.utils.Reflect;
-import com.angcyo.uiview.less.utils.ScreenUtil;
 import com.angcyo.uiview.less.utils.UI;
 import com.angcyo.uiview.less.widget.CanScrollUpCallBack;
 
@@ -168,6 +168,17 @@ public class RRecyclerView extends RecyclerView implements CanScrollUpCallBack {
     private OnSizeChangedListener mOnSizeChangedListener;
     private OnTouchScrollListener mOnTouchScrollListener;
 
+    /**
+     * 允许的最大高度, 如果为-2px,那么就是屏幕高度的一半, 如果是-3px,那么就是屏幕高度的三分之, 以此内推, 0不处理
+     * 如果是负数,就是屏幕的倍数.
+     * 如果是正数,就是确确的值
+     */
+    private float maxHeight = 0f;
+    /**
+     * 最大高度参考值, 是否是相对于 parent的高度, 默认是相对于屏幕的高度
+     */
+    private boolean isMaxHeightRelativeParent = false;
+
     public RRecyclerView(Context context) {
         this(context, null);
     }
@@ -198,13 +209,16 @@ public class RRecyclerView extends RecyclerView implements CanScrollUpCallBack {
             resetLayoutManager(context, layoutMatch);
         }
 
+        maxHeight = typedArray.getDimension(R.styleable.RRecyclerView_r_max_height, 0f);
+        isMaxHeightRelativeParent = typedArray.getBoolean(R.styleable.RRecyclerView_r_is_max_height_relative_parent, isMaxHeightRelativeParent);
+
         typedArray.recycle();
 
         initView(context);
     }
 
     public static void ensureGlow(RecyclerView recyclerView, int color) {
-        if (!RApplication.isLollipop()) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
             if (recyclerView != null) {
                 recyclerView.setOverScrollMode(OVER_SCROLL_NEVER);
             }
@@ -314,11 +328,33 @@ public class RRecyclerView extends RecyclerView implements CanScrollUpCallBack {
         this.setLayoutManager(mBaseLayoutManager);
     }
 
+
+    public void setMaxHeight(float height) {
+        maxHeight = height;
+        requestLayout();
+    }
+
     //----------------end--------------------//
 
     @Override
     protected void onMeasure(int widthSpec, int heightSpec) {
-        super.onMeasure(widthSpec, heightSpec);
+        if (maxHeight != 0) {
+            int maxMeasureHeight;
+            if (maxHeight < 0) {
+                float num = Math.abs(maxHeight);
+                if (isMaxHeightRelativeParent) {
+                    maxMeasureHeight = (int) (MeasureSpec.getSize(heightSpec) * num);
+                } else {
+                    maxMeasureHeight = (int) (RUtils.getScreenHeight() * num);
+                }
+            } else {
+                maxMeasureHeight = (int) maxHeight;
+            }
+            super.onMeasure(widthSpec, MeasureSpec.makeMeasureSpec(maxMeasureHeight, MeasureSpec.AT_MOST));
+        } else {
+            super.onMeasure(widthSpec, heightSpec);
+        }
+
         if (TextUtils.equals("aequilate", getContentDescription()) || equWidth) {
             /**自动设置等宽的RecyclerView*/
             setMeasuredDimension(getMeasuredWidth(), Math.min(getMeasuredWidth(), getMeasuredHeight()));
@@ -486,7 +522,7 @@ public class RRecyclerView extends RecyclerView implements CanScrollUpCallBack {
             if (actionMasked == MotionEvent.ACTION_UP) {
 
                 long eventTime = ev.getEventTime();
-                int dv = (int) (10 * ScreenUtil.density());
+                int dv = (int) (10 * RUtils.density());
 
                 float x = ev.getX();
                 float y = ev.getY();
