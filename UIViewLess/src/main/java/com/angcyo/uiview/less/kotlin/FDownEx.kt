@@ -14,6 +14,7 @@ import com.liulishuo.okdownload.DownloadTask
  */
 
 public fun String?.down(
+    useNewListener: Boolean = false,
     onTaskStart: (task: DownloadTask) -> Unit = {},
     onTaskProgress: (
         task: DownloadTask,
@@ -28,7 +29,9 @@ public fun String?.down(
         return
     }
 
-    val listener = FDown.getListener(this) ?: object : FDownListener() {
+    val oldListener = if (useNewListener) null else FDown.getListener(this)
+
+    val listener = oldListener ?: object : FDownListener() {
 
         override fun onTaskStart(task: DownloadTask) {
             super.onTaskStart(task)
