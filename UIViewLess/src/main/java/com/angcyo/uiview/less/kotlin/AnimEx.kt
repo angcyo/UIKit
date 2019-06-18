@@ -5,6 +5,7 @@ import android.animation.ValueAnimator
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.DecelerateInterpolator
+import android.view.animation.Interpolator
 import android.view.animation.ScaleAnimation
 import com.angcyo.uiview.less.resources.RAnimatorListener
 import com.angcyo.uiview.less.resources.RAnimtionListener
@@ -38,13 +39,23 @@ fun View.animWidth(widthFrom: Int, widthTo: Int, end: () -> Unit = {}): Animator
     return animator
 }
 
-fun View.animScale(from: Float, to: Float, end: () -> Unit = {}): Animation {
+fun View.animScale(
+    from: Float,
+    to: Float,
+    pivotXValue: Float = 0.5f,
+    pivotYValue: Float = 0.5f,
+    pivotXType: Int = Animation.RELATIVE_TO_SELF,
+    pivotYTyp: Int = Animation.RELATIVE_TO_SELF,
+    interpolator: Interpolator = DecelerateInterpolator(),
+    duration: Long = 300,
+    end: () -> Unit = {}
+): Animation {
     val animation = ScaleAnimation(
         from, to, from, to,
-        Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f
+        pivotXType, pivotXValue, pivotYTyp, pivotYValue
     )
-    animation.duration = 300
-    animation.interpolator = DecelerateInterpolator()
+    animation.duration = duration
+    animation.interpolator = interpolator
     animation.setAnimationListener(object : RAnimtionListener() {
         override fun onAnimationEnd(animation: Animation?) {
             super.onAnimationEnd(animation)
