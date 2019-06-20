@@ -12,7 +12,6 @@ if (rootProject.hasProperty("allGradle")) {
     apply from: '../lib/lib_base.gradle'
 }
 
-apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 
 def _S_VER = rootProject.hasProperty("S_VER") ? rootProject.ext.S_VER : '27.1.1'
