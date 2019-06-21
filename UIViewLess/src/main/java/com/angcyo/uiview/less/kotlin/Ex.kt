@@ -27,6 +27,7 @@ import java.io.FileOutputStream
 import java.net.URLDecoder
 import java.net.URLEncoder
 import java.nio.charset.Charset
+import java.util.*
 import java.util.regex.Pattern
 import kotlin.random.Random
 
@@ -606,4 +607,8 @@ public fun String?.fromHtml(): CharSequence {
         return ""
     }
     return EncodeUtils.htmlDecode(this)
+}
+
+public fun uuid(): String {
+    return UUID.randomUUID().toString()
 }
