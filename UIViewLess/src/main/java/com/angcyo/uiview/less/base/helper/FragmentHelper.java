@@ -140,6 +140,44 @@ public class FragmentHelper {
     }
 
     /**
+     * 移除已存在Fragment, 恢复目标
+     */
+    public static List<Fragment> restoreOnlyShow(@NonNull Context context,
+                                                 @NonNull FragmentManager fragmentManager,
+                                                 @IdRes int layoutId,
+                                                 Class<? extends Fragment>... cls) {
+        List<Fragment> oldFragmentList = getFragmentList(fragmentManager, layoutId);
+        List<Fragment> fragmentList = restore(context, fragmentManager, cls);
+        FragmentTransaction fragmentTransaction = null;
+
+        for (Fragment fragment : oldFragmentList) {
+            if (fragmentList.contains(fragment)) {
+                continue;
+            }
+            //需要移除的Fragment
+            if (fragmentTransaction == null) {
+                fragmentTransaction = fragmentManager.beginTransaction();
+            }
+
+            fragmentTransaction.remove(fragment);
+        }
+
+        for (Fragment fragment : fragmentList) {
+            if (fragment != null && !fragment.isAdded()) {
+                if (fragmentTransaction == null) {
+                    fragmentTransaction = fragmentManager.beginTransaction();
+                }
+                fragmentTransaction.add(layoutId, fragment, fragment.getClass().getSimpleName());
+            }
+        }
+
+        if (fragmentTransaction != null) {
+            fragmentTransaction.commitNow();
+        }
+        return fragmentList;
+    }
+
+    /**
      * 移除已存在
      * 重新创建所有Fragment
      * 用于屏幕方向改变后, 切换布局等

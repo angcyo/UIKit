@@ -37,6 +37,9 @@ open class DslAdapterItem {
     /**附加的数据*/
     var itemData: Any? = null
 
+    /**唯一标识此item的值*/
+    var itemTag: String? = null
+
     /**界面绑定*/
     open var itemBind: (itemHolder: RBaseViewHolder, itemPosition: Int, adapterItem: DslAdapterItem) -> Unit =
         { _, _, _ -> }

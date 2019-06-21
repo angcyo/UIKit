@@ -4,6 +4,7 @@ import android.support.v7.widget.DefaultItemAnimator
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.SimpleItemAnimator
+import android.text.TextUtils
 import android.view.View
 import com.angcyo.uiview.less.R
 import com.angcyo.uiview.less.kotlin.dsl.DslRecyclerScroll
@@ -305,4 +306,18 @@ public fun RecyclerView.eachDslAdapterItem(callback: (index: Int, dslItem: DslAd
 
 public fun RecyclerView.findViewHolder(position: Int): RBaseViewHolder? {
     return findViewHolderForAdapterPosition(position) as? RBaseViewHolder
+}
+
+/**
+ * 通过Tag, 刷新指定Item
+ */
+public fun DslAdapter?.notifyItemChangedByTag(tag: String?) {
+    this?.apply {
+        allDatas.forEachIndexed { index, dslAdapterItem ->
+            if (TextUtils.equals(dslAdapterItem.itemTag, tag)) {
+                notifyItemChanged(index)
+                return@forEachIndexed
+            }
+        }
+    }
 }

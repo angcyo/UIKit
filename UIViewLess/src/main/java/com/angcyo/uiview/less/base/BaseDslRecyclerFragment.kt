@@ -1,6 +1,7 @@
 package com.angcyo.uiview.less.base
 
 import android.os.Bundle
+import com.angcyo.uiview.less.kotlin.notifyItemChangedByTag
 import com.angcyo.uiview.less.recycler.DslItemDecoration
 import com.angcyo.uiview.less.recycler.HoverItemDecoration
 import com.angcyo.uiview.less.recycler.RBaseViewHolder
@@ -19,8 +20,8 @@ import com.angcyo.uiview.less.recycler.adapter.RBaseAdapter
  */
 
 open class BaseDslRecyclerFragment : BaseRecyclerFragment<DslAdapterItem>() {
-    val hoverItemDecoration = HoverItemDecoration()
-    val baseDslItemDecoration = DslItemDecoration()
+    var hoverItemDecoration = HoverItemDecoration()
+    var baseDslItemDecoration = DslItemDecoration()
 
     override fun onCreateAdapter(datas: MutableList<DslAdapterItem>?): RBaseAdapter<DslAdapterItem> {
         return DslAdapter(mAttachContext, datas).apply {
@@ -59,5 +60,18 @@ open class BaseDslRecyclerFragment : BaseRecyclerFragment<DslAdapterItem>() {
 
     override fun onUIDelayLoadData() {
         super.onUIDelayLoadData()
+    }
+
+    /**通过[DslAdapter]渲染界面*/
+    open fun renderDslAdapter(render: DslAdapter.() -> Unit) {
+        baseDslAdapter?.render()
+    }
+
+
+    /**
+     * 通过Tag, 刷新指定Item
+     */
+    open fun notifyItemChangedByTag(tag: String?) {
+        baseDslAdapter?.notifyItemChangedByTag(tag)
     }
 }
