@@ -66,8 +66,7 @@ open class BaseDslRecyclerFragment : BaseRecyclerFragment<DslAdapterItem>() {
     open fun renderDslAdapter(render: DslAdapter.() -> Unit) {
         baseDslAdapter?.render()
     }
-
-
+    
     /**
      * 通过Tag, 刷新指定Item
      */
