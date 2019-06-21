@@ -17,6 +17,8 @@ import com.angcyo.uiview.less.base.helper.FragmentHelper;
 import com.angcyo.uiview.less.recycler.RBaseViewHolder;
 import com.angcyo.uiview.less.utils.RUtils;
 import com.angcyo.uiview.less.widget.group.RSoftInputLayout;
+import kotlinx.coroutines.CoroutineScope;
+import kotlinx.coroutines.CoroutineScopeKt;
 import rx.Subscription;
 import rx.observers.SafeSubscriber;
 import rx.subscriptions.CompositeSubscription;
@@ -27,34 +29,6 @@ import rx.subscriptions.CompositeSubscription;
  * 生命周期的封装, 只需要关注 {@link #onFragmentShow(Bundle)} 和 {@link #onFragmentHide()}
  */
 public abstract class BaseFragment extends AbsLifeCycleFragment {
-
-    protected CompositeSubscription mSubscriptions = new CompositeSubscription();
-
-    public static void addSubscription(CompositeSubscription subscriptions, Subscription subscription,
-                                       boolean checkToken, Runnable onCancel) {
-        if (subscription == null) {
-            return;
-        }
-        if (subscriptions != null) {
-            subscriptions.add(subscription);
-        }
-        if (RUtils.isNoNet()) {
-            //取消网络请求
-            if (onCancel != null) {
-                onCancel.run();
-            }
-            try {
-                if (subscription instanceof SafeSubscriber) {
-                    if (((SafeSubscriber) subscription).getActual() instanceof HttpSubscriber) {
-                        ((SafeSubscriber) subscription).getActual().onError(new NonetException());
-                        ((SafeSubscriber) subscription).getActual().unsubscribe();
-                    }
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
 
     /**
      * onCreateAnimation -> onCreateAnimator
@@ -130,7 +104,26 @@ public abstract class BaseFragment extends AbsLifeCycleFragment {
         }
     }
 
-    //<editor-fold defaultstate="collapsed" desc="网络请求管理">
+    @Override
+    public void onFragmentFirstShow(@Nullable Bundle bundle) {
+        super.onFragmentFirstShow(bundle);
+        if (baseViewHolder != null) {
+            View focus = baseViewHolder.itemView.findFocus();
+
+            if (focus instanceof EditText) {
+
+            } else {
+                hideSoftInput();
+            }
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        onCancelSubscriptions();
+        onCancelCoroutine();
+    }
 
     /**
      * 隐藏键盘
@@ -163,12 +156,7 @@ public abstract class BaseFragment extends AbsLifeCycleFragment {
     }
 
     public void backFragment(boolean checkBackPress, boolean defaultAnim) {
-        FragmentManager fragmentManager = requireFragmentManager();
-//        if (getParentFragment() == null) {
-//            fragmentManager = requireFragmentManager();
-//        } else {
-//            fragmentManager = getChildFragmentManager();
-//        }
+        FragmentManager fragmentManager = getFragmentManager();
 
         FragmentHelper.Builder builder = FragmentHelper.build(fragmentManager)
                 .parentLayoutId(this)
@@ -183,24 +171,34 @@ public abstract class BaseFragment extends AbsLifeCycleFragment {
         builder.back(getActivity());
     }
 
-    @Override
-    public void onFragmentFirstShow(@Nullable Bundle bundle) {
-        super.onFragmentFirstShow(bundle);
-        if (baseViewHolder != null) {
-            View focus = baseViewHolder.itemView.findFocus();
+    //<editor-fold defaultstate="collapsed" desc="网络请求管理">
 
-            if (focus instanceof EditText) {
+    protected CompositeSubscription mSubscriptions = new CompositeSubscription();
 
-            } else {
-                hideSoftInput();
+    public static void addSubscription(CompositeSubscription subscriptions, Subscription subscription,
+                                       boolean checkToken, Runnable onCancel) {
+        if (subscription == null) {
+            return;
+        }
+        if (subscriptions != null) {
+            subscriptions.add(subscription);
+        }
+        if (RUtils.isNoNet()) {
+            //取消网络请求
+            if (onCancel != null) {
+                onCancel.run();
+            }
+            try {
+                if (subscription instanceof SafeSubscriber) {
+                    if (((SafeSubscriber) subscription).getActual() instanceof HttpSubscriber) {
+                        ((SafeSubscriber) subscription).getActual().onError(new NonetException());
+                        ((SafeSubscriber) subscription).getActual().unsubscribe();
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        onCancelSubscriptions();
     }
 
     public void onCancelSubscriptions() {
@@ -227,4 +225,29 @@ public abstract class BaseFragment extends AbsLifeCycleFragment {
 
     //</editor-fold">
 
+    //<editor-fold defaultstate="collapsed" desc="协程 相关">
+
+    /**
+     * 主线程的协程作用域
+     */
+    protected CoroutineScope baseMainScope;
+
+    @NonNull
+    public CoroutineScope getBaseMainScope() {
+        if (baseMainScope == null || !CoroutineScopeKt.isActive(baseMainScope)) {
+            baseMainScope = CoroutineScopeKt.MainScope();
+        }
+        return baseMainScope;
+    }
+
+    /**
+     * 取消协程作用域中的所有协程
+     */
+    public void onCancelCoroutine() {
+        if (baseMainScope != null) {
+            CoroutineScopeKt.cancel(baseMainScope, null);
+        }
+    }
+
+    //</editor-fold">
 }
