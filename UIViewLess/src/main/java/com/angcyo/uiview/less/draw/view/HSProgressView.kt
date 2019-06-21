@@ -24,7 +24,7 @@ class HSProgressView(context: Context, attributeSet: AttributeSet? = null) :
         if (valueAnimator == null) {
             valueAnimator = ValueAnimator.ofInt(1, 100).apply {
                 interpolator = LinearInterpolator()
-                duration = 1300
+                duration = 1400
                 repeatMode = ValueAnimator.RESTART
                 repeatCount = ValueAnimator.INFINITE
                 addUpdateListener { animation ->

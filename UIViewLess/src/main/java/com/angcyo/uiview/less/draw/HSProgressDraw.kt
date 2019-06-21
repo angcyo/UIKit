@@ -7,6 +7,7 @@ import android.view.View
 import android.view.animation.DecelerateInterpolator
 import com.angcyo.uiview.less.R
 import com.angcyo.uiview.less.kotlin.alpha
+import com.angcyo.uiview.less.kotlin.dp
 import com.angcyo.uiview.less.kotlin.set
 
 /**
@@ -23,12 +24,20 @@ class HSProgressDraw(view: View) : RSectionDraw(view) {
         setInterpolatorList(DecelerateInterpolator(), DecelerateInterpolator())
     }
 
+    /**进度颜色*/
     var progressColor = Color.WHITE
+
+    /**圆角大小*/
+    var roundSize = 5 * dp
 
     override fun initAttribute(attr: AttributeSet?) {
         super.initAttribute(attr)
         val typedArray = obtainStyledAttributes(attr, R.styleable.HSProgressDraw)
         progressColor = typedArray.getColor(R.styleable.HSProgressDraw_r_progress_color, progressColor)
+        roundSize = typedArray.getDimensionPixelOffset(
+            R.styleable.HSProgressDraw_r_progress_round_size,
+            roundSize.toInt()
+        ).toFloat()
         typedArray.recycle()
 
         if (isInEditMode) {
@@ -62,7 +71,7 @@ class HSProgressDraw(view: View) : RSectionDraw(view) {
                 viewHeight - paddingBottom
             )
         }
-        canvas.drawRect(mDrawRectF, mBasePaint)
+        canvas.drawRoundRect(mDrawRectF, roundSize, roundSize, mBasePaint)
     }
 
 }
