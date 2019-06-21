@@ -178,9 +178,7 @@
         <item name="android:paddingRight">6dp</item>
     </style>
 
-    <style name="BaseSkinButtonNoPaddingStyle">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
+    <style name="BaseSkinButtonNoPaddingStyle" parent="BaseMainTextStyle">
         <item name="android:gravity">center</item>
         <item name="android:clickable">true</item>
         <item name="android:paddingTop">1dp</item>
@@ -188,7 +186,7 @@
         <item name="android:paddingLeft">2dp</item>
         <item name="android:paddingRight">2dp</item>
         <item name="android:textColor">@color/base_white</item>
-        <item name="android:textSize">@dimen/default_text_size</item>
+        <item name="r_button_style">ROUND_GRADIENT_RECT</item>
     </style>
 
     <!--标准的Item Info 样式-->

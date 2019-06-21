@@ -67,7 +67,7 @@ public class Button extends RTextView {
 
     public Button(Context context, AttributeSet attrs) {
         super(context, attrs, R.attr.defaultButtonStyle);
-        TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.Button);
+        TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.Button, R.attr.defaultButtonStyle, 0);
         mButtonStyle = typedArray.getInt(R.styleable.Button_r_button_style, DEFAULT);
 
         //typedArray.getDimensionPixelOffset(com.android.in)
@@ -93,17 +93,17 @@ public class Button extends RTextView {
             gradientEndColor = SkinHelper.getSkin().getThemeColorPrimaryDark();
         }
 
-        rippleColor = typedArray.getInt(R.styleable.Button_r_button_ripple_color, Color.WHITE);
+        rippleColor = typedArray.getColor(R.styleable.Button_r_button_ripple_color, Color.WHITE);
 
-        themeColor = typedArray.getInt(R.styleable.Button_r_button_theme_color, themeColor);
-        themeDarkColor = typedArray.getInt(R.styleable.Button_r_button_theme_dark_color, themeDarkColor);
-        disableColor = typedArray.getInt(R.styleable.Button_r_button_disable_color, disableColor);
+        themeColor = typedArray.getColor(R.styleable.Button_r_button_theme_color, themeColor);
+        themeDarkColor = typedArray.getColor(R.styleable.Button_r_button_theme_dark_color, themeDarkColor);
+        disableColor = typedArray.getColor(R.styleable.Button_r_button_disable_color, disableColor);
 
         borderWidth = typedArray.getDimensionPixelOffset(R.styleable.Button_r_button_border_width, (int) (1 * density()));
         roundRadii = typedArray.getDimensionPixelOffset(R.styleable.Button_r_button_round_radii, defaultValue);
 
-        gradientStartColor = typedArray.getInt(R.styleable.Button_r_gradient_start_color, gradientStartColor);
-        gradientEndColor = typedArray.getInt(R.styleable.Button_r_gradient_end_color, gradientEndColor);
+        gradientStartColor = typedArray.getColor(R.styleable.Button_r_gradient_start_color, gradientStartColor);
+        gradientEndColor = typedArray.getColor(R.styleable.Button_r_gradient_end_color, gradientEndColor);
 
         typedArray.recycle();
 

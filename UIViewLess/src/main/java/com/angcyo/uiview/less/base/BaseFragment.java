@@ -13,6 +13,7 @@ import android.view.animation.Animation;
 import android.widget.EditText;
 import com.angcyo.http.HttpSubscriber;
 import com.angcyo.http.NonetException;
+import com.angcyo.uiview.less.R;
 import com.angcyo.uiview.less.base.helper.FragmentHelper;
 import com.angcyo.uiview.less.recycler.RBaseViewHolder;
 import com.angcyo.uiview.less.utils.RUtils;
@@ -81,6 +82,8 @@ public abstract class BaseFragment extends AbsLifeCycleFragment {
         if (interceptRootTouchEvent()) {
             viewHolder.itemView.setClickable(true);
         }
+
+        enableFragmentSoftInputLayout(false);
     }
 
     /**
@@ -247,6 +250,43 @@ public abstract class BaseFragment extends AbsLifeCycleFragment {
         if (baseMainScope != null) {
             CoroutineScopeKt.cancel(baseMainScope, null);
         }
+    }
+
+    //</editor-fold">
+
+    //<editor-fold defaultstate="collapsed" desc="软键盘 相关处理">
+
+    @Nullable
+    protected RSoftInputLayout getFragmentSoftInputLayout() {
+        RSoftInputLayout result = null;
+        if (baseViewHolder != null) {
+            result = baseViewHolder.v(R.id.base_soft_input_layout);
+        }
+        return result;
+    }
+
+    /**
+     * 激活 or 进制 软键盘的处理
+     */
+    public void enableFragmentSoftInputLayout(boolean enable) {
+        RSoftInputLayout fragmentSoftInputLayout = getFragmentSoftInputLayout();
+        if (fragmentSoftInputLayout != null) {
+            fragmentSoftInputLayout.setEnableSoftInput(enable);
+        }
+    }
+
+    @Override
+    public void onFragmentShow(@Nullable Bundle bundle) {
+        super.onFragmentShow(bundle);
+
+        enableFragmentSoftInputLayout(true);
+    }
+
+    @Override
+    public void onFragmentHide() {
+        super.onFragmentHide();
+
+        enableFragmentSoftInputLayout(false);
     }
 
     //</editor-fold">
