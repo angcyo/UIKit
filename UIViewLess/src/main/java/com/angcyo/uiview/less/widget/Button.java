@@ -81,16 +81,10 @@ public class Button extends RTextView {
             themeColor = ViewExKt.getColor(this, R.color.theme_color_accent);
             themeDarkColor = ViewExKt.getColor(this, R.color.theme_color_primary_dark);
             disableColor = Color.GRAY;
-
-            gradientStartColor = ViewExKt.getColor(this, R.color.theme_color_primary);
-            gradientEndColor = ViewExKt.getColor(this, R.color.theme_color_primary_dark);
         } else {
             themeColor = SkinHelper.getSkin().getThemeSubColor();
             themeDarkColor = SkinHelper.getSkin().getThemeDarkColor();
             disableColor = ContextCompat.getColor(getContext(), R.color.base_color_disable);
-
-            gradientStartColor = SkinHelper.getSkin().getThemeColorPrimary();
-            gradientEndColor = SkinHelper.getSkin().getThemeColorPrimaryDark();
         }
 
         rippleColor = typedArray.getColor(R.styleable.Button_r_button_ripple_color, Color.WHITE);
@@ -101,6 +95,9 @@ public class Button extends RTextView {
 
         borderWidth = typedArray.getDimensionPixelOffset(R.styleable.Button_r_button_border_width, (int) (1 * density()));
         roundRadii = typedArray.getDimensionPixelOffset(R.styleable.Button_r_button_round_radii, defaultValue);
+
+        gradientStartColor = themeColor;
+        gradientEndColor = themeDarkColor;
 
         gradientStartColor = typedArray.getColor(R.styleable.Button_r_gradient_start_color, gradientStartColor);
         gradientEndColor = typedArray.getColor(R.styleable.Button_r_gradient_end_color, gradientEndColor);
