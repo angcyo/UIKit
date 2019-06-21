@@ -622,7 +622,7 @@ public class FragmentHelper {
          * <p>
          * 这个值需要 >=1 才会生效
          */
-        int hideBeforeIndex = -1;
+        int hideBeforeIndex = 2;
 
         /**
          * commit()  or  commitAllowingStateLoss()
