@@ -3,6 +3,7 @@ package com.angcyo.uiview.less.kotlin
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.view.View
+import com.angcyo.lib.L
 import com.angcyo.uiview.less.R
 import com.angcyo.uiview.less.base.BaseFragment
 import com.angcyo.uiview.less.base.BaseTitleFragment
@@ -10,6 +11,8 @@ import com.angcyo.uiview.less.base.helper.FragmentHelper
 import com.angcyo.uiview.less.base.helper.TitleItemHelper
 import com.angcyo.uiview.less.utils.TopToast
 import com.angcyo.uiview.less.widget.ImageTextView
+import com.luck.picture.lib.rxbus2.RxBus
+import kotlinx.coroutines.*
 
 /**
  *
@@ -115,4 +118,44 @@ public fun BaseTitleFragment.appendLeftrItem(text: String, click: (View) -> Unit
     val item = createItem(text, click)
     leftControl().addView(item)
     return item
+}
+
+/**RxBus*/
+public fun <T> T.busRegister() {
+    if (!RxBus.getDefault().isRegistered(this)) {
+        RxBus.getDefault().register(this)
+    }
+}
+
+/**RxBus*/
+public fun <T> T.busUnRegister() {
+    if (RxBus.getDefault().isRegistered(this)) {
+        RxBus.getDefault().unregister(this)
+    }
+}
+
+/**RxBus*/
+public fun <T> T.busPost() {
+    RxBus.getDefault().post(this)
+}
+
+/**异常捕获处理*/
+public val BaseFragment.coroutineExceptionHandler by lazy {
+    CoroutineExceptionHandler { coroutineContext, throwable ->
+        L.e("协程异常处理:$coroutineContext ${throwable.message}")
+        throwable.printStackTrace()
+    }
+}
+
+/**单一请求, 单一返回处理*/
+public fun <T> BaseFragment.load(
+    loader: suspend CoroutineScope.() -> T,
+    receiver: suspend CoroutineScope.(T) -> Unit
+): Job {
+    return baseMainScope.launch(Dispatchers.Main + coroutineExceptionHandler) {
+        val deferred = async(Dispatchers.IO + coroutineExceptionHandler) {
+            loader()
+        }
+        receiver(deferred.await())
+    }
 }
