@@ -23,6 +23,7 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.TextView;
 import com.angcyo.uiview.less.R;
 import com.angcyo.uiview.less.draw.RDrawNoRead;
+import com.angcyo.uiview.less.draw.TextDraw;
 import com.angcyo.uiview.less.kotlin.ExKt;
 import com.angcyo.uiview.less.kotlin.ViewExKt;
 import com.angcyo.uiview.less.skin.SkinHelper;
@@ -144,6 +145,8 @@ public class RTextView extends AppCompatTextView {
     private long scrollLoopCount = 0;
     private OnScrollTextLoopListener onScrollTextLoopListener;
 
+    TextDraw textDraw;
+
     public RTextView(Context context) {
         this(context, null);
     }
@@ -245,6 +248,8 @@ public class RTextView extends AppCompatTextView {
             //暂时不替换
             setMaxLength(maxLength, true);
         }
+
+        textDraw = new TextDraw(this);
 
         typedArray.recycle();
 
@@ -537,6 +542,8 @@ public class RTextView extends AppCompatTextView {
             centerSaveCount = canvas.save();
             float dx = (textLeftDrawable.getIntrinsicWidth() + getCompoundDrawablePadding()) * 1f / 2;
             canvas.translate(dx, 0);
+        } else {
+            textDraw.onDraw(canvas);
         }
         super.onDraw(canvas);
         if (leftWidth > 0) {
@@ -1210,6 +1217,11 @@ public class RTextView extends AppCompatTextView {
 
     public long getScrollLoopCount() {
         return scrollLoopCount;
+    }
+
+    @NonNull
+    public TextDraw getTextDraw() {
+        return textDraw;
     }
 
     public interface OnScrollTextLoopListener {

@@ -18,6 +18,7 @@ import android.support.v4.view.GestureDetectorCompat
 import android.support.v4.view.ViewCompat
 import android.text.InputFilter
 import android.text.TextUtils
+import android.util.LayoutDirection
 import android.util.TypedValue
 import android.view.*
 import android.view.animation.DecelerateInterpolator
@@ -44,6 +45,7 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import java.io.File
 import java.util.*
+import kotlin.math.max
 
 /**
  * Kotlin View的扩展
@@ -105,9 +107,6 @@ public val View.debugPaint: Paint by lazy {
         strokeWidth = 1 * density()
     }
 }
-
-public val View.viewSize: Int
-    get() = viewDrawWith.maxValue(viewDrawHeight)
 
 private val View.tempRect: Rect by lazy {
     Rect()
@@ -952,3 +951,116 @@ public fun TextView.clearListeners() {
         Reflect.getMember(TextView::class.java, this, "mListeners") as? ArrayList<Any>
     mListeners?.clear()
 }
+
+public fun View.drawSize(): Int = max(viewDrawWith, viewDrawHeight)
+public fun View.viewSize(): Int = max(measuredWidth, measuredHeight)
+
+public fun View.drawCenterX(): Int {
+    return paddingLeft + viewDrawWith / 2
+}
+
+public fun View.drawCenterY(): Int {
+    return paddingTop + viewDrawHeight / 2
+}
+
+public fun TextView.gravityFlag(): ByteArray {
+    //L T R B C
+    //11111
+    //00000
+    val bytes = ByteArray(5) {
+        0
+    }
+
+    val absoluteGravity = Gravity.getAbsoluteGravity(gravity, LayoutDirection.LTR)
+
+    if (absoluteGravity and Gravity.FILL == Gravity.FILL) {
+        //no op
+    } else {
+        if (absoluteGravity and Gravity.FILL_VERTICAL == Gravity.FILL_VERTICAL) {
+            //no op
+        } else {
+            if (absoluteGravity and Gravity.TOP == Gravity.TOP) {
+                bytes[1] = 1
+            }
+            if (absoluteGravity and Gravity.BOTTOM == Gravity.BOTTOM) {
+                bytes[3] = 1
+            }
+        }
+        if (absoluteGravity and Gravity.FILL_HORIZONTAL == Gravity.FILL_HORIZONTAL) {
+            //no op
+        } else {
+            if (absoluteGravity and Gravity.START == Gravity.START) {
+                bytes[0] = 1
+            } else if (absoluteGravity and Gravity.LEFT == Gravity.LEFT) {
+                bytes[0] = 1
+            }
+            if (absoluteGravity and Gravity.END == Gravity.END) {
+                bytes[2] = 1
+            } else if (absoluteGravity and Gravity.RIGHT == Gravity.RIGHT) {
+                bytes[2] = 1
+            }
+        }
+    }
+    if (absoluteGravity and Gravity.CENTER == Gravity.CENTER) {
+        //都会执行
+        bytes[4] = 1
+    } else {
+        if (absoluteGravity and Gravity.CENTER_VERTICAL == Gravity.CENTER_VERTICAL) {
+            //no op
+        }
+        if (absoluteGravity and Gravity.CENTER_HORIZONTAL == Gravity.CENTER_HORIZONTAL) {
+            //no op
+        }
+    }
+    return bytes
+}
+
+public fun TextView.isGravityCenter(): Boolean {
+    return gravity == Gravity.CENTER
+}
+
+public fun TextView.isGravityCenterHorizontal(): Boolean {
+    //L T R B C
+    //0 1 2 3 4
+    val flags = gravityFlag()
+    val result = flags[0] == 0.toByte() &&
+            flags[2] == 0.toByte() &&
+            (flags[1] == 1.toByte() || flags[3] == 1.toByte()) &&
+            flags[4] == 1.toByte()
+
+    return isGravityCenter() || result
+}
+
+public fun TextView.isGravityCenterVertical(): Boolean {
+    //L T R B C
+    //0 1 2 3 4
+    val flags = gravityFlag()
+    val result = flags[1] == 0.toByte() &&
+            flags[3] == 0.toByte() &&
+            (flags[0] == 1.toByte() || flags[2] == 1.toByte()) &&
+            flags[4] == 1.toByte()
+    return isGravityCenter() || result
+}
+
+public fun TextView.isGravityTop(): Boolean {
+    val flags = gravityFlag()
+    return flags[1] == 1.toByte()
+}
+
+public fun TextView.isGravityBottom(): Boolean {
+    val flags = gravityFlag()
+    return flags[3] == 1.toByte()
+}
+
+public fun TextView.isGravityLeft(): Boolean {
+    val flags = gravityFlag()
+    return flags[0] == 1.toByte()
+}
+
+public fun TextView.isGravityRight(): Boolean {
+    val flags = gravityFlag()
+    return flags[2] == 1.toByte()
+}
+
+
+
