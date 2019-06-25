@@ -106,6 +106,9 @@ public class RFlowLayout extends LinearLayout {
         mLineHeight.clear();
         lineViews.clear();
 
+        //视图可用空间
+        int viewAvailableWidth = measureWidth - getPaddingLeft() - getPaddingRight();
+
         int count = getChildCount();
         for (int i = 0; i < count; i++) {
             View child = getChildAt(i);
@@ -120,13 +123,14 @@ public class RFlowLayout extends LinearLayout {
             }
 
             LayoutParams params = (LayoutParams) child.getLayoutParams();
-
             childWidth = child.getMeasuredWidth() + params.leftMargin + params.rightMargin;
             childHeight = child.getMeasuredHeight() + params.topMargin + params.bottomMargin;
 
             int lineViewSize = lineViews.size();
-            if (lineWidth + childWidth > measureWidth - getPaddingLeft() - getPaddingRight() ||
-                    (maxCountLine > 0 && lineViewSize == maxCountLine)) {
+
+            //本次追加 child后 , 需要的宽度
+            int needWidth = lineWidth + childWidth + itemHorizontalSpace;
+            if (needWidth > viewAvailableWidth || (maxCountLine > 0 && lineViewSize == maxCountLine)) {
                 //需要换新行
                 if (itemEquWidth) {
                     //margin,padding 消耗的宽度
