@@ -45,7 +45,7 @@ class HSProgressView(context: Context, attributeSet: AttributeSet? = null) :
 
     override fun onVisibilityChanged(changedView: View, visibility: Int) {
         super.onVisibilityChanged(changedView, visibility)
-        if (visibility != View.VISIBLE) {
+        if (!isInEditMode && visibility != View.VISIBLE) {
             stopAnimator()
         }
     }

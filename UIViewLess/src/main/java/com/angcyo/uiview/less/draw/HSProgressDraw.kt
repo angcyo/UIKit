@@ -9,6 +9,7 @@ import com.angcyo.uiview.less.R
 import com.angcyo.uiview.less.kotlin.alpha
 import com.angcyo.uiview.less.kotlin.dp
 import com.angcyo.uiview.less.kotlin.set
+import kotlin.math.min
 
 /**
  *
@@ -56,17 +57,30 @@ class HSProgressDraw(view: View) : RSectionDraw(view) {
         mBasePaint.color = progressColor.alpha(255 * (1 - sectionProgress + 0.2f))
 
         val right = viewWidth - paddingRight
-        if (index == 0) {
-            mDrawRectF.set(
+
+        var top = paddingTop
+        val threshold = 0.9f
+
+        if (sectionProgress > threshold) {
+            top = (top + viewDrawHeight * (min((sectionProgress - threshold) / (1 - threshold), 0.5f))).toInt()
+        }
+
+        when {
+            isInEditMode -> mDrawRectF.set(
                 paddingLeft,
-                paddingTop,
+                top,
+                (right * totalProgress).toInt(),
+                viewHeight - paddingBottom
+            )
+            index == 0 -> mDrawRectF.set(
+                paddingLeft,
+                top,
                 (right * sectionProgress).toInt(),
                 viewHeight - paddingBottom
             )
-        } else if (index == 1) {
-            mDrawRectF.set(
+            index == 1 -> mDrawRectF.set(
                 (right - viewDrawWidth * sectionProgress).toInt(),
-                paddingTop,
+                top,
                 right,
                 viewHeight - paddingBottom
             )
