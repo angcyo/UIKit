@@ -13,8 +13,10 @@ import android.widget.FrameLayout
 import android.widget.PopupWindow
 import com.angcyo.uiview.less.iview.ChoiceIView
 import com.angcyo.uiview.less.kotlin.dpi
+import com.angcyo.uiview.less.kotlin.getViewRect
 import com.angcyo.uiview.less.recycler.RBaseViewHolder
 import com.angcyo.uiview.less.utils.RDialog
+import com.angcyo.uiview.less.utils.RUtils
 
 /**
  *
@@ -227,6 +229,25 @@ fun Context.popupWindow(anchor: View? = null, config: PopupConfig.() -> Unit): P
 
         width = popupConfig.width
         height = popupConfig.height
+
+        popupConfig.anchor?.let {
+            val viewRect = it.getViewRect()
+            if (popupConfig.exactlyHeight) {
+                height = RUtils.getScreenHeight() - viewRect.bottom
+            }
+
+            if (viewRect.bottom >= RUtils.getScreenHeight()) {
+                //接近屏幕底部
+                if (popupConfig.gravity == Gravity.NO_GRAVITY) {
+                    //手动控制无效
+                    //popupConfig.gravity = Gravity.TOP
+
+                    if (popupConfig.exactlyHeight) {
+                        height = viewRect.top
+                    }
+                }
+            }
+        }
 
         isFocusable = popupConfig.focusable
         isTouchable = popupConfig.touchable

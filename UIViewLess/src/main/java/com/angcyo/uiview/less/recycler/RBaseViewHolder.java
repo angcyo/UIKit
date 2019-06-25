@@ -86,7 +86,7 @@ public class RBaseViewHolder extends RecyclerView.ViewHolder {
                         t.setAccessible(true);
 
                         Object fromValue = f.get(from);
-                        
+
                         if (ignoreNull && fromValue == null) {
                         } else {
                             Type fGenericType = f.getGenericType();
@@ -366,10 +366,14 @@ public class RBaseViewHolder extends RecyclerView.ViewHolder {
     }
 
     public AutoEditText auto(@IdRes int resId, List<String> dataList, boolean showOnFocus) {
+        return auto(resId, dataList, showOnFocus, 0);
+    }
+
+    public AutoEditText auto(@IdRes int resId, List<String> dataList, boolean showOnFocus, long focusDelay) {
         AutoEditText auto = auto(resId);
         if (auto != null) {
             //auto.setAdapter(new RArrayAdapter<>(getContext(), dataList));
-            auto.setDataList(dataList, showOnFocus);
+            auto.setDataList(dataList, showOnFocus, focusDelay);
         }
         return v(resId);
     }

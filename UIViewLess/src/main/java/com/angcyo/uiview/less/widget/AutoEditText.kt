@@ -40,13 +40,19 @@ open class AutoEditText : REditText {
     }
 
     /**设置下拉数据源*/
-    fun setDataList(list: List<CharSequence>, showOnFocus: Boolean = true) {
+    fun setDataList(list: List<CharSequence>, showOnFocus: Boolean = true, focusDelay: Long = 0L) {
         setAdapter(RArrayAdapter(context, list))
 
         if (showOnFocus) {
             onFocusChange {
                 if (it) {
-                    showDropDown()
+                    if (focusDelay > 0) {
+                        postDelayed({
+                            showDropDown()
+                        }, focusDelay)
+                    } else {
+                        showDropDown()
+                    }
                 }
             }
         }

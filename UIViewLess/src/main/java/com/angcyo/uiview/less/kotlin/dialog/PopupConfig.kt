@@ -31,8 +31,8 @@ open class PopupConfig {
     var xoff: Int = 0
     var yoff: Int = 0
 
-    //此属性 似乎只在 showAtLocation 有效
-    var gravity = Gravity.TOP or Gravity.START or Gravity.LEFT
+    //此属性 似乎只在 showAtLocation 有效, 在showAsDropDown中, anchor完全在屏幕底部, 系统会控制在TOP显示, 手动控制无效
+    var gravity = Gravity.NO_GRAVITY//Gravity.TOP or Gravity.START or Gravity.LEFT
 
     /**
      * 标准属性
@@ -44,6 +44,9 @@ open class PopupConfig {
     var touchable = true
     var outsideTouchable = true
     var background: Drawable? = null
+
+    /**将[height]设置为, 锚点距离屏幕*/
+    var exactlyHeight = false
 
     /**
      * 动画样式, 0 表示没有动画, -1 表示 默认动画.
