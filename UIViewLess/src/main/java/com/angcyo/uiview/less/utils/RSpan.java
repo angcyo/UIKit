@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.text.style.ReplacementSpan;
+import com.angcyo.uiview.less.R;
 import com.angcyo.uiview.less.resources.ResUtil;
 
 /**
@@ -69,6 +70,12 @@ public class RSpan extends SpanUtils {
     }
 
     @Override
+    public RSpan appendSpace(int size) {
+        super.appendSpace(size);
+        return this;
+    }
+
+    @Override
     public RSpan setBackgroundColor(int color) {
         super.setBackgroundColor(color);
         return this;
@@ -124,6 +131,19 @@ public class RSpan extends SpanUtils {
         mType = -1;
     }
 
+    public RSpan appendDarkText(@NonNull CharSequence text) {
+        append(text);
+        setForegroundColor(ResUtil.getColor(R.color.base_text_color));
+        setFontSize(ResUtil.getDimen(R.dimen.default_text_size), false);
+        return this;
+    }
+
+    public RSpan appendMainText(@NonNull CharSequence text) {
+        append(text);
+        setForegroundColor(ResUtil.getColor(R.color.base_text_color_dark));
+        setFontSize(ResUtil.getDimen(R.dimen.default_text_little_size), false);
+        return this;
+    }
 
     public static class TextSpan extends ReplacementSpan {
 
