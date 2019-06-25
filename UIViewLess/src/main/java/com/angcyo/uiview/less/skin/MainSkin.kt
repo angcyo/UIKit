@@ -13,7 +13,7 @@ class MainSkin(context: Context) : BaseSkin(context) {
     }
 
     override fun getThemeSubColor(): Int {
-        return ResUtil.getThemeColor(mContext, "colorPrimaryDark")
+        return ResUtil.getThemeColor(mContext, "colorPrimary")
     }
 
     override fun getThemeDarkColor(): Int {

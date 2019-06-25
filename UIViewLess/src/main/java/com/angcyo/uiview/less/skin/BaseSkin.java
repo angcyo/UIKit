@@ -35,12 +35,12 @@ public class BaseSkin extends SkinImpl {
 
     @Override
     public int getThemeSubColor() {
-        return ContextCompat.getColor(mContext, R.color.theme_color_primary_dark);
+        return ContextCompat.getColor(mContext, R.color.theme_color_primary);
     }
 
     @Override
     public int getThemeDarkColor() {
-        return ContextCompat.getColor(mContext, R.color.theme_color_primary_dark_tran);
+        return ContextCompat.getColor(mContext, R.color.theme_color_primary_dark);
     }
 
     @Override
