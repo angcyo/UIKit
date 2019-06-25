@@ -17,6 +17,7 @@ import com.angcyo.uiview.less.kotlin.getViewRect
 import com.angcyo.uiview.less.recycler.RBaseViewHolder
 import com.angcyo.uiview.less.utils.RDialog
 import com.angcyo.uiview.less.utils.RUtils
+import kotlin.math.max
 
 /**
  *
@@ -233,7 +234,7 @@ fun Context.popupWindow(anchor: View? = null, config: PopupConfig.() -> Unit): P
         popupConfig.anchor?.let {
             val viewRect = it.getViewRect()
             if (popupConfig.exactlyHeight) {
-                height = RUtils.getScreenHeight() - viewRect.bottom
+                height = max(RUtils.getContentViewHeight(it.context), RUtils.getScreenHeight()) - viewRect.bottom
             }
 
             if (viewRect.bottom >= RUtils.getScreenHeight()) {
