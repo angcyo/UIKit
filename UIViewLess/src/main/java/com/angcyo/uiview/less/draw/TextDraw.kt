@@ -34,7 +34,7 @@ class TextDraw(val textView: TextView) {
     var drawTextBgOffsetX = 0 * dp
     var drawTextBgOffsetY = 0 * dp
 
-    var drawTextBgColor = getColor(R.color.base_red)
+    var drawTextBgColor = if (textView.isInEditMode) "#FC3C38".toColor() else getColor(R.color.base_red)
 
     val paint: Paint by lazy {
         Paint(Paint.ANTI_ALIAS_FLAG)
