@@ -145,6 +145,12 @@ public class RSpan extends SpanUtils {
         return this;
     }
 
+    @Override
+    public RSpan setSpans(@NonNull Object... spans) {
+        super.setSpans(spans);
+        return this;
+    }
+
     public static class TextSpan extends ReplacementSpan {
 
         /**
