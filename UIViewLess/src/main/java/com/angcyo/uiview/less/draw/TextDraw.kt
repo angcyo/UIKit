@@ -28,8 +28,11 @@ class TextDraw(val textView: TextView) {
     /**圆角矩形时, 绘制的圆角大小*/
     var drawTextBgRound = 6 * dp
 
-    /**padding大小*/
+    /**padding大小, 只在圆形有效*/
     var drawTextBgPadding = 1 * dp
+    /**只在圆角时有效*/
+    var drawTextBgPaddingHorizontal = 1 * dp
+    var drawTextBgPaddingVertical = 1 * dp
 
     var drawTextBgOffsetX = 0 * dp
     var drawTextBgOffsetY = 0 * dp
@@ -96,10 +99,10 @@ class TextDraw(val textView: TextView) {
                     )
                 } else {
                     textRectF.set(
-                        cx - textWidth / 2 - drawTextBgPadding,
-                        cy - textHeight / 2 - drawTextBgPadding,
-                        cx + textWidth / 2 + drawTextBgPadding,
-                        cy + textHeight / 2 + drawTextBgPadding
+                        cx - textWidth / 2 - drawTextBgPaddingHorizontal,
+                        cy - textHeight / 2 - drawTextBgPaddingVertical,
+                        cx + textWidth / 2 + drawTextBgPaddingHorizontal,
+                        cy + textHeight / 2 + drawTextBgPaddingVertical
                     )
                     textRectF.offset(drawTextBgOffsetX + leftOffset, drawTextBgOffsetY + topOffset)
                     //圆角矩形
