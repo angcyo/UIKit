@@ -1,6 +1,7 @@
 package com.angcyo.uiview.less.recycler.adapter
 
 import android.content.Context
+import android.text.TextUtils
 import android.view.View
 import com.angcyo.uiview.less.kotlin.findViewHolder
 import com.angcyo.uiview.less.recycler.RBaseViewHolder
@@ -119,6 +120,14 @@ open class DslAdapter : RBaseAdapter<DslAdapterItem> {
         dslDateFilter?.filterItem(item, folder)
     }
 
+    override fun notifyItemChanged(item: DslAdapterItem?) {
+        if (dslDateFilter == null) {
+            super.notifyItemChanged(item)
+        } else {
+            notifyItemChanged(item, filterDataList.size != allDatas.size)
+        }
+    }
+
     /**支持过滤数据源*/
     fun notifyItemChanged(item: DslAdapterItem?, useFilterList: Boolean = false) {
         if (item == null) {
@@ -166,5 +175,46 @@ open class DslAdapter : RBaseAdapter<DslAdapterItem> {
                 getItemData(adapterPosition)?.onItemChildViewDetachedFromWindow?.invoke(it, adapterPosition)
             }
         }
+    }
+
+    /**查找相邻相同类型的[item]*/
+    fun findItemGroup(
+        item: DslAdapterItem,
+        callback: (items: MutableList<DslAdapterItem>, index: Int /*在分组当中的位置*/) -> Unit = { _, _ -> }
+    ) {
+        val groupItems = mutableListOf<DslAdapterItem>()
+        var prevClassName: String? = null
+
+        //目标的位置
+        var targetIndex = -1
+        getDataList(true).forEachIndexed { index, dslAdapterItem ->
+            if (prevClassName == null) {
+                prevClassName = dslAdapterItem.javaClass.simpleName
+            }
+            if (TextUtils.equals(dslAdapterItem.javaClass.simpleName, prevClassName)) {
+                //相同类型
+                if (item == dslAdapterItem) {
+                    targetIndex = index
+                }
+            } else {
+                if (targetIndex != -1) {
+                    //找到了目标
+                    return@forEachIndexed
+                }
+                if (item == dslAdapterItem) {
+                    targetIndex = index
+                }
+                groupItems.clear()
+            }
+            groupItems.add(dslAdapterItem)
+
+            prevClassName = dslAdapterItem.javaClass.simpleName
+        }
+
+        if (targetIndex != -1) {
+            targetIndex = groupItems.indexOf(item)
+        }
+
+        callback.invoke(groupItems, targetIndex)
     }
 }
