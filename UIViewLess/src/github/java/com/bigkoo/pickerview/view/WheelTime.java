@@ -109,14 +109,14 @@ public class WheelTime {
         wv_month = (WheelView) view.findViewById(R.id.month);
         wv_month.setAdapter(new ArrayWheelAdapter(ChinaDate.getMonths(year)));
         wv_month.setLabel("");
-        
+
         int leapMonth = ChinaDate.leapMonth(year);
         if (leapMonth != 0 && (month > leapMonth - 1 || isLeap)) { //选中月是闰月或大于闰月
             wv_month.setCurrentItem(month + 1);
         } else {
             wv_month.setCurrentItem(month);
         }
-        
+
         wv_month.setGravity(gravity);
 
         // 日
@@ -923,6 +923,15 @@ public class WheelTime {
         wv_hours.isCenterLabel(isCenterLabel);
         wv_minutes.isCenterLabel(isCenterLabel);
         wv_seconds.isCenterLabel(isCenterLabel);
+    }
+
+    public void isDrawLabelOnTextBehind(boolean isDrawLabelOnTextBehind) {
+        wv_day.isDrawLabelOnTextBehind = isDrawLabelOnTextBehind;
+        wv_month.isDrawLabelOnTextBehind = isDrawLabelOnTextBehind;
+        wv_year.isDrawLabelOnTextBehind = isDrawLabelOnTextBehind;
+        wv_hours.isDrawLabelOnTextBehind = isDrawLabelOnTextBehind;
+        wv_minutes.isDrawLabelOnTextBehind = isDrawLabelOnTextBehind;
+        wv_seconds.isDrawLabelOnTextBehind = isDrawLabelOnTextBehind;
     }
 
     public void setSelectChangeCallback(ISelectTimeCallback mSelectChangeCallback) {

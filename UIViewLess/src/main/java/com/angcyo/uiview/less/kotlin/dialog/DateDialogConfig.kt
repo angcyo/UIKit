@@ -57,7 +57,8 @@ open class DateDialogConfig : BaseDialogConfig() {
     var dividerColor = -0x2a2a2b //分割线的颜色
     var textColorOut = -0x575758 //分割线以外的文字颜色
     var textColorCenter = -0xd5d5d6 //分割线之间的文字颜色
-    var isCenterLabel = true//是否只显示中间的label,默认每个item都显示
+    var isCenterLabel = false//是否只显示中间的label,默认每个item都显示
+    var isDrawLabelOnTextBehind = true
 
     var dividerType: WheelView.DividerType = WheelView.DividerType.FILL//分隔线类型
 
@@ -173,7 +174,7 @@ open class DateDialogConfig : BaseDialogConfig() {
             wheelTime.setTextColorOut(textColorOut)
             wheelTime.setTextColorCenter(textColorCenter)
             wheelTime.isCenterLabel(isCenterLabel)
-
+            wheelTime.isDrawLabelOnTextBehind(isDrawLabelOnTextBehind)
         }
     }
 
