@@ -180,7 +180,7 @@ public class ItemInfoLayout extends RRelativeLayout {
         mDarkTextView.setEllipsize(TextUtils.TruncateAt.END);
         mDarkTextView.setMaxLength(20);
         mDarkTextView.setMaxWidth((int) (getResources().getDisplayMetrics().density * 260));
-        mDarkTextView.setPadding((int) dpToPx(10), 0, 0, 0);
+        mDarkTextView.setPadding((int) dpToPx(10), (int) dpToPx(4), 0, (int) dpToPx(4));
 
         setRightDrawableRes(rightDrawableRes);
         setDarkDrawableRes(darkDrawableRes);
