@@ -310,6 +310,15 @@ fun Context.optionDialog(config: OptionDialogConfig.() -> Unit): Dialog {
     ).showCompatDialog()
 }
 
+fun <T : BaseDialogConfig> Context.customBottomDialog(customConfig: T, config: T.() -> Unit): Dialog {
+    customConfig.config()
+
+    return configDialogBuilder(
+        buildBottomDialog().setCanceledOnTouchOutside(true),
+        customConfig
+    ).showCompatDialog()
+}
+
 // Fragment
 
 fun Fragment.normalDialog(config: NormalDialogConfig.() -> Unit): Dialog {
@@ -368,6 +377,10 @@ fun Fragment.optionDialog(config: OptionDialogConfig.() -> Unit): Dialog {
     return context!!.optionDialog(config)
 }
 
+fun <T : BaseDialogConfig> Fragment.customBottomDialog(customConfig: T, config: T.() -> Unit): Dialog {
+    return context!!.customBottomDialog(customConfig, config)
+}
+
 // RBaseViewHolder
 
 fun RBaseViewHolder.normalDialog(config: NormalDialogConfig.() -> Unit): Dialog {
@@ -424,4 +437,8 @@ fun RBaseViewHolder.dateDialog(config: DateDialogConfig.() -> Unit): Dialog {
 
 fun RBaseViewHolder.optionDialog(config: OptionDialogConfig.() -> Unit): Dialog {
     return context!!.optionDialog(config)
+}
+
+fun <T : BaseDialogConfig> RBaseViewHolder.customBottomDialog(customConfig: T, config: T.() -> Unit): Dialog {
+    return context!!.customBottomDialog(customConfig, config)
 }

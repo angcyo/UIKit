@@ -15,7 +15,8 @@
 
     <android.support.v7.widget.AppCompatImageView
             android:id="@+id/image_view"
-            app:srcCompat="@drawable/sel"
+            app:srcCompat="@drawable/ic_selector"
+            app:tint="@color/colorPrimary"
             android:layout_marginRight="@dimen/base_hdpi"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
