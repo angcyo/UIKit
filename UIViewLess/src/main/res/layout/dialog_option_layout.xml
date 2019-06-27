@@ -11,6 +11,11 @@
     <include android:id="@+id/title_layout"
              layout="@layout/dialog_base_title_layout"/>
 
+    <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="@color/line_color"/>
+
     <com.angcyo.uiview.less.widget.group.RTabLayout
             android:id="@+id/tab_layout"
             android:layout_width="match_parent"
