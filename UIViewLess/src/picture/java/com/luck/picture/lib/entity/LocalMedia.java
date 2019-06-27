@@ -72,11 +72,21 @@ public class LocalMedia implements Parcelable {
         this.path = path;
     }
 
+    /**
+     * @param mimeType
+     * @see PictureConfig#TYPE_ALL
+     * @see PictureConfig#TYPE_AUDIO
+     * @see PictureConfig#TYPE_IMAGE
+     * @see PictureConfig#TYPE_VIDEO
+     */
     public LocalMedia(String path, int mimeType) {
         this.path = path;
         this.mimeType = mimeType;
     }
 
+    /**
+     * @param pictureType image/jpeg
+     */
     public LocalMedia(String path, long duration, int mimeType, String pictureType) {
         this.path = path;
         this.duration = duration;
@@ -294,20 +304,20 @@ public class LocalMedia implements Parcelable {
         return TextUtils.isEmpty(getLoadUrl());
     }
 
-    public void setModifyTime(long modifyTime) {
-        this.modifyTime = modifyTime;
-    }
-
-    public void setAddTime(long addTime) {
-        this.addTime = addTime;
-    }
-
     public long getModifyTime() {
         return modifyTime;
     }
 
+    public void setModifyTime(long modifyTime) {
+        this.modifyTime = modifyTime;
+    }
+
     public long getAddTime() {
         return addTime;
+    }
+
+    public void setAddTime(long addTime) {
+        this.addTime = addTime;
     }
 
     @Override

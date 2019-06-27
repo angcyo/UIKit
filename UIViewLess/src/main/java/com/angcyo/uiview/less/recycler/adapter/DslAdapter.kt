@@ -187,10 +187,15 @@ open class DslAdapter : RBaseAdapter<DslAdapterItem> {
 
         //目标的位置
         var targetIndex = -1
-        getDataList(true).forEachIndexed { index, dslAdapterItem ->
+
+        val dataList = getDataList(true)
+        for (index in 0 until dataList.size) {
+            val dslAdapterItem = dataList[index]
+
             if (prevClassName == null) {
                 prevClassName = dslAdapterItem.javaClass.simpleName
             }
+
             if (TextUtils.equals(dslAdapterItem.javaClass.simpleName, prevClassName)) {
                 //相同类型
                 if (item == dslAdapterItem) {
@@ -199,7 +204,7 @@ open class DslAdapter : RBaseAdapter<DslAdapterItem> {
             } else {
                 if (targetIndex != -1) {
                     //找到了目标
-                    return@forEachIndexed
+                    break
                 }
                 if (item == dslAdapterItem) {
                     targetIndex = index
