@@ -5,6 +5,7 @@
         <enum name="TYPE_BOTTOM_LINE" value="1"/>
         <enum name="TYPE_ROUND_RECT_BLOCK" value="2"/>
         <enum name="TYPE_BOTTOM_FLOW_LINE" value="3"/>
+        <enum name="INDICATOR_TYPE_BOTTOM_GRADIENT_LINE" value="4"/>
     </attr>
 
     <!--自定义Drawable, 同样受到r_indicator_type的影响, 决定了bounds-->
@@ -55,6 +56,9 @@
         <attr name="r_indicator_round_size"/>
         <attr name="r_indicator_enable_anim"/>
         <attr name="r_indicator_enable_anim_overshoot"/>
+
+        <attr name="r_gradient_end_color"/>
+        <attr name="r_gradient_start_color"/>
     </declare-styleable>
 
     <declare-styleable name="RTabLayout">
@@ -65,7 +69,6 @@
         <!--指定item的宽度-->
         <attr name="r_item_width" format="dimension"/>
         <attr name="r_auto_set_item_selector_status" format="boolean"/>
-
 
         <attr name="r_use_child_view_index"/>
         <attr name="r_use_indicator_drawable_size"/>
@@ -95,6 +98,9 @@
         <attr name="r_item_normal_background_color" format="color"/>
         <attr name="r_item_selected_background_color" format="color"/>
         <attr name="r_auto_set_item_background" format="boolean"/>
+
+        <attr name="r_gradient_end_color"/>
+        <attr name="r_gradient_start_color"/>
     </declare-styleable>
 
     <declare-styleable name="RTabLayout_Layout">

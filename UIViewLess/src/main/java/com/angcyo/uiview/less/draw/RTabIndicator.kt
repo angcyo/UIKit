@@ -2,8 +2,11 @@ package com.angcyo.uiview.less.draw
 
 import android.animation.Animator
 import android.animation.ObjectAnimator
+import android.annotation.SuppressLint
 import android.graphics.Canvas
+import android.graphics.LinearGradient
 import android.graphics.RectF
+import android.graphics.Shader
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.View
@@ -11,7 +14,9 @@ import android.view.ViewGroup
 import android.view.animation.OvershootInterpolator
 import com.angcyo.uiview.less.R
 import com.angcyo.uiview.less.kotlin.abs
+import com.angcyo.uiview.less.kotlin.dpi
 import com.angcyo.uiview.less.resources.RAnimatorListener
+import com.angcyo.uiview.less.skin.SkinHelper
 
 /**
  * Copyright (C) 2016,深圳市红鸟网络科技股份有限公司 All rights reserved.
@@ -32,8 +37,10 @@ class RTabIndicator(view: View, attributeSet: AttributeSet? = null) : BaseDraw(v
         const val INDICATOR_TYPE_BOTTOM_LINE = 1
         //圆角矩形块状, 会在childView的后面绘制
         const val INDICATOR_TYPE_ROUND_RECT_BLOCK = 2
-        //其他等同 INDICATOR_TYPE_BOTTOM_LINE, 但是在滑动过程中,会放大到目标位置,再缩小的本身大神
+        //其他等同 INDICATOR_TYPE_BOTTOM_LINE, 但是在滑动过程中,会放大到目标位置,再缩小的本身大小
         const val INDICATOR_TYPE_BOTTOM_FLOW_LINE = 3
+        //[INDICATOR_TYPE_BOTTOM_LINE] 渐变
+        const val INDICATOR_TYPE_BOTTOM_GRADIENT_LINE = 4
     }
 
     var indicatorDrawable: Drawable? = null
@@ -70,20 +77,23 @@ class RTabIndicator(view: View, attributeSet: AttributeSet? = null) : BaseDraw(v
     /**使用tab Item 中的哪一个child index, 作为定位的靶子, -1使用顶级item*/
     var useChildViewIndex = -1
 
+    var gradientStartColor: Int = 0
+    var gradientEndColor: Int = 0
+
     init {
         initAttribute(attributeSet)
     }
 
     override fun initAttribute(attr: AttributeSet?) {
         val typedArray = obtainStyledAttributes(attr, R.styleable.RTabIndicator)
-        indicatorType = typedArray.getInt(R.styleable.RTabIndicator_r_indicator_type, INDICATOR_TYPE_BOTTOM_LINE)
+        indicatorType = typedArray.getInt(R.styleable.RTabIndicator_r_indicator_type, indicatorType)
         indicatorColor = baseColor
         indicatorColor = typedArray.getColor(R.styleable.RTabIndicator_r_indicator_color, indicatorColor)
         indicatorWidth = typedArray.getDimensionPixelOffset(R.styleable.RTabIndicator_r_indicator_width, indicatorWidth)
         indicatorHeight =
-                typedArray.getDimensionPixelOffset(R.styleable.RTabIndicator_r_indicator_height, indicatorHeight)
+            typedArray.getDimensionPixelOffset(R.styleable.RTabIndicator_r_indicator_height, indicatorHeight)
         indicatorOffsetY =
-                typedArray.getDimensionPixelOffset(R.styleable.RTabIndicator_r_indicator_offset_y, indicatorOffsetY)
+            typedArray.getDimensionPixelOffset(R.styleable.RTabIndicator_r_indicator_offset_y, indicatorOffsetY)
         indicatorWidthOffset = typedArray.getDimensionPixelOffset(
             R.styleable.RTabIndicator_r_indicator_offset_width,
             indicatorWidthOffset
@@ -92,18 +102,23 @@ class RTabIndicator(view: View, attributeSet: AttributeSet? = null) : BaseDraw(v
             R.styleable.RTabIndicator_r_indicator_offset_height,
             indicatorHeightOffset
         )
+
+        if (isInEditMode) {
+            indicatorRoundSize = 4 * dpi
+        }
+
         indicatorRoundSize =
-                typedArray.getDimensionPixelOffset(R.styleable.RTabIndicator_r_indicator_round_size, indicatorRoundSize)
+            typedArray.getDimensionPixelOffset(R.styleable.RTabIndicator_r_indicator_round_size, indicatorRoundSize)
 
         enableIndicatorAnim =
-                typedArray.getBoolean(R.styleable.RTabIndicator_r_indicator_enable_anim, enableIndicatorAnim)
+            typedArray.getBoolean(R.styleable.RTabIndicator_r_indicator_enable_anim, enableIndicatorAnim)
         enableOvershoot =
-                typedArray.getBoolean(R.styleable.RTabIndicator_r_indicator_enable_anim_overshoot, enableOvershoot)
+            typedArray.getBoolean(R.styleable.RTabIndicator_r_indicator_enable_anim_overshoot, enableOvershoot)
 
         useIndicatorDrawableSize =
-                typedArray.getBoolean(R.styleable.RTabIndicator_r_use_indicator_drawable_size, useIndicatorDrawableSize)
+            typedArray.getBoolean(R.styleable.RTabIndicator_r_use_indicator_drawable_size, useIndicatorDrawableSize)
 
-        useChildViewIndex = typedArray.getInt(R.styleable.RTabLayout_r_use_child_view_index, useChildViewIndex)
+        useChildViewIndex = typedArray.getInt(R.styleable.RTabIndicator_r_use_child_view_index, useChildViewIndex)
 
         indicatorDrawable = typedArray.getDrawable(R.styleable.RTabIndicator_r_indicator_drawable)
         if (useIndicatorDrawableSize) {
@@ -112,6 +127,17 @@ class RTabIndicator(view: View, attributeSet: AttributeSet? = null) : BaseDraw(v
                 indicatorHeight = it.intrinsicHeight
             }
         }
+
+        if (isInEditMode) {
+            gradientStartColor = this.getColor(R.color.theme_color_primary)
+            gradientEndColor = this.getColor(R.color.theme_color_primary_dark)
+        } else {
+            gradientStartColor = SkinHelper.getSkin().themeSubColor
+            gradientEndColor = SkinHelper.getSkin().themeDarkColor
+        }
+
+        gradientStartColor = typedArray.getColor(R.styleable.RTabIndicator_r_gradient_start_color, gradientStartColor)
+        gradientEndColor = typedArray.getColor(R.styleable.RTabIndicator_r_gradient_end_color, gradientEndColor)
 
         typedArray.recycle()
     }
@@ -262,7 +288,7 @@ class RTabIndicator(view: View, attributeSet: AttributeSet? = null) : BaseDraw(v
     }
 
     private fun getChildCenter(index: Int): Int {
-        if (index in 0..(childCount - 1)) {
+        if (index in 0 until childCount) {
             var curChildView = getChildAt(index)
 
             var pLeft = 0
@@ -283,7 +309,7 @@ class RTabIndicator(view: View, attributeSet: AttributeSet? = null) : BaseDraw(v
 
     private fun getIndicatorWidth(index: Int): Int {
         return if (indicatorWidth == 0) {
-            if (index in 0..(childCount - 1)) {
+            if (index in 0 until childCount) {
                 val curChildView = getChildAt(index)
                 //child横向中心x坐标
                 return curChildView.measuredWidth - curChildView.paddingLeft - curChildView.paddingRight
@@ -305,7 +331,7 @@ class RTabIndicator(view: View, attributeSet: AttributeSet? = null) : BaseDraw(v
             curIndex = 0
         }
 
-        if (curIndex in 0..(childCount - 1)) {
+        if (curIndex in 0 until childCount) {
             //安全的index
 
             val childView = getChildAt(curIndex)
@@ -339,13 +365,13 @@ class RTabIndicator(view: View, attributeSet: AttributeSet? = null) : BaseDraw(v
             }
 
             val top = when (indicatorType) {
-                INDICATOR_TYPE_BOTTOM_LINE -> (viewHeight - indicatorOffsetY - indicatorHeight).toFloat()
+                INDICATOR_TYPE_BOTTOM_LINE, INDICATOR_TYPE_BOTTOM_GRADIENT_LINE -> (viewHeight - indicatorOffsetY - indicatorHeight).toFloat()
                 INDICATOR_TYPE_ROUND_RECT_BLOCK -> (childView.top - indicatorHeightOffset / 2).toFloat()
                 INDICATOR_TYPE_BOTTOM_FLOW_LINE -> (viewHeight - indicatorOffsetY - indicatorHeight).toFloat()
                 else -> 0f
             }
             val bottom = when (indicatorType) {
-                INDICATOR_TYPE_BOTTOM_LINE -> (viewHeight - indicatorOffsetY).toFloat()
+                INDICATOR_TYPE_BOTTOM_LINE, INDICATOR_TYPE_BOTTOM_GRADIENT_LINE -> (viewHeight - indicatorOffsetY).toFloat()
                 INDICATOR_TYPE_ROUND_RECT_BLOCK -> (childView.bottom + indicatorHeightOffset / 2).toFloat()
                 INDICATOR_TYPE_BOTTOM_FLOW_LINE -> (viewHeight - indicatorOffsetY).toFloat()
                 else -> 0f
@@ -353,10 +379,24 @@ class RTabIndicator(view: View, attributeSet: AttributeSet? = null) : BaseDraw(v
             indicatorDrawRect.set(left, top, right, bottom)
 
             if (indicatorDrawable == null) {
+                mBasePaint.shader = null
                 when (indicatorType) {
                     INDICATOR_TYPE_NONE -> {
                     }
-                    INDICATOR_TYPE_BOTTOM_LINE -> {
+                    INDICATOR_TYPE_BOTTOM_LINE, INDICATOR_TYPE_BOTTOM_GRADIENT_LINE -> {
+                        if (indicatorType == INDICATOR_TYPE_BOTTOM_GRADIENT_LINE) {
+                            @SuppressLint("DrawAllocation")
+                            mBasePaint.shader = LinearGradient(
+                                indicatorDrawRect.left,
+                                indicatorDrawRect.top,
+                                indicatorDrawRect.right,
+                                indicatorDrawRect.top,
+                                intArrayOf(gradientStartColor, gradientEndColor),
+                                null,
+                                Shader.TileMode.CLAMP
+                            )
+                        }
+
                         mBasePaint.color = indicatorColor
                         canvas.drawRoundRect(
                             indicatorDrawRect,

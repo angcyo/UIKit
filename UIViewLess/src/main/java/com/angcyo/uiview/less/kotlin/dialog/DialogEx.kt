@@ -208,10 +208,7 @@ fun Context.gridDialog(config: GridDialogConfig.() -> Unit): Dialog {
     dialogConfig.config()
 
     return configDialogBuilder(
-        RDialog.build(this)
-            .setDialogWidth(-1)
-            .setDialogBgColor(Color.TRANSPARENT)
-            .setDialogGravity(Gravity.BOTTOM),
+        buildBottomDialog().setCanceledOnTouchOutside(true),
         dialogConfig
     ).showCompatDialog()
 }
@@ -295,10 +292,20 @@ fun Context.dateDialog(config: DateDialogConfig.() -> Unit): Dialog {
     dialogConfig.config()
 
     return configDialogBuilder(
-        RDialog.build(this)
-            .setDialogWidth(-1)
-            .setDialogBgColor(Color.TRANSPARENT)
-            .setDialogGravity(Gravity.BOTTOM),
+        buildBottomDialog().setCanceledOnTouchOutside(true),
+        dialogConfig
+    ).showCompatDialog()
+}
+
+/**
+ * 多级选项对话框
+ * */
+fun Context.optionDialog(config: OptionDialogConfig.() -> Unit): Dialog {
+    val dialogConfig = OptionDialogConfig()
+    dialogConfig.config()
+
+    return configDialogBuilder(
+        buildBottomDialog().setCanceledOnTouchOutside(true),
         dialogConfig
     ).showCompatDialog()
 }
@@ -357,6 +364,10 @@ fun Fragment.dateDialog(config: DateDialogConfig.() -> Unit): Dialog {
     return context!!.dateDialog(config)
 }
 
+fun Fragment.optionDialog(config: OptionDialogConfig.() -> Unit): Dialog {
+    return context!!.optionDialog(config)
+}
+
 // RBaseViewHolder
 
 fun RBaseViewHolder.normalDialog(config: NormalDialogConfig.() -> Unit): Dialog {
@@ -409,4 +420,8 @@ fun RBaseViewHolder.popupWindow(anchor: View? = null, config: PopupConfig.() -> 
 
 fun RBaseViewHolder.dateDialog(config: DateDialogConfig.() -> Unit): Dialog {
     return context!!.dateDialog(config)
+}
+
+fun RBaseViewHolder.optionDialog(config: OptionDialogConfig.() -> Unit): Dialog {
+    return context!!.optionDialog(config)
 }

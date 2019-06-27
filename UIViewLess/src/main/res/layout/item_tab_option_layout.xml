@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.angcyo.uiview.less.widget.RTextView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/text_view"
+        tools:text="标题2"
+        style="@style/BaseMainTextStyle"
+        android:gravity="center"
+        android:textColor="@color/base_main_text_color_selector"
+        android:drawablePadding="@dimen/base_xhdpi"
+        android:layout_width="wrap_content"
+        android:paddingLeft="@dimen/base_xhdpi"
+        android:paddingRight="@dimen/base_xhdpi"
+        tools:layout_height="@dimen/dialog_item_height"
+        android:layout_height="match_parent"/>

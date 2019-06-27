@@ -78,7 +78,7 @@ public class Button extends RTextView {
         }
 
         if (isInEditMode()) {
-            themeColor = ViewExKt.getColor(this, R.color.theme_color_accent);
+            themeColor = ViewExKt.getColor(this, R.color.theme_color_primary);
             themeDarkColor = ViewExKt.getColor(this, R.color.theme_color_primary_dark);
             disableColor = Color.GRAY;
         } else {

@@ -336,6 +336,23 @@ class RTabLayout(context: Context, attributeSet: AttributeSet? = null) : ViewGro
         })
     }
 
+    fun <T> resetItems(@LayoutRes layoutId: Int, items: List<T>, init: (view: View, data: T?, index: Int) -> Unit) {
+        addView(items, object : OnAddViewCallback<T>() {
+            override fun getLayoutId(): Int {
+                return layoutId
+            }
+
+            override fun onCreateView(child: View) {
+                super.onCreateView(child)
+            }
+
+            override fun onInitView(view: View, data: T?, index: Int) {
+                super.onInitView(view, data, index)
+                init(view, data, index)
+            }
+        })
+    }
+
     /**重置每个Item的样式*/
     fun resetItemStyle() {
         onTabLayoutListener?.let {

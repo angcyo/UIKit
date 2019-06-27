@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:minHeight="@dimen/dialog_item_height"
+        android:background="@drawable/base_bg_selector_v21"
+        android:gravity="center_vertical"
+        tools:background="@color/transparent_dark60"
+        android:paddingLeft="@dimen/base_xhdpi"
+        android:paddingRight="@dimen/base_xhdpi"
+        android:layout_height="wrap_content">
+
+    <android.support.v7.widget.AppCompatImageView
+            android:id="@+id/image_view"
+            app:srcCompat="@drawable/sel"
+            android:layout_marginRight="@dimen/base_hdpi"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+    <com.angcyo.uiview.less.widget.RTextView
+            android:id="@+id/text_view"
+            tools:text="标题2标题2标题2标题2标题2标题2标题2标题2标题2标题2标题2标题2标题2标题2标题2标题2"
+            style="@style/BaseMainTextStyle"
+            android:gravity="left"
+            android:textColor="@color/base_main_text_color_selector"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+</LinearLayout>
