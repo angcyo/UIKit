@@ -14,31 +14,10 @@ open class LocalMediaAdapter : RAddAdapter<LocalMedia>() {
     override fun onBindAddItemView(holder: RBaseViewHolder, position: Int, bean: LocalMedia?) {
         super.onBindAddItemView(holder, position, bean)
 
+        //nothing
         holder.clickItem {
             (it.context as? Activity)?.let {
 
-            }
-        }
-    }
-
-    override fun onBindShowItemView(holder: RBaseViewHolder, position: Int, bean: LocalMedia?) {
-        super.onBindShowItemView(holder, position, bean)
-        bean?.let {
-            holder.giv(R.id.image_view).apply {
-                reset()
-                url = bean.loadUrl
-            }
-
-            holder.visible(R.id.play_video_view, bean.isVideoType)
-        }
-    }
-
-    open fun showLocalMediaPager(fragmentManager: FragmentManager?, startIndex: Int) {
-        RPager.localMedia(fragmentManager) {
-            localMediaList = allDatas
-            startPagerIndex = startIndex
-            onGetRecyclerView = {
-                recyclerView
             }
         }
     }
