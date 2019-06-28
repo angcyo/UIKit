@@ -1101,6 +1101,9 @@ public class FragmentHelper {
             //提交事务
             if (needCommit) {
                 commitInner(fragmentTransaction);
+            } else if (canBack && size == 1) {
+                //关闭Activity
+                activity.finish();
             }
 
             return canBack;
