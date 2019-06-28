@@ -1062,5 +1062,10 @@ public fun TextView.isGravityRight(): Boolean {
     return flags[2] == 1.toByte()
 }
 
+public fun View.offsetTop(offset: Int) {
+    ViewCompat.offsetTopAndBottom(this, offset)
+}
 
-
+public fun View.offsetTopTo(newTop: Int) {
+    ViewCompat.offsetTopAndBottom(this, newTop - top)
+}

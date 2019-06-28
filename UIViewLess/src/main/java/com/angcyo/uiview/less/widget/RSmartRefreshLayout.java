@@ -5,6 +5,7 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import com.angcyo.uiview.less.R;
 import com.angcyo.uiview.less.smart.MaterialHeader;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
@@ -165,5 +166,26 @@ public class RSmartRefreshLayout extends SmartRefreshLayout {
         setEnableLoadMore(true);
         setEnableFooterTranslationContent(true);
         setEnableHeaderTranslationContent(true);
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent e) {
+        return super.dispatchTouchEvent(e);
+    }
+
+    @Override
+    public boolean onInterceptTouchEvent(MotionEvent ev) {
+        if (!isEnabled()) {
+            return false;
+        }
+        return super.onInterceptTouchEvent(ev);
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        if (!isEnabled()) {
+            return false;
+        }
+        return super.onTouchEvent(event);
     }
 }
