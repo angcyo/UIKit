@@ -13,6 +13,7 @@ import com.angcyo.uiview.less.utils.TopToast
 import com.angcyo.uiview.less.widget.ImageTextView
 import com.luck.picture.lib.rxbus2.RxBus
 import kotlinx.coroutines.*
+import kotlin.coroutines.CoroutineContext
 
 /**
  *
@@ -150,12 +151,29 @@ public val BaseFragment.coroutineExceptionHandler by lazy {
 /**单一请求, 单一返回处理*/
 public fun <T> BaseFragment.load(
     loader: suspend CoroutineScope.() -> T,
-    receiver: suspend CoroutineScope.(T) -> Unit
+    receiver: (suspend CoroutineScope.(T) -> Unit)? = null,
+    onCoroutineExceptionHandler: ((coroutineContext: CoroutineContext, throwable: Throwable) -> Unit)? = null
 ): Job {
-    return baseMainScope.launch(Dispatchers.Main + coroutineExceptionHandler) {
-        val deferred = async(Dispatchers.IO + coroutineExceptionHandler) {
-            loader()
+    return baseMainScope.launch(
+        Dispatchers.Main +
+                if (onCoroutineExceptionHandler == null)
+                    coroutineExceptionHandler
+                else
+                    CoroutineExceptionHandler { coroutineContext, throwable ->
+                        onCoroutineExceptionHandler(coroutineContext, throwable)
+                    }
+    )
+    {
+        val deferred =
+            async(Dispatchers.IO + coroutineExceptionHandler) {
+                loader()
+            }
+        receiver?.let {
+            it(deferred.await())
         }
-        receiver(deferred.await())
     }
+}
+
+public fun <T> BaseFragment.load(loader: suspend CoroutineScope.() -> T): Job {
+    return load(loader, null, null)
 }
