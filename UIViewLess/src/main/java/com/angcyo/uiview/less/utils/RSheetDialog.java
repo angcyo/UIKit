@@ -28,32 +28,55 @@ import java.util.ArrayList;
  *
  * @author angcyo
  * @date 2018/12/09
+ * @see RDialog.Builder#showSheetDialog()
  */
+@Deprecated
 public class RSheetDialog {
 
     public static Builder build(@NonNull Context context) {
         return new Builder(context);
     }
 
+    public static View createItem(@NonNull Context context, @NonNull final ItemInfo info) {
+        TextView textView = new TextView(context);
+        textView.setText(info.mItemText);
+        textView.setTextColor(SkinHelper.getSkin().getThemeSubColor());
+        textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, SkinHelper.getSkin().getMainTextSize());
+        //textView.setGravity(Gravity.CENTER);
+
+        int offset = ResUtil.getDimen(R.dimen.base_xxhdpi);
+        if (info.leftRes != 0) {
+            textView.setCompoundDrawablePadding(offset);
+            textView.setCompoundDrawablesWithIntrinsicBounds(info.leftRes, 0, 0, 0);
+        }
+        textView.setGravity(Gravity.START | Gravity.CENTER_VERTICAL);
+        textView.setPadding(offset, 0, 0, 0);
+
+        return textView;
+    }
+
+    public interface ItemConfig {
+        void onCreateItem(@NonNull View itemView, @NonNull ItemInfo itemInfo, int position);
+
+        void onLoadContent(@NonNull RBaseViewHolder viewHolder);
+    }
+
     public static class Builder {
 
-        Context context;
-
-        boolean showCancelButton = true;
-
-        ItemConfig itemConfig;
-
-        String dialogTitle;
-
-        View.OnClickListener cancelButtonClickListener;
-
         protected ArrayList<ItemInfo> mItemInfos = new ArrayList<>();
-
+        Context context;
+        boolean showCancelButton = true;
+        ItemConfig itemConfig;
+        String dialogTitle;
+        View.OnClickListener cancelButtonClickListener;
         BottomSheetDialog dialog;
+
+        int windowFeature = 0;
 
         public Builder(@NonNull Context context) {
             this.context = context;
             dialog = new BottomSheetDialog(context);
+            dialog.getWindow().setLayout(-1, 400);
         }
 
         public Builder addItem(String text, View.OnClickListener clickListener) {
@@ -90,6 +113,11 @@ public class RSheetDialog {
 
         public Builder setCancelButtonClickListener(View.OnClickListener cancelButtonClickListener) {
             this.cancelButtonClickListener = cancelButtonClickListener;
+            return this;
+        }
+
+        public Builder setWindowFeature(int windowFeature) {
+            this.windowFeature = windowFeature;
             return this;
         }
 
@@ -139,6 +167,7 @@ public class RSheetDialog {
         }
 
         public BottomSheetDialog show() {
+            dialog.getWindow().requestFeature(windowFeature);
             build();
             dialog.show();
             return dialog;
@@ -194,31 +223,6 @@ public class RSheetDialog {
         }
 
     }
-
-    public static View createItem(@NonNull Context context, @NonNull final ItemInfo info) {
-        TextView textView = new TextView(context);
-        textView.setText(info.mItemText);
-        textView.setTextColor(SkinHelper.getSkin().getThemeSubColor());
-        textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, SkinHelper.getSkin().getMainTextSize());
-        //textView.setGravity(Gravity.CENTER);
-
-        int offset = ResUtil.getDimen(R.dimen.base_xxhdpi);
-        if (info.leftRes != 0) {
-            textView.setCompoundDrawablePadding(offset);
-            textView.setCompoundDrawablesWithIntrinsicBounds(info.leftRes, 0, 0, 0);
-        }
-        textView.setGravity(Gravity.START | Gravity.CENTER_VERTICAL);
-        textView.setPadding(offset, 0, 0, 0);
-
-        return textView;
-    }
-
-    public interface ItemConfig {
-        void onCreateItem(@NonNull View itemView, @NonNull ItemInfo itemInfo, int position);
-
-        void onLoadContent(@NonNull RBaseViewHolder viewHolder);
-    }
-
 
     public static class ItemInfo {
         public String mItemText;

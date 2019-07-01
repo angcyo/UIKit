@@ -11,6 +11,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.PopupWindow
+import com.angcyo.uiview.less.base.helper.TitleItemHelper.NO_NUM
 import com.angcyo.uiview.less.iview.ChoiceIView
 import com.angcyo.uiview.less.kotlin.dpi
 import com.angcyo.uiview.less.kotlin.getViewRect
@@ -54,29 +55,46 @@ private fun configDialogBuilder(builder: RDialog.Builder, dialogConfig: BaseDial
                 dialogConfig.dialogInit.invoke(dialog, dialogViewHolder)
             }
         })
+        .setWindowFeature(dialogConfig.windowFeature)
+        .setWindowFlags(dialogConfig.windowFlags)
+
+    dialogConfig.dialogBgDrawable?.let {
+        builder.setDialogBgDrawable(it)
+    }
+
+    if (dialogConfig.dialogWidth != NO_NUM) {
+        builder.setDialogWidth(dialogConfig.dialogWidth)
+    }
+    if (dialogConfig.dialogHeight != NO_NUM) {
+        builder.setDialogHeight(dialogConfig.dialogHeight)
+    }
     return builder
+}
+
+private fun RDialog.Builder.show(dialogConfig: BaseDialogConfig): Dialog {
+    val builder = configDialogBuilder(this, dialogConfig)
+
+    return when (dialogConfig.dialogType) {
+        BaseDialogConfig.DIALOG_TYPE_ALERT_DIALOG -> builder.showAlertDialog()
+        BaseDialogConfig.DIALOG_TYPE_BOTTOM_SHEET_DIALOG -> builder.showSheetDialog()
+        else -> builder.showCompatDialog()
+    }
 }
 
 fun Context.normalDialog(config: NormalDialogConfig.() -> Unit): Dialog {
     val dialogConfig = NormalDialogConfig()
     dialogConfig.config()
 
-    return configDialogBuilder(
-        RDialog.build(this)
-            .setDialogWidth(-1),
-        dialogConfig
-    ).showCompatDialog()
+    return RDialog.build(this)
+        .setDialogWidth(-1).show(dialogConfig)
 }
 
 fun Context.normalIosDialog(config: IosDialogConfig.() -> Unit): Dialog {
     val dialogConfig = IosDialogConfig()
     dialogConfig.config()
 
-    return configDialogBuilder(
-        RDialog.build(this)
-            .setDialogWidth(-1),
-        dialogConfig
-    ).showCompatDialog()
+    return RDialog.build(this)
+        .setDialogWidth(-1).show(dialogConfig)
 }
 
 /**
@@ -86,10 +104,7 @@ fun Context.itemsDialog(config: ItemDialogConfig.() -> Unit): Dialog {
     val dialogConfig = ItemDialogConfig()
     dialogConfig.config()
 
-    return configDialogBuilder(
-        buildBottomDialog(),
-        dialogConfig
-    ).showCompatDialog()
+    return buildBottomDialog().show(dialogConfig)
 }
 
 /**
@@ -99,10 +114,7 @@ fun Context.menuDialog(config: MenuDialogConfig.() -> Unit): Dialog {
     val dialogConfig = MenuDialogConfig()
     dialogConfig.config()
 
-    return configDialogBuilder(
-        buildBottomDialog(),
-        dialogConfig
-    ).showCompatDialog()
+    return buildBottomDialog().show(dialogConfig)
 }
 
 /**
@@ -111,14 +123,10 @@ fun Context.menuDialog(config: MenuDialogConfig.() -> Unit): Dialog {
 fun Context.singleChoiceDialog(config: MenuDialogConfig.() -> Unit): Dialog {
     val dialogConfig = MenuDialogConfig()
     dialogConfig.choiceModel = ChoiceIView.CHOICE_MODE_SINGLE
-    dialogConfig.dialogCancel = false
     dialogConfig.dialogCanceledOnTouchOutside = false
     dialogConfig.config()
 
-    return configDialogBuilder(
-        buildBottomDialog(),
-        dialogConfig
-    ).showCompatDialog()
+    return buildBottomDialog().show(dialogConfig)
 }
 
 /**
@@ -127,14 +135,10 @@ fun Context.singleChoiceDialog(config: MenuDialogConfig.() -> Unit): Dialog {
 fun Context.multiChoiceDialog(config: MenuDialogConfig.() -> Unit): Dialog {
     val dialogConfig = MenuDialogConfig()
     dialogConfig.choiceModel = ChoiceIView.CHOICE_MODE_MULTI
-    dialogConfig.dialogCancel = false
     dialogConfig.dialogCanceledOnTouchOutside = false
     dialogConfig.config()
 
-    return configDialogBuilder(
-        buildBottomDialog(),
-        dialogConfig
-    ).showCompatDialog()
+    return buildBottomDialog().show(dialogConfig)
 }
 
 
@@ -145,10 +149,7 @@ fun Context.wheelDialog(config: WheelDialogConfig.() -> Unit): Dialog {
     val dialogConfig = WheelDialogConfig()
     dialogConfig.config()
 
-    return configDialogBuilder(
-        buildBottomDialog(),
-        dialogConfig
-    ).showCompatDialog()
+    return buildBottomDialog().show(dialogConfig)
 }
 
 
@@ -157,27 +158,19 @@ fun Context.wheelDialog(config: WheelDialogConfig.() -> Unit): Dialog {
  * */
 fun Context.inputDialog(config: InputDialogConfig.() -> Unit): Dialog {
     val dialogConfig = InputDialogConfig()
-    dialogConfig.dialogCancel = false
     dialogConfig.dialogCanceledOnTouchOutside = false
     dialogConfig.config()
 
-    return configDialogBuilder(
-        buildBottomDialog(),
-        dialogConfig
-    ).showCompatDialog()
+    return buildBottomDialog().show(dialogConfig)
 }
 
 /**多输入框*/
 fun Context.inputMultiDialog(config: InputMultiDialogConfig.() -> Unit): Dialog {
     val dialogConfig = InputMultiDialogConfig()
-    dialogConfig.dialogCancel = false
     dialogConfig.dialogCanceledOnTouchOutside = false
     dialogConfig.config()
 
-    return configDialogBuilder(
-        buildBottomDialog(),
-        dialogConfig
-    ).showCompatDialog()
+    return buildBottomDialog().show(dialogConfig)
 }
 
 
@@ -186,7 +179,6 @@ fun Context.inputMultiDialog(config: InputMultiDialogConfig.() -> Unit): Dialog 
  * */
 fun Context.multiInputDialog(config: InputDialogConfig.() -> Unit): Dialog {
     val dialogConfig = InputDialogConfig()
-    dialogConfig.dialogCancel = false
     dialogConfig.dialogCanceledOnTouchOutside = false
     dialogConfig.maxInputLength = 2000
     dialogConfig.inputViewHeight = 100 * dpi
@@ -194,10 +186,7 @@ fun Context.multiInputDialog(config: InputDialogConfig.() -> Unit): Dialog {
     dialogConfig.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE
     dialogConfig.config()
 
-    return configDialogBuilder(
-        buildBottomDialog(),
-        dialogConfig
-    ).showCompatDialog()
+    return buildBottomDialog().show(dialogConfig)
 }
 
 /**
@@ -207,10 +196,7 @@ fun Context.gridDialog(config: GridDialogConfig.() -> Unit): Dialog {
     val dialogConfig = GridDialogConfig()
     dialogConfig.config()
 
-    return configDialogBuilder(
-        buildBottomDialog().setCanceledOnTouchOutside(true),
-        dialogConfig
-    ).showCompatDialog()
+    return buildBottomDialog().show(dialogConfig)
 }
 
 /**
@@ -291,10 +277,7 @@ fun Context.dateDialog(config: DateDialogConfig.() -> Unit): Dialog {
     val dialogConfig = DateDialogConfig()
     dialogConfig.config()
 
-    return configDialogBuilder(
-        buildBottomDialog().setCanceledOnTouchOutside(true),
-        dialogConfig
-    ).showCompatDialog()
+    return buildBottomDialog().show(dialogConfig)
 }
 
 /**
@@ -304,19 +287,13 @@ fun Context.optionDialog(config: OptionDialogConfig.() -> Unit): Dialog {
     val dialogConfig = OptionDialogConfig()
     dialogConfig.config()
 
-    return configDialogBuilder(
-        buildBottomDialog().setCanceledOnTouchOutside(true),
-        dialogConfig
-    ).showCompatDialog()
+    return buildBottomDialog().show(dialogConfig)
 }
 
 fun <T : BaseDialogConfig> Context.customBottomDialog(customConfig: T, config: T.() -> Unit): Dialog {
     customConfig.config()
 
-    return configDialogBuilder(
-        buildBottomDialog().setCanceledOnTouchOutside(true),
-        customConfig
-    ).showCompatDialog()
+    return buildBottomDialog().show(customConfig)
 }
 
 // Fragment

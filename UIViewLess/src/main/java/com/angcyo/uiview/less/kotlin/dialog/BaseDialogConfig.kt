@@ -1,9 +1,12 @@
 package com.angcyo.uiview.less.kotlin.dialog
 
 import android.app.Dialog
+import android.graphics.drawable.Drawable
 import android.view.View
+import android.view.Window
 import com.angcyo.lib.L
 import com.angcyo.uiview.less.R
+import com.angcyo.uiview.less.base.helper.TitleItemHelper.NO_NUM
 import com.angcyo.uiview.less.kotlin.clickIt
 import com.angcyo.uiview.less.recycler.RBaseViewHolder
 
@@ -15,6 +18,12 @@ import com.angcyo.uiview.less.recycler.RBaseViewHolder
  * Copyright (c) 2019 ShenZhen O&M Cloud Co., Ltd. All rights reserved.
  */
 abstract class BaseDialogConfig {
+
+    companion object {
+        const val DIALOG_TYPE_APPCOMPAT = 1
+        const val DIALOG_TYPE_ALERT_DIALOG = 2
+        const val DIALOG_TYPE_BOTTOM_SHEET_DIALOG = 3
+    }
 
     open var dialogLayoutId = R.layout.dialog_normal_layout
 
@@ -168,4 +177,18 @@ abstract class BaseDialogConfig {
         L.d("onDialogDismiss")
     }
 
+    /**
+     * 显示dialog的类型
+     * [AppCompatDialog] [AlertDialog] [BottomSheetDialog]
+     * */
+    var dialogType = DIALOG_TYPE_APPCOMPAT
+
+    var dialogWidth = NO_NUM
+    var dialogHeight = NO_NUM
+    var dialogGravity = NO_NUM
+    var dialogBgDrawable: Drawable? = null
+
+    var windowFeature = Window.FEATURE_NO_TITLE
+    /**正数表示addFlags, 负数表示clearFlags*/
+    var windowFlags = intArrayOf()
 }

@@ -342,11 +342,40 @@ public class RDialog {
          */
         @StyleRes
         int animStyleResId = NO_NUM;
+        /**
+         * 系统默认3个按钮设置
+         */
+        CharSequence positiveButtonText;
+        CharSequence negativeButtonText;
+        CharSequence neutralButtonText;
+        DialogInterface.OnClickListener positiveButtonListener;
+        DialogInterface.OnClickListener negativeButtonListener;
+        DialogInterface.OnClickListener neutralButtonListener;
+        DialogInterface.OnDismissListener onDismissListener;
+        DialogInterface.OnCancelListener onCancelListener;
+
+        /**
+         * https://developer.android.google.cn/reference/android/view/Window.html
+         *
+         * @see Window#requestFeature(int)
+         */
+        int windowFeature = Window.FEATURE_NO_TITLE;
+        /**
+         * 正数表示addFlags, 负数表示clearFlags
+         *
+         * @see WindowManager.LayoutParams#FLAG_TRANSLUCENT_STATUS
+         * @see WindowManager.LayoutParams#FLAG_DIM_BEHIND
+         * @see WindowManager.LayoutParams#FLAG_LAYOUT_IN_SCREEN
+         * @see WindowManager.LayoutParams#FLAG_LAYOUT_IN_OVERSCAN
+         **/
+        int[] windowFlags;
 
         public Builder(@NonNull Context context) {
             this.context = context;
             setAnimStyleResId(R.style.BaseDialogTranAnim);
         }
+
+        //<editor-fold desc="window的配置">
 
         public Builder setContentView(@NonNull View view) {
             contentView = view;
@@ -395,8 +424,6 @@ public class RDialog {
             return this;
         }
 
-        //<editor-fold desc="window的配置">
-
         public Builder setDialogBgDrawable(@NonNull Drawable dialogBgDrawable) {
             this.dialogBgDrawable = dialogBgDrawable;
             return this;
@@ -406,10 +433,13 @@ public class RDialog {
             return setDialogBgDrawable(new ColorDrawable(color));
         }
 
+        //</editor-fold>
+
+        //<editor-fold desc="系统默认3个按钮设置">
+
         public Builder setDialogBgResource(@DrawableRes int drawable) {
             return setDialogBgDrawable(ResUtil.getDrawable(drawable));
         }
-
 
         public Builder setDialogWidth(int dialogWidth) {
             this.dialogWidth = dialogWidth;
@@ -446,24 +476,6 @@ public class RDialog {
             this.dialogGravity = dialogGravity;
             return this;
         }
-
-        //</editor-fold>
-
-        //<editor-fold desc="系统默认3个按钮设置">
-
-        /**
-         * 系统默认3个按钮设置
-         */
-        CharSequence positiveButtonText;
-        CharSequence negativeButtonText;
-        CharSequence neutralButtonText;
-
-        DialogInterface.OnClickListener positiveButtonListener;
-        DialogInterface.OnClickListener negativeButtonListener;
-        DialogInterface.OnClickListener neutralButtonListener;
-
-        DialogInterface.OnDismissListener onDismissListener;
-        DialogInterface.OnCancelListener onCancelListener;
 
         //积极的按钮
         public Builder setPositiveButtonText(CharSequence positiveButtonText) {
@@ -508,6 +520,16 @@ public class RDialog {
             return this;
         }
 
+        public Builder setWindowFeature(int windowFeature) {
+            this.windowFeature = windowFeature;
+            return this;
+        }
+
+        public Builder setWindowFlags(int[] windowFlags) {
+            this.windowFlags = windowFlags;
+            return this;
+        }
+
         //</editor-fold>
 
         /**
@@ -516,7 +538,23 @@ public class RDialog {
         private void configWindow(@NonNull Dialog dialog) {
             Window window = dialog.getWindow();
 
+            if (dialog instanceof AppCompatDialog) {
+                ((AppCompatDialog) dialog).supportRequestWindowFeature(windowFeature);
+            } else {
+                dialog.requestWindowFeature(windowFeature);
+            }
+
             if (window != null) {
+
+                if (windowFlags != null) {
+                    for (int flag : windowFlags) {
+                        if (flag >= 0) {
+                            window.addFlags(flag);
+                        } else {
+                            window.clearFlags(-flag);
+                        }
+                    }
+                }
 
                 if (dialog instanceof AlertDialog) {
                 } else {
@@ -613,6 +651,9 @@ public class RDialog {
 
         }
 
+        /**
+         * AppCompatDialog -> AlertDialog
+         */
         public AlertDialog showAlertDialog() {
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
 
@@ -648,15 +689,20 @@ public class RDialog {
             return alertDialog;
         }
 
+        /**
+         * AppCompatDialog -> BottomSheetDialog
+         */
         public BottomSheetDialog showSheetDialog() {
             BottomSheetDialog sheetDialog = new BottomSheetDialog(context);
             configDialog(sheetDialog);
             return sheetDialog;
         }
 
+        /**
+         * Dialog -> AppCompatDialog
+         */
         public AppCompatDialog showCompatDialog() {
             AppCompatDialog dialog = new AppCompatDialog(context);
-            dialog.requestWindowFeature(0);
             configDialog(dialog);
             return dialog;
         }
@@ -699,6 +745,10 @@ public class RDialog {
         OnInputListener inputListener;
 
         OnInitListener initListener;
+
+        public InputBuilder(@NonNull Context context) {
+            this.context = context;
+        }
 
         public InputBuilder setMaxInputLength(int maxInputLength) {
             this.maxInputLength = maxInputLength;
@@ -753,10 +803,6 @@ public class RDialog {
         public InputBuilder setSaveButtonText(String saveButtonText) {
             this.saveButtonText = saveButtonText;
             return this;
-        }
-
-        public InputBuilder(@NonNull Context context) {
-            this.context = context;
         }
 
         public void doIt() {
@@ -861,6 +907,7 @@ public class RDialog {
 
         public static final String DEFAULT_PATTERN = "yyyy-MM-dd";
         public static final SimpleDateFormat DF = new SimpleDateFormat(DEFAULT_PATTERN, Locale.CHINA);
+        private WheelTime wheelTime; //自定义控件
 
         public TimeBuilder(Context context) {
             super(context);
@@ -868,8 +915,6 @@ public class RDialog {
             setDate(getCalendar());
             setRangDate(getCalendar("1970-01-01", DEFAULT_PATTERN), getCalendar());
         }
-
-        private WheelTime wheelTime; //自定义控件
 
         /**
          * 设置可以选择的时间范围, 要在setTime之前调用才有效果
@@ -1117,12 +1162,14 @@ public class RDialog {
         String province;
         String city;
         String district;
+        List options1Items = new ArrayList();
+        List<List> options2Items;
+        List<List<List>> options3Items;
+        private WheelOptions wheelOptions;
 
         public OptionsBuilder(@NonNull Context context) {
             super(context);
         }
-
-        private WheelOptions wheelOptions;
 
         private void initWheelOptions(LinearLayout optionsPicker) {
             wheelOptions = new WheelOptions(optionsPicker, mPickerOptions.isRestoreItem);
@@ -1197,10 +1244,6 @@ public class RDialog {
             this.setPicker(options1Items, options2Items, null);
             return this;
         }
-
-        List options1Items = new ArrayList();
-        List<List> options2Items;
-        List<List<List>> options3Items;
 
         /**
          * @see com.contrarywind.interfaces.IPickerViewData

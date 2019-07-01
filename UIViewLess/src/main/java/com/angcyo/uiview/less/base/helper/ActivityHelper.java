@@ -116,8 +116,14 @@ public class ActivityHelper {
         if (activity == null) {
             return;
         }
+        enableLayoutFullScreen(activity.getWindow(), enable);
+    }
+
+    public static void enableLayoutFullScreen(Window window, boolean enable) {
+        if (window == null) {
+            return;
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Window window = activity.getWindow();
             window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             //window.setStatusBarColor(Color.TRANSPARENT);
