@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit;
  * @date 2018/12/17
  */
 public class HttpLogFileInterceptor implements Interceptor {
-    private static final Charset UTF8 = Charset.forName("UTF-8");
+    public static final Charset UTF8 = Charset.forName("UTF-8");
 
     OnHttpLogIntercept onHttpLogIntercept;
 
@@ -275,7 +275,7 @@ public class HttpLogFileInterceptor implements Interceptor {
         return response;
     }
 
-    static boolean isPlaintext(Buffer buffer) throws EOFException {
+    public static boolean isPlaintext(Buffer buffer) throws EOFException {
         try {
             Buffer prefix = new Buffer();
             long byteCount = buffer.size() < 64 ? buffer.size() : 64;
@@ -295,7 +295,7 @@ public class HttpLogFileInterceptor implements Interceptor {
         }
     }
 
-    private boolean bodyEncoded(Headers headers) {
+    public static boolean bodyEncoded(Headers headers) {
         String contentEncoding = headers.get("Content-Encoding");
         return contentEncoding != null && !contentEncoding.equalsIgnoreCase("identity");
     }

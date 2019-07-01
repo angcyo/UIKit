@@ -1786,7 +1786,7 @@ public class ExEditText extends AppCompatEditText {
     @Override
     protected void onVisibilityChanged(View changedView, int visibility) {
         super.onVisibilityChanged(changedView, visibility);
-        if (visibility != VISIBLE) {
+        if (visibility != VISIBLE && !isInEditMode()) {
             hideSoftInput();
         }
     }
