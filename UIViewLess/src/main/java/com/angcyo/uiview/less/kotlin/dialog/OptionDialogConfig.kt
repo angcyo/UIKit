@@ -65,7 +65,10 @@ open class OptionDialogConfig : BaseDialogConfig() {
 
             override fun onBindView(holder: RBaseViewHolder, position: Int, bean: Any?) {
                 holder.tv(R.id.text_view).text = optionItemToString(bean!!)
-                holder.visible(R.id.image_view, optionList.size > selectorLevel && optionList[selectorLevel] == bean)
+                holder.visible(
+                    R.id.image_view,
+                    optionList.size > selectorLevel && isOptionEquItem(optionList[selectorLevel], bean)
+                )
 
                 holder.clickItem {
                     if (selectorLevel == optionList.size) {
@@ -121,13 +124,13 @@ open class OptionDialogConfig : BaseDialogConfig() {
             var scrollPosition = 0
             if (selectorLevel in 0 until it.size && selectorLevel in 0 until optionList.size) {
                 for (i in 0 until it.size) {
-                    if (optionList[selectorLevel] == it[i]) {
+                    if (isOptionEquItem(optionList[selectorLevel], it[i])) {
                         scrollPosition = i
                         break
                     }
                 }
             }
-            dialogViewHolder.rv(R.id.recycler_view).scrollToFirst(scrollPosition)
+            dialogViewHolder.rv(R.id.recycler_view).smoothScrollToPosition(scrollPosition)
 
             //重置Tab Items (主要是添加 "请选择" tab)
             if (selectorLevel >= optionList.size) {
@@ -202,4 +205,8 @@ open class OptionDialogConfig : BaseDialogConfig() {
     var onOptionResult: (dialog: Dialog, options: MutableList<Any>) -> Boolean = { _, _ ->
         false
     }
+
+    /**Tab中的[Item]是否和列表中的[Item]相同*/
+    var isOptionEquItem: (option: Any, item: Any) -> Boolean =
+        { option, item -> optionItemToString(option) == optionItemToString(item) }
 }
