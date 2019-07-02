@@ -117,6 +117,19 @@ open class OptionDialogConfig : BaseDialogConfig() {
             selectorLevel = level
             adapter.resetData(it)
 
+            //滚动到目标位置
+            var scrollPosition = 0
+            if (selectorLevel in 0 until it.size && selectorLevel in 0 until optionList.size) {
+                for (i in 0 until it.size) {
+                    if (optionList[selectorLevel] == it[i]) {
+                        scrollPosition = i
+                        break
+                    }
+                }
+            }
+            dialogViewHolder.rv(R.id.recycler_view).scrollToFirst(scrollPosition)
+
+            //重置Tab Items (主要是添加 "请选择" tab)
             if (selectorLevel >= optionList.size) {
                 resetTabToLevel(dialogViewHolder, selectorLevel)
             }
