@@ -1,6 +1,6 @@
 package com.angcyo.uiview.less.picture;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.view.View;
 import com.angcyo.uiview.less.recycler.RBaseViewHolder;
 import com.angcyo.uiview.less.widget.pager.RPagerAdapter;

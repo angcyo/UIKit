@@ -1,8 +1,8 @@
 package com.angcyo.uiview.less.picture.transition
 
 import android.graphics.Rect
-import android.support.transition.*
-import android.support.v4.view.animation.LinearOutSlowInInterpolator
+import androidx.transition.*
+import androidx.interpolator.view.animation.LinearOutSlowInInterpolator
 import android.view.View
 import android.view.ViewGroup
 import com.angcyo.uiview.less.kotlin.setWidthHeight

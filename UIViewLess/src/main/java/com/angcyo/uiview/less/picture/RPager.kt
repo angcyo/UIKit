@@ -1,6 +1,6 @@
 package com.angcyo.uiview.less.picture
 
-import android.support.v4.app.FragmentManager
+import androidx.fragment.app.FragmentManager
 import com.angcyo.uiview.less.base.helper.FragmentHelper
 import com.angcyo.uiview.less.picture.transition.ViewTransitionConfig
 
@@ -14,7 +14,7 @@ import com.angcyo.uiview.less.picture.transition.ViewTransitionConfig
 
 object RPager {
     fun start(
-        fragmentManager: FragmentManager?,
+        fragmentManager: androidx.fragment.app.FragmentManager?,
         transitionFragment: ViewTransitionFragment,
         init: (ViewTransitionConfig.() -> Unit) = {}
     ) {
@@ -27,7 +27,7 @@ object RPager {
             .doIt()
     }
 
-    fun start(fragmentManager: FragmentManager?, init: (ViewTransitionConfig.() -> Unit) = {}) {
+    fun start(fragmentManager: androidx.fragment.app.FragmentManager?, init: (ViewTransitionConfig.() -> Unit) = {}) {
         start(fragmentManager, ViewTransitionFragment(), init)
     }
 
@@ -64,7 +64,7 @@ object RPager {
      * </pre>
      *
      * */
-    fun pager(fragmentManager: FragmentManager?, init: (ViewTransitionConfig.() -> Unit) = {}) {
+    fun pager(fragmentManager: androidx.fragment.app.FragmentManager?, init: (ViewTransitionConfig.() -> Unit) = {}) {
         start(fragmentManager, PagerTransitionFragment(), init)
     }
 
@@ -98,7 +98,7 @@ object RPager {
      * </pre>
      * */
     fun localMedia(
-        fragmentManager: FragmentManager?,
+        fragmentManager: androidx.fragment.app.FragmentManager?,
         init: (LocalMediaTransitionFragment.LocalMediaTransitionConfig.() -> Unit) = {}
     ) {
         start(fragmentManager, LocalMediaTransitionFragment(), init as ViewTransitionConfig.() -> Unit)

@@ -1,7 +1,7 @@
 package com.angcyo.uiview.less.picture
 
 import android.os.Bundle
-import android.support.v4.view.ViewPager
+import androidx.viewpager.widget.ViewPager
 import android.view.View
 import com.angcyo.uiview.less.R
 import com.angcyo.uiview.less.kotlin.isViewIn
@@ -43,7 +43,7 @@ open class PagerTransitionFragment : ViewTransitionFragment() {
         }
 
         //放在后面设置, 是不想让setCurrentItem, 后立马触发回调
-        viewPager.addOnPageChangeListener(object : ViewPager.SimpleOnPageChangeListener() {
+        viewPager.addOnPageChangeListener(object : androidx.viewpager.widget.ViewPager.SimpleOnPageChangeListener() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
                 transitionConfig.onPageSelected(

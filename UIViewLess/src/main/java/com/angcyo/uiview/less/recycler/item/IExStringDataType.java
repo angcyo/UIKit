@@ -1,6 +1,6 @@
 package com.angcyo.uiview.less.recycler.item;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 /**
  * Copyright (C) 2016,深圳市红鸟网络科技股份有限公司 All rights reserved.

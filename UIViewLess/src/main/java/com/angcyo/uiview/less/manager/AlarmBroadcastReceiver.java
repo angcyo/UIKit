@@ -6,7 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import com.angcyo.lib.L;
 import com.angcyo.uiview.less.kotlin.ExKt;
 import com.angcyo.uiview.less.utils.RUtils;

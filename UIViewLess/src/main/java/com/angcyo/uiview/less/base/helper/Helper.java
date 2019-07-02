@@ -1,8 +1,8 @@
 package com.angcyo.uiview.less.base.helper;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.v4.app.FragmentManager;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentManager;
 import android.view.View;
 import com.angcyo.uiview.less.manager.RNotifier;
 

@@ -2,14 +2,13 @@ package com.angcyo.uiview.less.draw;
 
 import android.content.res.TypedArray;
 import android.graphics.*;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.graphics.PathUtils;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.graphics.PathUtils;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.BounceInterpolator;
-import android.view.animation.DecelerateInterpolator;
 import com.angcyo.uiview.less.R;
 import com.angcyo.uiview.less.resources.PathUtil;
 

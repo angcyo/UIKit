@@ -2,8 +2,8 @@ package com.angcyo.uiview.less.base;
 
 import android.graphics.Canvas;
 import android.graphics.Rect;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import android.text.TextPaint;
 import android.view.View;
 import com.angcyo.uiview.less.recycler.RExItemDecoration;

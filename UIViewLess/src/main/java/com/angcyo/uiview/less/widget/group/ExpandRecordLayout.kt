@@ -5,8 +5,8 @@ import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.*
-import android.support.v4.view.GestureDetectorCompat
-import android.support.v4.view.MotionEventCompat
+import androidx.core.view.GestureDetectorCompat
+import androidx.core.view.MotionEventCompat
 import android.text.TextUtils
 import android.util.AttributeSet
 import android.view.*

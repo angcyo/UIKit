@@ -2,7 +2,7 @@ package com.angcyo.uiview.less.draw.frame;
 
 import android.animation.ValueAnimator;
 import android.graphics.Color;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.util.AttributeSet;
 import android.view.View;
 import com.angcyo.uiview.less.draw.frame.impl.RippleFrameImpl;

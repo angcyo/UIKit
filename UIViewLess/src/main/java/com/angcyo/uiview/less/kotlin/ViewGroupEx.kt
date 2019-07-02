@@ -2,8 +2,8 @@ package com.angcyo.uiview.less.kotlin
 
 import android.app.Activity
 import android.graphics.Rect
-import android.support.annotation.LayoutRes
-import android.support.v7.widget.RecyclerView
+import androidx.annotation.LayoutRes
+import androidx.recyclerview.widget.RecyclerView
 import android.view.*
 import android.view.animation.Animation
 import android.view.animation.AnticipateInterpolator
@@ -66,11 +66,11 @@ public fun View.getLayoutOffsetTopWidthSoftInput(): Int {
 
 
 /**获取touch坐标对应的RecyclerView, 如果没有则null*/
-public fun ViewGroup.getTouchOnRecyclerView(touchRawX: Float, touchRawY: Float): RecyclerView? {
+public fun ViewGroup.getTouchOnRecyclerView(touchRawX: Float, touchRawY: Float): androidx.recyclerview.widget.RecyclerView? {
     return findRecyclerView(touchRawX, touchRawY)
 }
 
-public fun ViewGroup.getTouchOnRecyclerView(event: MotionEvent): RecyclerView? {
+public fun ViewGroup.getTouchOnRecyclerView(event: MotionEvent): androidx.recyclerview.widget.RecyclerView? {
     return findRecyclerView(event.rawX, event.rawY)
 }
 
@@ -180,18 +180,18 @@ public fun ViewGroup.findView(
 public fun ViewGroup.findRecyclerView(
     touchRawX: Float,
     touchRawY: Float
-): RecyclerView? {
+): androidx.recyclerview.widget.RecyclerView? {
     /**键盘的高度*/
-    var touchView: RecyclerView? = null
+    var touchView: androidx.recyclerview.widget.RecyclerView? = null
 
     val findView = findView(touchRawX, touchRawY,
         { view, _ ->
-            view is RecyclerView
+            view is androidx.recyclerview.widget.RecyclerView
         }, { view, _ ->
-            view !is RecyclerView
+            view !is androidx.recyclerview.widget.RecyclerView
         })
 
-    if (findView is RecyclerView) {
+    if (findView is androidx.recyclerview.widget.RecyclerView) {
         touchView = findView
     }
 

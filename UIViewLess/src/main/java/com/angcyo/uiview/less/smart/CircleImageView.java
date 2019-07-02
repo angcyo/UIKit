@@ -23,7 +23,6 @@ import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
 import android.os.Build;
 import android.view.View;
-import android.widget.ImageView;
 
 /**
  * Private class created to work around issues with AnimationListeners being
@@ -31,7 +30,7 @@ import android.widget.ImageView;
  * platforms.
  */
 @SuppressLint("ViewConstructor")
-public class CircleImageView extends android.support.v7.widget.AppCompatImageView {
+public class CircleImageView extends androidx.appcompat.widget.AppCompatImageView {
 
     protected static final int KEY_SHADOW_COLOR = 0x1E000000;
     protected static final int FILL_SHADOW_COLOR = 0x3D000000;

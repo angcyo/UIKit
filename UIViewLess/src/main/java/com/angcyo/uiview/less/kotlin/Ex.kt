@@ -5,7 +5,7 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.*
 import android.net.Uri
-import android.support.v4.math.MathUtils
+import androidx.core.math.MathUtils
 import android.text.TextUtils
 import android.util.Base64
 import android.view.MotionEvent

@@ -1,7 +1,7 @@
 package com.angcyo.uiview.less.recycler.adapter
 
 import android.app.Activity
-import android.support.v4.app.FragmentManager
+import androidx.fragment.app.FragmentManager
 import com.angcyo.uiview.less.R
 import com.angcyo.uiview.less.picture.RPager
 import com.angcyo.uiview.less.recycler.RBaseViewHolder

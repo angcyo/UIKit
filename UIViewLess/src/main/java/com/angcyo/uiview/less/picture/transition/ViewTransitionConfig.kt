@@ -7,9 +7,9 @@ import android.graphics.RectF
 import android.graphics.drawable.Drawable
 import android.media.MediaPlayer
 import android.os.Bundle
-import android.support.transition.*
-import android.support.v4.view.animation.FastOutSlowInInterpolator
-import android.support.v7.widget.RecyclerView
+import androidx.transition.*
+import androidx.interpolator.view.animation.FastOutSlowInInterpolator
+import androidx.recyclerview.widget.RecyclerView
 import android.view.View
 import android.widget.ImageView
 import com.angcyo.lib.L
@@ -387,7 +387,7 @@ open class ViewTransitionConfig {
     }
 
     /**@see [onGetImageViewId]]*/
-    var onGetRecyclerView: () -> RecyclerView? = {
+    var onGetRecyclerView: () -> androidx.recyclerview.widget.RecyclerView? = {
         null
     }
     /**@see [onGetRecyclerView]]*/

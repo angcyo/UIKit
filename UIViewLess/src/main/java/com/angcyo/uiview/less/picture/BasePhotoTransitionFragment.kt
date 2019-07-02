@@ -1,9 +1,9 @@
 package com.angcyo.uiview.less.picture
 
 import android.os.Bundle
-import android.support.transition.*
-import android.support.v4.view.animation.FastOutSlowInInterpolator
-import android.support.v7.widget.AppCompatImageView
+import androidx.transition.*
+import androidx.interpolator.view.animation.FastOutSlowInInterpolator
+import androidx.appcompat.widget.AppCompatImageView
 import android.widget.ImageView
 import com.angcyo.uiview.less.R
 import com.angcyo.uiview.less.picture.transition.ColorTransition

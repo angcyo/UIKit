@@ -1,6 +1,6 @@
 package com.angcyo.uiview.less.picture;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import com.angcyo.uiview.less.recycler.RBaseViewHolder;
 
 /**

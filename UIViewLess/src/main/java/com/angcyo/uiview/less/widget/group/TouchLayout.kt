@@ -1,8 +1,8 @@
 package com.angcyo.uiview.less.widget.group
 
 import android.content.Context
-import android.support.annotation.CallSuper
-import android.support.v4.view.GestureDetectorCompat
+import androidx.annotation.CallSuper
+import androidx.core.view.GestureDetectorCompat
 import android.util.AttributeSet
 import android.view.GestureDetector
 import android.view.MotionEvent

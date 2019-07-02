@@ -3,8 +3,8 @@ package com.angcyo.uiview.less.component
 import android.graphics.Color
 import android.os.Bundle
 import android.os.SystemClock
-import android.support.v4.app.FragmentManager
-import android.support.v4.util.ArrayMap
+import androidx.fragment.app.FragmentManager
+import androidx.collection.ArrayMap
 import android.text.TextUtils
 import android.text.format.Formatter
 import android.view.Gravity
@@ -49,7 +49,7 @@ import java.util.*
 open class FileSelectorFragment : BaseFragment() {
 
     companion object {
-        fun show(fragmentManager: FragmentManager?, config: FileSelectorConfig.() -> Unit) {
+        fun show(fragmentManager: androidx.fragment.app.FragmentManager?, config: FileSelectorConfig.() -> Unit) {
             FragmentHelper.build(fragmentManager)
                 .showFragment(FileSelectorFragment().fileSelectorConfig(config))
                 .defaultEnterAnim()
@@ -59,7 +59,7 @@ open class FileSelectorFragment : BaseFragment() {
 
     private var config = FileSelectorConfig()
 
-    private val md5CacheMap = ArrayMap<String, String>()
+    private val md5CacheMap = androidx.collection.ArrayMap<String, String>()
 
     override fun getLayoutId(): Int {
         return R.layout.base_fragment_file_selector

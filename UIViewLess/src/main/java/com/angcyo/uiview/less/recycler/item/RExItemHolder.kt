@@ -4,7 +4,7 @@ import android.app.Activity
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Rect
-import android.support.annotation.ColorRes
+import androidx.annotation.ColorRes
 import android.text.TextPaint
 import android.view.View
 import com.angcyo.uiview.less.recycler.RBaseViewHolder

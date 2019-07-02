@@ -5,7 +5,7 @@ import android.app.*;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
-import android.support.multidex.MultiDex;
+import androidx.multidex.MultiDex;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import com.angcyo.lib.L;

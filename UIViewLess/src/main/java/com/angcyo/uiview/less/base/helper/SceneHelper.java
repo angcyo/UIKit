@@ -1,11 +1,11 @@
 package com.angcyo.uiview.less.base.helper;
 
-import android.support.annotation.LayoutRes;
-import android.support.annotation.NonNull;
-import android.support.transition.ChangeBounds;
-import android.support.transition.Scene;
-import android.support.transition.Transition;
-import android.support.transition.TransitionManager;
+import androidx.annotation.LayoutRes;
+import androidx.annotation.NonNull;
+import androidx.transition.ChangeBounds;
+import androidx.transition.Scene;
+import androidx.transition.Transition;
+import androidx.transition.TransitionManager;
 import android.view.ViewGroup;
 import com.angcyo.lib.L;
 

@@ -2,8 +2,8 @@ package com.angcyo.uiview.less.picture.transition
 
 import android.animation.Animator
 import android.animation.ValueAnimator
-import android.support.transition.Transition
-import android.support.transition.TransitionValues
+import androidx.transition.Transition
+import androidx.transition.TransitionValues
 import android.view.ViewGroup
 
 /**

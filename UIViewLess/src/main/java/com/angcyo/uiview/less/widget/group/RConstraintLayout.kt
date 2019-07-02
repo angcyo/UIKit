@@ -4,8 +4,8 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
-import android.support.annotation.ColorInt
-import android.support.constraint.ConstraintLayout
+import androidx.annotation.ColorInt
+import androidx.constraintlayout.widget.ConstraintLayout
 import android.util.AttributeSet
 import com.angcyo.uiview.less.R
 import com.angcyo.uiview.less.draw.RDrawLine

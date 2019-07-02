@@ -16,7 +16,7 @@
                 android:layout_height="match_parent"/>
 
         <!--用来执行动画-->
-        <android.support.v7.widget.AppCompatImageView
+        <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/base_preview_view"
                 android:layout_width="wrap_content"
                 android:scaleType="fitCenter"

@@ -3,8 +3,8 @@ package com.angcyo.uiview.less.picture
 import android.app.Activity
 import android.graphics.Rect
 import android.os.Bundle
-import android.support.transition.*
-import android.support.v4.view.animation.FastOutSlowInInterpolator
+import androidx.transition.*
+import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import android.view.ViewGroup
 import com.angcyo.uiview.less.R
 import com.angcyo.uiview.less.base.BaseFragment

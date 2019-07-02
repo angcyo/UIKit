@@ -1,7 +1,7 @@
 package com.angcyo.uiview.less.widget.rsen;
 
-import android.support.annotation.NonNull;
-import android.support.v4.view.GestureDetectorCompat;
+import androidx.annotation.NonNull;
+import androidx.core.view.GestureDetectorCompat;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;

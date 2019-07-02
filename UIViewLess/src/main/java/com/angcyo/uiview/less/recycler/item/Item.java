@@ -2,7 +2,7 @@ package com.angcyo.uiview.less.recycler.item;
 
 import android.graphics.Canvas;
 import android.graphics.Rect;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.text.TextPaint;
 import android.view.View;
 import android.view.ViewGroup;

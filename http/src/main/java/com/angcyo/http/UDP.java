@@ -1,6 +1,6 @@
 package com.angcyo.http;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import com.androidzeitgeist.ani.discovery.Discovery;
 import com.androidzeitgeist.ani.discovery.DiscoveryException;
 import com.androidzeitgeist.ani.discovery.DiscoveryListener;

@@ -1,6 +1,6 @@
 package com.angcyo.uiview.less.kotlin.dsl
 
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView
 
 /**
  *
@@ -11,18 +11,18 @@ import android.support.v7.widget.RecyclerView
  */
 class DslRecyclerScroll {
 
-    var firstItemAdapterPosition = RecyclerView.NO_POSITION
+    var firstItemAdapterPosition = androidx.recyclerview.widget.RecyclerView.NO_POSITION
 
-    var firstItemCompletelyVisibleAdapterPosition = RecyclerView.NO_POSITION
+    var firstItemCompletelyVisibleAdapterPosition = androidx.recyclerview.widget.RecyclerView.NO_POSITION
 
     /**
      * @see RecyclerView.OnScrollListener.onScrolled
      * */
-    var onRecyclerScrolled: (recyclerView: RecyclerView, dx: Int, dy: Int) -> Unit = { _, _, _ -> }
+    var onRecyclerScrolled: (recyclerView: androidx.recyclerview.widget.RecyclerView, dx: Int, dy: Int) -> Unit = { _, _, _ -> }
 
     /**
      * @see RecyclerView.OnScrollListener.onScrollStateChanged
      * */
-    var onRecyclerScrollStateChanged: (recyclerView: RecyclerView, newState: Int) -> Unit = { _, _ -> }
+    var onRecyclerScrollStateChanged: (recyclerView: androidx.recyclerview.widget.RecyclerView, newState: Int) -> Unit = { _, _ -> }
 
 }

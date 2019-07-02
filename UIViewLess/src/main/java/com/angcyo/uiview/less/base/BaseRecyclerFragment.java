@@ -1,8 +1,8 @@
 package com.angcyo.uiview.less.base;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import android.widget.TextView;
 import com.angcyo.uiview.less.R;
 import com.angcyo.uiview.less.iview.AffectUI;
@@ -15,7 +15,6 @@ import com.angcyo.uiview.less.smart.MaterialHeader;
 import com.angcyo.uiview.less.widget.RSmartRefreshLayout;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
-import com.scwang.smartrefresh.layout.footer.ClassicsFooter;
 import com.scwang.smartrefresh.layout.listener.OnLoadMoreListener;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 

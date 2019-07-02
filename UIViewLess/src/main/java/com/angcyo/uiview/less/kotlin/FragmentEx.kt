@@ -1,7 +1,7 @@
 package com.angcyo.uiview.less.kotlin
 
-import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentManager
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import android.view.View
 import com.angcyo.lib.L
 import com.angcyo.uiview.less.R
@@ -23,13 +23,13 @@ import kotlin.coroutines.CoroutineContext
  * Copyright (c) 2019 ShenZhen O&M Cloud Co., Ltd. All rights reserved.
  */
 
-public fun get(fm: FragmentManager?): FragmentHelper.Builder {
+public fun get(fm: androidx.fragment.app.FragmentManager?): FragmentHelper.Builder {
     return FragmentHelper.build(fm)
         .defaultEnterAnim()
         .hideBeforeIndex(2)
 }
 
-public fun only(fm: FragmentManager?): FragmentHelper.Builder {
+public fun only(fm: androidx.fragment.app.FragmentManager?): FragmentHelper.Builder {
     return FragmentHelper.build(fm)
         .anim(R.anim.base_scale_alpha_enter, R.anim.base_no_alpha)
         .keepFragment(emptyList())
@@ -46,7 +46,7 @@ public fun BaseFragment.only(): FragmentHelper.Builder {
 /**
  * 移除其他, 只显示 f
  * */
-public fun BaseFragment.only(f: Class<out Fragment>, init: FragmentHelper.Builder.() -> Unit = {}): Fragment? {
+public fun BaseFragment.only(f: Class<out androidx.fragment.app.Fragment>, init: FragmentHelper.Builder.() -> Unit = {}): androidx.fragment.app.Fragment? {
     val builder = only().showFragment(f).apply {
         init()
     }
@@ -56,21 +56,21 @@ public fun BaseFragment.only(f: Class<out Fragment>, init: FragmentHelper.Builde
 /**
  * 移除其他, 只显示 f
  * */
-public fun BaseFragment.only(f: Fragment, init: FragmentHelper.Builder.() -> Unit = {}): Fragment? {
+public fun BaseFragment.only(f: androidx.fragment.app.Fragment, init: FragmentHelper.Builder.() -> Unit = {}): androidx.fragment.app.Fragment? {
     val builder = only().showFragment(f).apply {
         init()
     }
     return builder.doIt()
 }
 
-public fun BaseFragment.show(f: Class<out Fragment>, init: FragmentHelper.Builder.() -> Unit = {}): Fragment? {
+public fun BaseFragment.show(f: Class<out androidx.fragment.app.Fragment>, init: FragmentHelper.Builder.() -> Unit = {}): androidx.fragment.app.Fragment? {
     val builder = wtf().showFragment(f).apply {
         init()
     }
     return builder.doIt()
 }
 
-public fun BaseFragment.show(f: Fragment, init: FragmentHelper.Builder.() -> Unit = {}): Fragment? {
+public fun BaseFragment.show(f: androidx.fragment.app.Fragment, init: FragmentHelper.Builder.() -> Unit = {}): androidx.fragment.app.Fragment? {
     val builder = wtf().showFragment(f).apply {
         init()
     }

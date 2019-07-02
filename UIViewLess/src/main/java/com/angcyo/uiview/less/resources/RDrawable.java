@@ -8,9 +8,9 @@ import android.graphics.Rect;
 import android.graphics.Shader;
 import android.graphics.drawable.*;
 import android.os.Build;
-import android.support.annotation.ColorInt;
-import android.support.annotation.IntDef;
-import android.support.annotation.Nullable;
+import androidx.annotation.ColorInt;
+import androidx.annotation.IntDef;
+import androidx.annotation.Nullable;
 import android.view.Gravity;
 
 import java.lang.annotation.Retention;

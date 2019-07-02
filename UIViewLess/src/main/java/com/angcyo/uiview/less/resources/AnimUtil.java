@@ -7,7 +7,7 @@ import android.animation.ValueAnimator;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.os.Build;
-import android.support.v4.view.ViewCompat;
+import androidx.core.view.ViewCompat;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;

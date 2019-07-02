@@ -1,8 +1,8 @@
 package com.angcyo.http;
 
 import android.os.SystemClock;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import android.text.TextUtils;
 import okhttp3.Interceptor;
 import okhttp3.Request;

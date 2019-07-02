@@ -1,7 +1,7 @@
 package com.angcyo.uiview.less.accessibility
 
 import android.app.Activity
-import android.support.v7.app.AlertDialog
+import androidx.appcompat.app.AlertDialog
 import com.angcyo.uiview.less.utils.RUtils
 import com.angcyo.uiview.less.utils.permission.SettingsCompat
 

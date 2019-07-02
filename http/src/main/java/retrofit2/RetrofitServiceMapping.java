@@ -1,7 +1,7 @@
 package retrofit2;
 
-import android.support.annotation.NonNull;
-import android.support.v4.util.ArrayMap;
+import androidx.annotation.NonNull;
+import androidx.collection.ArrayMap;
 import android.text.TextUtils;
 import com.angcyo.http.BuildConfig;
 

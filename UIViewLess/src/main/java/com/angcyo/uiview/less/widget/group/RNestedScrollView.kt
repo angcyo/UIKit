@@ -1,7 +1,7 @@
 package com.angcyo.uiview.less.widget.group
 
 import android.content.Context
-import android.support.v4.widget.NestedScrollView
+import androidx.core.widget.NestedScrollView
 import android.util.AttributeSet
 import com.angcyo.uiview.less.R
 import com.angcyo.uiview.less.kotlin.calcWidthHeightRatio

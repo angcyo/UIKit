@@ -2,8 +2,8 @@ package com.angcyo.uiview.less.base.helper;
 
 import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
-import android.support.annotation.*;
-import android.support.v4.view.ViewCompat;
+import androidx.annotation.*;
+import androidx.core.view.ViewCompat;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;

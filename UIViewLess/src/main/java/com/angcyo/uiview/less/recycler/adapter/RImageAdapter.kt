@@ -1,6 +1,6 @@
 package com.angcyo.uiview.less.recycler.adapter
 
-import android.support.v4.app.FragmentManager
+import androidx.fragment.app.FragmentManager
 import android.util.SparseIntArray
 import com.angcyo.uiview.less.R
 import com.angcyo.uiview.less.picture.RPager
@@ -129,10 +129,10 @@ open class RImageAdapter<T> : RBaseAdapter<T>() {
         return null
     }
 
-    open fun getFragmentManager(): FragmentManager? = null
+    open fun getFragmentManager(): androidx.fragment.app.FragmentManager? = null
 
     /**启动图片浏览*/
-    open fun showLocalMediaPager(fragmentManager: FragmentManager?, startIndex: Int) {
+    open fun showLocalMediaPager(fragmentManager: androidx.fragment.app.FragmentManager?, startIndex: Int) {
         val startItem = allDatas[startIndex]
 
         val mediaList: List<LocalMedia>

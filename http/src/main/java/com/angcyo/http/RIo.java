@@ -1,7 +1,7 @@
 package com.angcyo.http;
 
 import android.os.Build;
-import android.support.annotation.RequiresApi;
+import androidx.annotation.RequiresApi;
 import okio.*;
 
 import java.io.*;

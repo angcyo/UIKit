@@ -1,6 +1,6 @@
 package com.angcyo.http.log;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.text.TextUtils;
 import com.angcyo.http.progress.ProgressIntercept;
 import okhttp3.*;

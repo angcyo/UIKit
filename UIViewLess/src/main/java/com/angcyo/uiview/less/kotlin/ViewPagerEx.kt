@@ -1,6 +1,6 @@
 package com.angcyo.uiview.less.kotlin
 
-import android.support.v4.view.ViewPager
+import androidx.viewpager.widget.ViewPager
 import com.angcyo.uiview.less.kotlin.dsl.DslPagerItem
 import com.angcyo.uiview.less.kotlin.dsl.DslViewPagerAdapter
 
@@ -12,7 +12,7 @@ import com.angcyo.uiview.less.kotlin.dsl.DslViewPagerAdapter
  * Copyright (c) 2019 ShenZhen O&M Cloud Co., Ltd. All rights reserved.
  */
 
-public fun ViewPager.dslPagerAdapter(init: DslViewPagerAdapter.() -> Unit) {
+public fun androidx.viewpager.widget.ViewPager.dslPagerAdapter(init: DslViewPagerAdapter.() -> Unit) {
     adapter = DslViewPagerAdapter().apply {
         init()
     }

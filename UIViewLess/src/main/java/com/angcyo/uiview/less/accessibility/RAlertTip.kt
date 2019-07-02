@@ -4,7 +4,7 @@ import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Build
-import android.support.annotation.LayoutRes
+import androidx.annotation.LayoutRes
 import android.view.*
 import com.angcyo.uiview.less.RApplication
 

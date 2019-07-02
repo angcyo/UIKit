@@ -3,8 +3,8 @@ package com.angcyo.uiview.less.widget
 import android.content.Context
 import android.graphics.Rect
 import android.graphics.drawable.Drawable
-import android.support.v4.content.ContextCompat
-import android.support.v7.widget.AppCompatAutoCompleteTextView
+import androidx.core.content.ContextCompat
+import androidx.appcompat.widget.AppCompatAutoCompleteTextView
 import android.text.TextUtils
 import android.text.method.PasswordTransformationMethod
 import android.util.AttributeSet

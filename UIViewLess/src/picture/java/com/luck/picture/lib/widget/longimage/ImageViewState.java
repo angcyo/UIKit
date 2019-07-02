@@ -17,7 +17,7 @@ limitations under the License.
 package com.luck.picture.lib.widget.longimage;
 
 import android.graphics.PointF;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import java.io.Serializable;
 

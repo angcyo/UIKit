@@ -1,6 +1,6 @@
 package com.angcyo.uiview.less.widget;
 
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 
 public interface CanScrollUpCallBack {
     /**

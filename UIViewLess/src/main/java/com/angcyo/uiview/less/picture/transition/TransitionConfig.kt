@@ -1,7 +1,7 @@
 package com.angcyo.uiview.less.picture.transition
 
 import android.graphics.Color
-import android.support.v7.widget.AppCompatImageView
+import androidx.appcompat.widget.AppCompatImageView
 import android.widget.ImageView
 import com.angcyo.uiview.less.kotlin.getViewRect
 import com.angcyo.uiview.less.picture.BaseTransitionFragment

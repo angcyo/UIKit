@@ -1,8 +1,8 @@
 package com.yalantis.ucrop;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import com.angcyo.uiview.less.R;
 import com.angcyo.uiview.less.base.Debug;
 import com.luck.picture.lib.config.PictureSelectionConfig;

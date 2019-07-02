@@ -3,8 +3,8 @@ package com.angcyo.uiview.less.picture
 import android.app.Activity
 import android.graphics.Rect
 import android.graphics.drawable.Drawable
-import android.support.v4.app.FragmentManager
-import android.support.v7.widget.RecyclerView
+import androidx.fragment.app.FragmentManager
+import androidx.recyclerview.widget.RecyclerView
 import android.widget.ImageView
 import com.angcyo.uiview.less.base.helper.FragmentHelper
 import com.angcyo.uiview.less.kotlin.childs
@@ -26,7 +26,7 @@ object RPhotoPager {
      * 全部手动配置 PagerConfig
      * */
     fun start(
-        fragmentManager: FragmentManager?,
+        fragmentManager: androidx.fragment.app.FragmentManager?,
         init: (RPhotoPagerConfig.() -> Unit)? = null
     ) {
         val config = RPhotoPagerConfig()
@@ -44,8 +44,8 @@ object RPhotoPager {
      * 通过RecyclerView简单启动pager
      * */
     fun start(
-        fragmentManager: FragmentManager?,
-        recyclerView: RecyclerView,
+        fragmentManager: androidx.fragment.app.FragmentManager?,
+        recyclerView: androidx.recyclerview.widget.RecyclerView,
         imageViewId: Int,
         photos: List<String>,
         startIndex: Int = 0,
@@ -78,7 +78,7 @@ object RPhotoPager {
      * 基础参数启动pager
      * */
     fun start(
-        fragmentManager: FragmentManager?,
+        fragmentManager: androidx.fragment.app.FragmentManager?,
         images: List<ImageView>,
         photos: List<String>,
         startIndex: Int = 0,
@@ -124,7 +124,7 @@ object RPhotoPager {
     /**
      * 从RecyclerView中, 获取到界面上所有的ImageView
      * */
-    fun getImageViews(recyclerView: RecyclerView, imageViewId: Int): MutableList<ImageView> {
+    fun getImageViews(recyclerView: androidx.recyclerview.widget.RecyclerView, imageViewId: Int): MutableList<ImageView> {
         val results = mutableListOf<ImageView>()
         recyclerView.childs { index, child ->
             child.findViewById<ImageView>(imageViewId)?.let {

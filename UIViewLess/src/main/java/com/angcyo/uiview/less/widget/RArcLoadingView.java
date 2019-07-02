@@ -1,7 +1,7 @@
 package com.angcyo.uiview.less.widget;
 
 import android.content.Context;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.util.AttributeSet;
 import com.angcyo.uiview.less.draw.RDrawArcLoading;
 import com.angcyo.uiview.less.draw.view.BaseDrawView;

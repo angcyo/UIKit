@@ -6,7 +6,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
             android:background="@drawable/base_dark_round_selector"
             android:layout_width="match_parent"
             android:layout_margin="5dp"
@@ -23,7 +23,7 @@
                 app:r_placeholder_drawable="@drawable/image_placeholder"
                 app:layout_constraintDimensionRatio="1:1"/>
 
-        <android.support.v7.widget.AppCompatImageView
+        <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/play_video_view"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
@@ -34,9 +34,9 @@
                 app:srcCompat="@drawable/ic_video_play"
                 android:layout_width="40dp"
                 android:layout_height="40dp"/>
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <android.support.v7.widget.AppCompatImageView
+    <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/delete_image_view"
             android:layout_gravity="right"
             android:scaleType="fitCenter"

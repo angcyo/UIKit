@@ -19,7 +19,7 @@
 
     </com.github.chrisbanes.photoview.PhotoView>
 
-    <android.support.v7.widget.AppCompatImageView
+    <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/play_video_view"
             android:layout_gravity="center"
             android:visibility="visible"

@@ -1,7 +1,7 @@
 package com.angcyo.http.log;
 
-import android.support.annotation.IntDef;
-import android.support.annotation.Nullable;
+import androidx.annotation.IntDef;
+import androidx.annotation.Nullable;
 import com.angcyo.http.BuildConfig;
 
 import java.io.File;

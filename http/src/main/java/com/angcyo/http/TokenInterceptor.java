@@ -1,6 +1,6 @@
 package com.angcyo.http;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;

@@ -1,7 +1,7 @@
 package com.angcyo.uiview.less.resources;
 
-import android.support.annotation.IntDef;
-import android.support.annotation.NonNull;
+import androidx.annotation.IntDef;
+import androidx.annotation.NonNull;
 import android.view.View;
 import android.view.animation.*;
 

@@ -1,7 +1,7 @@
 package com.angcyo.uiview.less.resources;
 
 import android.graphics.Path;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 /**
  * Email:angcyo@126.com
