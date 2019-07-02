@@ -2,6 +2,7 @@ package com.angcyo.uiview.less.kotlin.dialog
 
 import android.app.Dialog
 import android.graphics.Color
+import android.view.View
 import android.widget.TextView
 import com.angcyo.uiview.less.R
 import com.angcyo.uiview.less.base.BaseUI
@@ -38,7 +39,31 @@ open class OptionDialogConfig : BaseDialogConfig() {
     override fun onDialogInit(dialog: Dialog, dialogViewHolder: RBaseViewHolder) {
         super.onDialogInit(dialog, dialogViewHolder)
 
-        affectUI = BaseUI.uiFragment.createAffectUI(dialogViewHolder.group(R.id.content_wrap_layout), null)
+        affectUI = BaseUI.uiFragment
+            .createAffectUI(dialogViewHolder.group(R.id.content_wrap_layout), object : AffectUI.OnAffectListener {
+                override fun onAffectChangeBefore(affectUI: AffectUI, fromAffect: Int, toAffect: Int) {
+                }
+
+                override fun onAffectChange(
+                    affectUI: AffectUI,
+                    fromAffect: Int,
+                    toAffect: Int,
+                    fromView: View?,
+                    toView: View?
+                ) {
+                    toView?.isClickable = true
+                    if (toAffect == AffectUI.AFFECT_ERROR) {
+                        toView?.find<View>(R.id.base_retry_button)?.setOnClickListener {
+                            loadOptionList(dialogViewHolder, selectorLevel)
+                        }
+                    }
+                }
+
+                override fun onAffectInitLayout(affectUI: AffectUI, affect: Int, rootView: View) {
+
+                }
+
+            })
             .setContentAffect(AffectUI.CONTENT_AFFECT_NONE).create()
 
         //确定按钮状态
@@ -112,7 +137,7 @@ open class OptionDialogConfig : BaseDialogConfig() {
         if (needAsyncLoad) {
             affectUI.showAffect(AffectUI.AFFECT_LOADING)
         }
-        onLoadOptionList(optionList, level) {
+        onLoadOptionList(optionList, level, {
             if (needAsyncLoad) {
                 affectUI.showAffect(AffectUI.AFFECT_CONTENT)
             }
@@ -136,6 +161,16 @@ open class OptionDialogConfig : BaseDialogConfig() {
             if (selectorLevel >= optionList.size) {
                 resetTabToLevel(dialogViewHolder, selectorLevel)
             }
+        }) {
+            selectorLevel = level
+            adapter.resetData(emptyList())
+
+            if (selectorLevel >= optionList.size) {
+                resetTabToLevel(dialogViewHolder, selectorLevel)
+            }
+            if (needAsyncLoad) {
+                affectUI.showAffect(AffectUI.AFFECT_ERROR)
+            }
         }
     }
 
@@ -147,6 +182,7 @@ open class OptionDialogConfig : BaseDialogConfig() {
         if (onCheckOptionEnd(optionList, level)) {
             dialogViewHolder.enable(R.id.positive_button, true)
         } else {
+            dialogViewHolder.enable(R.id.positive_button, false)
             tabItems.add("请选择")
         }
 
@@ -188,8 +224,12 @@ open class OptionDialogConfig : BaseDialogConfig() {
      * @param options 之前选中的选项
      * @param level 当前需要请求级别, 从0开始
      * */
-    var onLoadOptionList: (options: MutableList<Any>, level: Int, callback: (MutableList<Any>) -> Unit) -> Unit =
-        { options, level, callback ->
+    var onLoadOptionList: (
+        options: MutableList<Any>, level: Int,
+        itemsCallback: (MutableList<Any>) -> Unit,
+        errorCallback: (Throwable?) -> Unit
+    ) -> Unit =
+        { options, level, itemsCallback, errorCallback ->
 
         }
 
