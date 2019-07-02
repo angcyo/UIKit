@@ -155,7 +155,7 @@ open class OptionDialogConfig : BaseDialogConfig() {
     /**已选中的选项*/
     var optionList = mutableListOf<Any>()
 
-    /**是否需要一部加载数据, true 会开启[affectUI]*/
+    /**是否需要异步加载数据, true 会开启[affectUI]*/
     var needAsyncLoad = true
 
     /**当前查看的选项级别*/
