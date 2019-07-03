@@ -578,9 +578,12 @@ public class AnimUtil {
                 .start();
     }
 
-    public static final int DEFAULT_DELAY_ANIM_TIME = 260;
-    public static final int DEFAULT_FINISH_ANIM_TIME = 200;//完成动画,尽量比启动动画快一点(相差最好是一帧的时间)
-    public static final int DEFAULT_ANIM_TIME = 200;
+    public static final long DEFAULT_DELAY_ANIM_TIME = 260;
+    public static final long DEFAULT_FINISH_ANIM_TIME = 200;//完成动画,尽量比启动动画快一点(相差最好是一帧的时间)
+    /**
+     * 默认动画执行时间
+     */
+    public static final long DEFAULT_ANIM_TIME = 300;
 
     public static void setDefaultConfig(Animation animation, boolean isFinish) {
         if (isFinish) {
@@ -696,6 +699,30 @@ public class AnimUtil {
 
         AnimationSet animationSet = new AnimationSet(true);
         animationSet.addAnimation(alphaAnimation);
+        animationSet.addAnimation(translateAnimation);
+        return animationSet;
+    }
+
+    public static Animation translateRightEnterAnimation() {
+        TranslateAnimation translateAnimation = new TranslateAnimation(Animation.RELATIVE_TO_SELF, 1f, Animation.RELATIVE_TO_SELF, 0f,
+                Animation.RELATIVE_TO_SELF, 0f, Animation.RELATIVE_TO_SELF, 0f);
+        setDefaultConfig(translateAnimation, false);
+
+        translateAnimation.setDuration(2 * DEFAULT_DIALOG_FINISH_ANIM_TIME);
+
+        AnimationSet animationSet = new AnimationSet(true);
+        animationSet.addAnimation(translateAnimation);
+        return animationSet;
+    }
+
+    public static Animation translateRightExitAnimation() {
+        TranslateAnimation translateAnimation = new TranslateAnimation(Animation.RELATIVE_TO_SELF, 0f, Animation.RELATIVE_TO_SELF, 1f,
+                Animation.RELATIVE_TO_SELF, 0f, Animation.RELATIVE_TO_SELF, 0f);
+        setDefaultConfig(translateAnimation, true);
+
+        translateAnimation.setDuration(2 * DEFAULT_DIALOG_FINISH_ANIM_TIME);
+
+        AnimationSet animationSet = new AnimationSet(true);
         animationSet.addAnimation(translateAnimation);
         return animationSet;
     }

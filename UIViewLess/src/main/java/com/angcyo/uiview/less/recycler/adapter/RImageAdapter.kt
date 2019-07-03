@@ -2,6 +2,7 @@ package com.angcyo.uiview.less.recycler.adapter
 
 import androidx.fragment.app.FragmentManager
 import android.util.SparseIntArray
+import android.view.View
 import com.angcyo.uiview.less.R
 import com.angcyo.uiview.less.picture.RPager
 import com.angcyo.uiview.less.recycler.RBaseViewHolder
@@ -95,7 +96,7 @@ open class RImageAdapter<T> : RBaseAdapter<T>() {
 
             //删除按钮
             holder.click(R.id.delete_image_view) {
-                deleteItem(bean)
+                onDeleteClick(holder, it, position, bean)
             }
 
             //启动图片浏览
@@ -103,6 +104,10 @@ open class RImageAdapter<T> : RBaseAdapter<T>() {
                 showLocalMediaPager(getFragmentManager(), position)
             }
         }
+    }
+
+    open fun onDeleteClick(holder: RBaseViewHolder, view: View, position: Int, bean: T) {
+        deleteItem(bean)
     }
 
     override fun onDeleteItem(position: Int): Boolean {
