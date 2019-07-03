@@ -31,4 +31,8 @@ dependencies {
     //https://github.com/daimajia/AndroidViewAnimations
     api 'com.daimajia.easing:library:2.0@aar'
     api 'com.daimajia.androidanimations:library:2.3@aar'
+
+    //https://github.com/airbnb/lottie-android
+    def lottieVersion = "3.0.7"
+    api "com.airbnb.android:lottie:$lottieVersion"
 }
