@@ -43,7 +43,8 @@ public class LocalMediaLoader {
             MediaStore.MediaColumns.HEIGHT,
             DURATION,
             MediaStore.MediaColumns.DATE_ADDED,
-            MediaStore.MediaColumns.DATE_MODIFIED
+            MediaStore.MediaColumns.DATE_MODIFIED,
+            MediaStore.MediaColumns.SIZE,
     };
     // 图片
     private static final String SELECTION = MediaStore.Files.FileColumns.MEDIA_TYPE + "=?"
@@ -178,9 +179,15 @@ public class LocalMediaLoader {
                                         if (columnIndex != -1) {
                                             modifyTime = cursor.getLong(columnIndex);
                                         }
+                                        long fileSize = 0;
+                                        columnIndex = cursor.getColumnIndex(PROJECTION[8]);
+                                        if (columnIndex != -1) {
+                                            fileSize = cursor.getLong(columnIndex);
+                                        }
 
                                         LocalMedia image = new LocalMedia
                                                 (path, duration, type, pictureType, w, h, modifyTime, addTime);
+                                        image.setFileSize(fileSize);
 
                                         LocalMediaFolder folder = getImageFolder(path, imageFolders);
                                         List<LocalMedia> images = folder.getImages();

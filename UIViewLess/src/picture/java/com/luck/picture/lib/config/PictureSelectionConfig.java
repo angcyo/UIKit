@@ -3,8 +3,6 @@ package com.luck.picture.lib.config;
 import android.os.Parcel;
 import android.os.Parcelable;
 import androidx.annotation.StyleRes;
-
-
 import com.angcyo.uiview.less.R;
 import com.luck.picture.lib.entity.LocalMedia;
 import com.luck.picture.lib.tools.PictureFileUtils;
@@ -21,6 +19,17 @@ import java.util.List;
  */
 
 public final class PictureSelectionConfig implements Parcelable {
+    public static final Creator<PictureSelectionConfig> CREATOR = new Creator<PictureSelectionConfig>() {
+        @Override
+        public PictureSelectionConfig createFromParcel(Parcel source) {
+            return new PictureSelectionConfig(source);
+        }
+
+        @Override
+        public PictureSelectionConfig[] newArray(int size) {
+            return new PictureSelectionConfig[size];
+        }
+    };
     public int mimeType;
     public boolean camera;
     public String outputCameraPath;
@@ -65,8 +74,77 @@ public final class PictureSelectionConfig implements Parcelable {
     public boolean previewEggs;
     public boolean synOrAsy;
     public boolean isDragFrame;
-
+    /**
+     * 显示文件大小
+     */
+    public boolean showFileSize;
+    /**
+     * 允许选择多大的文件
+     */
+    public long maxFileSize = Long.MAX_VALUE;
     public List<LocalMedia> selectionMedias;
+
+    public PictureSelectionConfig() {
+    }
+
+    protected PictureSelectionConfig(Parcel in) {
+        this.mimeType = in.readInt();
+        this.camera = in.readByte() != 0;
+        this.outputCameraPath = in.readString();
+        this.compressSavePath = in.readString();
+        this.suffixType = in.readString();
+        this.themeStyleId = in.readInt();
+        this.selectionMode = in.readInt();
+        this.maxSelectNum = in.readInt();
+        this.minSelectNum = in.readInt();
+        this.videoQuality = in.readInt();
+        this.cropCompressQuality = in.readInt();
+        this.videoMaxSecond = in.readInt();
+        this.videoMinSecond = in.readInt();
+        this.recordVideoSecond = in.readInt();
+        this.minimumCompressSize = in.readInt();
+        this.imageSpanCount = in.readInt();
+        this.overrideWidth = in.readInt();
+        this.overrideHeight = in.readInt();
+        this.aspect_ratio_x = in.readInt();
+        this.aspect_ratio_y = in.readInt();
+        this.sizeMultiplier = in.readFloat();
+        this.cropWidth = in.readInt();
+        this.cropHeight = in.readInt();
+        this.zoomAnim = in.readByte() != 0;
+        this.isCompress = in.readByte() != 0;
+        this.isCamera = in.readByte() != 0;
+        this.isGif = in.readByte() != 0;
+        this.enablePreview = in.readByte() != 0;
+        this.enPreviewVideo = in.readByte() != 0;
+        this.enablePreviewAudio = in.readByte() != 0;
+        this.checkNumMode = in.readByte() != 0;
+        this.openClickSound = in.readByte() != 0;
+        this.enableCrop = in.readByte() != 0;
+        this.freeStyleCropEnabled = in.readByte() != 0;
+        this.circleDimmedLayer = in.readByte() != 0;
+        this.showCropFrame = in.readByte() != 0;
+        this.showCropGrid = in.readByte() != 0;
+        this.hideBottomControls = in.readByte() != 0;
+        this.rotateEnabled = in.readByte() != 0;
+        this.scaleEnabled = in.readByte() != 0;
+        this.previewEggs = in.readByte() != 0;
+        this.synOrAsy = in.readByte() != 0;
+        this.isDragFrame = in.readByte() != 0;
+        this.showFileSize = in.readByte() != 0;
+        this.maxFileSize = in.readLong();
+        this.selectionMedias = in.createTypedArrayList(LocalMedia.CREATOR);
+    }
+
+    public static PictureSelectionConfig getInstance() {
+        return InstanceHolder.INSTANCE;
+    }
+
+    public static PictureSelectionConfig getCleanInstance() {
+        PictureSelectionConfig selectionSpec = getInstance();
+        selectionSpec.reset();
+        return selectionSpec;
+    }
 
     private void reset() {
         mimeType = PictureConfig.TYPE_IMAGE;
@@ -108,25 +186,13 @@ public final class PictureSelectionConfig implements Parcelable {
         synOrAsy = true;
         zoomAnim = true;
         isDragFrame = true;
+        maxFileSize = Long.MAX_VALUE;
+        showFileSize = false;
         outputCameraPath = "";
         compressSavePath = "";
         suffixType = PictureFileUtils.POSTFIX;
         sizeMultiplier = 0.5f;
         selectionMedias = new ArrayList<>();
-    }
-
-    public static PictureSelectionConfig getInstance() {
-        return InstanceHolder.INSTANCE;
-    }
-
-    public static PictureSelectionConfig getCleanInstance() {
-        PictureSelectionConfig selectionSpec = getInstance();
-        selectionSpec.reset();
-        return selectionSpec;
-    }
-
-    private static final class InstanceHolder {
-        private static final PictureSelectionConfig INSTANCE = new PictureSelectionConfig();
     }
 
     @Override
@@ -179,68 +245,12 @@ public final class PictureSelectionConfig implements Parcelable {
         dest.writeByte(this.previewEggs ? (byte) 1 : (byte) 0);
         dest.writeByte(this.synOrAsy ? (byte) 1 : (byte) 0);
         dest.writeByte(this.isDragFrame ? (byte) 1 : (byte) 0);
+        dest.writeByte(this.showFileSize ? (byte) 1 : (byte) 0);
+        dest.writeLong(this.maxFileSize);
         dest.writeTypedList(this.selectionMedias);
     }
 
-    public PictureSelectionConfig() {
+    private static final class InstanceHolder {
+        private static final PictureSelectionConfig INSTANCE = new PictureSelectionConfig();
     }
-
-    protected PictureSelectionConfig(Parcel in) {
-        this.mimeType = in.readInt();
-        this.camera = in.readByte() != 0;
-        this.outputCameraPath = in.readString();
-        this.compressSavePath = in.readString();
-        this.suffixType = in.readString();
-        this.themeStyleId = in.readInt();
-        this.selectionMode = in.readInt();
-        this.maxSelectNum = in.readInt();
-        this.minSelectNum = in.readInt();
-        this.videoQuality = in.readInt();
-        this.cropCompressQuality = in.readInt();
-        this.videoMaxSecond = in.readInt();
-        this.videoMinSecond = in.readInt();
-        this.recordVideoSecond = in.readInt();
-        this.minimumCompressSize = in.readInt();
-        this.imageSpanCount = in.readInt();
-        this.overrideWidth = in.readInt();
-        this.overrideHeight = in.readInt();
-        this.aspect_ratio_x = in.readInt();
-        this.aspect_ratio_y = in.readInt();
-        this.sizeMultiplier = in.readFloat();
-        this.cropWidth = in.readInt();
-        this.cropHeight = in.readInt();
-        this.zoomAnim = in.readByte() != 0;
-        this.isCompress = in.readByte() != 0;
-        this.isCamera = in.readByte() != 0;
-        this.isGif = in.readByte() != 0;
-        this.enablePreview = in.readByte() != 0;
-        this.enPreviewVideo = in.readByte() != 0;
-        this.enablePreviewAudio = in.readByte() != 0;
-        this.checkNumMode = in.readByte() != 0;
-        this.openClickSound = in.readByte() != 0;
-        this.enableCrop = in.readByte() != 0;
-        this.freeStyleCropEnabled = in.readByte() != 0;
-        this.circleDimmedLayer = in.readByte() != 0;
-        this.showCropFrame = in.readByte() != 0;
-        this.showCropGrid = in.readByte() != 0;
-        this.hideBottomControls = in.readByte() != 0;
-        this.rotateEnabled = in.readByte() != 0;
-        this.scaleEnabled = in.readByte() != 0;
-        this.previewEggs = in.readByte() != 0;
-        this.synOrAsy = in.readByte() != 0;
-        this.isDragFrame = in.readByte() != 0;
-        this.selectionMedias = in.createTypedArrayList(LocalMedia.CREATOR);
-    }
-
-    public static final Parcelable.Creator<PictureSelectionConfig> CREATOR = new Parcelable.Creator<PictureSelectionConfig>() {
-        @Override
-        public PictureSelectionConfig createFromParcel(Parcel source) {
-            return new PictureSelectionConfig(source);
-        }
-
-        @Override
-        public PictureSelectionConfig[] newArray(int size) {
-            return new PictureSelectionConfig[size];
-        }
-    };
 }

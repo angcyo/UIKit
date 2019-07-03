@@ -6,7 +6,6 @@ import androidx.annotation.FloatRange;
 import androidx.annotation.IntRange;
 import androidx.annotation.StyleRes;
 import androidx.fragment.app.Fragment;
-
 import com.angcyo.uiview.less.picture.RPicture;
 import com.luck.picture.lib.config.PictureConfig;
 import com.luck.picture.lib.config.PictureSelectionConfig;
@@ -400,6 +399,16 @@ public class PictureSelectionModel {
             selectionMedia = new ArrayList<>();
         }
         selectionConfig.selectionMedias = selectionMedia;
+        return this;
+    }
+
+    public PictureSelectionModel showFileSize(boolean show) {
+        selectionConfig.showFileSize = show;
+        return this;
+    }
+
+    public PictureSelectionModel maxFileSize(long fileSize) {
+        selectionConfig.maxFileSize = Math.max(fileSize, 0);
         return this;
     }
 

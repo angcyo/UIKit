@@ -161,17 +161,18 @@ public class PicturePreviewActivity extends PictureBaseActivity implements
                     }
 
                     if (selectImages.size() >= config.maxSelectNum && isChecked) {
-                        if (config.mimeType == PictureConfig.TYPE_ALL) {
-                            ToastManage.s(mContext,
-                                    getString(R.string.picture_message_image_video_max_num, config.maxSelectNum));
-                        } else {
-                            ToastManage.s(mContext,
-                                    getString(R.string.picture_message_max_num, config.maxSelectNum));
-                        }
+                        ItemCheck.check(mContext, selectImages, config);
                         check.setSelected(false);
                         return;
                     }
                     if (isChecked) {
+                        //添加选择
+
+                        if (!ItemCheck.checkFileSize(mContext, image, config)) {
+                            check.setSelected(false);
+                            return;
+                        }
+
                         VoiceUtils.playVoice(mContext, config.openClickSound);
                         // 如果是单选，则清空已选中的并刷新列表(作单一选择)
                         if (config.selectionMode == PictureConfig.SINGLE) {
@@ -183,6 +184,8 @@ public class PicturePreviewActivity extends PictureBaseActivity implements
                             check.setText(String.valueOf(image.getNum()));
                         }
                     } else {
+                        //取消选择
+
                         for (LocalMedia media : selectImages) {
                             if (media.getPath().equals(image.getPath())) {
                                 selectImages.remove(media);
@@ -326,6 +329,8 @@ public class PicturePreviewActivity extends PictureBaseActivity implements
         if (images != null && images.size() > 0) {
             LocalMedia media = images.get(position);
             check.setSelected(isSelected(media));
+
+            ItemCheck.checkShowFileSize((TextView) findViewById(R.id.file_size), config, media);
         } else {
             check.setSelected(false);
         }
@@ -391,6 +396,7 @@ public class PicturePreviewActivity extends PictureBaseActivity implements
             EventEntity obj = new EventEntity(PictureConfig.UPDATE_FLAG, selectImages, index);
             RxBus.getDefault().post(obj);
         }
+        ItemCheck.checkShowAllFileSize((TextView) findViewById(R.id.all_file_size), config, selectImages);
     }
 
     @Override

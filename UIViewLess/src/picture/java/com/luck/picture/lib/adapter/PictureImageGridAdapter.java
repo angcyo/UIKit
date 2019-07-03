@@ -19,6 +19,7 @@ import com.angcyo.uiview.less.R;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
+import com.luck.picture.lib.ItemCheck;
 import com.luck.picture.lib.anim.OptAnimationLoader;
 import com.luck.picture.lib.config.PictureConfig;
 import com.luck.picture.lib.config.PictureMimeType;
@@ -155,6 +156,10 @@ public class PictureImageGridAdapter extends RecyclerView.Adapter<RecyclerView.V
         } else {
             final ViewHolder contentHolder = (ViewHolder) holder;
             final LocalMedia image = images.get(showCamera ? position - 1 : position);
+
+            TextView fileSizeView = contentHolder.itemView.findViewById(R.id.file_size);
+            ItemCheck.checkShowFileSize(fileSizeView, config, image);
+
             image.position = contentHolder.getAdapterPosition();
             final String path = image.getPath();
             final String pictureType = image.getPictureType();
@@ -298,19 +303,12 @@ public class PictureImageGridAdapter extends RecyclerView.Adapter<RecyclerView.V
         }
 
         if (selectImages.size() >= maxSelectNum && !isChecked) {
-            String str;
-            if (config.mimeType == PictureConfig.TYPE_ALL) {
-                str = context.getString(R.string.picture_message_image_video_max_num, maxSelectNum);
-            } else {
-                boolean eqImg = pictureType.startsWith(PictureConfig.IMAGE);
-                str = eqImg ? context.getString(R.string.picture_message_max_num, maxSelectNum)
-                        : context.getString(R.string.picture_message_video_max_num, maxSelectNum);
-            }
-            ToastManage.s(context, str);
+            ItemCheck.check(context, selectImages, config);
             return;
         }
 
         if (isChecked) {
+            //取消选择
             for (LocalMedia media : selectImages) {
                 if (media.getPath().equals(image.getPath())) {
                     selectImages.remove(media);
@@ -320,6 +318,12 @@ public class PictureImageGridAdapter extends RecyclerView.Adapter<RecyclerView.V
                 }
             }
         } else {
+            //添加选择
+
+            if (!ItemCheck.checkFileSize(context, image, config)) {
+                return;
+            }
+
             // 如果是单选，则清空已选中的并刷新列表(作单一选择)
             if (selectMode == PictureConfig.SINGLE) {
                 singleRadioMediaImage();

@@ -16,7 +16,7 @@ import com.luck.picture.lib.config.PictureMimeType;
  */
 
 public class LocalMedia implements Parcelable {
-    public static final Parcelable.Creator<LocalMedia> CREATOR = new Parcelable.Creator<LocalMedia>() {
+    public static final Creator<LocalMedia> CREATOR = new Creator<LocalMedia>() {
         @Override
         public LocalMedia createFromParcel(Parcel source) {
             return new LocalMedia(source);
@@ -34,14 +34,13 @@ public class LocalMedia implements Parcelable {
     private long duration;
     private boolean isChecked;
     private boolean isCut;
-    private int num;
     /**
      * @see PictureConfig#TYPE_ALL
      * @see PictureConfig#TYPE_AUDIO
      * @see PictureConfig#TYPE_IMAGE
      * @see PictureConfig#TYPE_VIDEO
      */
-
+    private int num;
     /**
      * 媒体选择时的类型
      */
@@ -51,7 +50,6 @@ public class LocalMedia implements Parcelable {
      */
     private String pictureType = "image/jpeg";
     private boolean compressed;
-
     //angcyo
     private int width;
     private int height;
@@ -63,6 +61,10 @@ public class LocalMedia implements Parcelable {
      * 1558921509 秒
      */
     private long addTime;
+    /**
+     * 文件大小, b->kb
+     */
+    private long fileSize;
 
     public LocalMedia() {
 
@@ -141,6 +143,7 @@ public class LocalMedia implements Parcelable {
         this.height = in.readInt();
         this.modifyTime = in.readLong();
         this.addTime = in.readLong();
+        this.fileSize = in.readLong();
     }
 
     public String getPictureType() {
@@ -320,6 +323,14 @@ public class LocalMedia implements Parcelable {
         this.addTime = addTime;
     }
 
+    public long getFileSize() {
+        return fileSize;
+    }
+
+    public void setFileSize(long fileSize) {
+        this.fileSize = fileSize;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -342,5 +353,6 @@ public class LocalMedia implements Parcelable {
         dest.writeInt(this.height);
         dest.writeLong(this.modifyTime);
         dest.writeLong(this.addTime);
+        dest.writeLong(this.fileSize);
     }
 }

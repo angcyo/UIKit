@@ -522,7 +522,7 @@ public class PictureSelectorActivity extends PictureBaseActivity implements View
                     }
                     startCrop(medias);
                 }
-            } else if (config.isCompress && eqImg) {
+            } else if (config.isCompress /*&& eqImg*/) {
                 // 图片才压缩，视频不管
                 compressImage(images);
             } else {
@@ -887,6 +887,7 @@ public class PictureSelectorActivity extends PictureBaseActivity implements View
                 picture_tv_ok.setText(getString(R.string.picture_please_select));
             }
         }
+        ItemCheck.checkShowAllFileSize((TextView) findViewById(R.id.all_file_size), config, selectImages);
     }
 
 
