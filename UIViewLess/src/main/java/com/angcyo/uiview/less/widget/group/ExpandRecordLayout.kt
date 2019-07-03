@@ -55,7 +55,7 @@ class ExpandRecordLayout(context: Context, attributeSet: AttributeSet? = null) :
     var drawCircle = true
 
     /**需要绘制的提示文本*/
-    var drawTipString = ""
+    var drawTipString = "轻触拍照, 长按摄像"
         set(value) {
             field = value
             postInvalidate()
@@ -172,7 +172,7 @@ class ExpandRecordLayout(context: Context, attributeSet: AttributeSet? = null) :
 
     /**长按检查*/
     val longPressRunnable = Runnable {
-        if (state == STATE_CLOSE) {
+        if (state == STATE_CLOSE && isEnabled) {
             L.e("call: longPressRunnable 长按... -> ")
             isLongPress = true
             startProgress()
@@ -347,6 +347,13 @@ class ExpandRecordLayout(context: Context, attributeSet: AttributeSet? = null) :
 
                     if (!outCircleRect.contains(eventX, eventY)) {
                         removeCallbacks(longPressRunnable)
+                    }
+                }
+                ACTION_DOWN -> {
+                    if (listener?.onTouchDown() == true) {
+
+                    } else {
+                        return false
                     }
                 }
             }
@@ -544,6 +551,12 @@ class ExpandRecordLayout(context: Context, attributeSet: AttributeSet? = null) :
     }
 
     public abstract class OnRecordListener {
+
+        /**touch down 时回调, 用于权限检查*/
+        open fun onTouchDown(): Boolean {
+            return true
+        }
+
         open fun onTick(layout: ExpandRecordLayout) {
 
         }
