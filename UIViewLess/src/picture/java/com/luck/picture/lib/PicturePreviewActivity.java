@@ -3,15 +3,14 @@ package com.luck.picture.lib;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import androidx.annotation.Nullable;
-import androidx.viewpager.widget.ViewPager;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.animation.Animation;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
+import androidx.annotation.Nullable;
+import androidx.viewpager.widget.ViewPager;
 import com.angcyo.uiview.less.R;
 import com.luck.picture.lib.adapter.SimpleFragmentAdapter;
 import com.luck.picture.lib.anim.OptAnimationLoader;
@@ -162,7 +161,13 @@ public class PicturePreviewActivity extends PictureBaseActivity implements
                     }
 
                     if (selectImages.size() >= config.maxSelectNum && isChecked) {
-                        ToastManage.s(mContext, getString(R.string.picture_message_max_num, config.maxSelectNum));
+                        if (config.mimeType == PictureConfig.TYPE_ALL) {
+                            ToastManage.s(mContext,
+                                    getString(R.string.picture_message_image_video_max_num, config.maxSelectNum));
+                        } else {
+                            ToastManage.s(mContext,
+                                    getString(R.string.picture_message_max_num, config.maxSelectNum));
+                        }
                         check.setSelected(false);
                         return;
                     }

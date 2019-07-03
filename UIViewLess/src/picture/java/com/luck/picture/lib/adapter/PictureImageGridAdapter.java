@@ -5,8 +5,6 @@ import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
-import androidx.core.content.ContextCompat;
-import androidx.recyclerview.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +13,8 @@ import android.view.animation.Animation;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.RecyclerView;
 import com.angcyo.uiview.less.R;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -298,9 +298,14 @@ public class PictureImageGridAdapter extends RecyclerView.Adapter<RecyclerView.V
         }
 
         if (selectImages.size() >= maxSelectNum && !isChecked) {
-            boolean eqImg = pictureType.startsWith(PictureConfig.IMAGE);
-            String str = eqImg ? context.getString(R.string.picture_message_max_num, maxSelectNum)
-                    : context.getString(R.string.picture_message_video_max_num, maxSelectNum);
+            String str;
+            if (config.mimeType == PictureConfig.TYPE_ALL) {
+                str = context.getString(R.string.picture_message_image_video_max_num, maxSelectNum);
+            } else {
+                boolean eqImg = pictureType.startsWith(PictureConfig.IMAGE);
+                str = eqImg ? context.getString(R.string.picture_message_max_num, maxSelectNum)
+                        : context.getString(R.string.picture_message_video_max_num, maxSelectNum);
+            }
             ToastManage.s(context, str);
             return;
         }
