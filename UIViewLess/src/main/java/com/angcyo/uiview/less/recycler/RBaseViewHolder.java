@@ -688,6 +688,10 @@ public class RBaseViewHolder extends RecyclerView.ViewHolder {
         postDelay(runnable, delayMillis);
     }
 
+    public void removeCallbacks(Runnable runnable) {
+        itemView.removeCallbacks(runnable);
+    }
+
     public Context getContext() {
         return itemView.getContext();
     }

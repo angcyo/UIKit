@@ -19,6 +19,15 @@ public class BaseLoadFragment extends BaseTitleFragment {
 
     public static int DELAY_TIME = 360;
 
+    protected Runnable delayRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (isAdded() && !isDetached()) {
+                onUIDelayLoadData();
+            }
+        }
+    };
+
     @Override
     protected void onInitBaseView(@NonNull RBaseViewHolder viewHolder, @Nullable Bundle arguments,
                                   @Nullable Bundle savedInstanceState) {
@@ -115,12 +124,7 @@ public class BaseLoadFragment extends BaseTitleFragment {
         if (needRefresh) {
             int delay = firstShowEnd ? 0 : DELAY_TIME;
             //切换到加载情感图, 调用刷新数据接口
-            baseViewHolder.postDelay(delay, new Runnable() {
-                @Override
-                public void run() {
-                    onUIDelayLoadData();
-                }
-            });
+            baseViewHolder.postDelay(delay, delayRunnable);
         }
     }
 
@@ -139,12 +143,15 @@ public class BaseLoadFragment extends BaseTitleFragment {
         }
 
         if (needRefresh && isFirstNeedLoadData()) {
-            baseViewHolder.postDelay(DELAY_TIME, new Runnable() {
-                @Override
-                public void run() {
-                    onUIDelayLoadData();
-                }
-            });
+            baseViewHolder.postDelay(DELAY_TIME, delayRunnable);
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        if (baseViewHolder != null) {
+            baseViewHolder.removeCallbacks(delayRunnable);
         }
     }
 
