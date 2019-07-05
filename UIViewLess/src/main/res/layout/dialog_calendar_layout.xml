@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:background="@drawable/base_white_top_round_bg"
+        android:orientation="vertical"
+        android:layout_height="wrap_content">
+
+    <include android:id="@+id/title_layout"
+             layout="@layout/dialog_base_title_layout"/>
+
+    <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="@color/line_color"/>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+        <TextView
+                android:id="@+id/current_calendar_tip"
+                style="@style/BaseMainTextStyle"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:padding="@dimen/base_xhdpi"
+                android:textSize="26sp"
+                tools:text="2019年7月"
+                android:textStyle="bold"/>
+
+        <TextView
+                android:id="@+id/selector_calendar_tip"
+                style="@style/BaseDarkTextStyle"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:lineSpacingExtra="4dp"
+                android:textSize="@dimen/default_text_size"
+                android:paddingRight="@dimen/base_xhdpi"
+                tools:text="始:2019-07-05\n止:2019-07-05"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <com.haibin.calendarview.RCalendarView
+            android:id="@+id/calendar_view"
+            app:month_view_show_mode="mode_all"
+            app:month_view="com.haibin.calendarview.custom.RRangeMonthView"
+            app:year_view="com.haibin.calendarview.custom.RYearView"
+            app:calendar_height="65dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+</LinearLayout>

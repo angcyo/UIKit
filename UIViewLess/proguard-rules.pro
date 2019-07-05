@@ -111,3 +111,8 @@
 -keep class android.support.v7.widget.RecyclerView {*;}
 -keep class android.support.v4.view.ViewPager {*;}
 -keep class android.widget.ArrayAdapter {*;}
+
+-keep class com.**.**WeekBar {*;}
+-keep class com.**.**MonthView {*;}
+-keep class com.**.**WeekView {*;}
+-keep class com.**.**YearView {*;}

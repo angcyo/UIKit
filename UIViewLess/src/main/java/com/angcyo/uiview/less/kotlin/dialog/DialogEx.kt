@@ -290,6 +290,16 @@ fun Context.optionDialog(config: OptionDialogConfig.() -> Unit): Dialog {
     return buildBottomDialog().show(dialogConfig)
 }
 
+/**
+ * 日历选择对话框
+ * */
+fun Context.calendarDialog(config: CalendarDialogConfig.() -> Unit): Dialog {
+    val dialogConfig = CalendarDialogConfig()
+    dialogConfig.config()
+
+    return buildBottomDialog().show(dialogConfig)
+}
+
 fun <T : BaseDialogConfig> Context.customBottomDialog(customConfig: T, config: T.() -> Unit): Dialog {
     customConfig.config()
 
@@ -358,6 +368,10 @@ fun <T : BaseDialogConfig> androidx.fragment.app.Fragment.customBottomDialog(cus
     return context!!.customBottomDialog(customConfig, config)
 }
 
+fun androidx.fragment.app.Fragment.calendarDialog(config: CalendarDialogConfig.() -> Unit): Dialog {
+    return context!!.calendarDialog(config)
+}
+
 // RBaseViewHolder
 
 fun RBaseViewHolder.normalDialog(config: NormalDialogConfig.() -> Unit): Dialog {
@@ -419,3 +433,8 @@ fun RBaseViewHolder.optionDialog(config: OptionDialogConfig.() -> Unit): Dialog 
 fun <T : BaseDialogConfig> RBaseViewHolder.customBottomDialog(customConfig: T, config: T.() -> Unit): Dialog {
     return context!!.customBottomDialog(customConfig, config)
 }
+
+fun RBaseViewHolder.calendarDialog(config: CalendarDialogConfig.() -> Unit): Dialog {
+    return context!!.calendarDialog(config)
+}
+
