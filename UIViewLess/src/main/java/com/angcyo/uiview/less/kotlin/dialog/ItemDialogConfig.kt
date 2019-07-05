@@ -116,6 +116,8 @@ open class ItemDialogConfig : BaseDialogConfig() {
     override fun initControlLayout(dialog: Dialog, dialogViewHolder: RBaseViewHolder) {
         super.initControlLayout(dialog, dialogViewHolder)
 
+        dialogViewHolder.enable(R.id.positive_button, items.isNotEmpty())
+
         //默认item dialog 不显示标题栏上的 确定/取消 按钮
         dialogViewHolder.tv(R.id.positive_button)?.visibility = View.GONE
         dialogViewHolder.tv(R.id.negative_button)?.visibility = View.GONE

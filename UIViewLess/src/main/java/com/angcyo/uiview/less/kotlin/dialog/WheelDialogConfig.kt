@@ -62,6 +62,8 @@ open class WheelDialogConfig : BaseDialogConfig() {
     override fun onDialogInit(dialog: Dialog, dialogViewHolder: RBaseViewHolder) {
         super.onDialogInit(dialog, dialogViewHolder)
 
+        dialogViewHolder.enable(R.id.positive_button, wheelItems.isNotEmpty())
+
         dialogViewHolder.v<WheelView>(R.id.wheel_view).apply {
 
             val stringList = mutableListOf<CharSequence>()
