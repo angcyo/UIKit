@@ -187,6 +187,10 @@ open class CalendarDialogConfig : BaseDialogConfig() {
             //滚动到今天
             calendarView.scrollToCurrent()
         } else {
+            if (calendarList.size < 2) {
+                calendarList.add(calendarList.first())
+            }
+
             if (calendarList.size > 1) {
                 calendarView.getCalendarViewDelegate().mSelectedEndRangeCalendar = calendarList[1]
             }
