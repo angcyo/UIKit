@@ -70,19 +70,14 @@ public class RecorderService extends Service implements MediaRecorder.OnErrorLis
     private static String mFilePath = null;
 
     private static long mStartTime = 0;
-
+    private final Handler mHandler = new Handler();
     private RemainingTimeCalculator mRemainingTimeCalculator;
-
     private NotificationManager mNotifiManager;
-
     private Notification mLowStorageNotification;
-
     private TelephonyManager mTeleManager;
-
     private WakeLock mWakeLock;
-
     private KeyguardManager mKeyguardManager;
-
+    private boolean mNeedUpdateRemainingTime;
     private final PhoneStateListener mPhoneStateListener = new PhoneStateListener() {
         @Override
         public void onCallStateChanged(int state, String incomingNumber) {
@@ -91,10 +86,8 @@ public class RecorderService extends Service implements MediaRecorder.OnErrorLis
             }
         }
     };
-
-    private final Handler mHandler = new Handler();
-
     private Runnable mUpdateRemainingTime = new Runnable() {
+        @Override
         public void run() {
             if (mRecorder != null && mNeedUpdateRemainingTime) {
                 updateRemainingTime();
@@ -102,7 +95,38 @@ public class RecorderService extends Service implements MediaRecorder.OnErrorLis
         }
     };
 
-    private boolean mNeedUpdateRemainingTime;
+    public static boolean isRecording() {
+        return mRecorder != null;
+    }
+
+    public static String getFilePath() {
+        return mFilePath;
+    }
+
+    public static long getStartTime() {
+        return mStartTime;
+    }
+
+    public static void startRecording(Context context, int outputFileFormat, String path,
+                                      boolean highQuality, long maxFileSize) {
+        Intent intent = new Intent(context, RecorderService.class);
+        intent.putExtra(ACTION_NAME, ACTION_START_RECORDING);
+        intent.putExtra(ACTION_PARAM_FORMAT, outputFileFormat);
+        intent.putExtra(ACTION_PARAM_PATH, path);
+        intent.putExtra(ACTION_PARAM_HIGH_QUALITY, highQuality);
+        intent.putExtra(ACTION_PARAM_MAX_FILE_SIZE, maxFileSize);
+        context.startService(intent);
+    }
+
+    public static void stopRecording(Context context) {
+        Intent intent = new Intent(context, RecorderService.class);
+        intent.putExtra(ACTION_NAME, ACTION_STOP_RECORDING);
+        context.startService(intent);
+    }
+
+    public static int getMaxAmplitude() {
+        return mRecorder == null ? 0 : mRecorder.getMaxAmplitude();
+    }
 
     @Override
     public void onCreate() {
@@ -115,7 +139,7 @@ public class RecorderService extends Service implements MediaRecorder.OnErrorLis
         mTeleManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
         mTeleManager.listen(mPhoneStateListener, PhoneStateListener.LISTEN_CALL_STATE);
         PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-        mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "soundrecorder:SoundRecorder");
+        mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, getPackageName() + ":SoundRecorder");
         mKeyguardManager = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
     }
 
@@ -331,39 +355,6 @@ public class RecorderService extends Service implements MediaRecorder.OnErrorLis
         if (mRecorder != null && mNeedUpdateRemainingTime) {
             mHandler.postDelayed(mUpdateRemainingTime, 500);
         }
-    }
-
-    public static boolean isRecording() {
-        return mRecorder != null;
-    }
-
-    public static String getFilePath() {
-        return mFilePath;
-    }
-
-    public static long getStartTime() {
-        return mStartTime;
-    }
-
-    public static void startRecording(Context context, int outputFileFormat, String path,
-                                      boolean highQuality, long maxFileSize) {
-        Intent intent = new Intent(context, RecorderService.class);
-        intent.putExtra(ACTION_NAME, ACTION_START_RECORDING);
-        intent.putExtra(ACTION_PARAM_FORMAT, outputFileFormat);
-        intent.putExtra(ACTION_PARAM_PATH, path);
-        intent.putExtra(ACTION_PARAM_HIGH_QUALITY, highQuality);
-        intent.putExtra(ACTION_PARAM_MAX_FILE_SIZE, maxFileSize);
-        context.startService(intent);
-    }
-
-    public static void stopRecording(Context context) {
-        Intent intent = new Intent(context, RecorderService.class);
-        intent.putExtra(ACTION_NAME, ACTION_STOP_RECORDING);
-        context.startService(intent);
-    }
-
-    public static int getMaxAmplitude() {
-        return mRecorder == null ? 0 : mRecorder.getMaxAmplitude();
     }
 
     @Override

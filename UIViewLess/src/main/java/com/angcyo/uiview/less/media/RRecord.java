@@ -111,6 +111,22 @@ public class RRecord {
     }
 
     /**
+     * 请求拿到音频焦点
+     */
+    private static void requestAudioFocus(Context context) {
+        AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+        audioManager.requestAudioFocus(null, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);//请求焦点
+    }
+
+    /**
+     * 释放音频焦点
+     */
+    private static void abandonAudioFocus(Context context) {
+        AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+        audioManager.abandonAudioFocus(null);//放弃焦点
+    }
+
+    /**
      * 开始录制, 需要注册 RecorderService 服务哦
      *
      * @param fileName 不包括后缀名
@@ -156,7 +172,6 @@ public class RRecord {
         return this;
     }
 
-
     /**
      * 开始回放
      */
@@ -199,35 +214,11 @@ public class RRecord {
         mainHandler.post(checkProgressRunnable);
     }
 
-    /**
-     * 请求拿到音频焦点
-     */
-    private static void requestAudioFocus(Context context) {
-        AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
-        audioManager.requestAudioFocus(null, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);//请求焦点
-    }
-
-    /**
-     * 释放音频焦点
-     */
-    private static void abandonAudioFocus(Context context) {
-        AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
-        audioManager.abandonAudioFocus(null);//放弃焦点
-    }
-
-    private class RecorderReceiver extends BroadcastReceiver {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent.hasExtra(RecorderService.RECORDER_SERVICE_BROADCAST_STATE)) {
-                boolean isRecording = intent.getBooleanExtra(
-                        RecorderService.RECORDER_SERVICE_BROADCAST_STATE, false);
-                innerRecorder.setState(isRecording ? Recorder.RECORDING_STATE : Recorder.IDLE_STATE);
-            } else if (intent.hasExtra(RecorderService.RECORDER_SERVICE_BROADCAST_ERROR)) {
-                int error = intent.getIntExtra(RecorderService.RECORDER_SERVICE_BROADCAST_ERROR, 0);
-                innerRecorder.setError(error);
-            }
+    public int getMaxAmplitude() {
+        if (innerRecorder != null) {
+            return innerRecorder.getMaxAmplitude();
         }
+        return 0;
     }
 
     public static abstract class OnRecordListener implements Recorder.OnStateChangedListener {
@@ -267,10 +258,26 @@ public class RRecord {
 
         /**
          * 返回播放时长, 和进度比例
+         *
          * @param time 秒
          */
         public void onPlayProgress(int time, float progress) {
 
+        }
+    }
+
+    private class RecorderReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.hasExtra(RecorderService.RECORDER_SERVICE_BROADCAST_STATE)) {
+                boolean isRecording = intent.getBooleanExtra(
+                        RecorderService.RECORDER_SERVICE_BROADCAST_STATE, false);
+                innerRecorder.setState(isRecording ? Recorder.RECORDING_STATE : Recorder.IDLE_STATE);
+            } else if (intent.hasExtra(RecorderService.RECORDER_SERVICE_BROADCAST_ERROR)) {
+                int error = intent.getIntExtra(RecorderService.RECORDER_SERVICE_BROADCAST_ERROR, 0);
+                innerRecorder.setError(error);
+            }
         }
     }
 }
