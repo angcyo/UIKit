@@ -19,7 +19,7 @@ open class DslDateFilter(val adapter: DslAdapter) {
     /**
      * 过滤后的数据源
      * */
-    val filterDataList: MutableList<DslAdapterItem>
+    open val filterDataList: MutableList<DslAdapterItem>
         get() {
             val list = mutableListOf<DslAdapterItem>()
 
@@ -80,7 +80,7 @@ open class DslDateFilter(val adapter: DslAdapter) {
      * @param fold 折叠 or 展开
      * */
     fun filterItem(item: DslAdapterItem, fold: Boolean) {
-        val startIndex = adapter.allDatas.indexOf(item)
+        val startIndex = adapter.getDataList(true).indexOf(item)
         item.itemGroupExtend = !fold
         if (startIndex != -1) {
             val childSize = groupChildSize(startIndex)
@@ -95,7 +95,7 @@ open class DslDateFilter(val adapter: DslAdapter) {
                     //展开
                     adapter.notifyItemRangeInserted(startIndex + 1, childSize)
                 }
-                adapter.notifyItemRangeChanged(startIndex + 1, originDataSize)
+                adapter.notifyItemRangeChanged(startIndex, originDataSize)
             }
         }
     }
