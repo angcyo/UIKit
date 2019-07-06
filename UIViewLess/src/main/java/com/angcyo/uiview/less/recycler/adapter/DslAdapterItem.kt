@@ -184,9 +184,9 @@ open class DslAdapterItem {
             return
         }
 
+        eachDrawItemDecoration(0, itemTopInsert, 0, 0)
         paint.color = itemDecorationColor
         val drawOffsetArea = onlyDrawOffsetArea
-        eachDrawItemDecoration(0, itemTopInsert, 0, 0)
         if (itemTopInsert > 0) {
             if (onlyDrawOffsetArea) {
                 //绘制左右区域
@@ -209,9 +209,9 @@ open class DslAdapterItem {
             }
         }
 
-        paint.color = itemDecorationColor
         onlyDrawOffsetArea = drawOffsetArea
         eachDrawItemDecoration(0, 0, 0, itemBottomInsert)
+        paint.color = itemDecorationColor
         if (itemBottomInsert > 0) {
             if (onlyDrawOffsetArea) {
                 //绘制左右区域
@@ -234,9 +234,9 @@ open class DslAdapterItem {
             }
         }
 
-        paint.color = itemDecorationColor
         onlyDrawOffsetArea = drawOffsetArea
         eachDrawItemDecoration(itemLeftInsert, 0, 0, 0)
+        paint.color = itemDecorationColor
         if (itemLeftInsert > 0) {
             if (onlyDrawOffsetArea) {
                 //绘制上下区域
@@ -259,9 +259,9 @@ open class DslAdapterItem {
             }
         }
 
-        paint.color = itemDecorationColor
         onlyDrawOffsetArea = drawOffsetArea
         eachDrawItemDecoration(0, 0, itemRightInsert, 0)
+        paint.color = itemDecorationColor
         if (itemRightInsert > 0) {
             if (onlyDrawOffsetArea) {
                 //绘制上下区域
