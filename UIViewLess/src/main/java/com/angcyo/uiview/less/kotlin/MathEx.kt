@@ -4,6 +4,7 @@ import android.graphics.Matrix
 import android.graphics.Path
 import android.graphics.PathMeasure
 import android.graphics.RectF
+import kotlin.math.atan2
 
 /**
  *
@@ -25,6 +26,34 @@ public fun Path.getProgressPosition(progress: Float): FloatArray {
     pathMeasure.getPosTan(progress, floatArray, null)
 
     return floatArray
+}
+
+public fun Path.getProgressAngle(progress: Float): Float {
+    val pathMeasure = PathMeasure(this, false)
+
+    val floatArray = floatArrayOf()
+    pathMeasure.getPosTan(progress, null, floatArray)
+
+    //利用反正切函数得到角度
+    return fixAngle((atan2(floatArray[1], floatArray[0]) * 180F / Math.PI).toFloat())
+}
+
+/**
+ * 调整角度，使其在0 ~ 360之间
+ *
+ * @param rotation 当前角度
+ * @return 调整后的角度
+ */
+private fun fixAngle(rotation: Float): Float {
+    var result = rotation
+    val angle = 360f
+    if (result < 0) {
+        result += angle
+    }
+    if (result > angle) {
+        result %= angle
+    }
+    return result
 }
 
 /**
