@@ -301,6 +301,14 @@ public abstract class BaseTitleFragment extends BaseFragment implements AffectUI
                 .gone();
     }
 
+    public void showTitleBar() {
+        ViewGroupHelper.build(baseViewHolder.itemView)
+                .selector(R.id.base_title_bar_layout)
+                .visible()
+                .selector(R.id.base_title_shadow_view)
+                .visible();
+    }
+
     /**
      * 隐藏返回按钮
      */

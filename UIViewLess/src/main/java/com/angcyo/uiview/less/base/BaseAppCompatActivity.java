@@ -15,10 +15,10 @@ import androidx.annotation.DrawableRes;
 import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
-import androidx.fragment.app.Fragment;
-import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
 import com.angcyo.lib.L;
 import com.angcyo.uiview.less.BuildConfig;
 import com.angcyo.uiview.less.RCrashHandler;
@@ -408,5 +408,22 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
 
     protected void onOrientationToPortrait() {
 
+    }
+
+    /**
+     * 画中画状态判断
+     */
+    public boolean isActivityResume = false;
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        isActivityResume = true;
+    }
+
+    @Override
+    public void startActivityForResult(Intent intent, int requestCode, @Nullable Bundle options) {
+        super.startActivityForResult(intent, requestCode, options);
+        isActivityResume = false;
     }
 }
