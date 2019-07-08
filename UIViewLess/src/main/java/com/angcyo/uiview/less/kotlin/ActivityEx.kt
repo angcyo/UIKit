@@ -10,6 +10,8 @@ import android.util.Rational
 import android.view.ViewGroup
 import android.view.Window
 import androidx.annotation.ColorInt
+import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.RecyclerView
 import com.angcyo.lib.L
 import com.angcyo.uiview.less.base.BaseAppCompatActivity
 import com.angcyo.uiview.less.base.helper.ActivityHelper
@@ -55,6 +57,21 @@ public fun Activity.fullscreen(enable: Boolean = true, checkSdk: Boolean = true)
     ActivityHelper.fullscreen(this, enable, checkSdk)
 }
 
+/**获取缓存池*/
+public fun Fragment.getRecyclerViewPool(): RecyclerView.RecycledViewPool? {
+    return if (activity is BaseAppCompatActivity) {
+        (activity as BaseAppCompatActivity).recycledViewPool
+    } else {
+        null
+    }
+}
+
+/**是否支持画中画*/
+public fun BaseAppCompatActivity.supportPictureInPicture(): Boolean {
+    return Build.VERSION.SDK_INT >= Build.VERSION_CODES.N &&
+            packageManager.hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE)
+}
+
 /**
  * 进入画中画模式. 可以指定宽高的比例
  * https://developer.android.google.cn/guide/topics/ui/picture-in-picture
@@ -62,13 +79,19 @@ public fun Activity.fullscreen(enable: Boolean = true, checkSdk: Boolean = true)
  * @param denominator 分母
  * */
 public fun BaseAppCompatActivity.enterPictureInPictureModeEx(numerator: Int = 3, denominator: Int = 4) {
-    if (isActivityResume && packageManager.hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE)) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val builder = PictureInPictureParams.Builder()
-            builder.setAspectRatio(Rational(numerator, denominator))
-            enterPictureInPictureMode(builder.build())
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            enterPictureInPictureMode()
+    if (supportPictureInPicture()) {
+        if (isActivityResume) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                val builder = PictureInPictureParams.Builder()
+                builder.setAspectRatio(Rational(numerator, denominator))
+                enterPictureInPictureMode(builder.build())
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                enterPictureInPictureMode()
+            } else {
+                L.w("无法进入画中画.")
+            }
+        } else {
+            L.w("只能在Activity Resume状态时进入画中画.")
         }
     } else {
         L.w("设备不支持画中画.")

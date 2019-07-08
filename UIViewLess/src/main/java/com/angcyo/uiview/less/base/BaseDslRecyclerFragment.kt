@@ -2,6 +2,7 @@ package com.angcyo.uiview.less.base
 
 import android.os.Bundle
 import androidx.recyclerview.widget.RecyclerView
+import com.angcyo.uiview.less.kotlin.getRecyclerViewPool
 import com.angcyo.uiview.less.kotlin.notifyItemChangedByTag
 import com.angcyo.uiview.less.recycler.DslItemDecoration
 import com.angcyo.uiview.less.recycler.HoverItemDecoration
@@ -22,17 +23,6 @@ import java.lang.ref.WeakReference
  */
 
 open class BaseDslRecyclerFragment : BaseRecyclerFragment<DslAdapterItem>() {
-    companion object {
-
-        /**共享缓存池*/
-        var dslRecycledViewPool: WeakReference<RecyclerView.RecycledViewPool>? = null
-            get() {
-                if (field == null || field?.get() == null) {
-                    field = WeakReference(RecyclerView.RecycledViewPool())
-                }
-                return field
-            }
-    }
 
     var hoverItemDecoration = HoverItemDecoration()
     var baseDslItemDecoration = DslItemDecoration()
@@ -55,7 +45,7 @@ open class BaseDslRecyclerFragment : BaseRecyclerFragment<DslAdapterItem>() {
 
     open fun initDslRecyclerView(recyclerView: RRecyclerView?) {
         recyclerView?.apply {
-            setRecycledViewPool(dslRecycledViewPool?.get())
+            setRecycledViewPool(getRecyclerViewPool())
             addItemDecoration(baseDslItemDecoration)
             hoverItemDecoration.attachToRecyclerView(this)
         }

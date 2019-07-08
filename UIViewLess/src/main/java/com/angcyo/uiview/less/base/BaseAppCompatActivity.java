@@ -19,6 +19,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.RecyclerView;
 import com.angcyo.lib.L;
 import com.angcyo.uiview.less.BuildConfig;
 import com.angcyo.uiview.less.RCrashHandler;
@@ -410,6 +411,8 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
 
     }
 
+    //<editor-fold desc="画中画支持">
+
     /**
      * 画中画状态判断
      */
@@ -426,4 +429,32 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
         super.startActivityForResult(intent, requestCode, options);
         isActivityResume = false;
     }
+
+    //</editor-fold desc="画中画支持">
+
+    //<editor-fold desc="RecyclerView共享二级缓存池">
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        clearRecycledViewPool();
+    }
+
+    protected RecyclerView.RecycledViewPool recycledViewPool;
+
+    public RecyclerView.RecycledViewPool getRecycledViewPool() {
+        if (recycledViewPool == null) {
+            recycledViewPool = new RecyclerView.RecycledViewPool();
+        }
+        return recycledViewPool;
+    }
+
+    public void clearRecycledViewPool() {
+        if (recycledViewPool != null) {
+            recycledViewPool.clear();
+            recycledViewPool = null;
+        }
+    }
+
+    //</editor-fold desc="RecyclerView共享二级缓存池">
 }

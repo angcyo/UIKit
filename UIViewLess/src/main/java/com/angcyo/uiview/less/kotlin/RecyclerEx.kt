@@ -1,11 +1,8 @@
 package com.angcyo.uiview.less.kotlin
 
-import androidx.recyclerview.widget.DefaultItemAnimator
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.SimpleItemAnimator
 import android.text.TextUtils
 import android.view.View
+import androidx.recyclerview.widget.RecyclerView
 import com.angcyo.uiview.less.R
 import com.angcyo.uiview.less.kotlin.dsl.DslRecyclerScroll
 import com.angcyo.uiview.less.recycler.DslItemDecoration
@@ -319,5 +316,14 @@ public fun DslAdapter?.notifyItemChangedByTag(tag: String?) {
                 return@forEachIndexed
             }
         }
+    }
+}
+
+/**
+ * 回收需回收的Item。
+ */
+public fun RecyclerView.LayoutManager.recycleScrapList(recycle: RecyclerView.Recycler) {
+    for (i in recycle.scrapList.size - 1 downTo 0) {
+        removeAndRecycleView(recycle.scrapList[i].itemView, recycle)
     }
 }
