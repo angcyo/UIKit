@@ -1,9 +1,12 @@
 package com.angcyo.uiview.less.recycler.adapter
 
+import android.content.Context
 import androidx.fragment.app.FragmentManager
 import android.util.SparseIntArray
 import android.view.View
 import com.angcyo.uiview.less.R
+import com.angcyo.uiview.less.kotlin.dialog.menuDialog
+import com.angcyo.uiview.less.picture.PagerTransitionFragment
 import com.angcyo.uiview.less.picture.RPager
 import com.angcyo.uiview.less.recycler.RBaseViewHolder
 import com.luck.picture.lib.config.PictureConfig
@@ -25,6 +28,12 @@ open class RImageAdapter<T> : RBaseAdapter<T>() {
 
     /**是否显示删除按钮*/
     var showDeleteModel = false
+
+    /**长按事件, 用来保存等操作*/
+    var itemLongClickListener: ((
+        fragment: PagerTransitionFragment, adapter: RImageAdapter<T>,
+        viewHolder: RBaseViewHolder, position: Int, bean: LocalMedia?
+    ) -> Boolean)? = null
 
     init {
 
@@ -160,6 +169,29 @@ open class RImageAdapter<T> : RBaseAdapter<T>() {
             }
             onGetRecyclerView = {
                 recyclerView
+            }
+
+            onItemLongClickListener = { fragment, _, viewHolder, position ->
+                itemLongClickListener?.invoke(
+                    fragment,
+                    this@RImageAdapter,
+                    viewHolder,
+                    position,
+                    if (position < mediaList.size) mediaList[position] else null
+                ) == true
+            }
+        }
+    }
+
+    /**显示长按菜单*/
+    open fun showLongMenu(context: Context, item: MutableList<Any>, callback: (index: Int, item: Any) -> Unit) {
+        context.menuDialog {
+            items = item
+            showBottomCancelLayout = true
+
+            onItemClick = { _, index, item ->
+                callback(index, item)
+                false
             }
         }
     }

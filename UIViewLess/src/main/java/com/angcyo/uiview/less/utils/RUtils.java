@@ -2139,9 +2139,11 @@ public class RUtils {
      *
      * @param filePath 需要复制的文件全路径
      * @param newName  新的文件名, 如果为空, 则使用源文件名
+     * @return 复制成功后的文件路径, 失败为null
      */
-    public static boolean copyToDCIM(String filePath, String newName) {
+    public static String copyToDCIM(String filePath, String newName) {
         //相册文件夹
+        String resultPath = null;
         try {
             File dcimFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
             File srcFile = new File(filePath);
@@ -2154,13 +2156,13 @@ public class RUtils {
             long l = RIo.copyFile(srcFile, targetFile);
             boolean result = l != -1;
             if (result) {
+                resultPath = targetFile.getAbsolutePath();
                 scanFile(RApplication.getApp(), targetFile.getAbsolutePath());
             }
-            return result;
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return false;
+        return resultPath;
     }
 
     /**

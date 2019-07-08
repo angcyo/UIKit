@@ -402,16 +402,43 @@ open class ViewTransitionConfig {
         fragment: PagerTransitionFragment, adapter: RPagerAdapter,
         viewHolder: RBaseViewHolder, itemView: PhotoView, position: Int
     ) -> Unit =
-        { fragment, _, _, _, _ -> fragment.doTransitionHide() }
+        { fragment, _, _, _, _ ->
+            L.i("点击View")
+            fragment.doTransitionHide()
+        }
 
     /**
-     * 图片长安回调
+     * 图片长按回调
      * */
     var onItemPhotoLongClickListener: (
         fragment: PagerTransitionFragment, adapter: RPagerAdapter,
         viewHolder: RBaseViewHolder, itemView: PhotoView, position: Int
     ) -> Boolean =
-        { _, _, _, _, _ -> true }
+        { _, _, _, _, _ ->
+            L.i("长按...图片")
+            true
+        }
+
+    /**
+     * 视频长按回调
+     * */
+    var onItemVideoLongClickListener: (
+        fragment: PagerTransitionFragment, adapter: RPagerAdapter,
+        viewHolder: RBaseViewHolder, itemView: TextureVideoView, position: Int
+    ) -> Boolean =
+        { _, _, _, _, _ ->
+            L.i("长按...视频")
+            true
+        }
+
+    /**Item长按事件, 视频和图片都会触发*/
+    var onItemLongClickListener: (
+        fragment: PagerTransitionFragment, adapter: RPagerAdapter,
+        viewHolder: RBaseViewHolder, position: Int
+    ) -> Boolean =
+        { _, _, _, _ ->
+            true
+        }
 
     /**
      * 页面切换回调
@@ -480,13 +507,12 @@ open class ViewTransitionConfig {
             }
 
             setOnViewTapListener { view, x, y ->
-                L.i("点击View")
                 onItemPhotoClickListener(fragment, adapter, viewHolder, photoView, position)
             }
 
             setOnLongClickListener {
-                L.i("长按1")
-                onItemPhotoLongClickListener(fragment, adapter, viewHolder, photoView, position)
+                onItemLongClickListener(fragment, adapter, viewHolder, position) ||
+                        onItemPhotoLongClickListener(fragment, adapter, viewHolder, photoView, position)
             }
         }
 
@@ -606,6 +632,16 @@ open class ViewTransitionConfig {
                             playVideo(viewHolder, it)
                         }
                     }
+                }
+
+                //item 事件
+                viewHolder.longClick(R.id.video_view) {
+                    onItemLongClickListener(fragment, adapter, viewHolder, position) ||
+                            onItemVideoLongClickListener(fragment, adapter, viewHolder, videoView, position)
+                }
+                viewHolder.longClick(R.id.base_item_layout) {
+                    onItemLongClickListener(fragment, adapter, viewHolder, position) ||
+                            onItemVideoLongClickListener(fragment, adapter, viewHolder, videoView, position)
                 }
             }
         }
