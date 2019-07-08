@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.Application;
 import android.app.DownloadManager;
-import androidx.arch.core.util.Function;
 import android.content.*;
 import android.content.pm.*;
 import android.content.res.Configuration;
@@ -23,15 +22,11 @@ import android.net.Uri;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
+import android.os.Environment;
 import android.os.Looper;
 import android.os.Process;
 import android.provider.MediaStore;
 import android.provider.Settings;
-import androidx.annotation.LayoutRes;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.core.content.FileProvider;
-import androidx.recyclerview.widget.RecyclerView;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.text.format.Formatter;
@@ -41,6 +36,13 @@ import android.util.TypedValue;
 import android.view.*;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+import androidx.annotation.LayoutRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.arch.core.util.Function;
+import androidx.core.content.FileProvider;
+import androidx.recyclerview.widget.RecyclerView;
+import com.angcyo.http.RIo;
 import com.angcyo.http.Rx;
 import com.angcyo.lib.L;
 import com.angcyo.uiview.less.RApplication;
@@ -2140,24 +2142,24 @@ public class RUtils {
      */
     public static boolean copyToDCIM(String filePath, String newName) {
         //相册文件夹
-//        try {
-//            File dcimFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
-//            File srcFile = new File(filePath);
-//            File targetFile;
-//            if (TextUtils.isEmpty(newName)) {
-//                targetFile = new File(dcimFolder.getPath(), srcFile.getName());
-//            } else {
-//                targetFile = new File(dcimFolder.getPath(), newName);
-//            }
-//            long l = RIo.copyFile(srcFile, targetFile);
-//            boolean result = l != -1;
-//            if (result) {
-//                scanFile(RApplication.getApp(), targetFile.getAbsolutePath());
-//            }
-//            return result;
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
+        try {
+            File dcimFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
+            File srcFile = new File(filePath);
+            File targetFile;
+            if (TextUtils.isEmpty(newName)) {
+                targetFile = new File(dcimFolder.getPath(), srcFile.getName());
+            } else {
+                targetFile = new File(dcimFolder.getPath(), newName);
+            }
+            long l = RIo.copyFile(srcFile, targetFile);
+            boolean result = l != -1;
+            if (result) {
+                scanFile(RApplication.getApp(), targetFile.getAbsolutePath());
+            }
+            return result;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return false;
     }
 
