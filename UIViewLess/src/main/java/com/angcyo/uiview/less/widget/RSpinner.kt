@@ -1,13 +1,14 @@
 package com.angcyo.uiview.less.widget
 
 import android.content.Context
-import androidx.appcompat.widget.AppCompatSpinner
 import android.util.AttributeSet
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.SpinnerAdapter
+import androidx.appcompat.widget.AppCompatSpinner
 import com.angcyo.uiview.less.R
+import com.angcyo.uiview.less.recycler.adapter.RArrayAdapter
 import com.angcyo.uiview.less.utils.Reflect
 
 /**
@@ -70,9 +71,15 @@ open class RSpinner(context: Context, attributeSet: AttributeSet? = null) : AppC
     }
 
     /**设置数据源*/
-    fun setStrings(list: List<String>) {
-        val adapter = ArrayAdapter<CharSequence>(context, dropDownLayout, list)
+    fun setStrings(list: List<String>, listener: (position: Int) -> Unit = {}) {
+        val adapter = RArrayAdapter<CharSequence>(context, dropDownLayout, list)
         setAdapter(adapter)
+
+        onItemSelectedListener = object : OnSpinnerItemSelected() {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                listener(position)
+            }
+        }
     }
 }
 
