@@ -20,6 +20,10 @@ open class DslAdapterItem {
     /**适配器*/
     var dslAdapter: DslAdapter? = null
 
+    open fun updateAdapterItem(useFilterList: Boolean = false) {
+        dslAdapter?.notifyItemChanged(this, useFilterList)
+    }
+
     //<editor-fold desc="Grid相关属性">
 
     /**
@@ -44,19 +48,19 @@ open class DslAdapterItem {
     open var itemBind: (itemHolder: RBaseViewHolder, itemPosition: Int, adapterItem: DslAdapterItem) -> Unit =
         { _, _, _ -> }
 
-    var onItemViewAttachedToWindow: (itemHolder: RBaseViewHolder) -> Unit = {
+    open var onItemViewAttachedToWindow: (itemHolder: RBaseViewHolder) -> Unit = {
 
     }
 
-    var onItemViewDetachedToWindow: (itemHolder: RBaseViewHolder) -> Unit = {
+    open var onItemViewDetachedToWindow: (itemHolder: RBaseViewHolder) -> Unit = {
 
     }
 
-    var onItemChildViewDetachedFromWindow: (itemHolder: RBaseViewHolder, itemPosition: Int) -> Unit = { _, _ ->
+    open var onItemChildViewDetachedFromWindow: (itemHolder: RBaseViewHolder, itemPosition: Int) -> Unit = { _, _ ->
 
     }
 
-    var onItemChildViewAttachedToWindow: (itemHolder: RBaseViewHolder, itemPosition: Int) -> Unit = { _, _ ->
+    open var onItemChildViewAttachedToWindow: (itemHolder: RBaseViewHolder, itemPosition: Int) -> Unit = { _, _ ->
 
     }
 
