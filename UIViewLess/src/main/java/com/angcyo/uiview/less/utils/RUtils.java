@@ -919,7 +919,7 @@ public class RUtils {
 
     public static ArrayList<String> split(String string, String regex, boolean allowEmpty, boolean checkExist, int maxSize) {
         final ArrayList<String> list = new ArrayList<>();
-        if (!"null".equalsIgnoreCase(string) && !TextUtils.isEmpty(string)) {
+        if (!"null".equalsIgnoreCase(string) && !TextUtils.isEmpty(string) && !TextUtils.isEmpty(regex)) {
             final String[] split = string.split(regex, Integer.MAX_VALUE);
             for (String s : split) {
                 String add = s;
