@@ -20,7 +20,7 @@ open class DslAdapterItem {
     /**适配器*/
     var dslAdapter: DslAdapter? = null
 
-    open fun updateAdapterItem(useFilterList: Boolean = false) {
+    open fun updateAdapterItem(useFilterList: Boolean = true) {
         dslAdapter?.notifyItemChanged(this, useFilterList)
     }
 

@@ -129,7 +129,7 @@ open class DslAdapter : RBaseAdapter<DslAdapterItem> {
     }
 
     /**支持过滤数据源*/
-    fun notifyItemChanged(item: DslAdapterItem?, useFilterList: Boolean = false) {
+    fun notifyItemChanged(item: DslAdapterItem?, useFilterList: Boolean = true) {
         if (item == null) {
             return
         }
