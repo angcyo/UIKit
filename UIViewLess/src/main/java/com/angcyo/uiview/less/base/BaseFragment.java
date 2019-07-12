@@ -20,6 +20,7 @@ import com.angcyo.uiview.less.utils.RUtils;
 import com.angcyo.uiview.less.widget.group.RSoftInputLayout;
 import kotlinx.coroutines.CoroutineScope;
 import kotlinx.coroutines.CoroutineScopeKt;
+import org.jetbrains.annotations.NotNull;
 import rx.Subscription;
 import rx.observers.SafeSubscriber;
 import rx.subscriptions.CompositeSubscription;
@@ -215,15 +216,19 @@ public abstract class BaseFragment extends AbsLifeCycleFragment {
     }
 
     public void addSubscription(Subscription subscription, boolean checkToken) {
-        if (mSubscriptions == null || mSubscriptions.isUnsubscribed()) {
-            mSubscriptions = new CompositeSubscription();
-        }
-        addSubscription(mSubscriptions, subscription, checkToken, new Runnable() {
+        addSubscription(getCompositeSubscription(), subscription, checkToken, new Runnable() {
             @Override
             public void run() {
                 onCancelSubscriptions();
             }
         });
+    }
+
+    public CompositeSubscription getCompositeSubscription() {
+        if (mSubscriptions == null || mSubscriptions.isUnsubscribed()) {
+            mSubscriptions = new CompositeSubscription();
+        }
+        return mSubscriptions;
     }
 
     //</editor-fold">
