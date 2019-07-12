@@ -9,13 +9,6 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
-import androidx.fragment.app.FragmentManager;
-import androidx.customview.widget.ViewDragHelper;
-import androidx.recyclerview.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -23,6 +16,13 @@ import android.view.ViewGroup;
 import android.view.WindowInsets;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.customview.widget.ViewDragHelper;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.recyclerview.widget.RecyclerView;
 import com.angcyo.lib.L;
 import com.angcyo.uiview.less.R;
 import com.angcyo.uiview.less.base.BaseAppCompatActivity;
@@ -60,12 +60,12 @@ public class FragmentSwipeBackLayout extends SwipeBackLayout {
     public static boolean SHOW_DEBUG_TIME = L.LOG_DEBUG;
     protected boolean isAttachedToWindow = false;
 
-    int hSpace = (int) (30 * getResources().getDisplayMetrics().density);
-    int vSpace = (int) (30 * getResources().getDisplayMetrics().density);
+    int hSpace = (int) (10 * getResources().getDisplayMetrics().density);
+    int vSpace = (int) (22 * getResources().getDisplayMetrics().density);
     int viewMaxHeight = 0; //debug模式下的成员变量
     boolean isInDebugLayout = false;
-    Paint debugPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    StringBuilder measureLogBuilder = new StringBuilder();
+    Paint debugPaint;
+    StringBuilder measureLogBuilder;
     Rect viewVisibleRectTemp = new Rect();
     /**
      * 已经按下返回键
@@ -137,10 +137,6 @@ public class FragmentSwipeBackLayout extends SwipeBackLayout {
         } else {
             return childView;
         }
-    }
-
-    public static void saveToSDCard(final String data) {
-
     }
 
     public static String name(Object obj) {
@@ -695,8 +691,18 @@ public class FragmentSwipeBackLayout extends SwipeBackLayout {
                 .doIt();
     }
 
+    private void initDebugLayout() {
+        if (debugPaint == null) {
+            debugPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        }
+        if (measureLogBuilder == null) {
+            measureLogBuilder = new StringBuilder();
+        }
+    }
+
     public void startDebugLayout() {
         if (!isInDebugLayout) {
+            initDebugLayout();
             isInDebugLayout = true;
             getOverScroller().abortAnimation();
             requestLayout();
@@ -833,8 +839,12 @@ public class FragmentSwipeBackLayout extends SwipeBackLayout {
                 measureLogBuilder.append(RUtils.getClassSimpleName(fragmentByView.getClass()));
                 measureLogBuilder.append(" ");
                 FragmentHelper.logFragmentStatus(fragmentByView, measureLogBuilder);
+                measureLogBuilder.append(" ha:");
+                measureLogBuilder.append(canvas.isHardwareAccelerated());
+                measureLogBuilder.append(" ");
+                measureLogBuilder.append(canvas.getClass().getSimpleName());
 
-                canvas.drawText(measureLogBuilder.toString(), hSpace, t + textHeight, debugPaint);
+                canvas.drawText(measureLogBuilder.toString(), 2 * ViewExKt.getDpi(0), t + textHeight, debugPaint);
 
                 t += hSize + vSpace;
             }

@@ -330,7 +330,7 @@ public class FragmentHelper {
             }
 
             if (fragment instanceof IFragment) {
-                builder.append(" 可视:");
+                builder.append(" see:");
                 builder.append(!((IFragment) fragment).isFragmentHide());
             }
         }
