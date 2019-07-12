@@ -37,6 +37,8 @@ import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.functions.Func2;
 
+import java.util.List;
+
 /**
  * Email:angcyo@126.com
  *
@@ -104,8 +106,23 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
         int fragmentParentLayoutId = getFragmentParentLayoutId();
 
         if (fragmentParentLayoutId != -1) {
-            if (!onFragmentBackPressed(fragmentParentLayoutId)) {
-                return;
+
+            List<Fragment> fragments = FragmentHelper.getFragmentList(getSupportFragmentManager(), fragmentParentLayoutId);
+            int size = fragments.size();
+
+            if (size > 1) {
+                if (!onFragmentBackPressed(fragmentParentLayoutId)) {
+                    return;
+                }
+            } else if (size == 1) {
+                boolean canBack = true;
+                Fragment fragment = fragments.get(0);
+                if (fragment instanceof IFragment) {
+                    canBack = ((IFragment) fragment).onBackPressed(this);
+                }
+                if (!canBack) {
+                    return;
+                }
             }
         }
 
