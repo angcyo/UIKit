@@ -6,12 +6,6 @@ import android.graphics.*;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
-import androidx.annotation.ColorInt;
-import androidx.annotation.DrawableRes;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
-import androidx.appcompat.widget.AppCompatTextView;
 import android.text.*;
 import android.text.style.CharacterStyle;
 import android.text.style.ForegroundColorSpan;
@@ -21,6 +15,12 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.TextView;
+import androidx.annotation.ColorInt;
+import androidx.annotation.DrawableRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.AppCompatTextView;
+import androidx.core.content.ContextCompat;
 import com.angcyo.uiview.less.R;
 import com.angcyo.uiview.less.draw.RDrawNoRead;
 import com.angcyo.uiview.less.draw.TextDraw;
@@ -96,6 +96,7 @@ public class RTextView extends AppCompatTextView {
      */
     boolean pauseScroll = false;
     RDrawNoRead mDrawNoRead;
+    TextDraw textDraw;
     private Drawable mBackgroundDrawable;
     private CharSequence mRawText;
     private int mPaddingLeft;
@@ -138,14 +139,11 @@ public class RTextView extends AppCompatTextView {
      * 使用英文字符数过滤, 一个汉字等于2个英文, 一个emoji表情等于2个汉字
      */
     private boolean useCharLengthFilter = false;
-
     /**
      * 滚动循环绘制文本的圈数, 会在没次setText的时候, 重置为0
      */
     private long scrollLoopCount = 0;
     private OnScrollTextLoopListener onScrollTextLoopListener;
-
-    TextDraw textDraw;
 
     public RTextView(Context context) {
         this(context, null);
@@ -422,7 +420,7 @@ public class RTextView extends AppCompatTextView {
         //super.onDraw(canvas);
     }
 
-    protected void onDrawScrollText(Canvas canvas) {
+    private float getScrollTextWidth() {
         String text = String.valueOf(getText());
         if (getText() == null) {
             if (isInEditMode()) {
@@ -433,7 +431,7 @@ public class RTextView extends AppCompatTextView {
         }
 
         if (TextUtils.isEmpty(text)) {
-            return;
+            return 0;
         }
 
         if (mScrollTextPaint == null) {
@@ -443,6 +441,11 @@ public class RTextView extends AppCompatTextView {
         mScrollTextPaint.setColor(getCurrentTextColor());
 
         float textWidth = mScrollTextPaint.measureText(text);
+        return textWidth;
+    }
+
+    protected void onDrawScrollText(Canvas canvas) {
+        float textWidth = getScrollTextWidth();
 
         float offset = scrollTextCircleOffset;
         if (scrollTextCircleOffset < 0) {
@@ -451,7 +454,7 @@ public class RTextView extends AppCompatTextView {
 
         if (scrollType == SCROLL_TYPE_DEFAULT) {
             if (isInEditMode()) {
-                scrollCurX = 100;
+                scrollCurX = 40 * ViewExKt.getDpi(canvas);
             }
 
             //canvas.drawText(text, getMeasuredWidth() - scrollCurX, drawTextY, mScrollTextPaint);
@@ -698,6 +701,12 @@ public class RTextView extends AppCompatTextView {
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         super.onLayout(changed, left, top, right, bottom);
+        if (isScrollText) {
+            float textWidth = getScrollTextWidth();
+            right = (int) (left + textWidth + getPaddingLeft() + getPaddingRight());
+            setRight(right);
+        }
+
         if (autoFixTextSize &&
                 (!ExKt.have(getInputType(), EditorInfo.TYPE_TEXT_FLAG_MULTI_LINE) || getMaxLines() == 1)) {
             while (getPaint().getTextSize() > 9 &&
