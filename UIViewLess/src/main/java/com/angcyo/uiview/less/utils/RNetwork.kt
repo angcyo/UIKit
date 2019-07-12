@@ -8,7 +8,8 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.net.*
 import android.os.Build
-import com.angcyo.http.Rx
+import android.os.Handler
+import android.os.Looper
 import com.angcyo.lib.L
 import com.angcyo.uiview.less.utils.RNetwork.getNetWorkState
 import com.angcyo.uiview.less.utils.RNetwork.notifyObservers
@@ -25,6 +26,10 @@ import com.angcyo.uiview.less.utils.RNetwork.notifyObservers
 object RNetwork {
 
     private val mObservers = mutableListOf<NetStateChangeObserver>()
+
+    val mainHandler: Handler by lazy {
+        Handler(Looper.getMainLooper())
+    }
 
     var netBroadcastReceiver: NetBroadcastReceiver? = null
     /**
@@ -64,9 +69,17 @@ object RNetwork {
         if (RUtils.isMainThread()) {
             notify()
         } else {
-            Rx.main {
+            mainHandler.post {
                 notify()
             }
+            //在画中画模式中, 所有子线程跳转主线程的异步操作都无法执行.所以, 这里直接使用 handler
+//            ThreadExecutor.instance().onMain {
+//                notify()
+//            }
+
+//            Rx.main {
+//                notify()
+//            }
         }
     }
 
