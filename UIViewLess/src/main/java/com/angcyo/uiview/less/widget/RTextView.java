@@ -444,6 +444,14 @@ public class RTextView extends AppCompatTextView {
         return textWidth;
     }
 
+    private void translateTo(Canvas canvas, float translate) {
+        canvas.save();
+        canvas.translate(translate, 0);
+        canvas.clipRect(0, 0, -translate + getMeasuredWidth(), getMeasuredHeight());
+        super.onDraw(canvas);
+        canvas.restore();
+    }
+
     protected void onDrawScrollText(Canvas canvas) {
         float textWidth = getScrollTextWidth();
 
@@ -452,6 +460,7 @@ public class RTextView extends AppCompatTextView {
             offset = getMeasuredWidth() - textWidth;
         }
 
+        float translateX = 0;
         if (scrollType == SCROLL_TYPE_DEFAULT) {
             if (isInEditMode()) {
                 scrollCurX = 40 * ViewExKt.getDpi(canvas);
@@ -459,34 +468,26 @@ public class RTextView extends AppCompatTextView {
 
             //canvas.drawText(text, getMeasuredWidth() - scrollCurX, drawTextY, mScrollTextPaint);
 
-            canvas.save();
-            canvas.translate(getMeasuredWidth() - scrollCurX, 0);
-            super.onDraw(canvas);
-            canvas.restore();
+            translateX = getMeasuredWidth() - scrollCurX;
+            translateTo(canvas, translateX);
 
             if (isScrollTextCircle) {
                 //canvas.drawText(text, getMeasuredWidth() - scrollCurX + textWidth + offset, drawTextY, mScrollTextPaint);
 
-                canvas.save();
-                canvas.translate(getMeasuredWidth() - scrollCurX + textWidth + offset, 0);
-                super.onDraw(canvas);
-                canvas.restore();
+                translateX = getMeasuredWidth() - scrollCurX + textWidth + offset;
+                translateTo(canvas, translateX);
             }
         } else if (scrollType == SCROLL_TYPE_START) {
             //canvas.drawText(text, -scrollCurX, drawTextY, mScrollTextPaint);
 
-            canvas.save();
-            canvas.translate(-scrollCurX, 0);
-            super.onDraw(canvas);
-            canvas.restore();
+            translateX = -scrollCurX;
+            translateTo(canvas, translateX);
 
             if (isScrollTextCircle) {
                 //canvas.drawText(text, -scrollCurX + textWidth + offset, drawTextY, mScrollTextPaint);
 
-                canvas.save();
-                canvas.translate(-scrollCurX + textWidth + offset, 0);
-                super.onDraw(canvas);
-                canvas.restore();
+                translateX = -scrollCurX + textWidth + offset;
+                translateTo(canvas, translateX);
             }
         }
 
