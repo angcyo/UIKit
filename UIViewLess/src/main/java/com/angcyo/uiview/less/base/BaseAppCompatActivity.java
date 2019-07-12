@@ -72,7 +72,7 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
         //系统Fragment操作日志输出
         //FragmentManager.enableDebugLogging(BuildConfig.DEBUG);
 
-        L.v("taskId:" + getTaskId());
+        L.v(this.getClass().getSimpleName() + " taskId:" + getTaskId());
         //ActivityHelper.setStatusBarColor(this, Color.YELLOW);
         //ActivityHelper.setStatusBarDrawable(this, getDrawableCompat(R.drawable.base_nav_shadow));
     }
@@ -150,8 +150,6 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
                 .defaultExitAnim()
                 .back(this);
     }
-
-    //</editor-fold>
 
     /**
      * Fragment所在的ViewGroup id
