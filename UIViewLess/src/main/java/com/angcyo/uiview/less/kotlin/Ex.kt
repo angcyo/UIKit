@@ -5,19 +5,18 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.*
 import android.net.Uri
-import androidx.core.math.MathUtils
+import android.text.SpannableStringBuilder
 import android.text.TextUtils
 import android.util.Base64
 import android.view.MotionEvent
 import android.view.ViewConfiguration
 import android.webkit.MimeTypeMap
+import androidx.core.math.MathUtils
 import com.angcyo.http.Http
 import com.angcyo.http.Json
 import com.angcyo.uiview.less.resources.ResUtil
 import com.angcyo.uiview.less.skin.SkinHelper
-import com.angcyo.uiview.less.utils.H5
-import com.angcyo.uiview.less.utils.RUtils
-import com.angcyo.uiview.less.utils.Reflect
+import com.angcyo.uiview.less.utils.*
 import com.angcyo.uiview.less.utils.utilcode.utils.EncodeUtils
 import com.angcyo.uiview.less.utils.utilcode.utils.FileUtils
 import okhttp3.ResponseBody
@@ -611,4 +610,14 @@ public fun String?.fromHtml(): CharSequence {
 
 public fun uuid(): String {
     return UUID.randomUUID().toString()
+}
+
+public fun SpanUtils.appendln() {
+    append(System.getProperty("line.separator")!!)
+}
+
+public fun span(init: RSpan.() -> Unit): SpannableStringBuilder {
+    return RSpan.get().apply {
+        this.init()
+    }.create()
 }
