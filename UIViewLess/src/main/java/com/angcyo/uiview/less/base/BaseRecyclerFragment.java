@@ -4,6 +4,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import android.widget.TextView;
+import androidx.recyclerview.widget.RecyclerView;
 import com.angcyo.uiview.less.R;
 import com.angcyo.uiview.less.iview.AffectUI;
 import com.angcyo.uiview.less.recycler.RBaseViewHolder;
@@ -353,4 +354,15 @@ public abstract class BaseRecyclerFragment<T> extends BaseLoadFragment
 
     //</editor-fold desc="分页加载相关">
 
+    /**
+     * 获取缓存池
+     */
+    @Nullable
+    public RecyclerView.RecycledViewPool getRecyclerViewPool() {
+        if (mAttachContext instanceof BaseAppCompatActivity) {
+            return ((BaseAppCompatActivity) mAttachContext).getRecycledViewPool();
+        } else {
+            return null;
+        }
+    }
 }

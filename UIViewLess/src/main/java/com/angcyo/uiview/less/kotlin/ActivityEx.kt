@@ -57,15 +57,6 @@ public fun Activity.fullscreen(enable: Boolean = true, checkSdk: Boolean = true)
     ActivityHelper.fullscreen(this, enable, checkSdk)
 }
 
-/**获取缓存池*/
-public fun Fragment.getRecyclerViewPool(): RecyclerView.RecycledViewPool? {
-    return if (activity is BaseAppCompatActivity) {
-        (activity as BaseAppCompatActivity).recycledViewPool
-    } else {
-        null
-    }
-}
-
 /**是否支持画中画*/
 public fun BaseAppCompatActivity.supportPictureInPicture(): Boolean {
     return Build.VERSION.SDK_INT >= Build.VERSION_CODES.N &&

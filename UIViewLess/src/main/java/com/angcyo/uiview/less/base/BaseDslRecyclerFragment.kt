@@ -1,8 +1,6 @@
 package com.angcyo.uiview.less.base
 
 import android.os.Bundle
-import androidx.recyclerview.widget.RecyclerView
-import com.angcyo.uiview.less.kotlin.getRecyclerViewPool
 import com.angcyo.uiview.less.kotlin.notifyItemChangedByTag
 import com.angcyo.uiview.less.recycler.DslItemDecoration
 import com.angcyo.uiview.less.recycler.HoverItemDecoration
@@ -12,7 +10,6 @@ import com.angcyo.uiview.less.recycler.adapter.DslAdapter
 import com.angcyo.uiview.less.recycler.adapter.DslAdapterItem
 import com.angcyo.uiview.less.recycler.adapter.DslDateFilter
 import com.angcyo.uiview.less.recycler.adapter.RBaseAdapter
-import java.lang.ref.WeakReference
 
 /**
  *
