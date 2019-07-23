@@ -2450,6 +2450,19 @@ public class RUtils {
         return list == null || list.isEmpty();
     }
 
+    public static boolean equalList(List<?> list1, List<?> list2) {
+        if (list1 == null || list2 == null) {
+            return false;
+        }
+        if (listSize(list1) != listSize(list2))
+            return false;
+        for (Object object : list1) {
+            if (!list2.contains(object))
+                return false;
+        }
+        return true;
+    }
+
     public static int listSize(List<?> list) {
         return list == null ? 0 : list.size();
     }

@@ -291,6 +291,11 @@ open class DslAdapterItem {
     }
 
     //</editor-fold desc="表单 分割线配置">
+
+    //<editor-fold desc="Diff 相关">
+    open var thisAreItemsTheSame: (newItem: DslAdapterItem) -> Boolean = { this == it }
+    open var thisAreContentsTheSame: (newItem: DslAdapterItem) -> Boolean = { false }
+    //</editor-fold desc="Diff 相关">
 }
 
 /**

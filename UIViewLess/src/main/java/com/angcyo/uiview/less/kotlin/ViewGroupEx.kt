@@ -10,6 +10,7 @@ import android.view.animation.AnticipateInterpolator
 import android.view.animation.OvershootInterpolator
 import android.widget.EditText
 import android.widget.TextView
+import com.angcyo.uiview.less.R
 import com.angcyo.uiview.less.resources.AnimUtil
 import com.angcyo.uiview.less.widget.group.RSoftInputLayout
 
@@ -250,13 +251,28 @@ public fun <T> ViewGroup.resetChild(size: Int, datas: List<T>? = null, onAddView
 }
 
 public fun <T> ViewGroup.addView(size: Int, datas: List<T>? = null, onAddViewCallback: OnAddViewCallback<T>) {
+    val layoutId = onAddViewCallback.getLayoutId()
+
+    //如果布局id不一样, 说明child不一样, 需要remove
+    if (layoutId > 0) {
+        for (index in childCount - 1 downTo 0) {
+            val tag = getChildAt(index).getTag(R.id.tag)
+            if (tag is Int) {
+                if (tag != layoutId) {
+                    removeViewAt(index)
+                }
+            }
+        }
+    }
+
     this.resetChildCount(size) {
-        val layoutId = onAddViewCallback.getLayoutId()
         val childView = if (layoutId > 0) {
             LayoutInflater.from(context).inflate(layoutId, this, false)
         } else onAddViewCallback.getView()!!
 
         onAddViewCallback.onCreateView(childView)
+
+        childView.setTag(R.id.tag, layoutId)
 
         childView
     }
