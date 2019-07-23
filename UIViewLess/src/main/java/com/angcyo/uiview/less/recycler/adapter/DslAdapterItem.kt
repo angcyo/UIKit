@@ -18,10 +18,10 @@ import com.angcyo.uiview.less.recycler.RBaseViewHolder
 open class DslAdapterItem {
 
     /**适配器*/
-    var dslAdapter: DslAdapter? = null
+    var itemDslAdapter: DslAdapter? = null
 
     open fun updateAdapterItem(useFilterList: Boolean = true) {
-        dslAdapter?.notifyItemChanged(this, useFilterList)
+        itemDslAdapter?.notifyItemChanged(this, useFilterList)
     }
 
     //<editor-fold desc="Grid相关属性">
