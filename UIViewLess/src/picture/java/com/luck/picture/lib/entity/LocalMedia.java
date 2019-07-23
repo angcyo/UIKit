@@ -337,6 +337,15 @@ public class LocalMedia implements Parcelable {
     }
 
     @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof LocalMedia) {
+            return TextUtils.equals(getLoadUrl(), ((LocalMedia) obj).getLoadUrl());
+        } else {
+            return false;
+        }
+    }
+
+    @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(this.position);
         dest.writeString(this.path);

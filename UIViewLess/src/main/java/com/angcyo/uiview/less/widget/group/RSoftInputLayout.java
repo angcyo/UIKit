@@ -66,6 +66,10 @@ public class RSoftInputLayout extends FrameLayout implements ILifecycle {
      * 键盘是否显示
      */
     private boolean isKeyboardShow = false;
+    /**
+     * 键盘之前是否显示
+     */
+    private boolean isKeyboardOldShow = false;
     private boolean mClipToPadding;
     private ValueAnimator mValueAnimator;
     /**
@@ -379,6 +383,8 @@ public class RSoftInputLayout extends FrameLayout implements ILifecycle {
             return;
         }
 
+        isKeyboardOldShow = isKeyboardShow;
+
         isKeyboardShow = isSoftKeyboardShow();
         if (isKeyboardShow) {
             isEmojiShow = false;
@@ -592,7 +598,6 @@ public class RSoftInputLayout extends FrameLayout implements ILifecycle {
 
     public void addOnEmojiLayoutChangeListener(OnEmojiLayoutChangeListener listener) {
         mEmojiLayoutChangeListeners.add(listener);
-
         if (getContext() instanceof Activity) {
             Window window = ((Activity) getContext()).getWindow();
             int softInputMode = window.getAttributes().softInputMode;
@@ -685,6 +690,10 @@ public class RSoftInputLayout extends FrameLayout implements ILifecycle {
     public void onLifeViewHide() {
         isViewHide = true;
         setFitsSystemWindows(false);
+    }
+
+    public boolean isKeyboardOldShow() {
+        return isKeyboardOldShow;
     }
 
     public interface OnEmojiLayoutChangeListener {
