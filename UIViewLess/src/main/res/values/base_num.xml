@@ -37,5 +37,5 @@
     <integer name="max_music_name_show_count">20</integer>
     <!--允许评论的最大字符数-->
     <integer name="max_comment_count">140</integer>
-    <integer name="base_anim_duration">150</integer>
+    <integer name="base_anim_duration">425</integer>
 </resources>

@@ -583,6 +583,10 @@ public class FragmentHelper {
 
 
     public static class Builder {
+        public static int DEFAULT_EXIT_ANIM = R.anim.base_scale_from_exit;
+        public static int DEFAULT_ENTER_ANIM = R.anim.base_scale_to_enter;
+        public static int DEFAULT_NO_ANIM = R.anim.base_no_alpha;
+
         FragmentManager fragmentManager;
         /**
          * 需要隐藏的Fragment
@@ -969,14 +973,14 @@ public class FragmentHelper {
         }
 
         public Builder defaultExitAnim() {
-            this.enterAnim = R.anim.base_no_alpha;
-            this.exitAnim = R.anim.base_tran_to_bottom;
+            this.enterAnim = DEFAULT_NO_ANIM;
+            this.exitAnim = DEFAULT_EXIT_ANIM;
             return this;
         }
 
         public Builder defaultEnterAnim() {
-            this.exitAnim = R.anim.base_no_alpha;
-            this.enterAnim = R.anim.base_tran_to_top;
+            this.enterAnim = DEFAULT_ENTER_ANIM;
+            this.exitAnim = DEFAULT_NO_ANIM;
             return this;
         }
 
@@ -1000,10 +1004,33 @@ public class FragmentHelper {
             }
         }
 
+        /**
+         * 如果一次性操作多个Fragment的hide, 会出现下次show的时候动画还在执行的BUG,所以清空之前的动画
+         */
+        private void clearAnimation() {
+            if (fragmentManager != null && parentLayoutId != -1) {
+                List<Fragment> fragments = getFragmentList(fragmentManager, parentLayoutId);
+                for (Fragment f : fragments) {
+                    View view = f.getView();
+                    if (view != null) {
+                        view.clearAnimation();
+                    }
+                }
+            }
+        }
+
         private void animation(FragmentTransaction fragmentTransaction) {
-            if (enterAnim != -1 || exitAnim != -1) {
-                fragmentTransaction.setCustomAnimations(enterAnim, exitAnim,
-                        enterAnim, exitAnim);
+            int animEnter = enterAnim;
+            int animExit = exitAnim;
+            if (animEnter != -1 || animExit != -1) {
+                if (!removeFragmentList.isEmpty()) {
+                    //有需要remove的Fragment
+                    if (animExit == DEFAULT_NO_ANIM) {
+                        animExit = DEFAULT_EXIT_ANIM;
+                    }
+                }
+                fragmentTransaction.setCustomAnimations(animEnter, animExit,
+                        animEnter, animExit);
             }
         }
 
@@ -1232,7 +1259,7 @@ public class FragmentHelper {
             }
 
             //隐藏之前的Fragment
-            if (hideBeforeIndex > 0) {
+            if (hideBeforeIndex > 0 && resultFragment != null) {
                 /*Fragment的顺序和add的顺序保持一致, 无法修改*/
                 List<Fragment> beforeFragments = getBeforeFragment(fragmentManager, resultFragment, fragmentContainerId, hideBeforeIndex);
 
@@ -1247,10 +1274,25 @@ public class FragmentHelper {
             if (hideBeforeIndex > 1) {
                 //如果不隐藏之前的Fragment, 那么onHiddenChanged不会触发.
                 //此时界面对用户不可见,需要手动调用setUserVisibleHint方法
-                Fragment lastFragment = getLastFragment(fragmentManager, fragmentContainerId, isFragmentAdded ? 1 : 0);
+                Fragment lastFragment = getLastFragment(fragmentManager, fragmentContainerId,
+                        (isFragmentAdded || resultFragment == null) ? 1 : 0);
 
                 if (lastFragment != null) {
-                    lastFragment.setUserVisibleHint(false);
+                    int fragmentViewVisibility = View.VISIBLE;
+                    View fragmentView = lastFragment.getView();
+                    if (fragmentView != null) {
+                        fragmentViewVisibility = fragmentView.getVisibility();
+                    }
+
+                    boolean needShowFragment = fragmentViewVisibility == View.GONE || lastFragment.isHidden();
+
+                    if (needShowFragment) {
+                        configTransaction();
+                        fragmentTransaction.show(lastFragment);
+                        needCommit = true;
+                    } else {
+                        lastFragment.setUserVisibleHint(false);
+                    }
                 }
             }
 
@@ -1332,6 +1374,7 @@ public class FragmentHelper {
          * 提交事务
          */
         private void commitInner(FragmentTransaction transaction) {
+            clearAnimation();
             if (commitNow) {
                 if (allowStateLoss) {
                     transaction.commitNowAllowingStateLoss();

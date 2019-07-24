@@ -1,23 +1,22 @@
 package com.angcyo.uiview.less.base.helper;
 
 import android.app.Activity;
-import androidx.annotation.*;
-import androidx.arch.core.util.Function;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.core.view.ViewCompat;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import androidx.annotation.*;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.arch.core.util.Function;
+import androidx.core.view.ViewCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import com.angcyo.lib.L;
-import com.angcyo.uiview.less.R;
 import com.angcyo.uiview.less.base.BaseAppCompatActivity;
 import com.angcyo.uiview.less.kotlin.ExKt;
 
@@ -381,14 +380,14 @@ public class ActivityHelper {
         }
 
         public Builder defaultExitAnim() {
-            this.enterAnim = R.anim.base_no_alpha;
-            this.exitAnim = R.anim.base_tran_to_bottom;
+            this.enterAnim = FragmentHelper.Builder.DEFAULT_NO_ANIM;
+            this.exitAnim = FragmentHelper.Builder.DEFAULT_EXIT_ANIM;
             return this;
         }
 
         public Builder defaultEnterAnim() {
-            this.exitAnim = R.anim.base_no_alpha;
-            this.enterAnim = R.anim.base_tran_to_top;
+            this.exitAnim = FragmentHelper.Builder.DEFAULT_NO_ANIM;
+            this.enterAnim = FragmentHelper.Builder.DEFAULT_ENTER_ANIM;
             return this;
         }
 
