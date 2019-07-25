@@ -8,6 +8,7 @@ import com.angcyo.http.log.LogInterceptor;
 import com.angcyo.http.log.LogUtil;
 import com.angcyo.http.progress.ProgressIntercept;
 import com.angcyo.http.type.TypeBuilder;
+import com.google.gson.JsonElement;
 import okhttp3.*;
 import retrofit2.Retrofit;
 import retrofit2.RetrofitServiceMapping;
@@ -63,16 +64,16 @@ public class Http {
      * OkHttp 客户端构建
      */
     public static OkHttpClient.Builder defaultOkHttpClient(String logTag) {
-        HttpLoggingInterceptorM httpLoggingInterceptorM = new HttpLoggingInterceptorM(new LogInterceptor(logTag));
+        HttpLoggingInterceptorM httpLogInterceptor = new HttpLoggingInterceptorM(new LogInterceptor(logTag));
         if (BuildConfig.DEBUG) {
-            httpLoggingInterceptorM.setLevel(HttpLoggingInterceptorM.Level.BODY);
+            httpLogInterceptor.setLevel(HttpLoggingInterceptorM.Level.BODY);
         }
-        httpLoggingInterceptorM.logResponse = LOG_INTERCEPTOR_RESPONSE;
+        httpLogInterceptor.logResponse = LOG_INTERCEPTOR_RESPONSE;
         return noSSL(new OkHttpClient.Builder()
                 .connectTimeout(TIME_OUT, TimeUnit.SECONDS)
                 .readTimeout(TIME_OUT, TimeUnit.SECONDS)
                 .writeTimeout(TIME_OUT, TimeUnit.SECONDS)
-                .addNetworkInterceptor(httpLoggingInterceptorM)
+                .addNetworkInterceptor(httpLogInterceptor)
                 .addInterceptor(new CopyrightInterceptor())
                 .addNetworkInterceptor(new ProgressIntercept()));
     }
@@ -335,6 +336,38 @@ public class Http {
     }
 
     /**
+     * 将args转成JsonElement
+     */
+    public static JsonElement json(String... args) {
+        final Json.Builder builder = Json.json();
+        foreach(new OnPutValue() {
+            @Override
+            public void onValue(String key, String value) {
+                if (!TextUtils.isEmpty(key) && !TextUtils.isEmpty(value)) {
+                    builder.add(key, value);
+                }
+            }
+
+            @Override
+            public void onRemove(String key) {
+
+            }
+
+            @Override
+            public boolean isKeyAllowEmpty(String key) {
+                return false;
+            }
+
+            @Override
+            public void onEmptyValue(String key, String value) {
+
+            }
+        }, args);
+
+        return builder.build();
+    }
+
+    /**
      * json 请求体
      */
     public static RequestBody body(String... args) {
@@ -533,11 +566,9 @@ public class Http {
         String covert(String body);
     }
 
-
     public interface IConvertJson<T> {
         T covert(String body);
     }
-
 
     public interface OnHttpRequestCallback {
         void onRequestCallback(@NonNull String body);

@@ -19,7 +19,9 @@ import com.angcyo.uiview.less.skin.SkinHelper
 import com.angcyo.uiview.less.utils.*
 import com.angcyo.uiview.less.utils.utilcode.utils.EncodeUtils
 import com.angcyo.uiview.less.utils.utilcode.utils.FileUtils
+import okhttp3.RequestBody
 import okhttp3.ResponseBody
+import okio.Buffer
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -567,7 +569,7 @@ public fun String?.decode(): String? {
     return decode
 }
 
-/**读取body中的字符串*/
+/**读取ResponseBody中的字符串*/
 public fun ResponseBody?.readString(charsetName: String = "UTF-8"): String {
     if (this == null) {
         return ""
@@ -575,6 +577,17 @@ public fun ResponseBody?.readString(charsetName: String = "UTF-8"): String {
     val source = source()
     source.request(Long.MAX_VALUE)
     val buffer = source.buffer
+    val charset: Charset = Charset.forName(charsetName)
+    return buffer.clone().readString(charset)
+}
+
+/**读取RequestBody中的字符串*/
+public fun RequestBody?.readString(charsetName: String = "UTF-8"): String {
+    if (this == null) {
+        return ""
+    }
+    val buffer = Buffer()
+    writeTo(buffer)
     val charset: Charset = Charset.forName(charsetName)
     return buffer.clone().readString(charset)
 }
