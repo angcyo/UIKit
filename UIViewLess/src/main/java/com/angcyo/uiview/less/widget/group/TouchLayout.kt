@@ -1,14 +1,16 @@
 package com.angcyo.uiview.less.widget.group
 
 import android.content.Context
-import androidx.annotation.CallSuper
-import androidx.core.view.GestureDetectorCompat
 import android.util.AttributeSet
 import android.view.GestureDetector
 import android.view.MotionEvent
+import android.view.ViewConfiguration
 import android.widget.FrameLayout
 import android.widget.OverScroller
+import androidx.annotation.CallSuper
+import androidx.core.view.GestureDetectorCompat
 import com.angcyo.uiview.less.kotlin.isDown
+import com.angcyo.uiview.less.kotlin.isFinish
 
 /**
  * Copyright (C) 2016,深圳市红鸟网络科技股份有限公司 All rights reserved.
@@ -53,57 +55,81 @@ open class TouchLayout(context: Context, attributeSet: AttributeSet? = null) : F
     protected var touchEventX = 0f
     protected var touchEventY = 0f
 
+    /**是否处于长按状态下*/
+    protected var isLongPress = false
+
+    protected var longPressRunnable = Runnable {
+        performLongClick()
+        isLongPress = true
+    }
+
     /*用来检测手指滑动方向*/
-    protected val orientationGestureDetector = GestureDetectorCompat(context, object : GestureDetector.SimpleOnGestureListener() {
-        override fun onFling(e1: MotionEvent?, e2: MotionEvent?, velocityX: Float, velocityY: Float): Boolean {
-            //L.e("call: onFling -> \n$e1 \n$e2 \n$velocityX $velocityY")
+    protected val orientationGestureDetector =
+        GestureDetectorCompat(context, object : GestureDetector.SimpleOnGestureListener() {
 
-            firstMotionEvent = e1
-            secondMotionEvent = e2
+            override fun onFling(e1: MotionEvent?, e2: MotionEvent?, velocityX: Float, velocityY: Float): Boolean {
+                //L.e("call: onFling -> \n$e1 \n$e2 \n$velocityX $velocityY")
 
-            val absX = Math.abs(velocityX)
-            val absY = Math.abs(velocityY)
+                firstMotionEvent = e1
+                secondMotionEvent = e2
 
-            if (absX > flingVelocitySlop || absY > flingVelocitySlop) {
-                if (absY > absX) {
-                    //竖直方向的Fling操作
-                    onFlingChange(if (velocityY > 0) ORIENTATION.BOTTOM else ORIENTATION.TOP, velocityY)
-                } else if (absX > absY) {
-                    //水平方向的Fling操作
-                    onFlingChange(if (velocityX > 0) ORIENTATION.RIGHT else ORIENTATION.LEFT, velocityX)
+                val absX = Math.abs(velocityX)
+                val absY = Math.abs(velocityY)
+
+                if (absX > flingVelocitySlop || absY > flingVelocitySlop) {
+                    if (absY > absX) {
+                        //竖直方向的Fling操作
+                        onFlingChange(if (velocityY > 0) ORIENTATION.BOTTOM else ORIENTATION.TOP, velocityX, velocityY)
+                    } else if (absX > absY) {
+                        //水平方向的Fling操作
+                        onFlingChange(if (velocityX > 0) ORIENTATION.RIGHT else ORIENTATION.LEFT, velocityX, velocityY)
+                    }
                 }
+
+                removeLongPressRunnable()
+
+                return true
             }
 
-            return true
-        }
+            override fun onScroll(e1: MotionEvent?, e2: MotionEvent?, distanceX: Float, distanceY: Float): Boolean {
+                //L.e("call: onScroll -> \n$e1 \n$e2 \n$distanceX $distanceY")
+                firstMotionEvent = e1
+                secondMotionEvent = e2
 
-        override fun onScroll(e1: MotionEvent?, e2: MotionEvent?, distanceX: Float, distanceY: Float): Boolean {
-            //L.e("call: onScroll -> \n$e1 \n$e2 \n$distanceX $distanceY")
-            firstMotionEvent = e1
-            secondMotionEvent = e2
+                val absX = Math.abs(distanceX)
+                val absY = Math.abs(distanceY)
 
-            val absX = Math.abs(distanceX)
-            val absY = Math.abs(distanceY)
-
-            if (absX > scrollDistanceSlop || absY > scrollDistanceSlop) {
-                if (absY > absX) {
-                    //竖直方向的Scroll操作
-                    onScrollChange(if (distanceY > 0) ORIENTATION.TOP else ORIENTATION.BOTTOM, distanceY)
-                } else if (absX > absY) {
-                    //水平方向的Scroll操作
-                    onScrollChange(if (distanceX > 0) ORIENTATION.LEFT else ORIENTATION.RIGHT, distanceX)
+                if (absX > scrollDistanceSlop || absY > scrollDistanceSlop) {
+                    if (absY > absX) {
+                        //竖直方向的Scroll操作
+                        onScrollChange(if (distanceY > 0) ORIENTATION.TOP else ORIENTATION.BOTTOM, distanceX, distanceY)
+                    } else if (absX > absY) {
+                        //水平方向的Scroll操作
+                        onScrollChange(if (distanceX > 0) ORIENTATION.LEFT else ORIENTATION.RIGHT, distanceX, distanceY)
+                    }
                 }
+
+                removeLongPressRunnable()
+
+                return true
             }
 
-            return true
+            override fun onLongPress(e: MotionEvent?) {
+                super.onLongPress(e)
+            }
+        }).apply {
+            setIsLongpressEnabled(false)
         }
-
-    })
 
     @CallSuper
     override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
         if (ev.actionMasked == MotionEvent.ACTION_DOWN) {
             overScroller.abortAnimation()
+
+            postDelayed(longPressRunnable, ViewConfiguration.getLongPressTimeout().toLong())
+        } else if (ev.isFinish()) {
+            removeLongPressRunnable()
+            isLongPress = false
         }
         if (handleTouchType == HANDLE_TOUCH_TYPE_DISPATCH) {
             orientationGestureDetector.onTouchEvent(ev)
@@ -135,6 +161,10 @@ open class TouchLayout(context: Context, attributeSet: AttributeSet? = null) : F
         }
         touchEventX = event.x
         touchEventY = event.y
+    }
+
+    protected open fun removeLongPressRunnable() {
+        removeCallbacks(longPressRunnable)
     }
 
     override fun computeScroll() {
@@ -183,12 +213,21 @@ open class TouchLayout(context: Context, attributeSet: AttributeSet? = null) : F
     fun isHorizontal(orientation: ORIENTATION) = orientation == ORIENTATION.LEFT || orientation == ORIENTATION.RIGHT
 
     /**Fling操作的处理方法*/
+    @Deprecated("不推荐使用")
     open fun onFlingChange(orientation: ORIENTATION, velocity: Float /*瞬时值*/) {
         //L.e("call: onFlingChange -> $orientation $velocity")
     }
 
+    open fun onFlingChange(orientation: ORIENTATION, velocityX: Float, velocityY: Float) {
+        onScrollChange(orientation, if (isVertical(orientation)) velocityY else velocityX)
+    }
+
     /**Scroll操作的处理方法*/
+    @Deprecated("不推荐使用")
     open fun onScrollChange(orientation: ORIENTATION, distance: Float /*瞬时值*/) {
-        //L.e("call: onScrollChange -> $orientation $distance")
+    }
+
+    open fun onScrollChange(orientation: ORIENTATION, distanceX: Float, distanceY: Float) {
+        onScrollChange(orientation, if (isVertical(orientation)) distanceY else distanceX)
     }
 }

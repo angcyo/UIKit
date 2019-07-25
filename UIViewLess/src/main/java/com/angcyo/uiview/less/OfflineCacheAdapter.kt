@@ -118,14 +118,14 @@ open class OfflineCacheAdapter : CacheAdapter() {
     override fun saveCache(request: Request, response: Response) {
         super.saveCache(request, response)
 
-        if (!isJsonType(request)) {
+        if (!isJsonType(request) || !response.isSuccessful) {
             return
         }
 
         response.body()?.let {
 
             val key = cacheAdapterListener.key(request)
-            saveCache(key, it.source().buffer, it.contentLength())
+            saveCache(key, it.source().buffer.clone(), it.contentLength())
             cache.flush()
 
             L.i("保存缓存:$key:${cacheAdapterListener.keyUrl(request)}".apply {
