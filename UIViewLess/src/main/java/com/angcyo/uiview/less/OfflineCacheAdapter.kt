@@ -60,7 +60,7 @@ open class OfflineCacheAdapter : CacheAdapter() {
         val key = cacheAdapterListener.key(request)
 
         loadCache(key)?.let { snapshot ->
-            L.i("读取缓存:$key:${cacheAdapterListener.keyUrl(request)} ".apply {
+            L.i("读取缓存:$key:${cacheAdapterListener.keyUrl(request)}".apply {
                 RLogFile.log("http", this)
             })
 
@@ -79,6 +79,10 @@ open class OfflineCacheAdapter : CacheAdapter() {
                 .body(CacheResponseBody(snapshot, contentType, "$contentLength"))
                 .build()
         }
+
+        L.i("无缓存:$key:${cacheAdapterListener.keyUrl(request)}".apply {
+            RLogFile.log("http", this)
+        })
 
         return null
     }
