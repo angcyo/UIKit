@@ -19,6 +19,7 @@ open class CacheInterceptor : Interceptor {
     companion object {
         const val TAG = "CacheInterceptor"
         const val HEADER_NO_CACHE = "offline-cache"
+        const val HEADER_FORCE_CACHE = "offline-force-cache"
     }
 
     var enableCache = true

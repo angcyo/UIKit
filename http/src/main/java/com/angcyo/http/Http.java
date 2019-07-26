@@ -73,9 +73,9 @@ public class Http {
                 .connectTimeout(TIME_OUT, TimeUnit.SECONDS)
                 .readTimeout(TIME_OUT, TimeUnit.SECONDS)
                 .writeTimeout(TIME_OUT, TimeUnit.SECONDS)
-                .addNetworkInterceptor(httpLogInterceptor)
+                .addNetworkInterceptor(new ProgressIntercept()))
                 .addInterceptor(new CopyrightInterceptor())
-                .addNetworkInterceptor(new ProgressIntercept()));
+                .addInterceptor(httpLogInterceptor);
     }
 
     /**

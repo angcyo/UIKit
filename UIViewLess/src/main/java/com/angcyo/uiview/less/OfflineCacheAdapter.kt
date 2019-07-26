@@ -48,12 +48,21 @@ open class OfflineCacheAdapter : CacheAdapter() {
     }
 
     override fun checkNeedCache(request: Request): Boolean {
+        if (RNetwork.isConnect(app())) {
+            return false
+        }
+        if (isForceCache(request)) {
+            return true
+        }
         //无网络需要缓存
-        return isJsonType(request) && !RNetwork.isConnect(app)
+        return isJsonType(request)
     }
 
+    /**读取缓存*/
     override fun loadCache(request: Request): Response? {
-        if (!isJsonType(request)) {
+        if (isForceCache(request)) {
+
+        } else if (!isJsonType(request)) {
             return null
         }
 
@@ -115,10 +124,15 @@ open class OfflineCacheAdapter : CacheAdapter() {
         return snapshot.readString()
     }
 
+    /**保存缓存数据*/
     override fun saveCache(request: Request, response: Response) {
-        super.saveCache(request, response)
+        if (!response.isSuccessful) {
+            return
+        }
 
-        if (!isJsonType(request) || !response.isSuccessful) {
+        if (isForceCache(request) || isJsonType(request)) {
+
+        } else {
             return
         }
 
@@ -168,6 +182,7 @@ open class OfflineCacheAdapter : CacheAdapter() {
         return loadCacheJson(key) != null
     }
 
+    /**只缓存json请求数据*/
     private fun isJsonType(request: Request): Boolean {
         var isJsonType = false
         request.body()?.contentType()?.let {
@@ -176,6 +191,11 @@ open class OfflineCacheAdapter : CacheAdapter() {
             }
         }
         return isJsonType
+    }
+
+    /**强制使用缓存*/
+    private fun isForceCache(request: Request): Boolean {
+        return request.header(CacheInterceptor.HEADER_FORCE_CACHE)?.isNotEmpty() == true
     }
 }
 
