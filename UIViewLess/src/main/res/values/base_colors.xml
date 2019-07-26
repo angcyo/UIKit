@@ -42,7 +42,7 @@
     <color name="base_gray_tran">#80C7C7CD</color>
 
     <color name="default_base_tran_dark2">#20000000</color>
-    <color name="default_base_bg_press">#40000000</color>
+    <color name="default_base_bg_press">#20000000</color>
     <color name="default_base_tran_dark">#80000000</color>
     <color name="default_base_bg_disable">#999999</color>
     <color name="default_base_bg_disable2">#DDDDDD</color>
