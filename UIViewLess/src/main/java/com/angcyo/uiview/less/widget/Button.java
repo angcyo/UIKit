@@ -207,4 +207,20 @@ public class Button extends RTextView {
         setBackground(null);
         initButton(true);
     }
+
+    public void setRoundRadii(int roundRadii) {
+        this.roundRadii = roundRadii;
+        initButton(true);
+    }
+
+    public void setButtonStyle(int buttonStyle) {
+        this.mButtonStyle = buttonStyle;
+        initButton(true);
+    }
+
+    public void setButtonStyle(int buttonStyle, int roundRadii) {
+        this.mButtonStyle = buttonStyle;
+        this.roundRadii = roundRadii;
+        initButton(true);
+    }
 }
