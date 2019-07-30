@@ -6,7 +6,7 @@ import com.angcyo.http.CacheInterceptor
 import com.angcyo.lib.L
 import com.angcyo.uiview.less.OfflineCacheAdapter.Companion.ENTRY_BODY
 import com.angcyo.uiview.less.OfflineCacheAdapter.Companion.ENTRY_METADATA
-import com.angcyo.uiview.less.RApplication.app
+import com.angcyo.uiview.less.kotlin.app
 import com.angcyo.uiview.less.kotlin.readString
 import com.angcyo.uiview.less.utils.RLogFile
 import com.angcyo.uiview.less.utils.RNetwork

@@ -1,6 +1,7 @@
 package com.angcyo.uiview.less.kotlin
 
 import com.angcyo.http.Http
+import com.angcyo.http.TokenInterceptor
 import com.angcyo.http.log.HttpLogFileInterceptor
 import com.angcyo.uiview.less.utils.RLogFile
 import okhttp3.OkHttpClient
@@ -26,14 +27,14 @@ public fun app_http_client(logTag: String = "请求"): OkHttpClient.Builder {
         }
     })
 
-//    val tokenInterceptor = TokenInterceptor(app().tokenListener)
-//
-//    defaultOkHttpClientBuilder.addInterceptor(httpLogFileInterceptor)
-//    app().buildCacheInterceptor()?.let {
-//        defaultOkHttpClientBuilder.addInterceptor(it)
-//    }
-//
-//    defaultOkHttpClientBuilder.addInterceptor(tokenInterceptor)
+    val tokenInterceptor = TokenInterceptor(app().tokenListener)
+
+    defaultOkHttpClientBuilder.addInterceptor(httpLogFileInterceptor)
+    app().buildCacheInterceptor()?.let {
+        defaultOkHttpClientBuilder.addInterceptor(it)
+    }
+
+    defaultOkHttpClientBuilder.addInterceptor(tokenInterceptor)
 
     return defaultOkHttpClientBuilder
 }

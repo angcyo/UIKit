@@ -5,18 +5,23 @@ import android.app.*;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import androidx.annotation.Nullable;
 import androidx.multidex.MultiDex;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
+import com.angcyo.http.CacheInterceptor;
+import com.angcyo.http.TokenInterceptor;
 import com.angcyo.lib.L;
 import com.angcyo.okdownload.FDown;
 import com.angcyo.uiview.less.base.NetworkStateReceiver;
+import com.angcyo.uiview.less.kotlin.HttpExKt;
 import com.angcyo.uiview.less.manager.RNotifier;
 import com.angcyo.uiview.less.skin.SkinHelper;
 import com.angcyo.uiview.less.utils.*;
 import com.angcyo.uiview.less.utils.utilcode.utils.AppUtils;
 import com.bumptech.glide.Glide;
 import com.orhanobut.hawk.Hawk;
+import okhttp3.OkHttpClient;
 
 import java.io.*;
 import java.lang.reflect.Field;
@@ -231,6 +236,31 @@ public class RApplication extends Application {
                 manager.createNotificationChannel(notificationChannel);
             }
         }
+    }
+
+
+    public TokenInterceptor.OnTokenListener getTokenListener() {
+        return new TokenInterceptor.TokenListenerAdapter();
+    }
+
+    /**
+     * 离线缓存配置
+     */
+    @Nullable
+    public CacheInterceptor buildCacheInterceptor() {
+        return null;
+    }
+
+    /**
+     * 全局使用一个网络请求客户端
+     */
+    OkHttpClient okHttpClient;
+
+    public OkHttpClient buildOkHttpClient(){
+        if (okHttpClient == null) {
+            okHttpClient =  HttpExKt.app_http_client("请求").build();
+        }
+        return okHttpClient;
     }
 
     public static class Util {
