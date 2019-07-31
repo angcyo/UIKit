@@ -822,9 +822,9 @@ public class SwitchButton extends View implements Checkable {
     }
 
     private void toggle(boolean animate, boolean broadcast) {
-        if (!isEnabled()) {
-            return;
-        }
+//        if (!isEnabled()) {
+//            return;
+//        }
 
         if (isEventBroadcast) {
             throw new RuntimeException("should NOT switch the state in method: [onCheckedChanged]!");
