@@ -58,6 +58,7 @@ public class RRecord {
                 //录制进度
                 if (onRecordListener != null) {
                     onRecordListener.onRecordProgress(innerRecorder.progress());
+                    onRecordListener.onRecordMaxAmplitude(innerRecorder.getMaxAmplitude());
                 }
             } else if (state == Recorder.PLAYING_STATE) {
                 doNext = true;
@@ -68,8 +69,9 @@ public class RRecord {
             }
 
             if (doNext) {
-                mainHandler.postDelayed(this, 300);
+                mainHandler.postDelayed(this, 100);
             }
+
         }
     };
 
@@ -234,6 +236,10 @@ public class RRecord {
         }
 
         public void onRecordStart() {
+
+        }
+
+        public void onRecordMaxAmplitude(int maxAmplitude) {
 
         }
 
