@@ -963,7 +963,10 @@ public class SwitchButton extends View implements Checkable {
                 }
                 break;
             }
+            default:
+                break;
         }
+        super.onTouchEvent(event);
         return true;
     }
 
@@ -1021,6 +1024,10 @@ public class SwitchButton extends View implements Checkable {
 
     public void setEnableEffect(boolean enable) {
         this.enableEffect = enable;
+    }
+
+    public boolean isEnableEffect() {
+        return enableEffect;
     }
 
     /**
@@ -1096,13 +1103,13 @@ public class SwitchButton extends View implements Checkable {
         valueAnimator.start();
     }
 
-    @Override
-    public final void setOnClickListener(OnClickListener l) {
-    }
-
-    @Override
-    public final void setOnLongClickListener(OnLongClickListener l) {
-    }
+//    @Override
+//    public final void setOnClickListener(OnClickListener l) {
+//    }
+//
+//    @Override
+//    public final void setOnLongClickListener(OnLongClickListener l) {
+//    }
 
     public void setOnCheckedChangeListener(OnCheckedChangeListener l) {
         onCheckedChangeListener = l;
