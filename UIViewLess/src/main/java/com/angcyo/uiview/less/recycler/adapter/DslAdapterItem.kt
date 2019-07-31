@@ -295,6 +295,20 @@ open class DslAdapterItem {
     //<editor-fold desc="Diff 相关">
     open var thisAreItemsTheSame: (newItem: DslAdapterItem) -> Boolean = { this == it }
     open var thisAreContentsTheSame: (newItem: DslAdapterItem) -> Boolean = { false }
+
+    /**
+     * [checkItem] 是否需要关联到处理列表
+     * [itemIndex] 分组折叠之后数据列表中的index
+     *
+     * 返回 true 时, [checkItem] 会受到 [formChildHandleModel] 的影响, 进行 [show] or [hide] 操作
+     * */
+    open var isFormItemInHandleList: (checkItem: DslAdapterItem, itemIndex: Int) -> Boolean = { _, _ -> false }
+
+    /**
+     * [itemIndex] 最终过滤之后数据列表中的index
+     * 返回 true 时, [checkItem] 会收到 来自 [this] 的 [onFormUpdateFrom] 出发的回调
+     * */
+    open var isFormItemInUpdateList: (checkItem: DslAdapterItem, itemIndex: Int) -> Boolean = { _, _ -> false }
     //</editor-fold desc="Diff 相关">
 }
 
