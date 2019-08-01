@@ -31,13 +31,23 @@ import java.util.*;
 public class Json {
 
     public static <T> List<T> fromList(String json, Class<T> type) {
-        Gson gson = new Gson();
-        return gson.fromJson(json, TypeBuilder.newInstance(List.class).addTypeParam(type).build());
+        try {
+            Gson gson = new Gson();
+            return gson.fromJson(json, TypeBuilder.newInstance(List.class).addTypeParam(type).build());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Collections.emptyList();
+        }
     }
 
     public static <T> T from(String json, Class<T> type) {
-        Gson gson = new Gson();
-        return gson.fromJson(json, type);
+        try {
+            Gson gson = new Gson();
+            return gson.fromJson(json, type);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public static <T> T from(String json, Type type) {
