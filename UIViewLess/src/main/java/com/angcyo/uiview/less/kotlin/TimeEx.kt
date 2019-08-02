@@ -63,6 +63,10 @@ fun String.toMillis(pattern: String = "yyyyMMdd"): Long {
     return time
 }
 
+public fun <T> T.nowTimeString(pattern: String = "yyyy-MM-dd HH:mm:ss"): String {
+    return nowTime().toTime(pattern)
+}
+
 public inline fun <T> T.nowTime() = System.currentTimeMillis()
 
 public inline fun Long.spiltTime() = RUtils.splitTime(this)
