@@ -56,6 +56,7 @@ class RConcurrentTask(
                             runTaskQueue.remove(task)
 
                             if (taskQueue.isEmpty() && runTaskQueue.isEmpty()) {
+                                release()
                                 onFinish()
                             }
                         } catch (e: Exception) {
@@ -77,4 +78,14 @@ class RConcurrentTask(
             }
         }
     }
+
+    private fun release() {
+        taskQueue.clear()
+        runTaskQueue.clear()
+        if (!executor.isShutdown) {
+            executor.shutdownNow()
+        }
+        //L.d("释放资源.")
+    }
+
 }
