@@ -219,16 +219,22 @@ public class Reflect {
             return;
         }
 
-        while (clazz != Object.class) {
+        Exception error = null;
+
+        while (clazz != null && clazz != Object.class) {
             try {
                 Field field = clazz.getDeclaredField(fieldName);
                 field.setAccessible(true);
                 field.set(obj, value);
-                return;
+                error = null;
+                break;
             } catch (Exception e) {
-                L.e("错误:" + e.getMessage());
+                error = e;
             }
             clazz = clazz.getSuperclass();
+        }
+        if (error != null) {
+            L.e("错误:" + error.getMessage());
         }
     }
 
