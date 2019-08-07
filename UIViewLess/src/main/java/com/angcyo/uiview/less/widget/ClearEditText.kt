@@ -9,7 +9,9 @@ import android.text.TextUtils
 import android.text.method.PasswordTransformationMethod
 import android.util.AttributeSet
 import android.util.StateSet
+import android.view.KeyEvent
 import android.view.MotionEvent
+import android.view.inputmethod.EditorInfo
 import android.widget.TextView
 import com.angcyo.uiview.less.R
 import com.angcyo.uiview.less.kotlin.dpi
@@ -149,7 +151,9 @@ open class ClearEditText : AppCompatAutoCompleteTextView {
     override fun onFocusChanged(focused: Boolean, direction: Int, previouslyFocusedRect: Rect?) {
         super.onFocusChanged(focused, direction, previouslyFocusedRect)
         checkEdit(focused)
-
+        if (!focused) {
+            lastKeyCode = -1
+        }
     }
 
     override fun onCreateDrawableState(extraSpace: Int): IntArray {
@@ -337,5 +341,30 @@ open class ClearEditText : AppCompatAutoCompleteTextView {
 
         // And restore the cursor position
         setSelection(selection)
+    }
+
+    private var lastKeyCode = -1
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        lastKeyCode = keyCode
+
+        //L.i("${isEditSingleLine()} $maxLines $minLines")
+
+        return super.onKeyDown(keyCode, event)
+    }
+
+    override fun hasOnClickListeners(): Boolean {
+        //使用AutoCompleteTextView时, 会被默认设置onClickListener
+        //这个时候, 输入法中的"下一步"触发的onKeyUp事件, 就会根据这个方法的返回值,
+        //将焦点切换到下一个`EditText`.
+        if (isEditSingleLine() && lastKeyCode == KeyEvent.KEYCODE_ENTER) {
+            return false
+        }
+        return super.hasOnClickListeners()
+    }
+
+    fun isEditSingleLine(): Boolean {
+        return inputType and EditorInfo.TYPE_TEXT_FLAG_MULTI_LINE != EditorInfo.TYPE_TEXT_FLAG_MULTI_LINE &&
+                maxLines == 1 &&
+                minLines == 1
     }
 }
