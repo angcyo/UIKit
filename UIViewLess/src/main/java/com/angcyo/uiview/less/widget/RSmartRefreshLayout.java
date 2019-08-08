@@ -25,15 +25,16 @@ public class RSmartRefreshLayout extends SmartRefreshLayout {
     private float percentBottom = 0.5f;
 
     public RSmartRefreshLayout(Context context) {
-        this(context, null);
+        super(context);
+        initLayout(context, null);
     }
 
     public RSmartRefreshLayout(Context context, AttributeSet attrs) {
-        this(context, attrs, 0);
+        super(context, attrs);
+        initLayout(context, attrs);
     }
 
-    public RSmartRefreshLayout(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
+    private void initLayout(Context context, AttributeSet attrs) {
         initLayout(context);
 
         TypedArray array = context.obtainStyledAttributes(attrs, R.styleable.RSmartRefreshLayout);
