@@ -153,6 +153,9 @@ public class RSmartRefreshLayout extends SmartRefreshLayout {
      * @param disable false 可以开启下拉刷新控件
      */
     public void disableRefreshAffect(boolean disable) {
+        if (!disable) {
+            enableRefreshAffect(false);
+        }
         setEnableRefresh(!disable);
         setEnableLoadMore(false);
         setEnableOverScrollDrag(false);
@@ -163,14 +166,18 @@ public class RSmartRefreshLayout extends SmartRefreshLayout {
      * 启用纯下拉刷新效果
      */
     public void enableRefreshAffect() {
+        enableRefreshAffect(true);
+    }
+
+    public void enableRefreshAffect(boolean enable) {
         //激活越界滚动
-        setEnableOverScrollDrag(true);
+        setEnableOverScrollDrag(enable);
         //纯滚动模式, 需要激活越界滚动才有效
-        setEnablePureScrollMode(true);
-        setEnableLoadMoreWhenContentNotFull(true);
-        setEnableLoadMore(true);
-        setEnableFooterTranslationContent(true);
-        setEnableHeaderTranslationContent(true);
+        setEnablePureScrollMode(enable);
+        setEnableLoadMoreWhenContentNotFull(enable);
+        setEnableLoadMore(enable);
+        setEnableFooterTranslationContent(enable);
+        setEnableHeaderTranslationContent(enable);
     }
 
     @Override
