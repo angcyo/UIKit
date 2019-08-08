@@ -19,6 +19,7 @@ import com.angcyo.uiview.less.skin.SkinHelper
 import com.angcyo.uiview.less.utils.*
 import com.angcyo.uiview.less.utils.utilcode.utils.EncodeUtils
 import com.angcyo.uiview.less.utils.utilcode.utils.FileUtils
+import com.angcyo.uiview.less.utils.utilcode.utils.ImageUtils
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
 import okio.Buffer
@@ -108,7 +109,8 @@ public fun Float.maxValue(value: Float /*允许的最大值*/) = Math.min(value,
 
 public fun Int.maxValue(value: Int) = Math.min(value, this)
 
-public fun String.int() = if ((TextUtils.isEmpty(this) || "null".equals(this, true))) 0 else this.toInt()
+public fun String.int() =
+    if ((TextUtils.isEmpty(this) || "null".equals(this, true))) 0 else this.toInt()
 
 /**矩形缩放*/
 public fun Rect.scale(scaleX: Float, scaleY: Float) {
@@ -163,7 +165,12 @@ public fun Rect.rotateTo(inRect: Rect, degrees: Float) {
 public fun Rect.c(): Double {
     /*斜边长度*/
     val c =
-        Math.sqrt(Math.pow(this.width().toDouble(), 2.toDouble()) + Math.pow(this.height().toDouble(), 2.toDouble()))
+        Math.sqrt(
+            Math.pow(
+                this.width().toDouble(),
+                2.toDouble()
+            ) + Math.pow(this.height().toDouble(), 2.toDouble())
+        )
     return c
 }
 
@@ -327,7 +334,10 @@ public fun MotionEvent.isClickEvent(context: Context, downX: Float, downY: Float
 }
 
 /**将图片转成字节数组*/
-public fun Bitmap.toBytes(format: Bitmap.CompressFormat = Bitmap.CompressFormat.PNG, quality: Int = 100): ByteArray? {
+public fun Bitmap.toBytes(
+    format: Bitmap.CompressFormat = Bitmap.CompressFormat.PNG,
+    quality: Int = 100
+): ByteArray? {
     var out: ByteArrayOutputStream? = null
     var bytes: ByteArray? = null
     try {
@@ -347,7 +357,10 @@ public fun Bitmap.toBytes(format: Bitmap.CompressFormat = Bitmap.CompressFormat.
 /**
  * 将图片转成base64字符串
  * */
-public fun Bitmap.toBase64(format: Bitmap.CompressFormat = Bitmap.CompressFormat.PNG, quality: Int = 100): String {
+public fun Bitmap.toBase64(
+    format: Bitmap.CompressFormat = Bitmap.CompressFormat.PNG,
+    quality: Int = 100
+): String {
     var result = ""
     toBytes(format, quality)?.let {
         result = Base64.encodeToString(it, Base64.NO_WRAP /*去掉/n符*/)
@@ -385,6 +398,11 @@ public fun ByteArray.toBitmap(): Bitmap {
 
 public fun Bitmap.share(context: Context, shareQQ: Boolean = false, chooser: Boolean = true) {
     RUtils.shareBitmap(context, this, shareQQ, chooser)
+}
+
+/**模糊图片*/
+public fun Bitmap.blur(scale: Float = 1f /*0~1*/, radius: Float = 25f /*1~25*/): Bitmap {
+    return ImageUtils.fastBlur(this, scale, radius)
 }
 
 /**将base64字符串, 转换成图片*/
@@ -552,7 +570,8 @@ public fun String.queryParameter(key: String): String? {
 
 /**获取url或者文件扩展名 对应的mimeType*/
 public fun String.mimeType(): String? {
-    return MimeTypeMap.getSingleton().getMimeTypeFromExtension(MimeTypeMap.getFileExtensionFromUrl(this))
+    return MimeTypeMap.getSingleton()
+        .getMimeTypeFromExtension(MimeTypeMap.getFileExtensionFromUrl(this))
 }
 
 public fun String?.decode(): String? {

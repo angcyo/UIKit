@@ -98,6 +98,12 @@ public class RSmartRefreshLayout extends SmartRefreshLayout {
 
     @Override
     public void draw(Canvas canvas) {
+        super.draw(canvas);
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
         if (rBackgroundDrawableBottom != null) {
             rBackgroundDrawableBottom.setBounds(0, (int) (getMeasuredHeight() - getMeasuredHeight() * percentBottom),
                     getMeasuredWidth(), getMeasuredHeight());
@@ -107,7 +113,6 @@ public class RSmartRefreshLayout extends SmartRefreshLayout {
             rBackgroundDrawable.setBounds(0, 0, getMeasuredWidth(), (int) (getMeasuredHeight() * percent));
             rBackgroundDrawable.draw(canvas);
         }
-        super.draw(canvas);
     }
 
     public void setRBackgroundDrawable(Drawable drawable) {
