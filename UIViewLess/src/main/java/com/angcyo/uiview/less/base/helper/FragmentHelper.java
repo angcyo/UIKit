@@ -1180,6 +1180,10 @@ public class FragmentHelper {
             if (isFromCreate) {
                 //需要从恢复模式中获取Fragment
                 resultFragment = restoreFragment();
+
+                if (resultFragment == null) {
+                    resultFragment = showFragment;
+                }
             } else {
                 resultFragment = showFragment;
             }
