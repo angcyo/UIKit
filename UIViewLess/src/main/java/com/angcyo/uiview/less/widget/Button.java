@@ -223,4 +223,40 @@ public class Button extends RTextView {
         this.roundRadii = roundRadii;
         initButton(true);
     }
+
+    public void setThemeColor(int themeColor) {
+        this.themeColor = themeColor;
+    }
+
+    public void setRippleColor(int rippleColor) {
+        this.rippleColor = rippleColor;
+    }
+
+    public void setThemeDarkColor(int themeDarkColor) {
+        this.themeDarkColor = themeDarkColor;
+    }
+
+    public void setDisableColor(int disableColor) {
+        this.disableColor = disableColor;
+    }
+
+    public int getThemeColor() {
+        return themeColor;
+    }
+
+    public int getRippleColor() {
+        return rippleColor;
+    }
+
+    public int getThemeDarkColor() {
+        return themeDarkColor;
+    }
+
+    public int getDisableColor() {
+        return disableColor;
+    }
+
+    public void refreshBackground() {
+        initButton(true);
+    }
 }
