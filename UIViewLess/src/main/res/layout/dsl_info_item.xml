@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.angcyo.uiview.less.widget.group.RLinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/base_bg_selector"
+    android:gravity="center_vertical"
+    android:minHeight="@dimen/dialog_item_height"
+    app:r_background="@color/base_white"
+    tools:background="@color/transparent_dark20">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/text_view"
+        style="@style/BaseMainTextStyle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:drawablePadding="@dimen/base_hdpi"
+        android:paddingLeft="@dimen/base_padding_left"
+        tools:drawableLeft="@drawable/base_tip_ok"
+        tools:text="关于我们" />
+
+    <FrameLayout
+        android:id="@+id/wrap_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent" />
+
+</com.angcyo.uiview.less.widget.group.RLinearLayout>

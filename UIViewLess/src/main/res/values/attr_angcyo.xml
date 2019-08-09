@@ -242,6 +242,8 @@
         <attr name="r_show_content_menu"/>
 
         <attr name="r_show_noread"/>
+        <attr name="r_offset_drawable"/>
+        <attr name="r_offset_padding"/>
         <attr name="r_noread_gravity"/>
         <attr name="r_noread_color"/>
         <attr name="r_noread_radius"/>

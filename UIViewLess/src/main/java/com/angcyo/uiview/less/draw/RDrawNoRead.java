@@ -5,8 +5,12 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import androidx.annotation.NonNull;
+
+import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.View;
+import android.widget.TextView;
+
 import com.angcyo.uiview.less.R;
 import com.angcyo.uiview.less.kotlin.ExKt;
 import com.angcyo.uiview.less.kotlin.ViewExKt;
@@ -36,6 +40,14 @@ public class RDrawNoRead extends BaseDraw {
      * 是否显示 未读小红点
      */
     private boolean showNoRead = false;
+    /**
+     * 绘制的时候, 是否要排除 l t r b 的drawable宽高
+     */
+    private boolean offsetDrawable = true;
+    /**
+     * 绘制的时候, 是否要排除 padding
+     */
+    private boolean offsetPadding = false;
     /**
      * 小红点半径
      */
@@ -67,6 +79,8 @@ public class RDrawNoRead extends BaseDraw {
         noReadPaddingRight = typedArray.getDimensionPixelOffset(R.styleable.RDrawNoRead_r_noread_padding_right, (int) noReadPaddingRight);
         noReadPaddingTop = typedArray.getDimensionPixelOffset(R.styleable.RDrawNoRead_r_noread_padding_top, (int) noReadPaddingTop);
         noReadColor = typedArray.getColor(R.styleable.RDrawNoRead_r_noread_color, noReadColor);
+        offsetDrawable = typedArray.getBoolean(R.styleable.RDrawNoRead_r_offset_drawable, offsetDrawable);
+        offsetPadding = typedArray.getBoolean(R.styleable.RDrawNoRead_r_offset_padding, offsetPadding);
 
         typedArray.recycle();
     }
@@ -97,21 +111,53 @@ public class RDrawNoRead extends BaseDraw {
                     cy = ViewExKt.getDrawCenterCy(mView) + noReadPaddingTop;
                 }
                 if (ExKt.have(noreadGravity, LEFT)) {
-                    cx = noReadRadius + noReadPaddingRight;
+                    cx = noReadRadius + noReadPaddingRight + getDrawableOffset(0) + getPaddingOffset(0);
                 }
                 if (ExKt.have(noreadGravity, RIGHT)) {
-                    cx = getViewWidth() - noReadRadius - noReadPaddingRight;
+                    cx = getViewWidth() - noReadRadius - noReadPaddingRight - getDrawableOffset(2) - getPaddingOffset(2);
                 }
                 if (ExKt.have(noreadGravity, TOP)) {
-                    cy = noReadRadius + noReadPaddingTop;
+                    cy = noReadRadius + noReadPaddingTop + getDrawableOffset(1) + getPaddingOffset(1);
                 }
                 if (ExKt.have(noreadGravity, BOTTOM)) {
-                    cy = getViewHeight() - noReadRadius - noReadPaddingTop;
+                    cy = getViewHeight() - noReadRadius - noReadPaddingTop - getDrawableOffset(3) - getPaddingOffset(3);
                 }
             }
-
             canvas.drawCircle(cx, cy, noReadRadius, mPaint);
         }
+    }
+
+    private int getDrawableOffset(int pos) {
+        if (offsetDrawable && mView instanceof TextView) {
+            Drawable[] compoundDrawables = ((TextView) mView).getCompoundDrawables();
+            Drawable drawable = compoundDrawables[pos];
+            if (drawable != null) {
+                if (pos == 0 || pos == 2) {
+                    int intrinsicWidth = drawable.getIntrinsicWidth();
+                    return intrinsicWidth + ((TextView) mView).getCompoundDrawablePadding();
+                } else {
+                    int intrinsicHeight = drawable.getIntrinsicHeight();
+                    return intrinsicHeight + ((TextView) mView).getCompoundDrawablePadding();
+                }
+            }
+        }
+        return 0;
+    }
+
+    private int getPaddingOffset(int pos) {
+        if (offsetPadding) {
+            switch (pos) {
+                case 1:
+                    return getPaddingTop();
+                case 2:
+                    return getPaddingRight();
+                case 3:
+                    return getPaddingBottom();
+                default:
+                    return getPaddingLeft();
+            }
+        }
+        return 0;
     }
 
     /**
@@ -153,6 +199,11 @@ public class RDrawNoRead extends BaseDraw {
 
     public void setNoreadGravity(int noreadGravity) {
         this.noreadGravity = noreadGravity;
+        postInvalidate();
+    }
+
+    public void setOffsetDrawable(boolean offsetDrawable) {
+        this.offsetDrawable = offsetDrawable;
         postInvalidate();
     }
 }

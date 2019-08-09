@@ -10,12 +10,7 @@ import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Rect
-import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
-import com.google.android.material.textfield.TextInputLayout
-import androidx.core.content.ContextCompat
-import androidx.core.view.GestureDetectorCompat
-import androidx.core.view.ViewCompat
 import android.text.InputFilter
 import android.text.TextUtils
 import android.util.LayoutDirection
@@ -24,7 +19,9 @@ import android.view.*
 import android.view.animation.DecelerateInterpolator
 import android.view.animation.LinearInterpolator
 import android.widget.*
-import com.angcyo.uiview.less.RApplication
+import androidx.core.content.ContextCompat
+import androidx.core.view.GestureDetectorCompat
+import androidx.core.view.ViewCompat
 import com.angcyo.uiview.less.draw.RDrawNoRead
 import com.angcyo.uiview.less.recycler.RBaseViewHolder
 import com.angcyo.uiview.less.recycler.RRecyclerView
@@ -43,6 +40,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
+import com.google.android.material.textfield.TextInputLayout
 import java.io.File
 import java.util.*
 import kotlin.math.max
@@ -58,18 +56,18 @@ public fun <V : View> View.v(id: Int): V? {
     return view as V?
 }
 
-public fun <T> T.getDrawable(resId: Int): Drawable {
-    if (resId == -1) {
-        return ColorDrawable(Color.TRANSPARENT)
+public fun <T> T.getDrawable(resId: Int): Drawable? {
+    if (resId < 0) {
+        return null
     }
-    return ContextCompat.getDrawable(RApplication.getApp(), resId)!!
+    return ContextCompat.getDrawable(app(), resId)
 }
 
 public fun <T> T.getColor(resId: Int): Int {
     if (resId == -1) {
         return Color.TRANSPARENT
     }
-    return ContextCompat.getColor(RApplication.getApp(), resId)
+    return ContextCompat.getColor(app(), resId)
 }
 
 public fun <T> T.getDimen(resId: Int): Int {
@@ -197,11 +195,15 @@ public fun TextView.setRightIco(id: Int) {
     RExTextView.setRightIco(this, id)
 }
 
+public fun TextView.setRightIco(drawable: Drawable?) {
+    RExTextView.setRightIco(this, drawable)
+}
+
 public fun TextView.setLeftIco(id: Int) {
     RExTextView.setLeftIco(this, id)
 }
 
-public fun TextView.setLeftIco(drawable: Drawable) {
+public fun TextView.setLeftIco(drawable: Drawable?) {
     RExTextView.setLeftIco(this, drawable)
 }
 
@@ -210,17 +212,20 @@ public fun View.getColor(id: Int): Int = ContextCompat.getColor(context, id)
 public fun View.getDimensionPixelOffset(id: Int): Int = resources.getDimensionPixelOffset(id)
 
 /**Match_Parent*/
-public fun View.exactlyMeasure(size: Int): Int = View.MeasureSpec.makeMeasureSpec(size, View.MeasureSpec.EXACTLY)
+public fun View.exactlyMeasure(size: Int): Int =
+    View.MeasureSpec.makeMeasureSpec(size, View.MeasureSpec.EXACTLY)
 
 public fun View.exactlyMeasure(size: Float): Int = this.exactlyMeasure(size.toInt())
 
 /**Wrap_Content*/
-public fun View.atmostMeasure(size: Int): Int = View.MeasureSpec.makeMeasureSpec(size, View.MeasureSpec.AT_MOST)
+public fun View.atmostMeasure(size: Int): Int =
+    View.MeasureSpec.makeMeasureSpec(size, View.MeasureSpec.AT_MOST)
 
 public fun View.atmostMeasure(size: Float): Int = this.atmostMeasure(size.toInt())
 
 /**Match_Parent*/
-public fun exactly(size: Int): Int = View.MeasureSpec.makeMeasureSpec(size, View.MeasureSpec.EXACTLY)
+public fun exactly(size: Int): Int =
+    View.MeasureSpec.makeMeasureSpec(size, View.MeasureSpec.EXACTLY)
 
 public fun exactly(size: Float): Int = exactly(size.toInt())
 
@@ -356,7 +361,8 @@ public fun View.longClick(listener: (View) -> Unit) {
 
 /**焦点变化改变监听*/
 public fun EditText.onFocusChange(listener: (Boolean) -> Unit) {
-    this.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus -> listener.invoke(hasFocus) }
+    this.onFocusChangeListener =
+        View.OnFocusChangeListener { _, hasFocus -> listener.invoke(hasFocus) }
     listener.invoke(this.isFocused)
 }
 
@@ -372,7 +378,10 @@ public fun EditText.onEmptyText(listener: (Boolean) -> Unit) {
 }
 
 /**只要文本改变就通知*/
-public fun EditText.onTextChange(defaultText: CharSequence? = null, listener: (CharSequence) -> Unit) {
+public fun EditText.onTextChange(
+    defaultText: CharSequence? = null,
+    listener: (CharSequence) -> Unit
+) {
     this.addTextChangedListener(object : SingleTextWatcher() {
         var lastText: CharSequence? = defaultText
 
@@ -897,7 +906,11 @@ public fun <T : View> View.find(id: Int): T? {
 /**
  * 旋转到多少度
  * */
-public fun View.rotation(rotation: Float, duration: Long = 300, config: ViewPropertyAnimator.() -> Unit = {}) {
+public fun View.rotation(
+    rotation: Float,
+    duration: Long = 300,
+    config: ViewPropertyAnimator.() -> Unit = {}
+) {
     animate().apply {
         rotation(rotation)
         setDuration(duration)
@@ -909,7 +922,11 @@ public fun View.rotation(rotation: Float, duration: Long = 300, config: ViewProp
 /**
  * 旋转多少度
  * */
-public fun View.rotationBy(rotation: Float, duration: Long = 300, config: ViewPropertyAnimator.() -> Unit = {}) {
+public fun View.rotationBy(
+    rotation: Float,
+    duration: Long = 300,
+    config: ViewPropertyAnimator.() -> Unit = {}
+) {
     animate().apply {
         rotationBy(rotation)
         setDuration(duration)
@@ -1069,3 +1086,4 @@ public fun View.offsetTop(offset: Int) {
 public fun View.offsetTopTo(newTop: Int) {
     ViewCompat.offsetTopAndBottom(this, newTop - top)
 }
+

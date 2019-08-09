@@ -19,4 +19,5 @@ public fun Drawable.getBoundsWith(centerPoint: Point, inRect: Rect) = Rect().app
     bottom = centerPoint.y + intrinsicHeight / 2
 }
 
-public fun Drawable.color(filterColor: Int) = ResUtil.filterDrawable(this, filterColor)
+public fun Drawable?.color(filterColor: Int) =
+    this?.let { ResUtil.filterDrawable(it, filterColor) }
