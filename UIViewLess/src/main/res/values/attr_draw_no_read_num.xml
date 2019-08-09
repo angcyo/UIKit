@@ -4,6 +4,8 @@
     <attr name="r_draw_keep_circle" format="boolean"/>
     <attr name="r_draw_round_size" format="dimension"/>
     <attr name="r_draw_space_size" format="dimension"/>
+    <attr name="r_draw_space_vertical_size" format="dimension"/>
+    <attr name="r_draw_space_horizontal_size" format="dimension"/>
     <attr name="r_draw_read_num_string" format="string"/>
 
     <declare-styleable name="RDrawNoReadNumView">
@@ -31,5 +33,7 @@
         <attr name="r_draw_round_size"/>
         <attr name="r_draw_read_num_string"/>
         <attr name="r_draw_space_size"/>
+        <attr name="r_draw_space_vertical_size"/>
+        <attr name="r_draw_space_horizontal_size"/>
     </declare-styleable>
 </resources>

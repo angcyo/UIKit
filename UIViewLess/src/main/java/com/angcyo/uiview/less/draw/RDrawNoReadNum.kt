@@ -53,6 +53,8 @@ class RDrawNoReadNum(view: View) : BaseDraw(view) {
      * 间隙大小
      * */
     var spaceSize = 2f
+    var spaceVerticalSize = -1f
+    var spaceHorizontalSize = -1f
 
     override fun initAttribute(attr: AttributeSet?) {
         val typedArray = obtainStyledAttributes(attr, R.styleable.RDrawNoReadNum)
@@ -73,13 +75,29 @@ class RDrawNoReadNum(view: View) : BaseDraw(view) {
             (spaceSize * dp).toInt()
         ).toFloat()
 
+        spaceVerticalSize = typedArray.getDimensionPixelOffset(
+            R.styleable.RDrawNoReadNum_r_draw_space_vertical_size,
+            -1
+        ).toFloat()
+
+        spaceHorizontalSize = typedArray.getDimensionPixelOffset(
+            R.styleable.RDrawNoReadNum_r_draw_space_horizontal_size,
+            -1
+        ).toFloat()
+
         textColor = typedArray.getColor(R.styleable.RDrawNoReadNum_r_draw_text_color, textColor)
-        backgroundColor = typedArray.getColor(R.styleable.RDrawNoReadNum_r_draw_background_color, backgroundColor)
-        borderColor = typedArray.getColor(R.styleable.RDrawNoReadNum_r_draw_border_color, borderColor)
+        backgroundColor =
+            typedArray.getColor(R.styleable.RDrawNoReadNum_r_draw_background_color, backgroundColor)
+        borderColor =
+            typedArray.getColor(R.styleable.RDrawNoReadNum_r_draw_border_color, borderColor)
 
         drawBorder = typedArray.getBoolean(R.styleable.RDrawNoReadNum_r_draw_border, drawBorder)
-        keepCircle = typedArray.getBoolean(R.styleable.RDrawNoReadNum_r_draw_keep_circle, keepCircle)
-        drawBackgroundColor = typedArray.getBoolean(R.styleable.RDrawNoReadNum_r_draw_background_color_enable, drawBackgroundColor)
+        keepCircle =
+            typedArray.getBoolean(R.styleable.RDrawNoReadNum_r_draw_keep_circle, keepCircle)
+        drawBackgroundColor = typedArray.getBoolean(
+            R.styleable.RDrawNoReadNum_r_draw_background_color_enable,
+            drawBackgroundColor
+        )
         readNumString = typedArray.getString(R.styleable.RDrawNoReadNum_r_draw_read_num_string)
 
         typedArray.recycle()
@@ -109,8 +127,8 @@ class RDrawNoReadNum(view: View) : BaseDraw(view) {
         } else {
         }
 
-        widthSize = (widthSize + borderWidth + spaceSize * 2).toInt()
-        heightSize = (heightSize + borderWidth + spaceSize).toInt()
+        widthSize = (widthSize + borderWidth + chooseSize(spaceHorizontalSize) * 2).toInt()
+        heightSize = (heightSize + borderWidth + chooseSize(spaceVerticalSize) * 2).toInt()
 
         //永远保证, 最小时的状态的圆
         if (widthSize < heightSize) {
@@ -127,6 +145,14 @@ class RDrawNoReadNum(view: View) : BaseDraw(view) {
         measureTemp[0] = widthSize
         measureTemp[1] = heightSize
         return measureTemp
+    }
+
+    private fun chooseSize(size: Float): Float {
+        return if (size > 0) {
+            size
+        } else {
+            spaceSize
+        }
     }
 
     val drawPath: Path by lazy {
