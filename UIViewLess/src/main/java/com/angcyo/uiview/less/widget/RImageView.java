@@ -240,9 +240,9 @@ public class RImageView extends CircleImageView {
 
                 mShowMask = true;
                 postInvalidate();
-//                layerDrawable.setColorFilter(color, PorterDuff.Mode.MULTIPLY);
+//                layerDrawable.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
             } else {
-                drawable.mutate().setColorFilter(color, PorterDuff.Mode.MULTIPLY);
+                drawable.mutate().setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
             }
         }
     }

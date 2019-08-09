@@ -211,6 +211,7 @@
     <declare-styleable name="RTextView">
         <!--左边竖线的颜色-->
         <attr name="r_left_color" format="color"/>
+        <attr name="r_left_drawable_color" format="color"/>
         <!--左边竖线的宽度-->
         <attr name="r_left_width" format="dimension"/>
         <attr name="r_left_round_size" format="dimension"/>

@@ -76,9 +76,8 @@ public class ResUtil {
      */
     public static Drawable colorFilter(@NonNull Drawable drawable, @ColorInt int color) {
         Drawable wrappedDrawable = DrawableCompat.wrap(drawable).mutate();
-        wrappedDrawable.setColorFilter(color, PorterDuff.Mode.MULTIPLY);
+        wrappedDrawable.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
         return wrappedDrawable;
-
     }
 
     /**

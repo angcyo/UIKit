@@ -79,6 +79,10 @@ public class RTextView extends AppCompatTextView {
      * 由于系统的drawableLeft, 并不会显示在居中文本的左边, 所以自定义此属性
      */
     Drawable textLeftDrawable;
+    /**
+     * textLeftDrawable filter color
+     */
+    int textLeftDrawableColor = -2;
     int leftDrawableGravity = LEFT_DRAWABLE_GRAVITY_CENTER_VERTICAL;
     int leftDrawableOffsetX = 0;
     int leftDrawableOffsetY = 0;
@@ -160,6 +164,7 @@ public class RTextView extends AppCompatTextView {
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.RTextView);
         leftColor = typedArray.getColor(R.styleable.RTextView_r_left_color,
                 isInEditMode() ? getResources().getColor(R.color.colorPrimary) : SkinHelper.getSkin().getThemeColor());
+        textLeftDrawableColor = typedArray.getColor(R.styleable.RTextView_r_left_drawable_color, textLeftDrawableColor);
         leftWidth = typedArray.getDimensionPixelOffset(R.styleable.RTextView_r_left_width, 0);
         leftRoundSize = typedArray.getDimensionPixelOffset(R.styleable.RTextView_r_left_round_size, (int) leftRoundSize);
         hasUnderline = typedArray.getBoolean(R.styleable.RTextView_r_has_underline, false);
@@ -185,6 +190,7 @@ public class RTextView extends AppCompatTextView {
         if (textLeftDrawable != null) {
             textLeftDrawable.setBounds(0, 0, textLeftDrawable.getIntrinsicWidth(), textLeftDrawable.getIntrinsicHeight());
         }
+        filterLeftDrawable();
 
         leftDrawableGravity = typedArray.getInt(R.styleable.RTextView_r_left_drawable_gravity, leftDrawableGravity);
         leftDrawableOffsetX = typedArray.getDimensionPixelOffset(R.styleable.RTextView_r_left_drawable_offset_x, leftDrawableOffsetX);
@@ -598,6 +604,14 @@ public class RTextView extends AppCompatTextView {
             textPaint.setColor(tipTextColor);
             //默认位置在右上角
             canvas.drawText(tipText, tipTextRectF.centerX() - tipW / 2, tipTextRectF.bottom - textPaint.descent(), textPaint);
+        }
+    }
+
+    private void filterLeftDrawable() {
+        if (textLeftDrawable != null) {
+            if (textLeftDrawableColor != -2) {
+                textLeftDrawable.setColorFilter(textLeftDrawableColor, PorterDuff.Mode.SRC_ATOP);
+            }
         }
     }
 
