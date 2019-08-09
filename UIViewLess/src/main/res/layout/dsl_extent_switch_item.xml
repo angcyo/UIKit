@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <com.angcyo.github.SwitchButton
+        android:id="@+id/switch_view"
+        android:layout_width="48dp"
+        android:layout_height="30dp"
+        android:layout_gravity="center_vertical|right"
+        android:layout_marginRight="@dimen/base_padding_left"
+        app:sb_checked_color="@color/colorPrimary"
+        tools:sb_checked="true" />
+</merge>

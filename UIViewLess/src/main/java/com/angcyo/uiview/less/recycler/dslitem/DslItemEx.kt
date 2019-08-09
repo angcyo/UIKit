@@ -35,3 +35,8 @@ public fun DslAdapter.dslBaseInfoItem(config: DslBaseInfoItem.() -> Unit = {}) {
 public fun DslAdapter.dslTextInfoItem(config: DslTextInfoItem.() -> Unit = {}) {
     dslCustomItem(DslTextInfoItem(), config)
 }
+
+/**单行文本+开关*/
+public fun DslAdapter.dslSwitchInfoItem(config: DslSwitchInfoItem.() -> Unit = {}) {
+    dslCustomItem(DslSwitchInfoItem(), config)
+}
