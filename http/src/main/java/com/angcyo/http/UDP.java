@@ -148,6 +148,12 @@ public class UDP {
         return data;
     }
 
+    public static byte[] bindData(@NonNull byte[] src, int offset, int length) {
+        byte[] data = new byte[length];
+        System.arraycopy(src, offset, data, 0, length);
+        return data;
+    }
+
     public static void bindData(@NonNull byte[] src, @NonNull byte[] fill, int offset) {
         System.arraycopy(fill, 0, src, offset, fill.length);
     }
@@ -334,5 +340,22 @@ public class UDP {
         }
         builder.append(hexString);
         return builder.toString();
+    }
+
+    /**
+     * 获取异或校验值
+     */
+    public static int bcc(@NonNull byte[] data) {
+        int result = -1;
+
+        for (byte b : data) {
+            if (result == -1) {
+                result = b;
+            } else {
+                result = result ^ b;
+            }
+        }
+
+        return result;
     }
 }
