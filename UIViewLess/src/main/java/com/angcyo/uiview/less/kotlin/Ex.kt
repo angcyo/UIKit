@@ -6,6 +6,7 @@ import android.content.res.Configuration
 import android.graphics.*
 import android.net.Uri
 import android.support.v4.math.MathUtils
+import android.text.SpannableStringBuilder
 import android.text.TextUtils
 import android.util.Base64
 import android.view.MotionEvent
@@ -15,12 +16,13 @@ import com.angcyo.http.Http
 import com.angcyo.http.Json
 import com.angcyo.uiview.less.resources.ResUtil
 import com.angcyo.uiview.less.skin.SkinHelper
-import com.angcyo.uiview.less.utils.H5
-import com.angcyo.uiview.less.utils.RUtils
-import com.angcyo.uiview.less.utils.Reflect
+import com.angcyo.uiview.less.utils.*
 import com.angcyo.uiview.less.utils.utilcode.utils.EncodeUtils
 import com.angcyo.uiview.less.utils.utilcode.utils.FileUtils
+import com.angcyo.uiview.less.utils.utilcode.utils.ImageUtils
+import okhttp3.RequestBody
 import okhttp3.ResponseBody
+import okio.Buffer
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -386,6 +388,11 @@ public fun Bitmap.share(context: Context, shareQQ: Boolean = false, chooser: Boo
     RUtils.shareBitmap(context, this, shareQQ, chooser)
 }
 
+/**模糊图片*/
+public fun Bitmap.blur(scale: Float = 1f /*0~1*/, radius: Float = 25f /*1~25*/): Bitmap {
+    return ImageUtils.fastBlur(this, scale, radius)
+}
+
 /**将base64字符串, 转换成图片*/
 public fun String.toBitmap(): Bitmap {
     val bytes = Base64.decode(this, Base64.NO_WRAP)
@@ -568,7 +575,7 @@ public fun String?.decode(): String? {
     return decode
 }
 
-/**读取body中的字符串*/
+/**读取ResponseBody中的字符串*/
 public fun ResponseBody?.readString(charsetName: String = "UTF-8"): String {
     if (this == null) {
         return ""
@@ -576,6 +583,17 @@ public fun ResponseBody?.readString(charsetName: String = "UTF-8"): String {
     val source = source()
     source.request(Long.MAX_VALUE)
     val buffer = source.buffer
+    val charset: Charset = Charset.forName(charsetName)
+    return buffer.clone().readString(charset)
+}
+
+/**读取RequestBody中的字符串*/
+public fun RequestBody?.readString(charsetName: String = "UTF-8"): String {
+    if (this == null) {
+        return ""
+    }
+    val buffer = Buffer()
+    writeTo(buffer)
     val charset: Charset = Charset.forName(charsetName)
     return buffer.clone().readString(charset)
 }
@@ -611,4 +629,14 @@ public fun String?.fromHtml(): CharSequence {
 
 public fun uuid(): String {
     return UUID.randomUUID().toString()
+}
+
+public fun SpanUtils.appendln() {
+    append(System.getProperty("line.separator")!!)
+}
+
+public fun span(init: RSpan.() -> Unit): SpannableStringBuilder {
+    return RSpan.get().apply {
+        this.init()
+    }.create()
 }
