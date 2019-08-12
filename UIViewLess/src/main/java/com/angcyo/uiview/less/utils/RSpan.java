@@ -3,10 +3,12 @@ package com.angcyo.uiview.less.utils;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import android.text.TextUtils;
 import android.text.style.ReplacementSpan;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.angcyo.uiview.less.R;
 import com.angcyo.uiview.less.kotlin.ViewExKt;
 import com.angcyo.uiview.less.resources.ResUtil;
@@ -129,9 +131,9 @@ public class RSpan extends SpanUtils {
 
         if (fontSize != -1) {
             if (fontSizeIsDp) {
-                textSpan.fontSize = fontSize;
-            } else {
                 textSpan.fontSize = fontSize * ViewExKt.getDp(fontSize);
+            } else {
+                textSpan.fontSize = fontSize;
             }
         }
 
