@@ -14,7 +14,6 @@ import com.angcyo.uiview.less.kotlin.ExKt;
 import com.angcyo.uiview.less.kotlin.ViewExKt;
 import com.angcyo.uiview.less.resources.ResUtil;
 
-import kotlin.Function;
 import kotlin.jvm.functions.Function1;
 
 /**
@@ -26,13 +25,15 @@ import kotlin.jvm.functions.Function1;
  */
 public class RSpan extends SpanUtils {
 
-    private final int mTypeMinSize = 10;
+    private static final int TYPE_MIN_SIZE = 10;
+    private static final int TYPE_CUSTOM = 11;
 
     private int minSize = -1;
     private int maxSize = -1;
     private String replaceText = null;
     private boolean isSetColor = false;
     private Function1<TextSpan, Object> configTextSpan;
+    private Function1<RSpan, Object> customSpan;
 
     public RSpan() {
     }
@@ -73,6 +74,7 @@ public class RSpan extends SpanUtils {
         isSetColor = false;
         replaceText = null;
         configTextSpan = null;
+        customSpan = null;
     }
 
     @Override
@@ -108,8 +110,10 @@ public class RSpan extends SpanUtils {
 
     @Override
     protected void applyLast() {
-        if (mType == mTypeMinSize) {
+        if (mType == TYPE_MIN_SIZE) {
             updateMinSize();
+        } else if (mType == TYPE_CUSTOM) {
+            customSpan();
         }
         super.applyLast();
     }
@@ -119,13 +123,13 @@ public class RSpan extends SpanUtils {
      */
     public RSpan setMinSize(int size) {
         minSize = size;
-        mType = mTypeMinSize;
+        mType = TYPE_MIN_SIZE;
         return this;
     }
 
     public RSpan setMaxSize(int size) {
         maxSize = size;
-        mType = mTypeMinSize;
+        mType = TYPE_MIN_SIZE;
         return this;
     }
 
@@ -134,14 +138,40 @@ public class RSpan extends SpanUtils {
      */
     public RSpan replaceText(String text) {
         replaceText = text;
-        mType = mTypeMinSize;
+        mType = TYPE_MIN_SIZE;
         return this;
     }
 
     public RSpan setConfigTextSpan(Function1<TextSpan, Object> configTextSpan) {
         this.configTextSpan = configTextSpan;
-        mType = mTypeMinSize;
+        mType = TYPE_MIN_SIZE;
         return this;
+    }
+
+    /**
+     * 自定义span
+     */
+    public RSpan customSpan(Function1<RSpan, Object> customSpan) {
+        this.customSpan = customSpan;
+        mType = TYPE_CUSTOM;
+        return this;
+    }
+
+    private void customSpan() {
+        if (mText.length() == 0 || customSpan == null) return;
+        Object span = customSpan.invoke(this);
+
+        int start = mBuilder.length();
+        mBuilder.append(mText);
+        int end = mBuilder.length();
+
+        if (span == null) {
+            return;
+        }
+
+        mBuilder.setSpan(span, start, end, flag);
+
+        mType = -1;
     }
 
     private void updateMinSize() {
@@ -212,7 +242,9 @@ public class RSpan extends SpanUtils {
          */
         protected int maxSize = -1;
 
-        /**省略号*/
+        /**
+         * 省略号
+         */
         protected String ellipsesText = "...";
 
         /**
@@ -220,7 +252,7 @@ public class RSpan extends SpanUtils {
          */
         protected CharSequence replaceText = null;
 
-        protected boolean isSetColor = false;
+        private boolean isSetColor = false;
         /**
          * 背景颜色
          */
@@ -231,7 +263,7 @@ public class RSpan extends SpanUtils {
         protected int foregroundColor = -1;
 
         //缓存测量的大小
-        protected float spanSize = 0;
+        private float spanSize = 0;
 
         protected float offsetY = 0;
 
