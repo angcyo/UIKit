@@ -8,6 +8,7 @@ import androidx.annotation.Nullable;
 import android.text.TextUtils;
 import android.text.style.ReplacementSpan;
 import com.angcyo.uiview.less.R;
+import com.angcyo.uiview.less.kotlin.ViewExKt;
 import com.angcyo.uiview.less.resources.ResUtil;
 
 /**
@@ -126,6 +127,14 @@ public class RSpan extends SpanUtils {
             textSpan.setBackgroundColor(backgroundColor);
         }
 
+        if (fontSize != -1) {
+            if (fontSizeIsDp) {
+                textSpan.fontSize = fontSize;
+            } else {
+                textSpan.fontSize = fontSize * ViewExKt.getDp(fontSize);
+            }
+        }
+
         mBuilder.setSpan(textSpan, start, end, flag);
 
         mType = -1;
@@ -181,6 +190,8 @@ public class RSpan extends SpanUtils {
 
         protected float offsetX = 0;
 
+        protected float fontSize = 0;
+
         public TextSpan() {
         }
 
@@ -209,13 +220,26 @@ public class RSpan extends SpanUtils {
             isSetColor = true;
         }
 
+        private void configPaint(Paint paint) {
+            if (paint != null) {
+                if (fontSize > 0) {
+                    paint.setTextSize(fontSize);
+                }
+
+                if (isSetColor) {
+                    paint.setColor(foregroundColor);
+                }
+            }
+        }
+
         @Override
         public int getSize(@NonNull Paint paint,
                            CharSequence text, int start, int end,
                            @Nullable Paint.FontMetricsInt fm) {
             if (isValid(text, start, end)) {
-                float originTextSize = paint.measureText(String.valueOf(text.subSequence(start, end)));
-                spanSize = originTextSize;
+                configPaint(paint);
+
+                spanSize = paint.measureText(String.valueOf(text.subSequence(start, end)));
 
                 float replaceTextSize = 0f;
                 if (replaceText != null) {
@@ -259,9 +283,7 @@ public class RSpan extends SpanUtils {
                             x + spanSize, bottom, paint);
                 }
 
-                if (isSetColor) {
-                    paint.setColor(foregroundColor);
-                }
+                configPaint(paint);
 
                 x += offsetX;
                 y += offsetY;

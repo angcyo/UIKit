@@ -58,8 +58,8 @@ public class SpanUtils {
     private int bulletColor;
     private int bulletRadius;
     private int bulletGapWidth;
-    private int fontSize;
-    private boolean fontSizeIsDp;
+    protected int fontSize;
+    protected boolean fontSizeIsDp;
     private float proportion;
     private float xProportion;
     private boolean isStrikethrough;
