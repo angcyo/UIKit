@@ -85,6 +85,33 @@ public fun Paint.textHeight(): Float = descent() - ascent()
 /**文本的宽度*/
 public fun Paint.textWidth(text: String): Float = this.measureText(text)
 
+/**
+ * 查找指定宽度内的文本
+ * @param text 目标文本
+ * @param width 宽度范围
+ * @param excludeAppendText 额外追加在判断文本后面的字符串, 用来打省略号(...)
+ * */
+public fun Paint.findTextWidth(text: String, width: Float, excludeAppendText: String? = null): String {
+    val excludeWidth = if (TextUtils.isEmpty(excludeAppendText)) {
+        0f
+    } else {
+        textWidth(excludeAppendText!!)
+    }
+
+    var result = text
+    for (i in 1 until text.length) {
+        val substring = text.substring(0, i)
+        val textWidth = textWidth(substring)
+
+        if (textWidth >= (width - excludeWidth)) {
+            result = text.substring(0, i - 1)
+            break
+        }
+    }
+    return result
+}
+
+
 //public inline fun <T : View> UIIViewImpl.vh(id: Int): Lazy<T> {
 //    return lazy {
 //        v<T>(id)

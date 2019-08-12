@@ -10,8 +10,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.angcyo.uiview.less.R;
+import com.angcyo.uiview.less.kotlin.ExKt;
 import com.angcyo.uiview.less.kotlin.ViewExKt;
 import com.angcyo.uiview.less.resources.ResUtil;
+
+import kotlin.Function;
+import kotlin.jvm.functions.Function1;
 
 /**
  * Email:angcyo@126.com
@@ -25,7 +29,10 @@ public class RSpan extends SpanUtils {
     private final int mTypeMinSize = 10;
 
     private int minSize = -1;
+    private int maxSize = -1;
+    private String replaceText = null;
     private boolean isSetColor = false;
+    private Function1<TextSpan, Object> configTextSpan;
 
     public RSpan() {
     }
@@ -62,7 +69,10 @@ public class RSpan extends SpanUtils {
     protected void setDefault() {
         super.setDefault();
         minSize = -1;
+        maxSize = -1;
         isSetColor = false;
+        replaceText = null;
+        configTextSpan = null;
     }
 
     @Override
@@ -100,9 +110,8 @@ public class RSpan extends SpanUtils {
     protected void applyLast() {
         if (mType == mTypeMinSize) {
             updateMinSize();
-        } else {
-            super.applyLast();
         }
+        super.applyLast();
     }
 
     /**
@@ -114,6 +123,27 @@ public class RSpan extends SpanUtils {
         return this;
     }
 
+    public RSpan setMaxSize(int size) {
+        maxSize = size;
+        mType = mTypeMinSize;
+        return this;
+    }
+
+    /**
+     * 使用 [TextSpan] 手动绘制
+     */
+    public RSpan replaceText(String text) {
+        replaceText = text;
+        mType = mTypeMinSize;
+        return this;
+    }
+
+    public RSpan setConfigTextSpan(Function1<TextSpan, Object> configTextSpan) {
+        this.configTextSpan = configTextSpan;
+        mType = mTypeMinSize;
+        return this;
+    }
+
     private void updateMinSize() {
         if (mText.length() == 0) return;
         int start = mBuilder.length();
@@ -121,6 +151,9 @@ public class RSpan extends SpanUtils {
         int end = mBuilder.length();
 
         TextSpan textSpan = new TextSpan(minSize);
+        textSpan.replaceText = replaceText;
+        textSpan.maxSize = maxSize;
+
         if (isSetColor) {
             textSpan.setForegroundColor(foregroundColor);
         }
@@ -135,6 +168,10 @@ public class RSpan extends SpanUtils {
             } else {
                 textSpan.fontSize = fontSize;
             }
+        }
+
+        if (configTextSpan != null) {
+            configTextSpan.invoke(textSpan);
         }
 
         mBuilder.setSpan(textSpan, start, end, flag);
@@ -169,6 +206,14 @@ public class RSpan extends SpanUtils {
          * 负数 表示使用原始大小
          */
         protected int minSize = -1;
+
+        /**
+         * 最大的 宽度, 负数不限制
+         */
+        protected int maxSize = -1;
+
+        /**省略号*/
+        protected String ellipsesText = "...";
 
         /**
          * 需要替代显示的文本
@@ -250,8 +295,6 @@ public class RSpan extends SpanUtils {
                     spanSize = replaceTextSize;
                 }
 
-                //spanSize = (int) Math.max(originTextSize, replaceTextSize);
-
                 if (minSize < 0) {
                     //未设置min size
                 } else {
@@ -259,12 +302,18 @@ public class RSpan extends SpanUtils {
                     spanSize = Math.max(spanSize, minSize);
                 }
 
-                if (fm != null) {
-                    fm.ascent = 0;
-                    fm.descent = 0;
+                if (maxSize > 0) {
+                    spanSize = Math.min(spanSize, maxSize);
+                }
 
-                    fm.top = 0;
-                    fm.bottom = 0;
+                if (fm != null) {
+                    if (!TextUtils.isEmpty(replaceText)) {
+                        //影响换行时, 文本需要绘制的坐标
+                        //fm.ascent = 0;
+                        //fm.descent = 0;
+                        //fm.top = 0;
+                        //fm.bottom = 0;
+                    }
                 }
             } else {
                 spanSize = 0;
@@ -296,6 +345,18 @@ public class RSpan extends SpanUtils {
                     end = replaceText.length();
                 }
 
+
+                if (maxSize > 0) {
+                    String textString = String.valueOf(text);
+                    float textWidth = ExKt.textWidth(paint, textString);
+                    if (textWidth > maxSize) {
+                        //判断是否需要打省略号
+                        text = ExKt.findTextWidth(paint, textString, maxSize, ellipsesText) + ellipsesText;
+
+                        start = 0;
+                        end = text.length();
+                    }
+                }
                 canvas.drawText(text, start, end, x, y, paint);
             }
         }
@@ -342,6 +403,18 @@ public class RSpan extends SpanUtils {
 
         public void setSpanSize(float spanSize) {
             this.spanSize = spanSize;
+        }
+
+        public void setMaxSize(int maxSize) {
+            this.maxSize = maxSize;
+        }
+
+        public void setEllipsesText(String ellipsesText) {
+            this.ellipsesText = ellipsesText;
+        }
+
+        public void setFontSize(float fontSize) {
+            this.fontSize = fontSize;
         }
     }
 }
