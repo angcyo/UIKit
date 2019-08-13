@@ -71,7 +71,7 @@ fun View.anim(
     to: Float = 1f,
     interpolator: TimeInterpolator = LinearInterpolator(),
     duration: Long = 300L,
-    end: () -> Unit = {},
+    end: (() -> Unit)? = null,
     update: (Float) -> Unit = {}
 ): Animator {
     val animator = ValueAnimator.ofFloat(from, to)
@@ -80,12 +80,16 @@ fun View.anim(
     animator.addUpdateListener {
         update(it.animatedValue as Float)
     }
-    animator.addListener(object : RAnimatorListener() {
-        override fun onAnimationFinish(animation: Animator?, cancel: Boolean) {
-            super.onAnimationFinish(animation, cancel)
-            end.invoke()
-        }
-    })
+
+    if (end != null) {
+        animator.addListener(object : RAnimatorListener() {
+            override fun onAnimationFinish(animation: Animator?, cancel: Boolean) {
+                super.onAnimationFinish(animation, cancel)
+                end.invoke()
+            }
+        })
+    }
+
     if (parent != null && this.visibility == View.VISIBLE) {
         animator.start()
     }
