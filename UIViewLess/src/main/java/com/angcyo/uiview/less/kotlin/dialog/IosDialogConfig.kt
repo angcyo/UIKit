@@ -1,5 +1,7 @@
 package com.angcyo.uiview.less.kotlin.dialog
 
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import com.angcyo.uiview.less.R
 
 /**
@@ -11,5 +13,9 @@ import com.angcyo.uiview.less.R
  */
 
 open class IosDialogConfig : BaseDialogConfig() {
-    override var dialogLayoutId = R.layout.dialog_normal_ios_layout
+
+    init {
+        dialogLayoutId = R.layout.dialog_normal_ios_layout
+        dialogBgDrawable = ColorDrawable(Color.TRANSPARENT)
+    }
 }

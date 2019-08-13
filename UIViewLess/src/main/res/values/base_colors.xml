@@ -91,4 +91,6 @@
     <!--跳转链接的颜色-->
     <color name="base_link_color">#002AFF</color>
     <color name="base_link_color_dark">#369AE7</color>
+
+    <color name="wt_line">#D5D5D5</color>
 </resources>
