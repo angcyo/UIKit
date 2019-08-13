@@ -1,12 +1,10 @@
 package com.angcyo.uiview.less.kotlin
 
 import android.animation.Animator
+import android.animation.TimeInterpolator
 import android.animation.ValueAnimator
 import android.view.View
-import android.view.animation.Animation
-import android.view.animation.DecelerateInterpolator
-import android.view.animation.Interpolator
-import android.view.animation.ScaleAnimation
+import android.view.animation.*
 import com.angcyo.uiview.less.resources.RAnimatorListener
 import com.angcyo.uiview.less.resources.RAnimtionListener
 
@@ -66,4 +64,30 @@ fun View.animScale(
         startAnimation(animation)
     }
     return animation
+}
+
+fun View.anim(
+    from: Float = 0f,
+    to: Float = 1f,
+    interpolator: TimeInterpolator = LinearInterpolator(),
+    duration: Long = 300L,
+    end: () -> Unit = {},
+    update: (Float) -> Unit = {}
+): Animator {
+    val animator = ValueAnimator.ofFloat(from, to)
+    animator.duration = duration
+    animator.interpolator = interpolator
+    animator.addUpdateListener {
+        update(it.animatedValue as Float)
+    }
+    animator.addListener(object : RAnimatorListener() {
+        override fun onAnimationFinish(animation: Animator?, cancel: Boolean) {
+            super.onAnimationFinish(animation, cancel)
+            end.invoke()
+        }
+    })
+    if (parent != null && this.visibility == View.VISIBLE) {
+        animator.start()
+    }
+    return animator
 }
