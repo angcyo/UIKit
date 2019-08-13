@@ -35,6 +35,8 @@ import com.angcyo.uiview.less.utils.ThreadExecutor;
 
 import java.util.*;
 
+import static androidx.core.app.NotificationCompat.VISIBILITY_PUBLIC;
+
 /**
  * new message notifier class
  * <p>
@@ -295,6 +297,19 @@ public class RNotifier {
             }
         }
 
+        int visibility = VISIBILITY_PUBLIC;
+
+        /**
+         * 锁定屏幕通知
+         *   VISIBILITY_PRIVATE：显示通知图标等基本信息，但隐藏通知的完整内容。
+         *   VISIBILITY_PUBLIC：显示通知的完整内容。
+         *   VISIBILITY_SECRET：不显示任何内容，甚至不显示通知图标。
+         * */
+        public Builder setVisibility(int visibility) {
+            this.visibility = visibility;
+            return this;
+        }
+
         /**
          * https://www.jianshu.com/p/6aec3656e274
          */
@@ -326,6 +341,15 @@ public class RNotifier {
             //.setCustomContentView()
             //.setCustomBigContentView()
             //.setCustomBigContentView()
+
+                    /*锁定屏幕通知
+                    VISIBILITY_PRIVATE：显示通知图标等基本信息，但隐藏通知的完整内容。
+                    VISIBILITY_PUBLIC：显示通知的完整内容。
+                    VISIBILITY_SECRET：不显示任何内容，甚至不显示通知图标。
+                    * */
+            .setVisibility(visibility)
+            //.setPublicVersion()
+            //.setCategory()
 
             ;
             if (contentTitle != null) {

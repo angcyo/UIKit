@@ -6,6 +6,14 @@ import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.transition.ChangeBounds;
+import android.transition.ChangeClipBounds;
+import android.transition.ChangeImageTransform;
+import android.transition.ChangeTransform;
+import android.transition.Fade;
+import android.transition.Transition;
+import android.transition.TransitionSet;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -13,6 +21,9 @@ import androidx.annotation.*;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.arch.core.util.Function;
+import androidx.core.app.ActivityCompat;
+import androidx.core.app.ActivityOptionsCompat;
+import androidx.core.util.Pair;
 import androidx.core.view.ViewCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -20,6 +31,7 @@ import com.angcyo.lib.L;
 import com.angcyo.uiview.less.base.BaseAppCompatActivity;
 import com.angcyo.uiview.less.kotlin.ExKt;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -304,10 +316,14 @@ public class ActivityHelper {
     public static class Builder {
         Context context;
         Intent intent;
-        Bundle bundle;
+        Bundle bundle = null;
         int enterAnim = -1;
         int exitAnim = -1;
         int requestCode = -1;
+
+        String bundleKey = KEY_EXTRA;
+
+        private Bundle transitionOptions = null;
 
         public Builder(@NonNull Context context) {
             this.context = context;
@@ -318,7 +334,6 @@ public class ActivityHelper {
          */
         public Builder setClass(@NonNull Class<? extends Activity> cls) {
             intent = new Intent(context, cls);
-            configIntent();
             return this;
         }
 
@@ -327,7 +342,6 @@ public class ActivityHelper {
          */
         public Builder setIntent(@NonNull Intent intent) {
             this.intent = intent;
-            configIntent();
             return this;
         }
 
@@ -336,7 +350,6 @@ public class ActivityHelper {
          */
         public Builder setPackageName(@NonNull String packageName) {
             intent = context.getPackageManager().getLaunchIntentForPackage(packageName);
-            configIntent();
             return this;
         }
 
@@ -348,7 +361,7 @@ public class ActivityHelper {
             }
 
             if (bundle != null) {
-                intent.putExtra(KEY_EXTRA, bundle);
+                intent.putExtra(bundleKey, bundle);
             }
         }
 
@@ -360,11 +373,19 @@ public class ActivityHelper {
             return this;
         }
 
+        public Builder setBundle(@NonNull String key, Bundle bundle) {
+            bundleKey = key;
+            setBundle(bundle);
+            return this;
+        }
+
         /**
          * 扩展设置
          */
         public Builder extra(@NonNull Function<Bundle, Void> function) {
-            this.bundle = new Bundle();
+            if (bundle == null) {
+                this.bundle = new Bundle();
+            }
             function.apply(bundle);
             return this;
         }
@@ -405,13 +426,22 @@ public class ActivityHelper {
          */
         public Intent start() {
             if (intent == null) {
-                L.e("必要的参数不合法,请检查参数:" + "\n1->intent:" + intent + " ×");
+                L.e("必要的参数不合法,请检查参数:" + "\n1->intent:null ×");
             } else {
 
+                configIntent();
+
+                if (context instanceof Activity) {
+                    if (sharedElementList != null) {
+                        transitionOptions = ActivityOptionsCompat.makeSceneTransitionAnimation((Activity) context,
+                                sharedElementList.toArray(new Pair[sharedElementList.size()])).toBundle();
+                    }
+                }
+
                 if (requestCode != -1 && context instanceof Activity) {
-                    ((Activity) context).startActivityForResult(intent, requestCode);
+                    ActivityCompat.startActivityForResult((Activity) context, intent, requestCode, transitionOptions);
                 } else {
-                    context.startActivity(intent);
+                    ActivityCompat.startActivity(context, intent, transitionOptions);
                 }
 
                 if (context instanceof Activity) {
@@ -440,6 +470,149 @@ public class ActivityHelper {
         @Deprecated
         public void back() {
 
+        }
+
+        private List<Pair<View, String>> sharedElementList;
+
+        /**
+         * 转场动画支持.
+         * 步骤1: 获取共享元素属性值
+         * 步骤2: 传递属性
+         * 步骤3: 播放动画
+         */
+        public Builder transitionView(@NonNull View sharedElement, @Nullable String sharedElementName) {
+            if (!TextUtils.isEmpty(sharedElementName)) {
+                if (sharedElementList == null) {
+                    sharedElementList = new ArrayList<>();
+                }
+                sharedElementList.add(new Pair<View, String>(sharedElement, sharedElementName));
+            }
+            return this;
+        }
+
+        public Builder transitionView(@NonNull View sharedElement) {
+            return transitionView(sharedElement, ViewCompat.getTransitionName(sharedElement));
+        }
+    }
+
+    public static TransitionBuilder transition(Activity activity) {
+        return new TransitionBuilder(activity);
+    }
+
+    public static class TransitionBuilder {
+        Activity activity;
+
+        private TransitionBuilder(Activity activity) {
+            this.activity = activity;
+        }
+
+        private List<Pair<View, String>> sharedElementList;
+
+        /**
+         * 转场动画支持.
+         * 步骤1: 获取共享元素属性值
+         * 步骤2: 传递属性
+         * 步骤3: 播放动画
+         */
+        public TransitionBuilder transitionView(@NonNull View sharedElement, @Nullable String sharedElementName) {
+            if (!TextUtils.isEmpty(sharedElementName)) {
+                if (sharedElementList == null) {
+                    sharedElementList = new ArrayList<>();
+                }
+                sharedElementList.add(new Pair<View, String>(sharedElement, sharedElementName));
+            }
+            return this;
+        }
+
+        public TransitionBuilder transitionView(@NonNull View sharedElement) {
+            return transitionView(sharedElement, ViewCompat.getTransitionName(sharedElement));
+        }
+
+        private boolean isSupport() {
+            return activity != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
+        }
+
+        public TransitionBuilder defaultTransition() {
+            defaultWindowTransition();
+            defaultShareElementTransition();
+            return this;
+        }
+
+        public TransitionBuilder defaultWindowTransition() {
+            if (isSupport()) {
+                return windowTransition(new Fade(), new Fade());
+            } else {
+                return this;
+            }
+        }
+
+        public TransitionBuilder windowTransition(Transition enterTransition, Transition exitTransition) {
+            windowEnterTransition(enterTransition);
+            windowExitTransition(exitTransition);
+            return this;
+        }
+
+        public TransitionBuilder windowEnterTransition(Transition enterTransition) {
+            if (isSupport()) {
+                activity.getWindow().setEnterTransition(enterTransition);
+            }
+            return this;
+        }
+
+        public TransitionBuilder windowExitTransition(Transition exitTransition) {
+            if (isSupport()) {
+                activity.getWindow().setExitTransition(exitTransition);
+            }
+            return this;
+        }
+
+        public TransitionBuilder defaultShareElementTransition() {
+            if (isSupport()) {
+                TransitionSet transitionSet = new TransitionSet();
+                transitionSet.addTransition(new ChangeBounds());
+                transitionSet.addTransition(new ChangeTransform());
+                transitionSet.addTransition(new ChangeClipBounds());
+                transitionSet.addTransition(new ChangeImageTransform());
+                //transitionSet.addTransition(ChangeScroll()) //图片过渡效果, 请勿设置此项
+                return shareElementTransition(transitionSet, transitionSet);
+            } else {
+                return this;
+            }
+        }
+
+        public TransitionBuilder shareElementTransition(Transition enterTransition, Transition exitTransition) {
+            shareElementEnterTransition(enterTransition);
+            shareElementExitTransition(exitTransition);
+            return this;
+        }
+
+        public TransitionBuilder shareElementEnterTransition(Transition enterTransition) {
+            if (isSupport()) {
+                activity.getWindow().setSharedElementEnterTransition(enterTransition);
+            }
+            return this;
+        }
+
+        public TransitionBuilder shareElementExitTransition(Transition exitTransition) {
+            if (isSupport()) {
+                activity.getWindow().setSharedElementExitTransition(exitTransition);
+            }
+            return this;
+        }
+
+        public void doIt() {
+            if (activity == null || sharedElementList == null) {
+                L.e("必要的参数不合法,请检查参数:"
+                        + "\n1->activity:" + activity + (activity == null ? " ×" : " √")
+                        + "\n2->sharedElementList:" + sharedElementList + (sharedElementList == null ? " ×" : " √")
+                );
+            } else {
+                for (Pair<View, String> pair : sharedElementList) {
+                    if (pair.first != null) {
+                        ViewCompat.setTransitionName(pair.first, pair.second);
+                    }
+                }
+            }
         }
     }
 }
