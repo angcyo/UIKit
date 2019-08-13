@@ -2,12 +2,23 @@ package com.angcyo.uiview.less.base.helper;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
 import androidx.annotation.*;
+import androidx.core.util.Pair;
+import androidx.core.view.ViewCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.transition.ChangeBounds;
+import androidx.transition.ChangeClipBounds;
+import androidx.transition.ChangeImageTransform;
+import androidx.transition.ChangeTransform;
+import androidx.transition.Fade;
+import androidx.transition.Transition;
+import androidx.transition.TransitionSet;
+
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
@@ -1039,6 +1050,15 @@ public class FragmentHelper {
                 fragmentTransaction = fragmentManager.beginTransaction();
                 //动画设置
                 animation(fragmentTransaction);
+
+                if (sharedElementList != null) {
+                    for (Pair<View, String> pair : sharedElementList) {
+                        if (pair.first != null && pair.second != null) {
+                            ViewCompat.setTransitionName(pair.first, pair.second);
+                            fragmentTransaction.addSharedElement(pair.first, pair.second);
+                        }
+                    }
+                }
             }
         }
 
@@ -1400,5 +1420,140 @@ public class FragmentHelper {
             }
         }
 
+        private List<Pair<View, String>> sharedElementList;
+
+        /**
+         * Fragment转场动画, 不能用add只能用replace
+         */
+        public Builder transitionView(@NonNull View sharedElement, @Nullable String sharedElementName) {
+            if (!TextUtils.isEmpty(sharedElementName)) {
+                if (sharedElementList == null) {
+                    sharedElementList = new ArrayList<>();
+                }
+                sharedElementList.add(new Pair<View, String>(sharedElement, sharedElementName));
+            }
+            return this;
+        }
+    }
+
+    public static TransitionBuilder transition(Fragment fragment) {
+        return new TransitionBuilder(fragment);
+    }
+
+    public static class TransitionBuilder {
+        Fragment fragment;
+
+        private TransitionBuilder(Fragment fragment) {
+            this.fragment = fragment;
+        }
+
+        private List<Pair<View, String>> sharedElementList;
+
+        /**
+         * Fragment 转场动画支持.(不能用add只能用replace)
+         * 步骤1: fragmentTransaction.addSharedElement
+         * 步骤2: fragment.onCreate 中,设置windowTransition
+         * 步骤3: fragment.onCreateView 中,设置shareElementTransition
+         */
+        public TransitionBuilder transitionView(@NonNull View sharedElement, @Nullable String sharedElementName) {
+            if (!TextUtils.isEmpty(sharedElementName)) {
+                if (sharedElementList == null) {
+                    sharedElementList = new ArrayList<>();
+                }
+                sharedElementList.add(new Pair<View, String>(sharedElement, sharedElementName));
+            }
+            return this;
+        }
+
+        public TransitionBuilder transitionView(@NonNull View sharedElement) {
+            return transitionView(sharedElement, ViewCompat.getTransitionName(sharedElement));
+        }
+
+        private boolean isSupport() {
+            return fragment != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
+        }
+
+        public TransitionBuilder defaultTransition() {
+            defaultWindowTransition();
+            defaultShareElementTransition();
+            return this;
+        }
+
+        public TransitionBuilder defaultWindowTransition() {
+            if (isSupport()) {
+                return windowTransition(new Fade(), new Fade());
+            } else {
+                return this;
+            }
+        }
+
+        public TransitionBuilder windowTransition(Transition enterTransition, Transition exitTransition) {
+            windowEnterTransition(enterTransition);
+            windowExitTransition(exitTransition);
+            return this;
+        }
+
+        public TransitionBuilder windowEnterTransition(Transition enterTransition) {
+            if (isSupport()) {
+                fragment.setEnterTransition(enterTransition);
+            }
+            return this;
+        }
+
+        public TransitionBuilder windowExitTransition(Transition exitTransition) {
+            if (isSupport()) {
+                fragment.setExitTransition(exitTransition);
+            }
+            return this;
+        }
+
+        public TransitionBuilder defaultShareElementTransition() {
+            if (isSupport()) {
+                TransitionSet transitionSet = new TransitionSet();
+                transitionSet.addTransition(new ChangeBounds());
+                transitionSet.addTransition(new ChangeTransform());
+                transitionSet.addTransition(new ChangeClipBounds());
+                transitionSet.addTransition(new ChangeImageTransform());
+                //transitionSet.addTransition(ChangeScroll()) //图片过渡效果, 请勿设置此项
+                return shareElementTransition(transitionSet, transitionSet);
+            } else {
+                return this;
+            }
+        }
+
+        public TransitionBuilder shareElementTransition(Transition enterTransition, Transition returnTransition) {
+            shareElementEnterTransition(enterTransition);
+            shareElementReturnTransition(returnTransition);
+            return this;
+        }
+
+        public TransitionBuilder shareElementEnterTransition(Transition enterTransition) {
+            if (isSupport()) {
+                fragment.setSharedElementEnterTransition(enterTransition);
+            }
+            return this;
+        }
+
+        public TransitionBuilder shareElementReturnTransition(Transition returnTransition) {
+            if (isSupport()) {
+                fragment.setSharedElementReturnTransition(returnTransition);
+            }
+            return this;
+        }
+
+        public void doIt() {
+            if (fragment == null || sharedElementList == null) {
+                L.e("必要的参数不合法,请检查参数:"
+                        + "\n1->fragment:" + fragment + (fragment == null ? " ×" : " √")
+                        + "\n2->sharedElementList:" + sharedElementList + (sharedElementList == null ? " ×" : " √")
+                );
+            } else {
+                for (Pair<View, String> pair : sharedElementList) {
+                    if (pair.first != null) {
+                        ViewCompat.setTransitionName(pair.first, pair.second);
+                    }
+                }
+            }
+        }
     }
 }
