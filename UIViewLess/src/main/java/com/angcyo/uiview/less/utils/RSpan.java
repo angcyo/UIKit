@@ -338,13 +338,17 @@ public class RSpan extends SpanUtils {
                     spanSize = Math.min(spanSize, maxSize);
                 }
 
+                /**
+                 * @see android.text.BoringLayout#init line:229 241~249
+                 * */
                 if (fm != null) {
-                    if (!TextUtils.isEmpty(replaceText)) {
-                        //影响换行时, 文本需要绘制的坐标
-                        //fm.ascent = 0;
-                        //fm.descent = 0;
-                        //fm.top = 0;
-                        //fm.bottom = 0;
+                    int height1 = fm.bottom - fm.top;
+                    int height2 = fm.descent - fm.ascent;
+                    if (fontSize > 0 || (height1 <= 0 && height2 <= 0)) {
+                        fm.ascent = Math.min((int) paint.ascent(), fm.ascent);
+                        fm.descent = Math.max((int) paint.descent(), fm.descent);
+                        fm.top = Math.min(fm.ascent, fm.top);
+                        fm.bottom = Math.max(fm.descent, fm.bottom);
                     }
                 }
             } else {
@@ -376,7 +380,6 @@ public class RSpan extends SpanUtils {
                     start = 0;
                     end = replaceText.length();
                 }
-
 
                 if (maxSize > 0) {
                     String textString = String.valueOf(text);
