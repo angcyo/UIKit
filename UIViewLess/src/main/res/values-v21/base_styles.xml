@@ -18,6 +18,11 @@
         <item name="android:windowBackground">@color/theme_color_primary</item>
     </style>
 
+    <style name="BaseSplashTheme" parent="BaseTranStatusTheme">
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:navigationBarColor">@color/transparent</item>
+    </style>
+
     <!--透明状态栏主题, 多用于启动页, 透明状态栏会影响 dialog中 EditText弹出键盘-->
     <style name="BaseTranStatusTheme" parent="BaseWhiteAppTheme">
         <item name="android:windowTranslucentStatus">true</item>

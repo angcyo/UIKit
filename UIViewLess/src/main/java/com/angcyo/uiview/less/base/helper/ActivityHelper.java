@@ -320,6 +320,8 @@ public class ActivityHelper {
         int enterAnim = -1;
         int exitAnim = -1;
         int requestCode = -1;
+        int resultCode = Activity.RESULT_CANCELED;
+        Intent resultData = null;
 
         String bundleKey = KEY_EXTRA;
 
@@ -463,6 +465,15 @@ public class ActivityHelper {
         }
 
         /**
+         * @see Activity#setResult(int, Intent)
+         */
+        public Builder setResult(int resultCode, Intent data) {
+            resultData = data;
+            this.resultCode = resultCode;
+            return this;
+        }
+
+        /**
          * 可以在Fragment中, 关闭Activity , 或者 Remove  Fragment
          *
          * @deprecated 请使用 {@link FragmentHelper.Builder#back(Activity)}
@@ -470,6 +481,31 @@ public class ActivityHelper {
         @Deprecated
         public void back() {
 
+        }
+
+        /**
+         * 关闭Activity, 不考虑Fragment
+         */
+        public void finish() {
+            finish(true);
+        }
+
+        public void finish(boolean withBackPress) {
+            if (context instanceof Activity) {
+                ((Activity) context).setResult(resultCode, resultData);
+
+                if (withBackPress) {
+                    ((Activity) context).onBackPressed();
+                } else {
+                    ((Activity) context).finish();
+                }
+
+                if (enterAnim != -1 || exitAnim != -1) {
+                    ((Activity) context).overridePendingTransition(enterAnim, exitAnim);
+                }
+            } else {
+                L.e("context 必须是 Activity, 才能执行 finish()");
+            }
         }
 
         private List<Pair<View, String>> sharedElementList;
