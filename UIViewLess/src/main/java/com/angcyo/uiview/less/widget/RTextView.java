@@ -315,6 +315,14 @@ public class RTextView extends AppCompatTextView {
         }
     }
 
+    public void setTextLeftDrawableColor(int textLeftDrawableColor) {
+        this.textLeftDrawableColor = textLeftDrawableColor;
+        if (textLeftDrawable != null) {
+            filterLeftDrawable();
+            postInvalidate();
+        }
+    }
+
     public void setLeftString(String leftString) {
         mLeftString = leftString;
         if (!TextUtils.isEmpty(mLeftString)) {
