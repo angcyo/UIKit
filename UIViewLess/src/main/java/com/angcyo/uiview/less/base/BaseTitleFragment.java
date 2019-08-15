@@ -110,15 +110,22 @@ public abstract class BaseTitleFragment extends BaseFragment implements AffectUI
      * 左边控制按钮初始化
      */
     protected void initLeftControlLayout() {
-        if (getParentFragment() == null &&
-                getFragmentManager() != null &&
-                getFragmentManager().getFragments().size() > 1) {
+        if (needBackItem()) {
             //添加返回按钮
             View backItem = createBackItem();
             if (backItem != null) {
                 addLeftItem(backItem);
             }
         }
+    }
+
+    /**
+     * 是否需要返回按钮
+     */
+    protected boolean needBackItem() {
+        return getParentFragment() == null &&
+                getFragmentManager() != null &&
+                getFragmentManager().getFragments().size() > 1;
     }
 
     /**

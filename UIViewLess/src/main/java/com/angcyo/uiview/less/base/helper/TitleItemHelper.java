@@ -61,6 +61,8 @@ public class TitleItemHelper {
          */
         int src = -1;
 
+        Drawable srcDrawable = null;
+
         /**
          * 文字和图片之间的距离
          */
@@ -109,6 +111,11 @@ public class TitleItemHelper {
 
         public Builder setSrc(@DrawableRes int src) {
             this.src = src;
+            return this;
+        }
+
+        public Builder setSrcDrawable(Drawable srcDrawable) {
+            this.srcDrawable = srcDrawable;
             return this;
         }
 
@@ -193,6 +200,15 @@ public class TitleItemHelper {
             return this;
         }
 
+        public Builder setTargetView(ImageTextView targetView) {
+            this.targetView = targetView;
+            return this;
+        }
+
+        public ImageTextView getTargetView() {
+            return targetView;
+        }
+
         public ImageTextView doIt() {
             return build();
         }
@@ -205,18 +221,25 @@ public class TitleItemHelper {
             return build(null);
         }
 
+        protected ImageTextView targetView;
+
         public ImageTextView build(@Nullable ViewGroup viewGroup) {
             ImageTextView view;
-            if (viewGroup == null) {
-                view = (ImageTextView) LayoutInflater.from(context)
-                        .inflate(R.layout.base_title_item_layout,
-                                new FrameLayout(context), false);
+            if (targetView == null) {
+                if (viewGroup == null) {
+                    view = (ImageTextView) LayoutInflater.from(context)
+                            .inflate(R.layout.base_title_item_layout,
+                                    new FrameLayout(context), false);
+                } else {
+                    view = (ImageTextView) LayoutInflater.from(context)
+                            .inflate(R.layout.base_title_item_layout,
+                                    viewGroup, false);
+                    viewGroup.addView(view, viewIndex);
+                }
             } else {
-                view = (ImageTextView) LayoutInflater.from(context)
-                        .inflate(R.layout.base_title_item_layout,
-                                viewGroup, false);
-                viewGroup.addView(view, viewIndex);
+                view = targetView;
             }
+
             if (viewId != -1) {
                 view.setId(viewId);
             }
@@ -251,6 +274,9 @@ public class TitleItemHelper {
             }
             if (src != -1) {
                 view.setImageResource(src);
+            }
+            if (srcDrawable != null) {
+                view.setImageDrawable(srcDrawable);
             }
             if (minWidth != -1) {
                 view.setMinimumWidth(minWidth);
