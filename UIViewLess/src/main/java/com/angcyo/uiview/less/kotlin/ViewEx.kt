@@ -11,6 +11,7 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Rect
 import android.graphics.drawable.Drawable
+import android.os.Build
 import android.text.InputFilter
 import android.text.TextUtils
 import android.util.LayoutDirection
@@ -167,9 +168,9 @@ public fun TextView.getDrawCenterTextCy(): Float {
 }
 
 /**文本的高度*/
-public fun <T> T.textHeight(paint: Paint): Float = paint.descent() - paint.ascent()
+public fun <T> T.textHeight(paint: Paint): Float = paint.textHeight()
 
-public fun TextView.textHeight(): Float = paint.descent() - paint.ascent()
+public fun TextView.textHeight(): Float = paint.textHeight()
 
 /**文本宽度*/
 public fun View.textWidth(paint: Paint?, text: String?): Float = paint?.measureText(text ?: "")
@@ -980,7 +981,7 @@ public fun View.drawCenterY(): Int {
     return paddingTop + viewDrawHeight / 2
 }
 
-public fun TextView.gravityFlag(): ByteArray {
+public fun Int.gravityFlag(): ByteArray {
     //L T R B C
     //11111
     //00000
@@ -988,7 +989,11 @@ public fun TextView.gravityFlag(): ByteArray {
         0
     }
 
-    val absoluteGravity = Gravity.getAbsoluteGravity(gravity, LayoutDirection.LTR)
+    val absoluteGravity = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+        Gravity.getAbsoluteGravity(this, LayoutDirection.LTR)
+    } else {
+        this
+    }
 
     if (absoluteGravity and Gravity.FILL == Gravity.FILL) {
         //no op
@@ -1023,60 +1028,94 @@ public fun TextView.gravityFlag(): ByteArray {
         bytes[4] = 1
     } else {
         if (absoluteGravity and Gravity.CENTER_VERTICAL == Gravity.CENTER_VERTICAL) {
-            //no op
+            bytes[0] = 1 //竖直 左对齐
+            bytes[4] = 1 //在TextView中, 这个值始终为1, 但是在自定义的Gravity的地方就不会
         }
         if (absoluteGravity and Gravity.CENTER_HORIZONTAL == Gravity.CENTER_HORIZONTAL) {
-            //no op
+            bytes[1] = 1 //水平 顶部对齐
+            bytes[4] = 1 //在TextView中, 这个值始终为1, 但是在自定义的Gravity的地方就不会
         }
     }
     return bytes
 }
 
-public fun TextView.isGravityCenter(): Boolean {
-    return gravity == Gravity.CENTER
+public fun Int.isGravityCenter(): Boolean {
+    return this == Gravity.CENTER
 }
 
-public fun TextView.isGravityCenterHorizontal(): Boolean {
+public fun Int.isGravityCenterHorizontal(): Boolean {
     //L T R B C
     //0 1 2 3 4
     val flags = gravityFlag()
-    val result = flags[0] == 0.toByte() &&
-            flags[2] == 0.toByte() &&
+    val result = (flags[0] == 0.toByte() && flags[2] == 0.toByte()) &&
             (flags[1] == 1.toByte() || flags[3] == 1.toByte()) &&
             flags[4] == 1.toByte()
 
     return isGravityCenter() || result
 }
 
-public fun TextView.isGravityCenterVertical(): Boolean {
+public fun Int.isGravityCenterVertical(): Boolean {
     //L T R B C
     //0 1 2 3 4
     val flags = gravityFlag()
-    val result = flags[1] == 0.toByte() &&
-            flags[3] == 0.toByte() &&
+    val result = (flags[1] == 0.toByte() && flags[3] == 0.toByte()) &&
             (flags[0] == 1.toByte() || flags[2] == 1.toByte()) &&
             flags[4] == 1.toByte()
     return isGravityCenter() || result
 }
 
-public fun TextView.isGravityTop(): Boolean {
+public fun Int.isGravityTop(): Boolean {
     val flags = gravityFlag()
     return flags[1] == 1.toByte()
 }
 
-public fun TextView.isGravityBottom(): Boolean {
+public fun Int.isGravityBottom(): Boolean {
     val flags = gravityFlag()
     return flags[3] == 1.toByte()
 }
 
-public fun TextView.isGravityLeft(): Boolean {
+public fun Int.isGravityLeft(): Boolean {
     val flags = gravityFlag()
     return flags[0] == 1.toByte()
 }
 
-public fun TextView.isGravityRight(): Boolean {
+public fun Int.isGravityRight(): Boolean {
     val flags = gravityFlag()
     return flags[2] == 1.toByte()
+}
+
+/*---------------------------------------------*/
+
+public fun TextView.gravityFlag(): ByteArray {
+    return gravity.gravityFlag()
+}
+
+public fun TextView.isGravityCenter(): Boolean {
+    return gravity.isGravityCenter()
+}
+
+public fun TextView.isGravityCenterHorizontal(): Boolean {
+    return gravity.isGravityCenterHorizontal()
+}
+
+public fun TextView.isGravityCenterVertical(): Boolean {
+    return gravity.isGravityCenterVertical()
+}
+
+public fun TextView.isGravityTop(): Boolean {
+    return gravity.isGravityTop()
+}
+
+public fun TextView.isGravityBottom(): Boolean {
+    return gravity.isGravityBottom()
+}
+
+public fun TextView.isGravityLeft(): Boolean {
+    return gravity.isGravityLeft()
+}
+
+public fun TextView.isGravityRight(): Boolean {
+    return gravity.isGravityRight()
 }
 
 public fun View.offsetTop(offset: Int) {
