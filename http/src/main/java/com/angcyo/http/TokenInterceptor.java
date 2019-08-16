@@ -33,6 +33,11 @@ public class TokenInterceptor implements Interceptor {
 
     StringBuilder responseBodyBuilder = new StringBuilder();
 
+    /**
+     * body 允许读取的最大值 64kb
+     */
+    long maxReadSize = 64 * 1024;
+
     public TokenInterceptor(OnTokenListener tokenListener) {
         this.tokenListener = tokenListener;
         charset = UTF8;
@@ -92,7 +97,8 @@ public class TokenInterceptor implements Interceptor {
         ResponseBody responseBody = response.body();
         if (responseBody != null
                 && responseBody.contentType() != null
-                && responseBody.contentLength() > 0) {
+                && responseBody.contentLength() > 0
+                && responseBody.contentLength() < maxReadSize) {
 
             BufferedSource source = responseBody.source();
             source.request(Long.MAX_VALUE);
