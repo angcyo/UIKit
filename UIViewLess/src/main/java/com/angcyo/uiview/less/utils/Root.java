@@ -3,21 +3,30 @@ package com.angcyo.uiview.less.utils;
 import android.content.Context;
 import android.os.Build;
 import android.os.Environment;
-import androidx.annotation.Nullable;
+import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
+
+import androidx.annotation.Nullable;
+
 import com.angcyo.lib.L;
 import com.angcyo.uiview.less.RApplication;
 import com.angcyo.uiview.less.RCrashHandler;
 import com.angcyo.uiview.less.resources.ResUtil;
 import com.angcyo.uiview.less.utils.utilcode.utils.AppUtils;
-import kotlin.jvm.functions.Function2;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Properties;
 import java.util.UUID;
+
+import kotlin.jvm.functions.Function2;
 
 /**
  * Created by angcyo on 2016-11-05.
@@ -355,6 +364,8 @@ public class Root {
      * 038d4833-5fa1-47a0-8c43-3ef3b8a9d103
      */
     public static String initImei() {
+        //Settings.System.getString(, Settings.Secure.ANDROID_ID);
+
         //需要返回的uuid
         String uuid = null;
         //sd卡中存在的uuid

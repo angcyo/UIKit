@@ -3,10 +3,7 @@ package com.angcyo.uiview.less.component
 import android.graphics.Color
 import android.os.Bundle
 import android.os.SystemClock
-import androidx.fragment.app.FragmentManager
-import androidx.collection.ArrayMap
 import android.text.TextUtils
-import android.text.format.Formatter
 import android.view.Gravity
 import android.view.View
 import android.webkit.MimeTypeMap
@@ -49,7 +46,10 @@ import java.util.*
 open class FileSelectorFragment : BaseFragment() {
 
     companion object {
-        fun show(fragmentManager: androidx.fragment.app.FragmentManager?, config: FileSelectorConfig.() -> Unit) {
+        fun show(
+            fragmentManager: androidx.fragment.app.FragmentManager?,
+            config: FileSelectorConfig.() -> Unit
+        ) {
             FragmentHelper.build(fragmentManager)
                 .showFragment(FileSelectorFragment().fileSelectorConfig(config))
                 .defaultEnterAnim()
@@ -66,7 +66,8 @@ open class FileSelectorFragment : BaseFragment() {
     }
 
     /**获取上一层路径*/
-    private fun getPrePath(): String = config.targetPath.substring(0, config.targetPath.lastIndexOf("/"))
+    private fun getPrePath(): String =
+        config.targetPath.substring(0, config.targetPath.lastIndexOf("/"))
 
     private var scrollView: HorizontalScrollView? = null
 
@@ -80,7 +81,11 @@ open class FileSelectorFragment : BaseFragment() {
         return this
     }
 
-    override fun initBaseView(viewHolder: RBaseViewHolder, arguments: Bundle?, savedInstanceState: Bundle?) {
+    override fun initBaseView(
+        viewHolder: RBaseViewHolder,
+        arguments: Bundle?,
+        savedInstanceState: Bundle?
+    ) {
         super.initBaseView(viewHolder, arguments, savedInstanceState)
 
         //半屏效果
@@ -122,7 +127,8 @@ open class FileSelectorFragment : BaseFragment() {
 
         viewHolder.reV(R.id.base_recycler_view).apply {
             adapter = object : RBaseAdapter<FileItem>(mAttachContext) {
-                override fun getItemLayoutId(viewType: Int): Int = R.layout.base_fragment_file_selector_item
+                override fun getItemLayoutId(viewType: Int): Int =
+                    R.layout.base_fragment_file_selector_item
 
                 override fun onBindView(holder: RBaseViewHolder, position: Int, item: FileItem?) {
                     if (item == null) {
@@ -133,11 +139,12 @@ open class FileSelectorFragment : BaseFragment() {
                     holder.tv(R.id.base_time_view).text = formatTime(bean.lastModified())
 
                     //权限信息
-                    holder.tv(R.id.base_auth_view).text = RSpan.get(if (bean.isDirectory) "d" else "-")
-                        .append(if (bean.canExecute()) "e" else "-")
-                        .append(if (bean.canRead()) "r" else "-")
-                        .append(if (bean.canWrite()) "w" else "-")
-                        .create()
+                    holder.tv(R.id.base_auth_view).text =
+                        RSpan.get(if (bean.isDirectory) "d" else "-")
+                            .append(if (bean.canExecute()) "e" else "-")
+                            .append(if (bean.canRead()) "r" else "-")
+                            .append(if (bean.canWrite()) "w" else "-")
+                            .create()
 
                     holder.tv(R.id.base_md5_view).visibility = View.GONE
 
@@ -187,14 +194,21 @@ open class FileSelectorFragment : BaseFragment() {
 
                     fun selectorItemView(itemView: RLinearLayout, selector: Boolean) {
                         if (selector) {
-                            itemView.setRBackgroundDrawable(SkinHelper.getSkin().getThemeTranColor(0x30))
+                            itemView.setRBackgroundDrawable(
+                                SkinHelper.getSkin().getThemeTranColor(
+                                    0x30
+                                )
+                            )
                         } else {
                             itemView.setRBackgroundDrawable(Color.TRANSPARENT)
                         }
                     }
 
                     val itemView: RLinearLayout = holder.itemView as RLinearLayout
-                    selectorItemView(itemView, TextUtils.equals(config.selectorFilePath, bean.absolutePath))
+                    selectorItemView(
+                        itemView,
+                        TextUtils.equals(config.selectorFilePath, bean.absolutePath)
+                    )
 
                     if (bean.canRead()) {
                         //item 点击事件
@@ -264,11 +278,12 @@ open class FileSelectorFragment : BaseFragment() {
 
     private fun formatTime(time: Long): String = config.simpleFormat.format(time)
 
-    private fun formatFileSize(size: Long): String = Formatter.formatFileSize(mAttachContext, size)
+    private fun formatFileSize(size: Long): String = RUtils.formatFileSize(size)
 
     private fun setSelectorFilePath(path: String) {
         config.selectorFilePath = path
-        baseViewHolder.view(R.id.base_selector_button).isEnabled = File(config.selectorFilePath).exists()
+        baseViewHolder.view(R.id.base_selector_button).isEnabled =
+            File(config.selectorFilePath).exists()
     }
 
     private fun resetPath(path: String, force: Boolean = false) {
@@ -295,7 +310,8 @@ open class FileSelectorFragment : BaseFragment() {
         getFileList(config.targetPath, delay) {
             baseViewHolder.reV(R.id.base_recycler_view).adapterRaw.resetData(it)
             if (it.isEmpty()) {
-                baseViewHolder.reV(R.id.base_recycler_view).adapterRaw.setShowState(IShowState.EMPTY)
+                baseViewHolder.reV(R.id.base_recycler_view)
+                    .adapterRaw.setShowState(IShowState.EMPTY)
             }
         }
     }
@@ -305,47 +321,48 @@ open class FileSelectorFragment : BaseFragment() {
         addSubscription(Rx.just(path)
             .map {
                 val file = File(it)
-                val result: List<FileItem> = if (file.exists() && file.isDirectory && file.canRead()) {
-                    val list = file.listFiles().asList()
+                val result: List<FileItem> =
+                    if (file.exists() && file.isDirectory && file.canRead()) {
+                        val list = file.listFiles().asList()
 
-                    //排序, 文件夹在上面
-                    Collections.sort(list) { o1, o2 ->
-                        when {
-                            (o1.isDirectory && o2.isDirectory) || (o1.isFile && o2.isFile) -> o1.name.toLowerCase().compareTo(
-                                o2.name.toLowerCase()
-                            )
-                            o2.isDirectory -> 1
-                            o1.isDirectory -> -1
-                            else -> o1.name.toLowerCase().compareTo(o2.name.toLowerCase())
+                        //排序, 文件夹在上面
+                        Collections.sort(list) { o1, o2 ->
+                            when {
+                                (o1.isDirectory && o2.isDirectory) || (o1.isFile && o2.isFile) -> o1.name.toLowerCase().compareTo(
+                                    o2.name.toLowerCase()
+                                )
+                                o2.isDirectory -> 1
+                                o1.isDirectory -> -1
+                                else -> o1.name.toLowerCase().compareTo(o2.name.toLowerCase())
+                            }
                         }
-                    }
 
-                    val items = mutableListOf<FileItem>()
-                    val fileList: List<File>
+                        val items = mutableListOf<FileItem>()
+                        val fileList: List<File>
 
-                    fileList = if (config.showHideFile) {
-                        list
-                    } else {
-                        list.filter {
-                            !it.isHidden
+                        fileList = if (config.showHideFile) {
+                            list
+                        } else {
+                            list.filter {
+                                !it.isHidden
+                            }
                         }
-                    }
-                    fileList.mapTo(items) {
-                        FileItem(
-                            it,
-                            Ok.ImageType.of(Ok.ImageTypeUtil.getImageType(it)),
-                            "",//异步加载 /*if (config.showFileMd5) MD5.getStreamMD5(it.absolutePath) else "",*/
-                            MimeTypeMap.getSingleton().getMimeTypeFromExtension(
-                                MimeTypeMap.getFileExtensionFromUrl(
-                                    it.absolutePath
+                        fileList.mapTo(items) {
+                            FileItem(
+                                it,
+                                Ok.ImageType.of(Ok.ImageTypeUtil.getImageType(it)),
+                                "",//异步加载 /*if (config.showFileMd5) MD5.getStreamMD5(it.absolutePath) else "",*/
+                                MimeTypeMap.getSingleton().getMimeTypeFromExtension(
+                                    MimeTypeMap.getFileExtensionFromUrl(
+                                        it.absolutePath
+                                    )
                                 )
                             )
-                        )
+                        }
+                        items
+                    } else {
+                        emptyList()
                     }
-                    items
-                } else {
-                    emptyList()
-                }
 
                 if (delay > 0) {
                     SystemClock.sleep(delay)
@@ -399,7 +416,12 @@ open class FileSelectorFragment : BaseFragment() {
     }
 }
 
-data class FileItem(val file: File, val imageType: Ok.ImageType, var fileMd5: String = "", val mimeType: String? = null)
+data class FileItem(
+    val file: File,
+    val imageType: Ok.ImageType,
+    var fileMd5: String = "",
+    val mimeType: String? = null
+)
 
 open class FileSelectorConfig {
 
