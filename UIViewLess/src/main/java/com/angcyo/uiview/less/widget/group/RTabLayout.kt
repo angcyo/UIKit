@@ -4,13 +4,13 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Canvas
 import android.graphics.Color
-import androidx.annotation.LayoutRes
-import androidx.viewpager.widget.ViewPager
 import android.util.AttributeSet
 import android.view.*
 import android.widget.FrameLayout
 import android.widget.OverScroller
 import android.widget.TextView
+import androidx.annotation.LayoutRes
+import androidx.viewpager.widget.ViewPager
 import com.angcyo.uiview.less.R
 import com.angcyo.uiview.less.draw.RDrawBorder
 import com.angcyo.uiview.less.draw.RDrawText
@@ -215,34 +215,6 @@ class RTabLayout(context: Context, attributeSet: AttributeSet? = null) : ViewGro
 
     fun getCurrentItem() = currentItem
 
-    /**ViewPager 滚动监听*/
-    fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
-        if (!isClickScrollPager) {
-            tabIndicator.pagerPosition = position
-            tabIndicator.pagerPositionOffset = positionOffset
-        }
-
-        onTabLayoutListener?.let {
-            if (currentItem == position) {
-                //view pager 往下一页滚
-                it.onPageScrolled(
-                    this,
-                    getChildAt(currentItem), getChildAt(currentItem + 1),
-                    currentItem, currentItem + 1,
-                    positionOffset
-                )
-            } else {
-                //往上一页滚
-                it.onPageScrolled(
-                    this,
-                    getChildAt(currentItem), getChildAt(position),
-                    currentItem, position,
-                    1f - positionOffset
-                )
-            }
-        }
-    }
-
     private var isViewPagerDragging = false
 
     /**自动关联ViewPager*/
@@ -250,44 +222,17 @@ class RTabLayout(context: Context, attributeSet: AttributeSet? = null) : ViewGro
         viewPager.addOnPageChangeListener(object : androidx.viewpager.widget.ViewPager.SimpleOnPageChangeListener() {
             override fun onPageScrollStateChanged(state: Int) {
                 super.onPageScrollStateChanged(state)
-                //L.e("call: onPageScrollStateChanged -> $state")
-                val isClickScrollPagerOld = isClickScrollPager
-
-                if (state == androidx.viewpager.widget.ViewPager.SCROLL_STATE_DRAGGING) {
-                    isViewPagerDragging = true
-                } else if (state == androidx.viewpager.widget.ViewPager.SCROLL_STATE_IDLE) {
-                    isViewPagerDragging = false
-                    isClickScrollPager = false
-                }
-
-                onTabLayoutListener?.let {
-                    it.onPageScrollStateChanged(state)
-                }
-
-                if (isClickScrollPagerOld) {
-                    resetItemStyle()
-                }
+                this@RTabLayout.onPageScrollStateChanged(state)
             }
 
             override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
                 super.onPageScrolled(position, positionOffset, positionOffsetPixels)
-                if (isViewPagerDragging || isClickScrollPager) {
-                    this@RTabLayout.onPageScrolled(position, positionOffset, positionOffsetPixels)
-                }
+                this@RTabLayout.onPageScrolled(position, positionOffset, positionOffsetPixels)
             }
 
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
-                if (!isViewPagerDragging) {
-                    isClickScrollPager = false
-                    onTabLayoutListener?.let {
-                        it.onPageScrollStateChanged(androidx.viewpager.widget.ViewPager.SCROLL_STATE_IDLE)
-                        if (childCount > position) {
-                            it.onSelectorItemView(this@RTabLayout, getChildAt(position), position)
-                        }
-                    }
-                }
-                setCurrentItem(position, false)
+                this@RTabLayout.onPageSelected(position)
             }
         })
 
@@ -317,6 +262,69 @@ class RTabLayout(context: Context, attributeSet: AttributeSet? = null) : ViewGro
             /**默认实现*/
             onTabLayoutListener = DefaultTabLayoutListener(viewPager)
         }
+    }
+
+    fun onPageScrollStateChanged(state: Int) {
+        //L.e("call: onPageScrollStateChanged -> $state")
+        val isClickScrollPagerOld = isClickScrollPager
+
+        if (state == androidx.viewpager.widget.ViewPager.SCROLL_STATE_DRAGGING) {
+            isViewPagerDragging = true
+        } else if (state == androidx.viewpager.widget.ViewPager.SCROLL_STATE_IDLE) {
+            isViewPagerDragging = false
+            isClickScrollPager = false
+        }
+
+        onTabLayoutListener?.let {
+            it.onPageScrollStateChanged(state)
+        }
+
+        if (isClickScrollPagerOld) {
+            resetItemStyle()
+        }
+    }
+
+    fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
+        if (isViewPagerDragging || isClickScrollPager) {
+
+            if (!isClickScrollPager) {
+                tabIndicator.pagerPosition = position
+                tabIndicator.pagerPositionOffset = positionOffset
+            }
+
+            onTabLayoutListener?.let {
+                if (currentItem == position) {
+                    //view pager 往下一页滚
+                    it.onPageScrolled(
+                        this,
+                        getChildAt(currentItem), getChildAt(currentItem + 1),
+                        currentItem, currentItem + 1,
+                        positionOffset
+                    )
+                } else {
+                    //往上一页滚
+                    it.onPageScrolled(
+                        this,
+                        getChildAt(currentItem), getChildAt(position),
+                        currentItem, position,
+                        1f - positionOffset
+                    )
+                }
+            }
+        }
+    }
+
+    fun onPageSelected(position: Int) {
+        if (!isViewPagerDragging) {
+            isClickScrollPager = false
+            onTabLayoutListener?.let {
+                it.onPageScrollStateChanged(androidx.viewpager.widget.ViewPager.SCROLL_STATE_IDLE)
+                if (childCount > position) {
+                    it.onSelectorItemView(this@RTabLayout, getChildAt(position), position)
+                }
+            }
+        }
+        setCurrentItem(position, false)
     }
 
     fun <T> resetItems(@LayoutRes layoutId: Int, items: List<T>, callback: OnAddViewCallback<T>) {
@@ -735,7 +743,8 @@ class RTabLayout(context: Context, attributeSet: AttributeSet? = null) : ViewGro
     }
 
     /**改变Tab字体大小的实现*/
-    open class DefaultTabLayoutListener(viewPager: androidx.viewpager.widget.ViewPager? = null) : DefaultViewPagerListener(viewPager) {
+    open class DefaultTabLayoutListener(viewPager: androidx.viewpager.widget.ViewPager? = null) :
+        DefaultViewPagerListener(viewPager) {
         var maxTextSize: Float = getDimen(R.dimen.default_text_size16).toFloat()
         var minTextSize: Float = getDimen(R.dimen.default_text_size9).toFloat()
 
@@ -813,7 +822,8 @@ class RTabLayout(context: Context, attributeSet: AttributeSet? = null) : ViewGro
     /**
      * 默认实现方式, 简单的切换ViewPager
      * */
-    open class DefaultViewPagerListener(val viewPager: androidx.viewpager.widget.ViewPager? = null) : OnTabLayoutListener() {
+    open class DefaultViewPagerListener(val viewPager: androidx.viewpager.widget.ViewPager? = null) :
+        OnTabLayoutListener() {
         override fun onTabSelector(tabLayout: RTabLayout, fromIndex: Int, toIndex: Int) {
             super.onTabSelector(tabLayout, fromIndex, toIndex)
             viewPager?.setCurrentItem(toIndex, (toIndex - fromIndex).abs() == 1)
