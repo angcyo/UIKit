@@ -2,15 +2,17 @@ package com.angcyo.uiview.less.base;
 
 import android.graphics.Color;
 import android.os.Bundle;
-import androidx.annotation.ColorInt;
-import androidx.annotation.LayoutRes;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+
+import androidx.annotation.ColorInt;
+import androidx.annotation.LayoutRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.angcyo.uiview.less.R;
 import com.angcyo.uiview.less.base.helper.ViewGroupHelper;
 import com.angcyo.uiview.less.iview.AffectUI;
@@ -178,10 +180,20 @@ public abstract class BaseTitleFragment extends BaseFragment implements AffectUI
      * 浮动标题栏, 自动设置透明背景标题栏
      */
     public void floatTitleBar() {
+        floatTitleBar(false, true);
+    }
+
+    public void floatTitleBar(boolean paddingContent, boolean tranTitleBar) {
         if (fragmentContentWrapperLayout != null) {
-            fragmentContentWrapperLayout.setContentLayoutState(FragmentContentWrapperLayout.CONTENT_BACK_OF_TITLE);
+            if (paddingContent) {
+                fragmentContentWrapperLayout.setContentLayoutState(FragmentContentWrapperLayout.CONTENT_BACK_OF_TITLE_PADDING);
+            } else {
+                fragmentContentWrapperLayout.setContentLayoutState(FragmentContentWrapperLayout.CONTENT_BACK_OF_TITLE);
+            }
         }
-        setTitleBarLayoutColor(Color.TRANSPARENT);
+        if (tranTitleBar) {
+            setTitleBarLayoutColor(Color.TRANSPARENT);
+        }
         hideTitleShadow();
     }
 

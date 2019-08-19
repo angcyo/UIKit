@@ -41,6 +41,10 @@ public class FragmentContentWrapperLayout extends FrameLayout {
      * 标题浮动在内容的上面
      */
     public static final int CONTENT_BACK_OF_TITLE = CONTENT_BOTTOM_OF_TITLE << 1;
+    /**
+     * 内容布局使用title布局的高度设置paddingTop
+     */
+    public static final int CONTENT_BACK_OF_TITLE_PADDING = CONTENT_BACK_OF_TITLE << 1;
     GestureDetectorCompat gestureDetectorCompat;
     /**
      * 内容布局的状态
@@ -49,7 +53,7 @@ public class FragmentContentWrapperLayout extends FrameLayout {
     private int titleViewIndex = 1;
     private int contentViewIndex = 0;
     /**
-     * 是否监听touch时间, 折叠标题栏
+     * 是否监听touch事件, 折叠标题栏.
      */
     private boolean collapsingTitle = false;
 
@@ -110,6 +114,24 @@ public class FragmentContentWrapperLayout extends FrameLayout {
             if (childAt == titleView) {
                 continue;
             }
+
+            //内容需要padding
+            if (childAt == contentView() && contentLayoutState == CONTENT_BACK_OF_TITLE_PADDING) {
+                int pLeft = childAt.getPaddingLeft();
+                int pTop = titleViewHeight + titleViewMarginVertical;
+                int pRight = childAt.getPaddingRight();
+                int pBottom = childAt.getPaddingBottom();
+
+                if (childAt instanceof RSoftInputLayout) {
+                    pLeft = -1;
+                    pRight = -1;
+                    pBottom = -1;
+                }
+
+                childAt.setPadding(pLeft, pTop, pRight, pBottom);
+            }
+
+            //titleView 支持滚动隐藏
             if (childAt == contentView() && collapsingTitle) {
                 measureChildWithMargins(childAt, widthMeasureSpec, 0,
                         MeasureSpec.makeMeasureSpec(heightSize + titleViewHeight(), heightMode), heightUsed);

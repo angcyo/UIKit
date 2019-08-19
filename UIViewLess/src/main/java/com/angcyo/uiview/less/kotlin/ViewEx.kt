@@ -1126,3 +1126,7 @@ public fun View.offsetTopTo(newTop: Int) {
     ViewCompat.offsetTopAndBottom(this, newTop - top)
 }
 
+/**显示软键盘, [EditText]*/
+public fun View.showSoftInput() {
+    RSoftInputLayout.showSoftInput(this)
+}
