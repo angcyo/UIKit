@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="RSoftInputLayout">
+        <attr name="r_default_soft_input_height" format="dimension" />
+        <attr name="r_enable_soft_input_anim" format="boolean" />
+    </declare-styleable>
+
+</resources>
