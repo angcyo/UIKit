@@ -127,6 +127,8 @@ public class RSoftInputLayout extends FrameLayout {
         int maxWidth = widthSize - getPaddingLeft() - getPaddingRight();
         int maxHeight = heightSize - getPaddingTop() - getPaddingBottom();
 
+        boolean layoutFullScreen = isLayoutFullScreen(getContext());
+
         int bottomHeight = bottomCurrentShowHeight;
         if (isInEditMode()) {
             bottomHeight = defaultKeyboardHeight;
@@ -139,10 +141,17 @@ public class RSoftInputLayout extends FrameLayout {
         if (contentLayout != null) {
             FrameLayout.LayoutParams layoutParams = (LayoutParams) contentLayout.getLayoutParams();
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
+            if (layoutFullScreen) {
                 contentLayoutMaxHeight = maxHeight - bottomHeight - layoutParams.topMargin - layoutParams.bottomMargin;
             } else {
                 if (isSoftKeyboardShow()) {
+                    //这里加动画, 体验不好.
+//                    if (isAnimStart()) {
+//                        contentLayoutMaxHeight = (int) (maxHeight - layoutParams.topMargin - layoutParams.bottomMargin
+//                                + bottomCurrentShowHeight * (1 - animProgress));
+//                    } else {
+//                        contentLayoutMaxHeight = maxHeight - layoutParams.topMargin - layoutParams.bottomMargin;
+//                    }
                     contentLayoutMaxHeight = maxHeight - layoutParams.topMargin - layoutParams.bottomMargin;
                 } else {
                     contentLayoutMaxHeight = maxHeight - bottomHeight - layoutParams.topMargin - layoutParams.bottomMargin;
@@ -211,16 +220,16 @@ public class RSoftInputLayout extends FrameLayout {
     int bottomCurrentShowHeight = 0;
     //动画过程中的高度变量
     int bottomCurrentShowHeightAnim = 0;
+    //动画进度
+    float animProgress = 0f;
     int lastKeyboardHeight = 0;
 
     private Runnable delaySizeChanged;
 
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        super.onSizeChanged(w, h, oldw, oldh);
-
         //低版本适配
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+        if (!isLayoutFullScreen(getContext())) {
             if (intentAction == INTENT_SHOW_EMOJI && checkSizeChanged == null) {
                 return;
             }
@@ -470,6 +479,7 @@ public class RSoftInputLayout extends FrameLayout {
         mValueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
+                animProgress = animation.getAnimatedFraction();
                 bottomCurrentShowHeightAnim = (int) animation.getAnimatedValue();
                 requestLayout();
             }
@@ -597,12 +607,24 @@ public class RSoftInputLayout extends FrameLayout {
      * 显示表情布局
      */
     public void showEmojiLayout() {
-        if (isEmojiLayoutShow()) {
-            return;
-        }
+        showEmojiLayout(validBottomHeight(), false);
+    }
 
-        if (intentAction == INTENT_SHOW_EMOJI) {
-            return;
+    public void showEmojiLayout(int height) {
+        showEmojiLayout(height, true);
+    }
+
+    public void showEmojiLayout(int height, boolean force) {
+        if (force) {
+            lastKeyboardHeight = height;
+        } else {
+            if (isEmojiLayoutShow()) {
+                return;
+            }
+
+            if (intentAction == INTENT_SHOW_EMOJI) {
+                return;
+            }
         }
 
         if (isSoftKeyboardShow()) {
@@ -610,7 +632,7 @@ public class RSoftInputLayout extends FrameLayout {
         }
 
         intentAction = INTENT_SHOW_EMOJI;
-        insetBottom(validBottomHeight());
+        insetBottom(height);
     }
 
     /**
@@ -688,11 +710,28 @@ public class RSoftInputLayout extends FrameLayout {
         manager.showSoftInput(view, 0);
     }
 
+    public static boolean isLayoutFullScreen(@Nullable Context context) {
+        if (context == null) {
+            return false;
+        }
+        if (context instanceof Activity) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                Window window = ((Activity) context).getWindow();
+                int systemUiVisibility = window.getDecorView().getSystemUiVisibility();
+                return (systemUiVisibility & View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN) == View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
     public static int getSoftKeyboardHeight(@NonNull View view) {
         Context context = view.getContext();
         int screenHeight = 0;
         boolean isLollipop = Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
-        if (context instanceof Activity && isLollipop) {
+        if (context instanceof Activity && isLayoutFullScreen(context)) {
             Window window = ((Activity) context).getWindow();
             view = window.getDecorView();
             screenHeight = window.findViewById(Window.ID_ANDROID_CONTENT).getMeasuredHeight();
