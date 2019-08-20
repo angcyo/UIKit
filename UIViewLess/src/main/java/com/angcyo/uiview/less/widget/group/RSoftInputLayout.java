@@ -20,10 +20,10 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.angcyo.lib.L;
 import com.angcyo.uiview.less.R;
-import com.angcyo.uiview.less.iview.ILifecycle;
 import com.angcyo.uiview.less.kotlin.ViewExKt;
 import com.angcyo.uiview.less.utils.RUtils;
 import com.orhanobut.hawk.Hawk;
@@ -35,355 +35,136 @@ import java.util.Iterator;
  * Copyright (C) 2016,深圳市红鸟网络科技股份有限公司 All rights reserved.
  * 项目名称：
  * 类的描述：支持透明状态栏, 支持Dialog, 支持动画
+ * <p>
+ * 重写于2019-8-19
+ * 原理:
+ * API < 21
+ * 键盘弹出, 只会回调 onSizeChanged , 相差的高度就是键盘的高度
+ * <p>
+ * API >= 21
+ * 键盘弹出, 会回调 onApplyWindowInsets , insets.getSystemWindowInsetBottom, 就是键盘的高度
+ * 此时onSizeChange方法不会执行, 应为系统是用 PaddingBottom的方式, 为键盘腾出空间
+ * <p>
  * 创建人员：Robi
  * 创建时间：2016/12/21 9:01
  * 修改人员：Robi
- * 修改时间：2016/12/21 9:01
+ * 修改时间：2019-8-19
  * 修改备注：
  * Version: 1.0.0
  */
-public class RSoftInputLayout extends FrameLayout implements ILifecycle {
+public class RSoftInputLayout extends FrameLayout {
 
-    public static final String KEY_KEYBOARD_HEIGHT = "key_keyboard_height";
+    private static final int INTENT_NONE = 0;
+    private static final int INTENT_SHOW_KEYBOARD = 1;
+    private static final int INTENT_HIDE_KEYBOARD = 2;
+    private static final int INTENT_SHOW_EMOJI = 3;
+    private static final int INTENT_HIDE_EMOJI = 4;
 
-    private static final String TAG = "Robi";
-    View contentLayout;
-    View emojiLayout;
     /**
-     * 缺省的键盘高度, 键盘显示过才会赋值, 用来确定emoji布局的高度
-     */
-    int keyboardHeight = -1;
-    /**
-     * 需要显示的键盘高度,可以指定显示多高
-     */
-    int showEmojiHeight = 0;
-    /**
-     * 动画执行时, 表情显示的高度
-     */
-    int animShowEmojiHeight = -1;
-    boolean isEmojiShow = false;
-    HashSet<OnEmojiLayoutChangeListener> mEmojiLayoutChangeListeners = new HashSet<>();
-    /**
-     * 需要隐藏键盘, 当为true时, 不用代码检查键盘是否显示
-     */
-    boolean needHideSoftInput = false;
-    /**
-     * 是否是需要显示表情布局
-     */
-    boolean needShowEmojiLayout = false;
-    /**
-     * 键盘是否显示
-     */
-    private boolean isKeyboardShow = false;
-    /**
-     * 键盘之前是否显示
-     */
-    private boolean isKeyboardOldShow = false;
-    /**
-     * -1表示未赋值
-     */
-    private int mClipToPadding = -1;
-    private ValueAnimator mValueAnimator;
-    /**
-     * 使用动画的形式展开表情布局
-     */
-    private boolean isAnimToShow = true;
-    /**
-     * 所在的界面,是否隐藏了. 隐藏了,不处理事件
-     */
-    private boolean isViewHide = false;
-    /**
-     * 是否需要处理键盘
+     * 是否激活控件
      */
     private boolean enableSoftInput = true;
-    private Runnable mCheckSizeChanged = new Runnable() {
-        @Override
-        public void run() {
-            onSizeChanged(-1, -1, getMeasuredWidth(), getMeasuredHeight());
-        }
-    };
+    private boolean enableSoftInputAnim = true;
 
-    public RSoftInputLayout(Context context) {
+    /**
+     * 频繁切换键盘, 延迟检查时长
+     */
+    private int switchCheckDelay = 64;
+
+    private int animDuration = 240;
+
+    /**
+     * 激活表情布局恢复, (如:显示键盘之前是表情布局, 那么隐藏键盘后就会显示表情布局)
+     */
+    private boolean enableEmojiRestore = false;
+
+    /**
+     * 当键盘未显示过时, 默认的键盘高度
+     */
+    int defaultKeyboardHeight = -1;
+
+    /**
+     * 当前用户操作的意图
+     */
+    int intentAction = INTENT_NONE;
+
+    /**
+     * 最后一次的意图, 用来实现表情布局状态恢复
+     */
+    int lastIntentAction = intentAction;
+    //2级缓存状态
+    int lastIntentAction2 = intentAction;
+
+    public RSoftInputLayout(@NonNull Context context) {
         super(context);
         initLayout(context, null);
     }
 
-    public RSoftInputLayout(Context context, AttributeSet attrs) {
+    public RSoftInputLayout(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         initLayout(context, attrs);
     }
 
-    public RSoftInputLayout(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-        initLayout(context, attrs);
-    }
-
-    private int pLeft = 0;
-    private int pTop = 0;
-    private int pRight = 0;
-    private int pBottom = 0;
-
-    int defaultKeyboardHeight;
-
-    private void initLayout(Context context, AttributeSet attrs) {
-        pLeft = getPaddingLeft();
-        pTop = getPaddingTop();
-        pRight = getPaddingRight();
-        pBottom = getPaddingBottom();
-
+    private void initLayout(@NonNull Context context, @Nullable AttributeSet attrs) {
         TypedArray array = context.obtainStyledAttributes(attrs, R.styleable.RSoftInputLayout);
-        defaultKeyboardHeight = array.getDimensionPixelOffset(R.styleable.RSoftInputLayout_r_default_soft_input_height, ViewExKt.getDpi(275));
+        defaultKeyboardHeight = array.getDimensionPixelOffset(R.styleable.RSoftInputLayout_r_default_soft_input_height, -1);
+        enableSoftInputAnim = array.getBoolean(R.styleable.RSoftInputLayout_r_enable_soft_input_anim, enableSoftInputAnim);
+        enableEmojiRestore = array.getBoolean(R.styleable.RSoftInputLayout_r_enable_emoji_restore, enableEmojiRestore);
+        switchCheckDelay = array.getInt(R.styleable.RSoftInputLayout_r_switch_check_delay, switchCheckDelay);
+        animDuration = array.getInt(R.styleable.RSoftInputLayout_r_anim_duration, animDuration);
         array.recycle();
     }
 
-    @Override
-    public void setPadding(int left, int top, int right, int bottom) {
-        if (left >= 0) {
-            pLeft = left;
-        }
-        if (top >= 0) {
-            pTop = top;
-        }
-        if (right >= 0) {
-            pRight = right;
-        }
-        if (pBottom >= 0) {
-            pBottom = bottom;
-        }
-        super.setPadding(pLeft, pTop, pRight, pBottom);
-    }
+    //<editor-fold defaultState="collapsed" desc="核心方法">
 
-    public static void hideSoftInput(@NonNull View view) {
-        InputMethodManager manager = (InputMethodManager) view.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-        manager.hideSoftInputFromWindow(view.getWindowToken(), 0);
-    }
-
-    public static void showSoftInput(@NonNull View view) {
-        view.requestFocus();
-        InputMethodManager manager = (InputMethodManager) view.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-        manager.showSoftInput(view, 0);
-    }
-
-    public static int getSoftKeyboardHeight(@NonNull View view) {
-        Context context = view.getContext();
-        int screenHeight = 0;
-        if (context instanceof Activity) {
-            Window window = ((Activity) context).getWindow();
-            screenHeight = window.findViewById(Window.ID_ANDROID_CONTENT).getMeasuredHeight();
-        } else {
-            screenHeight = view.getResources().getDisplayMetrics().heightPixels;
-            screenHeight += RUtils.getStatusBarHeight(context);
-        }
-
-        Rect rect = new Rect();
-        view.getWindowVisibleDisplayFrame(rect);
-        int visibleBottom = rect.bottom;
-        return screenHeight - visibleBottom;
-    }
-
-    public boolean isEnableSoftInput() {
-        return enableSoftInput;
-    }
-
-    public void setEnableSoftInput(boolean enableSoftInput) {
-        if (this.enableSoftInput == enableSoftInput) {
-            return;
-        }
-
-        this.enableSoftInput = enableSoftInput;
-        if (enableSoftInput) {
-            setFitsSystemWindows();
-        } else {
-            setFitsSystemWindows(false);
-        }
-
-        requestLayout();
-    }
-
-    public void setAnimToShow(boolean animToShow) {
-        isAnimToShow = animToShow;
-    }
-
-    @Override
-    protected void onAttachedToWindow() {
-        super.onAttachedToWindow();
-
-        if (!isInEditMode()) {
-            setKeyboardHeight(Hawk.get(KEY_KEYBOARD_HEIGHT, 0));
-        }
-
-        if (!isInEditMode() && isEnabled()) {
-            setFitsSystemWindows();
-            setClipToPadding(false);
-        }
-    }
-
-    @Override
-    public void setEnabled(boolean enabled) {
-        super.setEnabled(enabled);
-        if (enabled) {
-            setFitsSystemWindows();
-        } else {
-            setFitsSystemWindows(false);
-        }
-    }
-
-    @Override
-    public void addView(View child, int index, ViewGroup.LayoutParams params) {
-        super.addView(child, index, params);
-
-        int childCount = getChildCount();
-        /*请按顺序布局*/
-        if (childCount > 0) {
-            contentLayout = getChildAt(0);
-        }
-        if (childCount > 1) {
-            emojiLayout = getChildAt(1);
-        }
-
-        if (haveChildSoftInput(child)) {
-            setEnableSoftInput(false);
-        }
-    }
-
-    /**
-     * 解决RSoftInputLayout嵌套RSoftInputLayout的问题
-     */
-    private boolean haveChildSoftInput(View child) {
-        if (child instanceof ViewGroup) {
-            for (int i = 0; i < ((ViewGroup) child).getChildCount(); i++) {
-                return haveChildSoftInput(((ViewGroup) child).getChildAt(i));
-            }
-        }
-        return child instanceof RSoftInputLayout;
-    }
-
-    private void measureOther(int widthMeasureSpec, int heightMeasureSpec) {
-        for (int i = 2; i < getChildCount(); i++) {
-            final View child = getChildAt(i);
-            if (child.getVisibility() != GONE) {
-                measureChildWithMargins(child, widthMeasureSpec, pLeft + pRight,
-                        heightMeasureSpec, pTop + pBottom);
-            }
-        }
-    }
+    int contentLayoutMaxHeight = 0;
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        if (!enableSoftInput ||
-                isViewHide ||
-                contentLayout == null ||
-                !isEnabled()) {
-            super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-            return;
-        }
-
         int widthSize = MeasureSpec.getSize(widthMeasureSpec);
         int heightSize = MeasureSpec.getSize(heightMeasureSpec);
-//        int maxHeight = heightSize - getPaddingBottom() - getPaddingTop();
-        int maxHeight = heightSize - pTop - pBottom;
-        int maxWidth = widthSize - pLeft - pRight;
 
-//        L.w("height:" + heightSize + " paddBottom:" + paddingBottom);
+        int maxWidth = widthSize - getPaddingLeft() - getPaddingRight();
+        int maxHeight = heightSize - getPaddingTop() - getPaddingBottom();
 
+        int bottomHeight = bottomCurrentShowHeight;
         if (isInEditMode()) {
-            int keyboardHeight = validKeyboardHeight();
-
-            if (emojiLayout == null) {
-                keyboardHeight = 0;
-            } else {
-                emojiLayout.measure(MeasureSpec.makeMeasureSpec(maxWidth, MeasureSpec.EXACTLY),
-                        MeasureSpec.makeMeasureSpec(keyboardHeight, MeasureSpec.EXACTLY));
-            }
-
-            contentLayout.measure(MeasureSpec.makeMeasureSpec(maxWidth, MeasureSpec.EXACTLY),
-                    MeasureSpec.makeMeasureSpec(maxHeight - keyboardHeight, MeasureSpec.EXACTLY));
-
-            measureOther(widthMeasureSpec, heightMeasureSpec);
-            setMeasuredDimension(widthMeasureSpec, heightMeasureSpec);
-            return;
+            bottomHeight = defaultKeyboardHeight;
         }
 
-        //星期一 2017-8-14
-//        isKeyboardShow = isSoftKeyboardShow();
-//        if (isKeyboardShow) {
-//            keyboardHeight = getSoftKeyboardHeight();
-//            //isEmojiShow = false;
-//        }
-//
-//        int contentHeight;
-//        int emojiHeight;
-//
-//        if (isEmojiShow) {
-//            int showEmojiHeight = getShowEmojiHeight();
-//            if (showEmojiHeight == 0) {
-//                emojiHeight = keyboardHeight;
-//            } else {
-//                emojiHeight = showEmojiHeight;
-//            }
-//        } else {
-//            emojiHeight = 0;
-//        }
-//
-//        if (isKeyboardShow) {
-//            if (maxHeight + keyboardHeight > getScreenHeightPixels()) {
-//                contentHeight = maxHeight - keyboardHeight;
-//            } else {
-//                contentHeight = maxHeight;
-//            }
-//        } else {
-//            contentHeight = maxHeight - emojiHeight;
-//        }
-//
-//        contentLayout.measure(MeasureSpec.makeMeasureSpec(widthSize, MeasureSpec.EXACTLY),
-//                MeasureSpec.makeMeasureSpec(contentHeight, MeasureSpec.EXACTLY));
-//        if (isEmojiShow && emojiLayout != null) {
-//            emojiLayout.measure(MeasureSpec.makeMeasureSpec(widthSize, MeasureSpec.EXACTLY),
-//                    MeasureSpec.makeMeasureSpec(keyboardHeight /*emojiHeight*/, MeasureSpec.EXACTLY));
-//        }
-
-        //2019-8-19
-        //键盘是否显示
-        boolean softKeyboardShow = isSoftKeyboardShow();
-        //是否需要显示表情
-        int contentLayoutHeight, emojiLayoutHeight, keyboardHeight;
-        keyboardHeight = getSoftKeyboardHeight();
-
-        //L.e("call: -> softKeyboardShow:" + softKeyboardShow + " needShowEmojiLayout:" + needShowEmojiLayout + " needHideSoftInputForStart:" + needHideSoftInputForStart);
-
-        //如果键盘显示了, 那么内容的高度=总高度-键盘的高度
-        if (softKeyboardShow) {
-            isEmojiShow = false;
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                contentLayoutHeight = maxHeight - keyboardHeight;
-            } else {
-                contentLayoutHeight = maxHeight;
-            }
-            emojiLayoutHeight = keyboardHeight;
-            this.keyboardHeight = keyboardHeight;//缓存键盘的高度
-        } else if (needShowEmojiLayout) {
-            //如果需要显示表情
-            isEmojiShow = true;
-            if (animShowEmojiHeight > 0) {
-                contentLayoutHeight = maxHeight - animShowEmojiHeight;
-            } else {
-                contentLayoutHeight = maxHeight - showEmojiHeight;
-                //emojiLayoutHeight = getKeyboardHeight();//键盘的高度, 如果之前还没有缓存键盘的高度, 那么就用默认的高度
-            }
-            emojiLayoutHeight = showEmojiHeight;
-        } else {
-            //标准布局情况, 内容占满全屏
-            isEmojiShow = false;
-            contentLayoutHeight = maxHeight;
-            emojiLayoutHeight = getKeyboardHeight();
+        if (isAnimStart()) {
+            bottomHeight = bottomCurrentShowHeightAnim;
         }
 
-        contentLayout.measure(MeasureSpec.makeMeasureSpec(maxWidth, MeasureSpec.EXACTLY),
-                MeasureSpec.makeMeasureSpec(contentLayoutHeight, MeasureSpec.EXACTLY));
+        if (contentLayout != null) {
+            FrameLayout.LayoutParams layoutParams = (LayoutParams) contentLayout.getLayoutParams();
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
+                contentLayoutMaxHeight = maxHeight - bottomHeight - layoutParams.topMargin - layoutParams.bottomMargin;
+            } else {
+                if (isSoftKeyboardShow()) {
+                    contentLayoutMaxHeight = maxHeight - layoutParams.topMargin - layoutParams.bottomMargin;
+                } else {
+                    contentLayoutMaxHeight = maxHeight - bottomHeight - layoutParams.topMargin - layoutParams.bottomMargin;
+                }
+            }
+            int contentLayoutMaxWidth = maxWidth - layoutParams.leftMargin - layoutParams.rightMargin;
+
+            if (layoutParams.height != ViewGroup.LayoutParams.MATCH_PARENT) {
+                measureChildWithMargins(contentLayout, widthMeasureSpec, 0,
+                        heightMeasureSpec, 0);
+            }
+
+            if (contentLayout.getMeasuredHeight() > contentLayoutMaxHeight
+                    || layoutParams.height == ViewGroup.LayoutParams.MATCH_PARENT) {
+                contentLayout.measure(MeasureSpec.makeMeasureSpec(contentLayoutMaxWidth, MeasureSpec.EXACTLY),
+                        MeasureSpec.makeMeasureSpec(contentLayoutMaxHeight, MeasureSpec.EXACTLY));
+            }
+        }
 
         if (emojiLayout != null) {
             emojiLayout.measure(MeasureSpec.makeMeasureSpec(maxWidth, MeasureSpec.EXACTLY),
-                    MeasureSpec.makeMeasureSpec(emojiLayoutHeight /*emojiHeight*/, MeasureSpec.EXACTLY));
+                    MeasureSpec.makeMeasureSpec(validBottomHeight(), MeasureSpec.EXACTLY));
         }
 
         measureOther(widthMeasureSpec, heightMeasureSpec);
@@ -391,14 +172,90 @@ public class RSoftInputLayout extends FrameLayout implements ILifecycle {
         setMeasuredDimension(widthSize, heightSize);
     }
 
+    @Override
+    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+        int l = getPaddingLeft();
+        int t = getPaddingTop();
+        int r = 0;
+        int b = 0;
+
+        if (contentLayout != null) {
+            FrameLayout.LayoutParams layoutParams = (LayoutParams) contentLayout.getLayoutParams();
+
+            r = l + contentLayout.getMeasuredWidth();
+            b = t + contentLayoutMaxHeight;
+
+            t = b - layoutParams.bottomMargin - contentLayout.getMeasuredHeight();
+
+            contentLayout.layout(l, t, r, b);
+
+            t = contentLayout.getBottom();
+        }
+
+        if (emojiLayout != null) {
+            if (isSoftKeyboardShow()) {
+                t = getMeasuredHeight();
+            } else if (!enableSoftInputAnim && intentAction == INTENT_HIDE_KEYBOARD) {
+                t = getMeasuredHeight();
+            }
+
+            r = l + emojiLayout.getMeasuredWidth();
+            b = t + emojiLayout.getMeasuredHeight();
+            emojiLayout.layout(l, t, r, b);
+        }
+
+        layoutOther();
+    }
+
+    //键盘/emoji 当前显示的高度
+    int bottomCurrentShowHeight = 0;
+    //动画过程中的高度变量
+    int bottomCurrentShowHeightAnim = 0;
+    int lastKeyboardHeight = 0;
+
+    private Runnable delaySizeChanged;
+
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+
+        //低版本适配
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            if (intentAction == INTENT_SHOW_EMOJI && checkSizeChanged == null) {
+                return;
+            }
+        }
+
+        //用来解决, 快速切换 emoji布局和键盘或者普通键盘和密码键盘 时, 闪烁的不良体验.
+        if (delaySizeChanged != null) {
+            removeCallbacks(delaySizeChanged);
+        }
+        delaySizeChanged = new DelaySizeChangeRunnable(w, h, oldw, oldh);
+        postDelayed(delaySizeChanged, switchCheckDelay);
+    }
+
+    //</editor-fold defaultstate="collapsed" desc="核心方法">
+
+    //<editor-fold defaultstate="collapsed" desc="辅助方法">
+
+    private void measureOther(int widthMeasureSpec, int heightMeasureSpec) {
+        for (int i = 2; i < getChildCount(); i++) {
+            final View child = getChildAt(i);
+            if (child.getVisibility() != GONE) {
+                measureChildWithMargins(child, widthMeasureSpec, 0,
+                        heightMeasureSpec, 0);
+            }
+        }
+    }
+
     private void layoutOther() {
         final int count = getChildCount();
 
-        final int parentLeft = pLeft;
-        final int parentRight = getMeasuredWidth() - pRight;
+        final int parentLeft = getPaddingLeft();
+        final int parentRight = getMeasuredWidth() - getPaddingRight();
 
-        final int parentTop = pTop;
-        final int parentBottom = getMeasuredHeight() - pBottom;
+        final int parentTop = getPaddingTop();
+        final int parentBottom = getMeasuredHeight() - getPaddingBottom();
 
         final boolean forceLeftGravity = false;
 
@@ -457,157 +314,121 @@ public class RSoftInputLayout extends FrameLayout implements ILifecycle {
         }
     }
 
+    View contentLayout;
+    View emojiLayout;
+
     @Override
-    protected void onLayout(boolean changed, int l, int t, int r, int b) {
-        boolean oldNeedHideSoftInput = this.needHideSoftInput;
-        this.needHideSoftInput = false;
+    public void addView(View child, int index, ViewGroup.LayoutParams params) {
+        super.addView(child, index, params);
 
-        if (!enableSoftInput ||
-                isViewHide ||
-                contentLayout == null ||
-                !isEnabled()) {
-            super.onLayout(changed, l, t, r, b);
-            return;
+        int childCount = getChildCount();
+        /*请按顺序布局*/
+        if (childCount > 0) {
+            contentLayout = getChildAt(0);
+        }
+        if (childCount > 1) {
+            emojiLayout = getChildAt(1);
         }
 
-        int left = pLeft;
-        int top = pTop;
+        if (haveChildSoftInput(child)) {
+            setEnableSoftInput(false);
+        }
+    }
 
-        if (isInEditMode()) {
-            contentLayout.layout(left, top, left + contentLayout.getMeasuredWidth(), top + contentLayout.getMeasuredHeight());
 
-            if (emojiLayout != null) {
-                int bottom = getMeasuredHeight() - pBottom;
-
-                emojiLayout.layout(left, bottom - emojiLayout.getMeasuredHeight(),
-                        left + emojiLayout.getMeasuredWidth(),
-                        bottom);
+    /**
+     * 解决RSoftInputLayout嵌套RSoftInputLayout的问题
+     */
+    private boolean haveChildSoftInput(View child) {
+        if (child instanceof ViewGroup) {
+            for (int i = 0; i < ((ViewGroup) child).getChildCount(); i++) {
+                return haveChildSoftInput(((ViewGroup) child).getChildAt(i));
             }
-
-            layoutOther();
-            return;
         }
+        return child instanceof RSoftInputLayout;
+    }
 
-        int contentLayoutHeight = contentLayout.getMeasuredHeight();
-        int contentBottom = top + contentLayoutHeight;
-        contentLayout.layout(left, top, left + contentLayout.getMeasuredWidth(), contentBottom);
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
 
-        if (isSoftKeyboardShow()) {
-            if (oldNeedHideSoftInput) {
-            } else {
-                int viewHeight = getMeasuredHeight();
-                if (contentLayoutHeight == viewHeight || contentLayoutHeight == viewHeight - getSoftKeyboardHeight()) {
-                    needShowEmojiLayout = false;
-                    showEmojiHeight = 0;
-                    contentBottom = viewHeight;
+        //恢复上一次键盘的高度
+        if (!isInEditMode()) {
+            if (defaultKeyboardHeight < 0) {
+                int lastKeyboardHeight = Hawk.get(KEY_KEYBOARD_HEIGHT, 0);
+                if (lastKeyboardHeight <= 0) {
+                    defaultKeyboardHeight = ViewExKt.getDpi(275);
+                } else {
+                    defaultKeyboardHeight = lastKeyboardHeight;
                 }
             }
         }
-        if (emojiLayout != null) {
-            emojiLayout.layout(left, contentBottom, left + emojiLayout.getMeasuredWidth(), contentBottom + emojiLayout.getMeasuredHeight());
-        }
 
-        layoutOther();
-    }
-
-    @Override
-    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        //L.e("call: onSizeChanged([w, h, oldw, oldh])-> " + h + " oldh:" + oldh);
-        removeCallbacks(mCheckSizeChanged);
-
-        if (!isEnabled() || !enableSoftInput || isViewHide) {
-            return;
-        }
-
-        if (w == oldw && h == oldh) {
-            return;
-        }
-
-        isKeyboardOldShow = isKeyboardShow;
-
-        isKeyboardShow = isSoftKeyboardShow();
-        if (isKeyboardShow) {
-            isEmojiShow = false;
-        }
-        checkEmojiLayout();
-        if (emojiLayout != null && !isInEditMode()) {
-            L.w("onSizeChanged: emojiLayout:" + this.hashCode() + " -> top:" + emojiLayout.getTop() +
-                    " height:" + emojiLayout.getMeasuredHeight() +
-                    " viewHeight:" + getMeasuredHeight() +
-                    " contentHeight:" + contentLayout.getMeasuredHeight());
-        }
-        if (!isInEditMode() && oldw > 0 && oldh > 0) {
-            notifyEmojiLayoutChangeListener(isEmojiShow, isKeyboardShow,
-                    isKeyboardShow ? getSoftKeyboardHeight() : showEmojiHeight);
-        }
-    }
-
-    private void checkEmojiLayout() {
-        isEmojiShow = false;
-        if (emojiLayout != null) {
-            if (emojiLayout.getMeasuredHeight() != 0
-                    && emojiLayout.getTop() < getMeasuredHeight() - pBottom
-                    && emojiLayout.getBottom() >= getMeasuredHeight() - pBottom
-            ) {
-                isEmojiShow = true;
-            }
-
-//            if (emojiLayout.getTop() != 0 &&
-//                    emojiLayout.getTop() < getMeasuredHeight() &&
-//                    emojiLayout.getMeasuredHeight() != 0) {
-//                isEmojiShow = true;
-//            } else {
-//                isEmojiShow = false;
-//            }
+        if (!isInEditMode() && isEnabled() && enableSoftInput) {
+            setFitsSystemWindows();
+            //setClipToPadding(false);//未知作用
         }
     }
 
     @Override
-    public void setClipToPadding(boolean clipToPadding) {
-        super.setClipToPadding(clipToPadding);
-        if (clipToPadding) {
-            mClipToPadding = 1;
+    public void setEnabled(boolean enabled) {
+        super.setEnabled(enabled);
+        if (enabled) {
+            setFitsSystemWindows();
         } else {
-            mClipToPadding = 0;
+            setFitsSystemWindows(false);
         }
-    }
-
-    @Override
-    public int getPaddingTop() {
-        if (mClipToPadding == 0) {
-            return 0;
-        } else {
-            return super.getPaddingTop();
-        }
-    }
-
-    /**
-     * 当在5.0+ 手机上, 并且设置了 状态栏透明, 则onSizeChange方法不会执行,
-     * 因为此时系统设置了PaddingBottom来腾出键盘的位置, 而不是通过改变高度.
-     * 这个时候需要通过下面的方法处理
-     */
-    @Override
-    protected boolean fitSystemWindows(Rect insets) {
-        boolean result = false;
-        if (getFitsSystemWindows()) {
-            result = super.fitSystemWindows(insets);
-            checkOnSizeChanged(false);
-        } else {
-            insets.set(0, 0, 0, 0);
-        }
-        return result;
     }
 
     @Override
     public WindowInsets onApplyWindowInsets(WindowInsets insets) {
-        if (getFitsSystemWindows() && enableSoftInput) {
-            return super.onApplyWindowInsets(insets);
-        } else {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                return insets.replaceSystemWindowInsets(0, 0, 0, 0);
-            } else {
-                return super.onApplyWindowInsets(insets);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
+            int insetBottom = insets.getSystemWindowInsetBottom();
+            if (intentAction <= INTENT_HIDE_KEYBOARD) {
+                if (insetBottom > 0) {
+                    intentAction = INTENT_SHOW_KEYBOARD;
+                } else {
+                    intentAction = INTENT_HIDE_KEYBOARD;
+                }
+                cancelAnim();
+                insetBottom(insetBottom);
             }
+            //替换掉系统的默认处理方式(setPadding)
+            //系统会使用setPadding的方式, 为键盘留出空间
+            return insets.replaceSystemWindowInsets(0, 0, 0, 0);
+        }
+        return super.onApplyWindowInsets(insets);
+    }
+
+    //底部需要腾出距离
+    private void insetBottom(int height) {
+        //L.i("插入:" + height);
+        int insetBottom = height;
+        int measuredWidth = getMeasuredWidth();
+        int measuredHeight = getMeasuredHeight();
+        if (insetBottom > 0) {
+            //键盘弹出
+            checkSizeChanged = new KeyboardRunnable(measuredWidth, measuredHeight - insetBottom,
+                    measuredWidth, measuredHeight);
+        } else {
+            //键盘隐藏
+            checkSizeChanged = new KeyboardRunnable(measuredWidth, measuredHeight,
+                    measuredWidth, measuredHeight - bottomCurrentShowHeight);
+        }
+        checkOnSizeChanged(false);
+    }
+
+    private Runnable checkSizeChanged;
+
+    private void checkOnSizeChanged(boolean delay) {
+        if (checkSizeChanged == null) {
+            return;
+        }
+        removeCallbacks(checkSizeChanged);
+        if (delay) {
+            post(checkSizeChanged);
+        } else {
+            checkSizeChanged.run();
         }
     }
 
@@ -637,57 +458,20 @@ public class RSoftInputLayout extends FrameLayout implements ILifecycle {
         return getResources().getDisplayMetrics().heightPixels;
     }
 
-    private void showEmojiLayoutInner(int height, boolean isInAnim) {
-        if (/*height > 0 && */isEmojiShow() && height == showEmojiHeight) {
+    private ValueAnimator mValueAnimator;
+
+    private void startAnim(int bottomHeightFrom, int bottomHeightTo, int duration) {
+        if (isAnimStart()) {
             return;
         }
-
-        boolean keyboardShow = isKeyboardShow();
-        //动画高度的开始值
-        int oldHeight = showEmojiHeight;
-
-        needShowEmojiLayout = height > 0;
-
-        if (isInAnim) {
-            animShowEmojiHeight = height;
-        } else {
-            this.showEmojiHeight = height;
-        }
-
-        if (keyboardShow) {
-            needHideSoftInput = true;
-            hideSoftInput(this);
-        } else {
-            requestLayout();
-            if (isAnimToShow) {
-                animToShow(height, oldHeight);
-            } else {
-                checkOnSizeChanged(true);
-            }
-        }
-    }
-
-    private void checkOnSizeChanged(boolean delay) {
-        removeCallbacks(mCheckSizeChanged);
-        if (delay) {
-            post(mCheckSizeChanged);
-        } else {
-            mCheckSizeChanged.run();
-        }
-    }
-
-    private void animToShow(int height, int oldHeight) {
-        if (mValueAnimator != null) {
-            return;
-        }
-
-        mValueAnimator = ObjectAnimator.ofInt(oldHeight, height);
-        mValueAnimator.setDuration(300);
+        mValueAnimator = ObjectAnimator.ofInt(bottomHeightFrom, bottomHeightTo);
+        mValueAnimator.setDuration(duration);
         mValueAnimator.setInterpolator(new DecelerateInterpolator());
         mValueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
-                showEmojiLayoutInner((Integer) animation.getAnimatedValue(), true);
+                bottomCurrentShowHeightAnim = (int) animation.getAnimatedValue();
+                requestLayout();
             }
         });
         mValueAnimator.addListener(new Animator.AnimatorListener() {
@@ -698,14 +482,12 @@ public class RSoftInputLayout extends FrameLayout implements ILifecycle {
 
             @Override
             public void onAnimationEnd(Animator animation) {
-                mValueAnimator = null;
-                animShowEmojiHeight = -1;
-                checkOnSizeChanged(true);
+                intentAction = INTENT_NONE;
             }
 
             @Override
             public void onAnimationCancel(Animator animation) {
-
+                intentAction = INTENT_NONE;
             }
 
             @Override
@@ -716,40 +498,140 @@ public class RSoftInputLayout extends FrameLayout implements ILifecycle {
         mValueAnimator.start();
     }
 
+    private void cancelAnim() {
+        if (mValueAnimator != null) {
+            mValueAnimator.cancel();
+            mValueAnimator = null;
+        }
+    }
+
+    //动画是否执行中
+    private boolean isAnimStart() {
+        return mValueAnimator != null && mValueAnimator.isRunning();
+    }
+
+    //表情布局有效的高度
+    private int validBottomHeight() {
+        //没显示过键盘, 默认高度
+        int bottomHeight = defaultKeyboardHeight;
+
+        if (lastKeyboardHeight > 0) {
+            //显示过键盘, 有键盘的高度
+            bottomHeight = lastKeyboardHeight;
+        }
+
+        return bottomHeight;
+    }
+
+    //</editor-fold defaultstate="collapsed" desc="辅助方法">
+
+    //<editor-fold defaultstate="collapsed" desc="属性操作">
+
+    public void setEnableSoftInput(boolean enableSoftInput) {
+        if (this.enableSoftInput == enableSoftInput) {
+            return;
+        }
+
+        this.enableSoftInput = enableSoftInput;
+        if (enableSoftInput) {
+            setFitsSystemWindows();
+        } else {
+            setFitsSystemWindows(false);
+        }
+
+        requestLayout();
+    }
+
+    public void setFitsSystemWindows() {
+        setFitsSystemWindows(isEnabled() && enableSoftInput);
+    }
+
+    //</editor-fold defaultstate="collapsed" desc="属性操作">
+
+    //<editor-fold defaultstate="collapsed" desc="方法控制">
+
+    public boolean isEmojiLayoutShow() {
+        boolean result = false;
+
+        if (isSoftKeyboardShow()) {
+            return false;
+        }
+
+        if (emojiLayout != null) {
+            if (isAnimStart()) {
+                result = bottomCurrentShowHeight > 0;
+            } else if (emojiLayout.getMeasuredHeight() > 0
+                    && emojiLayout.getTop() < getMeasuredHeight() - getPaddingBottom()
+                    && emojiLayout.getBottom() >= getMeasuredHeight() - getPaddingBottom()
+            ) {
+                result = true;
+            }
+        }
+        return result;
+    }
+
+    /**
+     * 返回按键处理
+     *
+     * @return true 表示可以关闭界面
+     */
+    public boolean requestBackPressed() {
+        if (isSoftKeyboardShow()) {
+            if (intentAction == INTENT_HIDE_KEYBOARD) {
+                return false;
+            }
+            intentAction = INTENT_HIDE_KEYBOARD;
+            hideSoftInput(this);
+            return false;
+        }
+
+        if (isEmojiLayoutShow()) {
+            hideEmojiLayout();
+            return false;
+        }
+
+        return true;
+    }
+
     /**
      * 显示表情布局
-     *
-     * @param height 指定表情需要显示的高度
-     */
-    public void showEmojiLayout(final int height) {
-        showEmojiLayoutInner(height, false);
-    }
-
-    /**
-     * 采用默认的键盘高度显示表情, 如果键盘从未弹出过, 则使用一个缺省的高度
      */
     public void showEmojiLayout() {
-        if (keyboardHeight <= 0) {
-            keyboardHeight = getDefaultKeyboardHeight();
+        if (isEmojiLayoutShow()) {
+            return;
         }
-        showEmojiLayoutInner(keyboardHeight, false);
-    }
 
-    private int validKeyboardHeight() {
-        if (keyboardHeight > 0) {
-            return keyboardHeight;
+        if (intentAction == INTENT_SHOW_EMOJI) {
+            return;
         }
-        return getDefaultKeyboardHeight();
+
+        if (isSoftKeyboardShow()) {
+            hideSoftInput(this);
+        }
+
+        intentAction = INTENT_SHOW_EMOJI;
+        insetBottom(validBottomHeight());
     }
 
     /**
-     * 采用默认的键盘高度显示表情, 如果键盘从未弹出过, 则使用一个缺省的高度
+     * 隐藏表情布局
      */
     public void hideEmojiLayout() {
-        if (isSoftKeyboardShow() || isEmojiShow()) {
-            showEmojiLayoutInner(0, false);
+        if (intentAction == INTENT_HIDE_EMOJI) {
+            return;
+        }
+
+        if (isEmojiLayoutShow()) {
+            intentAction = INTENT_HIDE_EMOJI;
+            insetBottom(0);
         }
     }
+
+    //</editor-fold defaultstate="collapsed" desc="方法控制">
+
+    //<editor-fold defaultstate="collapsed" desc="事件相关">
+
+    HashSet<OnEmojiLayoutChangeListener> mEmojiLayoutChangeListeners = new HashSet<>();
 
     public void addOnEmojiLayoutChangeListener(OnEmojiLayoutChangeListener listener) {
         mEmojiLayoutChangeListeners.add(listener);
@@ -768,7 +650,7 @@ public class RSoftInputLayout extends FrameLayout implements ILifecycle {
     }
 
     private void notifyEmojiLayoutChangeListener(boolean isEmojiShow, boolean isKeyboardShow, int height) {
-        L.w(hashCode() + " 表情:" + isEmojiShow + " 键盘:" + isKeyboardShow + " 高度:" + height);
+        L.i(hashCode() + " 表情:" + isEmojiShow + " 键盘:" + isKeyboardShow + " 高度:" + height);
 
         if (isKeyboardShow && !isInEditMode()) {
             Hawk.put(KEY_KEYBOARD_HEIGHT, height);
@@ -780,81 +662,6 @@ public class RSoftInputLayout extends FrameLayout implements ILifecycle {
         }
     }
 
-    /**
-     * 当键盘显示时, 可以通过此方法返回键盘的高度
-     */
-    public int getKeyboardHeight() {
-        if (keyboardHeight <= 0) {
-            keyboardHeight = getDefaultKeyboardHeight();
-        }
-        return keyboardHeight;
-    }
-
-    public void setKeyboardHeight(int keyboardHeight) {
-        this.keyboardHeight = keyboardHeight;
-    }
-
-    public boolean isEmojiShow() {
-        boolean softKeyboardShow = isSoftKeyboardShow();
-        if (softKeyboardShow) {
-            isEmojiShow = false;
-            return false;
-        }
-        checkEmojiLayout();
-        return isEmojiShow;
-    }
-
-    public boolean isKeyboardShow() {
-        if (needHideSoftInput) {
-            isKeyboardShow = false;
-        } else {
-            isKeyboardShow = isSoftKeyboardShow();
-        }
-        return isKeyboardShow;
-    }
-
-    /**
-     * 当表情显示时, 可以通过此方法返回表情的高度
-     */
-    public int getShowEmojiHeight() {
-        return showEmojiHeight;
-    }
-
-    /**
-     * 返回true时, 可以退出. 否则会隐藏键盘或者表情.
-     */
-    public boolean requestBackPressed() {
-        if (isSoftKeyboardShow() || isEmojiShow()) {
-            hideEmojiLayout();
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public void onLifeViewShow() {
-        isViewHide = false;
-        setFitsSystemWindows();
-    }
-
-    public void setFitsSystemWindows() {
-        setFitsSystemWindows(isEnabled() && !isViewHide && enableSoftInput);
-    }
-
-    @Override
-    public void onLifeViewHide() {
-        isViewHide = true;
-        setFitsSystemWindows(false);
-    }
-
-    public boolean isKeyboardOldShow() {
-        return isKeyboardOldShow;
-    }
-
-    public int getDefaultKeyboardHeight() {
-        return defaultKeyboardHeight;
-    }
-
     public interface OnEmojiLayoutChangeListener {
         /**
          * @param height         EmojiLayout弹出的高度 或者 键盘弹出的高度
@@ -862,5 +669,149 @@ public class RSoftInputLayout extends FrameLayout implements ILifecycle {
          * @param isKeyboardShow 键盘是否显示了
          */
         void onEmojiLayoutChange(boolean isEmojiShow, boolean isKeyboardShow, int height);
+    }
+
+    //</editor-fold defaultstate="collapsed" desc="事件相关">
+
+    //<editor-fold defaultstate="collapsed" desc="静态区">
+
+    public static final String KEY_KEYBOARD_HEIGHT = "key_keyboard_height";
+
+    public static void hideSoftInput(@NonNull View view) {
+        InputMethodManager manager = (InputMethodManager) view.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+        manager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
+
+    public static void showSoftInput(@NonNull View view) {
+        view.requestFocus();
+        InputMethodManager manager = (InputMethodManager) view.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+        manager.showSoftInput(view, 0);
+    }
+
+    public static int getSoftKeyboardHeight(@NonNull View view) {
+        Context context = view.getContext();
+        int screenHeight = 0;
+        boolean isLollipop = Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
+        if (context instanceof Activity && isLollipop) {
+            Window window = ((Activity) context).getWindow();
+            view = window.getDecorView();
+            screenHeight = window.findViewById(Window.ID_ANDROID_CONTENT).getMeasuredHeight();
+        } else {
+            screenHeight = view.getResources().getDisplayMetrics().heightPixels;
+            if (isLollipop) {
+                screenHeight += RUtils.getStatusBarHeight(context);
+            }
+        }
+
+        Rect rect = new Rect();
+        view.getWindowVisibleDisplayFrame(rect);
+        int visibleBottom = rect.bottom;
+        return screenHeight - visibleBottom;
+    }
+
+    //</editor-fold defaultstate="collapsed" desc="静态区">
+
+    private class KeyboardRunnable implements Runnable {
+        int w;
+        int h;
+        int oldw;
+        int oldh;
+
+        public KeyboardRunnable(int w, int h, int oldw, int oldh) {
+            this.w = w;
+            this.h = h;
+            this.oldw = oldw;
+            this.oldh = oldh;
+        }
+
+        @Override
+        public void run() {
+            onSizeChanged(w, h, oldw, oldh);
+            checkSizeChanged = null;
+        }
+    }
+
+    private class DelaySizeChangeRunnable implements Runnable {
+        int w;
+        int h;
+        int oldw;
+        int oldh;
+
+        public DelaySizeChangeRunnable(int w, int h, int oldw, int oldh) {
+            this.w = w;
+            this.h = h;
+            this.oldw = oldw;
+            this.oldh = oldh;
+        }
+
+        @Override
+        public void run() {
+            int oldBottomCurrentShowHeight = bottomCurrentShowHeight;
+
+            //L.i("size:" + oldh + "->" + h + " " + oldBottomCurrentShowHeight);
+
+            bottomCurrentShowHeight = 0;
+            if (oldw == 0 && oldh == 0) {
+                //布局第一次显示在界面上
+            } else if (w != oldw) {
+                //有可能屏幕旋转了
+            } else if (h != oldh && oldw > 0 && oldh > 0) {
+                //有可能是键盘弹出了
+                int diffHeight = oldh - h;
+
+                boolean softKeyboardShow = isSoftKeyboardShow();
+                boolean emojiLayoutShow = false;
+
+                if (softKeyboardShow) {
+                    lastIntentAction2 = lastIntentAction;
+                } else {
+                    lastIntentAction = intentAction;
+                }
+
+                //低版本, 普通输入框和密码输入框切换适配
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                    if (softKeyboardShow) {
+                        diffHeight = getSoftKeyboardHeight();
+                    }
+                }
+
+                if (diffHeight > 0) {
+                    //当用代码调整了布局的height属性, 也会回调此方法.
+                    bottomCurrentShowHeight = diffHeight;
+
+                    if (softKeyboardShow) {
+                        lastKeyboardHeight = diffHeight;
+                        emojiLayoutShow = false;
+                    } else {
+                        emojiLayoutShow = intentAction == INTENT_SHOW_EMOJI;
+                        //有可能是表情布局显示
+                    }
+                    notifyEmojiLayoutChangeListener(emojiLayoutShow, softKeyboardShow, diffHeight);
+                    if (enableSoftInputAnim) {
+                        startAnim(oldBottomCurrentShowHeight, diffHeight, animDuration);
+                    }
+                } else {
+                    if (lastIntentAction2 == INTENT_SHOW_EMOJI && enableEmojiRestore) {
+                        emojiLayoutShow = true;
+                        diffHeight = -diffHeight;
+
+                        bottomCurrentShowHeight = diffHeight;
+                        lastIntentAction2 = INTENT_NONE;
+                    }
+                    notifyEmojiLayoutChangeListener(emojiLayoutShow, softKeyboardShow, diffHeight);
+
+                    if (enableSoftInputAnim && !emojiLayoutShow) {
+                        startAnim(Math.abs(diffHeight), 0, animDuration);
+                    }
+                }
+
+                requestLayout();
+            }
+
+            if (!enableSoftInputAnim) {
+                intentAction = INTENT_NONE;
+            }
+            delaySizeChanged = null;
+        }
     }
 }
