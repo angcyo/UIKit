@@ -72,7 +72,7 @@ public class RSoftInputLayout extends FrameLayout {
      */
     private int switchCheckDelay = 64;
 
-    private int animDuration = 240;
+    private long animDuration = 240;
 
     /**
      * 在软键盘展示的过程中, 动态改变此paddingTop, 需要开启 [enableSoftInputAnim]
@@ -132,7 +132,7 @@ public class RSoftInputLayout extends FrameLayout {
         enableSoftInputAnim = array.getBoolean(R.styleable.RSoftInputLayout_r_enable_soft_input_anim, enableSoftInputAnim);
         enableEmojiRestore = array.getBoolean(R.styleable.RSoftInputLayout_r_enable_emoji_restore, enableEmojiRestore);
         switchCheckDelay = array.getInt(R.styleable.RSoftInputLayout_r_switch_check_delay, switchCheckDelay);
-        animDuration = array.getInt(R.styleable.RSoftInputLayout_r_anim_duration, animDuration);
+        animDuration = array.getInt(R.styleable.RSoftInputLayout_r_anim_duration, (int) animDuration);
         array.recycle();
     }
 
@@ -146,7 +146,9 @@ public class RSoftInputLayout extends FrameLayout {
         int heightSize = MeasureSpec.getSize(heightMeasureSpec);
 
         int maxWidth = widthSize - getPaddingLeft() - getPaddingRight();
-        int maxHeight = heightSize - getPaddingTop() - getPaddingBottom() - calcAnimPaddingTop();
+
+        int animPaddingTop = calcAnimPaddingTop();
+        int maxHeight = heightSize - getPaddingTop() - getPaddingBottom() - animPaddingTop;
 
         boolean layoutFullScreen = isLayoutFullScreen(getContext());
 
@@ -190,6 +192,10 @@ public class RSoftInputLayout extends FrameLayout {
                 contentLayout.measure(MeasureSpec.makeMeasureSpec(contentLayoutMaxWidth, MeasureSpec.EXACTLY),
                         MeasureSpec.makeMeasureSpec(contentLayoutMaxHeight, MeasureSpec.EXACTLY));
             }
+
+//            L.i("内容高度:" + contentLayout.getMeasuredHeight() +
+//                    " max: " + maxHeight + ":" + contentLayoutMaxHeight + " anim:" + isAnimStart()
+//                    + " top:" + animPaddingTop + " wa:" + wantIntentAction + " la:" + lastIntentAction);
         }
 
         if (emojiLayout != null) {
@@ -249,6 +255,9 @@ public class RSoftInputLayout extends FrameLayout {
 
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+//        L.i("sizeChanged:" + oldw + "->" + w + " " + oldh + "->" + h +
+//                " " + intentAction + " k:" + isSoftKeyboardShow() + " anim:" + isAnimStart());
+
         //低版本适配
         boolean layoutFullScreen = isLayoutFullScreen(getContext());
         if (!layoutFullScreen) {
@@ -256,11 +265,14 @@ public class RSoftInputLayout extends FrameLayout {
                 return;
             }
 
-            if (oldw == 0 && oldh == 0) {
-                //布局第一次显示在界面上
-            } else if (w != oldw) {
-                //有可能屏幕旋转了
-            } else if (h != oldh && oldw > 0 && oldh > 0) {
+            if (isFirstLayout(oldw, oldh)) {
+                if (isSoftKeyboardShow()) {
+                    //软件盘默认是显示状态
+                    oldh = h + getSoftKeyboardHeight();
+                }
+            }
+
+            if (handleSizeChange(w, h, oldw, oldh)) {
                 //有可能是键盘弹出了
                 int diffHeight = oldh - h;
 
@@ -280,19 +292,50 @@ public class RSoftInputLayout extends FrameLayout {
                     }
                 }
             }
+        } else {
+            //高版本, 默认显示键盘适配
+            if (oldw == 0 && oldh == 0) {
+                if (isSoftKeyboardShow()) {
+                    oldh = h;
+                    h = oldh - getSoftKeyboardHeight();
+                }
+            }
         }
 
         //用来解决, 快速切换 emoji布局和键盘或者普通键盘和密码键盘 时, 闪烁的不良体验.
         if (delaySizeChanged != null) {
             removeCallbacks(delaySizeChanged);
         }
-        delaySizeChanged = new DelaySizeChangeRunnable(w, h, oldw, oldh);
+        delaySizeChanged = new DelaySizeChangeRunnable(w, h, oldw, oldh, wantIntentAction);
         postDelayed(delaySizeChanged, switchCheckDelay);
     }
 
     //</editor-fold defaultstate="collapsed" desc="核心方法">
 
     //<editor-fold defaultstate="collapsed" desc="辅助方法">
+
+    private boolean isFirstLayout(int oldw, int oldh) {
+        return oldw == 0 && oldh == 0 && intentAction == INTENT_NONE;
+    }
+
+    private boolean handleSizeChange(int w, int h, int oldw, int oldh) {
+        boolean result = false;
+
+        boolean isFirstLayout = isFirstLayout(oldw, oldh);
+
+        int diffHeight = oldh - h;
+        if (isFirstLayout) {
+            //布局第一次显示在界面上, 需要排除默认键盘展示的情况
+            result = diffHeight != 0;
+        } else {
+            if (oldw != 0 && w != oldw) {
+                //有可能屏幕旋转了
+            } else {
+                result = diffHeight != 0;
+            }
+        }
+        return result;
+    }
 
     private void setIntentAction(int action) {
         if (action == INTENT_NONE || intentAction != action) {
@@ -463,6 +506,9 @@ public class RSoftInputLayout extends FrameLayout {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
             int insetBottom = insets.getSystemWindowInsetBottom();
 
+//            L.i("onApplyWindowInsets:" + insetBottom + " " +
+//                    intentAction + " w:" + getMeasuredWidth() + " h:" + getMeasuredHeight());
+
             if (getMeasuredWidth() <= 0 && getMeasuredHeight() <= 0) {
                 return super.onApplyWindowInsets(insets);
             }
@@ -498,7 +544,8 @@ public class RSoftInputLayout extends FrameLayout {
 
     //底部需要腾出距离
     private void insetBottom(int height) {
-        //L.i("插入:" + height);
+//        L.i("插入:" + height + ":" + getMeasuredHeight() +
+//                " isFirstLayout:" + isFirstLayout(getMeasuredWidth(), getMeasuredHeight()));
         int insetBottom = height;
         int measuredWidth = getMeasuredWidth();
         int measuredHeight = getMeasuredHeight();
@@ -556,10 +603,10 @@ public class RSoftInputLayout extends FrameLayout {
 
     private ValueAnimator mValueAnimator;
 
-    private void startAnim(int bottomHeightFrom, int bottomHeightTo, int duration) {
-        if (isAnimStart()) {
-            return;
-        }
+    private void startAnim(int bottomHeightFrom, int bottomHeightTo, long duration) {
+//        L.i("动画:from:" + bottomHeightFrom + "->" + bottomHeightTo);
+        cancelAnim();
+
         mValueAnimator = ObjectAnimator.ofInt(bottomHeightFrom, bottomHeightTo);
         mValueAnimator.setDuration(duration);
         mValueAnimator.setInterpolator(new DecelerateInterpolator());
@@ -584,7 +631,7 @@ public class RSoftInputLayout extends FrameLayout {
 
             @Override
             public void onAnimationCancel(Animator animation) {
-                clearIntentAction();
+                //clearIntentAction();
             }
 
             @Override
@@ -629,6 +676,7 @@ public class RSoftInputLayout extends FrameLayout {
         boolean animStart = isAnimStart();
         int statusBarHeight = RUtils.getStatusBarHeight(getContext());
 
+        boolean layoutFullScreen = isLayoutFullScreen(getContext());
         if (isSoftKeyboardShow() || isEmojiLayoutShow()) {
             if (animStart && intentAction != lastIntentAction) {
                 result = (int) (animPaddingTop * (1 - animProgress));
@@ -637,7 +685,7 @@ public class RSoftInputLayout extends FrameLayout {
                     lastIntentAction == INTENT_HIDE_EMOJI ||
                     lastIntentAction == INTENT_HIDE_KEYBOARD) {
 
-            } else if (isLayoutFullScreen(getContext())) {
+            } else if (layoutFullScreen) {
                 result = statusBarHeight + animPaddingMinTop;
             } else {
                 result = animPaddingMinTop;
@@ -649,8 +697,10 @@ public class RSoftInputLayout extends FrameLayout {
                 if (animStart && wantIntentAction != lastIntentAction) {
                     result = (int) (animPaddingTop * animProgress);
                     result = Math.max(result, statusBarHeight + animPaddingMinTop);
-                } else {
+                } else if (layoutFullScreen) {
                     result = statusBarHeight + animPaddingMinTop;
+                } else {
+                    result = animPaddingMinTop;
                 }
             }
         }
@@ -794,6 +844,10 @@ public class RSoftInputLayout extends FrameLayout {
         return bottomCurrentShowHeight;
     }
 
+    public long getAnimDuration() {
+        return animDuration;
+    }
+
     //</editor-fold defaultstate="collapsed" desc="方法控制">
 
     //<editor-fold defaultstate="collapsed" desc="事件相关">
@@ -925,26 +979,24 @@ public class RSoftInputLayout extends FrameLayout {
         int h;
         int oldw;
         int oldh;
+        int delayIntentAction;
 
-        public DelaySizeChangeRunnable(int w, int h, int oldw, int oldh) {
+        public DelaySizeChangeRunnable(int w, int h, int oldw, int oldh, int action) {
             this.w = w;
             this.h = h;
             this.oldw = oldw;
             this.oldh = oldh;
+            this.delayIntentAction = action;
         }
 
         @Override
         public void run() {
             int oldBottomCurrentShowHeight = bottomCurrentShowHeight;
 
-            //L.i("size:" + oldh + "->" + h + " " + oldBottomCurrentShowHeight);
+//            L.i("doSizeChanged:" + oldw + "->" + w + " " + oldh + "->" + h + " " + oldBottomCurrentShowHeight + " " + intentAction);
 
             bottomCurrentShowHeight = 0;
-            if (oldw == 0 && oldh == 0) {
-                //布局第一次显示在界面上
-            } else if (w != oldw) {
-                //有可能屏幕旋转了
-            } else if (h != oldh && oldw > 0 && oldh > 0) {
+            if (handleSizeChange(w, h, oldw, oldh)) {
                 //有可能是键盘弹出了
                 int diffHeight = oldh - h;
 
@@ -979,7 +1031,11 @@ public class RSoftInputLayout extends FrameLayout {
                     }
                     notifyEmojiLayoutChangeListener(emojiLayoutShow, softKeyboardShow, diffHeight);
                     if (enableSoftInputAnim) {
-                        startAnim(oldBottomCurrentShowHeight, diffHeight, animDuration);
+                        if (isAnimStart()) {
+                            startAnim(Math.abs(bottomCurrentShowHeightAnim), diffHeight, animDuration);
+                        } else {
+                            startAnim(oldBottomCurrentShowHeight, diffHeight, animDuration);
+                        }
                     }
                 } else {
                     if (lastRestoreIntentAction2 == INTENT_SHOW_EMOJI && enableEmojiRestore) {
@@ -992,13 +1048,18 @@ public class RSoftInputLayout extends FrameLayout {
                     notifyEmojiLayoutChangeListener(emojiLayoutShow, softKeyboardShow, diffHeight);
 
                     if (enableSoftInputAnim && !emojiLayoutShow) {
-                        startAnim(Math.abs(diffHeight), 0, animDuration);
+
+                        if (isAnimStart()) {
+                            startAnim(Math.abs(bottomCurrentShowHeightAnim), 0, animDuration);
+                        } else {
+                            startAnim(Math.abs(diffHeight), 0, animDuration);
+                        }
                     }
                 }
 
                 //低版本适配
                 if (!layoutFullScreen) {
-                    setIntentAction(wantIntentAction);
+                    setIntentAction(delayIntentAction);
                 }
 
                 requestLayout();
