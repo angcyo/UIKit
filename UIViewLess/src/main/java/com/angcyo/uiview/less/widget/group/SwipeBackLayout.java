@@ -397,12 +397,17 @@ public abstract class SwipeBackLayout extends TouchLayout {
     }
 
     public void setDimStatusBar(boolean dim, int color) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            mDimStatusBar = dim;
-            if (mStatusPaint == null) {
-                mStatusPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        boolean layoutFullScreen = RSoftInputLayout.isLayoutFullScreen(getContext());
+        if (dim) {
+            if (layoutFullScreen) {
+                mDimStatusBar = true;
+                if (mStatusPaint == null) {
+                    mStatusPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+                }
+                mStatusPaint.setColor(color);
             }
-            mStatusPaint.setColor(color);
+        } else {
+            mDimStatusBar = false;
         }
     }
 
