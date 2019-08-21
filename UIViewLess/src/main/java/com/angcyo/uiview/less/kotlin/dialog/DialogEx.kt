@@ -36,7 +36,7 @@ fun Context.buildBottomDialog(): RDialog.Builder {
         .setDialogGravity(Gravity.BOTTOM)
 }
 
-private fun configDialogBuilder(builder: RDialog.Builder, dialogConfig: BaseDialogConfig): RDialog.Builder {
+public fun configDialogBuilder(builder: RDialog.Builder, dialogConfig: BaseDialogConfig): RDialog.Builder {
     builder.setCancelable(dialogConfig.dialogCancel)
         .setCanceledOnTouchOutside(dialogConfig.dialogCanceledOnTouchOutside)
         .setOnCancelListener {
@@ -71,7 +71,7 @@ private fun configDialogBuilder(builder: RDialog.Builder, dialogConfig: BaseDial
     return builder
 }
 
-private fun RDialog.Builder.show(dialogConfig: BaseDialogConfig): Dialog {
+public fun RDialog.Builder.show(dialogConfig: BaseDialogConfig): Dialog {
     val builder = configDialogBuilder(this, dialogConfig)
 
     return when (dialogConfig.dialogType) {

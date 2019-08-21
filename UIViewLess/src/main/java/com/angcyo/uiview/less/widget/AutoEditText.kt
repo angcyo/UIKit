@@ -26,11 +26,15 @@ open class AutoEditText : REditText {
         initAutoEditText(context, null)
     }
 
-    constructor(context: Context, attrs: AttributeSet) : super(context, attrs) {
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
         initAutoEditText(context, attrs)
     }
 
-    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    ) {
         initAutoEditText(context, attrs)
     }
 
@@ -48,9 +52,15 @@ open class AutoEditText : REditText {
         }
 
         autoCompleteShowOnFocus =
-            typedArray.getBoolean(R.styleable.AutoEditText_r_auto_complete_show_on_focus, autoCompleteShowOnFocus)
+            typedArray.getBoolean(
+                R.styleable.AutoEditText_r_auto_complete_show_on_focus,
+                autoCompleteShowOnFocus
+            )
         autoCompleteFocusDelay =
-            typedArray.getInt(R.styleable.AutoEditText_r_auto_complete_focus_delay, autoCompleteFocusDelay)
+            typedArray.getInt(
+                R.styleable.AutoEditText_r_auto_complete_focus_delay,
+                autoCompleteFocusDelay
+            )
 
         typedArray.recycle()
     }
@@ -101,5 +111,12 @@ open class AutoEditText : REditText {
                 }
             }
         }
+    }
+
+    override fun showDropDown() {
+        if (adapter == null || adapter.count <= 0) {
+            return
+        }
+        super.showDropDown()
     }
 }
