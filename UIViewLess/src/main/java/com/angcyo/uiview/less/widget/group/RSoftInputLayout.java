@@ -24,7 +24,6 @@ import androidx.annotation.Nullable;
 
 import com.angcyo.lib.L;
 import com.angcyo.uiview.less.R;
-import com.angcyo.uiview.less.kotlin.ViewExKt;
 import com.angcyo.uiview.less.utils.RUtils;
 import com.orhanobut.hawk.Hawk;
 
@@ -154,6 +153,9 @@ public class RSoftInputLayout extends FrameLayout {
 
         int bottomHeight = bottomCurrentShowHeight;
         if (isInEditMode()) {
+            if (emojiLayout == null) {
+                defaultKeyboardHeight = 0;
+            }
             bottomHeight = defaultKeyboardHeight;
         }
 
@@ -314,6 +316,21 @@ public class RSoftInputLayout extends FrameLayout {
 
     //<editor-fold defaultstate="collapsed" desc="辅助方法">
 
+    private void initDefaultKeyboardHeight() {
+        //恢复上一次键盘的高度
+        if (defaultKeyboardHeight < 0) {
+            int lastKeyboardHeight = 0;
+            if (!isInEditMode()) {
+                lastKeyboardHeight = Hawk.get(KEY_KEYBOARD_HEIGHT, 0);
+            }
+            if (lastKeyboardHeight <= 0) {
+                defaultKeyboardHeight = (int) (275 * getResources().getDisplayMetrics().density);
+            } else {
+                defaultKeyboardHeight = lastKeyboardHeight;
+            }
+        }
+    }
+
     private boolean isFirstLayout(int oldw, int oldh) {
         return oldw == 0 && oldh == 0 && intentAction == INTENT_NONE;
     }
@@ -465,17 +482,7 @@ public class RSoftInputLayout extends FrameLayout {
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
 
-        //恢复上一次键盘的高度
-        if (!isInEditMode()) {
-            if (defaultKeyboardHeight < 0) {
-                int lastKeyboardHeight = Hawk.get(KEY_KEYBOARD_HEIGHT, 0);
-                if (lastKeyboardHeight <= 0) {
-                    defaultKeyboardHeight = ViewExKt.getDpi(275);
-                } else {
-                    defaultKeyboardHeight = lastKeyboardHeight;
-                }
-            }
-        }
+        initDefaultKeyboardHeight();
 
         if (!isInEditMode() && isEnabled() && enableSoftInput) {
             setFitsSystemWindows();
@@ -670,6 +677,10 @@ public class RSoftInputLayout extends FrameLayout {
     private int calcAnimPaddingTop() {
         if (animPaddingTop <= 0) {
             return 0;
+        }
+
+        if (isInEditMode()) {
+            return animPaddingTop;
         }
 
         int result = animPaddingTop;
@@ -960,7 +971,7 @@ public class RSoftInputLayout extends FrameLayout {
         int oldw;
         int oldh;
 
-        public KeyboardRunnable(int w, int h, int oldw, int oldh) {
+        private KeyboardRunnable(int w, int h, int oldw, int oldh) {
             this.w = w;
             this.h = h;
             this.oldw = oldw;
@@ -981,7 +992,7 @@ public class RSoftInputLayout extends FrameLayout {
         int oldh;
         int delayIntentAction;
 
-        public DelaySizeChangeRunnable(int w, int h, int oldw, int oldh, int action) {
+        private DelaySizeChangeRunnable(int w, int h, int oldw, int oldh, int action) {
             this.w = w;
             this.h = h;
             this.oldw = oldw;
@@ -1076,7 +1087,7 @@ public class RSoftInputLayout extends FrameLayout {
 
         int insetBottom;
 
-        public InsetRunnable(int insetBottom) {
+        private InsetRunnable(int insetBottom) {
             this.insetBottom = insetBottom;
         }
 
