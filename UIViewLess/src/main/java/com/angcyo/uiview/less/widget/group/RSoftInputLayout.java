@@ -2,6 +2,7 @@ package com.angcyo.uiview.less.widget.group;
 
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
+import android.animation.TimeInterpolator;
 import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.Context;
@@ -53,11 +54,11 @@ import java.util.Iterator;
  */
 public class RSoftInputLayout extends FrameLayout {
 
-    private static final int INTENT_NONE = 0;
-    private static final int INTENT_SHOW_KEYBOARD = 1;
-    private static final int INTENT_HIDE_KEYBOARD = 2;
-    private static final int INTENT_SHOW_EMOJI = 3;
-    private static final int INTENT_HIDE_EMOJI = 4;
+    public static final int INTENT_NONE = 0;
+    public static final int INTENT_SHOW_KEYBOARD = 1;
+    public static final int INTENT_HIDE_KEYBOARD = 2;
+    public static final int INTENT_SHOW_EMOJI = 3;
+    public static final int INTENT_HIDE_EMOJI = 4;
 
     /**
      * 是否激活控件
@@ -614,14 +615,33 @@ public class RSoftInputLayout extends FrameLayout {
 //        L.i("动画:from:" + bottomHeightFrom + "->" + bottomHeightTo);
         cancelAnim();
 
-        mValueAnimator = ObjectAnimator.ofInt(bottomHeightFrom, bottomHeightTo);
+        int from = bottomHeightFrom;
+        int to = bottomHeightTo;
+        if (animatorCallback != null) {
+            int[] preStart = animatorCallback.onAnimatorPreStart(wantIntentAction, bottomHeightFrom, bottomHeightTo, duration);
+            from = preStart[0];
+            to = preStart[1];
+            duration = preStart[2];
+        }
+
+        mValueAnimator = ObjectAnimator.ofInt(from, to);
         mValueAnimator.setDuration(duration);
-        mValueAnimator.setInterpolator(new DecelerateInterpolator());
+        if (animatorCallback == null) {
+            mValueAnimator.setInterpolator(new DecelerateInterpolator());
+        } else {
+            mValueAnimator.setInterpolator(animatorCallback.getInterpolator(wantIntentAction));
+        }
         mValueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
-                animProgress = animation.getAnimatedFraction();
-                bottomCurrentShowHeightAnim = (int) animation.getAnimatedValue();
+                float animatedFraction = animation.getAnimatedFraction();
+                int animatedValue = (int) animation.getAnimatedValue();
+                animProgress = animatedFraction;
+                if (animatorCallback == null) {
+                    bottomCurrentShowHeightAnim = animatedValue;
+                } else {
+                    bottomCurrentShowHeightAnim = animatorCallback.onUpdateAnimatorValue(intentAction, animatedFraction, animatedValue);
+                }
                 requestLayout();
             }
         });
@@ -634,11 +654,17 @@ public class RSoftInputLayout extends FrameLayout {
             @Override
             public void onAnimationEnd(Animator animation) {
                 clearIntentAction();
+                if (animatorCallback != null) {
+                    animatorCallback.onAnimatorEnd(lastIntentAction, false);
+                }
             }
 
             @Override
             public void onAnimationCancel(Animator animation) {
                 //clearIntentAction();
+                if (animatorCallback != null) {
+                    animatorCallback.onAnimatorEnd(wantIntentAction, true);
+                }
             }
 
             @Override
@@ -647,6 +673,10 @@ public class RSoftInputLayout extends FrameLayout {
             }
         });
         mValueAnimator.start();
+
+        if (animatorCallback != null) {
+            animatorCallback.onAnimatorStart(wantIntentAction);
+        }
     }
 
     private void cancelAnim() {
@@ -855,8 +885,16 @@ public class RSoftInputLayout extends FrameLayout {
         return bottomCurrentShowHeight;
     }
 
+    public int getBottomCurrentShowHeightAnim() {
+        return bottomCurrentShowHeightAnim;
+    }
+
     public long getAnimDuration() {
         return animDuration;
+    }
+
+    public boolean isEnableSoftInputAnim() {
+        return enableSoftInputAnim;
     }
 
     //</editor-fold defaultstate="collapsed" desc="方法控制">
@@ -894,6 +932,43 @@ public class RSoftInputLayout extends FrameLayout {
          * @param isKeyboardShow 键盘是否显示了
          */
         void onEmojiLayoutChange(boolean isEmojiShow, boolean isKeyboardShow, int height);
+    }
+
+
+    /**
+     * 动画执行回调, 可以修改动画执行的值
+     */
+    public AnimatorCallback animatorCallback;
+
+    public static class AnimatorCallback {
+
+        /**
+         * 动画需要执行的值
+         *
+         * @return 按照入参顺序, 返回对应修改后的值
+         */
+        public int[] onAnimatorPreStart(int intentAction, int bottomHeightFrom, int bottomHeightTo, long duration) {
+            return new int[]{bottomHeightFrom, bottomHeightTo, (int) duration};
+        }
+
+        /**
+         * 动画执行过程中的值
+         */
+        public int onUpdateAnimatorValue(int intentAction, float animatedFraction, int animatedValue) {
+            return animatedValue;
+        }
+
+        public TimeInterpolator getInterpolator(int intentAction) {
+            return new DecelerateInterpolator();
+        }
+
+        public void onAnimatorStart(int intentAction) {
+
+        }
+
+        public void onAnimatorEnd(int intentAction, boolean isCancel) {
+
+        }
     }
 
     //</editor-fold defaultstate="collapsed" desc="事件相关">

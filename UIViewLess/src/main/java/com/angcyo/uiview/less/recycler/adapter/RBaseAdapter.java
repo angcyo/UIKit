@@ -970,6 +970,7 @@ public abstract class RBaseAdapter<T> extends RecyclerView.Adapter<RBaseViewHold
 
     /**
      * 自动处理分页加载, 和加载更多的数据
+     * @see #loadMoreEnd(List, int, int)
      */
     @Deprecated
     public void onUILoadData(int page /*分页*/, int pageSize /*每一页数量*/, List<T> datas /*数据*/) {
@@ -1014,6 +1015,9 @@ public abstract class RBaseAdapter<T> extends RecyclerView.Adapter<RBaseViewHold
         }
     }
 
+    /**
+     * @see #loadMoreEnd(List, int, int)
+     * */
     @Deprecated
     public void onUILoadDataSet(int page /*分页*/, int pageSize /*每一页数量*/, int datasSize /*数据数量*/) {
         if (page <= 1) {

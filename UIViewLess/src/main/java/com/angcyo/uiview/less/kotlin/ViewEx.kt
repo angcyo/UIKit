@@ -20,6 +20,8 @@ import android.view.*
 import android.view.animation.DecelerateInterpolator
 import android.view.animation.LinearInterpolator
 import android.widget.*
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.GestureDetectorCompat
 import androidx.core.view.ViewCompat
@@ -1129,4 +1131,24 @@ public fun View.offsetTopTo(newTop: Int) {
 /**显示软键盘, [EditText]*/
 public fun View.showSoftInput() {
     RSoftInputLayout.showSoftInput(this)
+}
+
+public fun ViewGroup.LayoutParams.marginParams(config: ViewGroup.MarginLayoutParams.() -> Unit = {}): ViewGroup.LayoutParams {
+    (this as? ViewGroup.MarginLayoutParams)?.config()
+    return this
+}
+
+public fun ViewGroup.LayoutParams.frameParams(config: FrameLayout.LayoutParams.() -> Unit = {}): ViewGroup.LayoutParams {
+    (this as? FrameLayout.LayoutParams)?.config()
+    return this
+}
+
+public fun ViewGroup.LayoutParams.coordinatorParams(config: CoordinatorLayout.LayoutParams.() -> Unit = {}): ViewGroup.LayoutParams {
+    (this as? CoordinatorLayout.LayoutParams)?.config()
+    return this
+}
+
+public fun ViewGroup.LayoutParams.constraintParams(config: ConstraintLayout.LayoutParams.() -> Unit = {}): ViewGroup.LayoutParams {
+    (this as? ConstraintLayout.LayoutParams)?.config()
+    return this
 }
