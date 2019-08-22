@@ -16,6 +16,7 @@ import com.angcyo.uiview.less.R;
 import com.angcyo.uiview.less.kotlin.ViewGroupExKt;
 import com.angcyo.uiview.less.resources.ResUtil;
 import com.angcyo.uiview.less.skin.SkinHelper;
+import com.angcyo.uiview.less.utils.RUtils;
 import com.angcyo.uiview.less.widget.RTextCheckView;
 import com.angcyo.uiview.less.widget.RTextView;
 import kotlin.jvm.functions.Function1;
@@ -187,6 +188,10 @@ public class RFlowLayout extends LinearLayout {
      * 等宽并且maxCountLine>0 的时候, 计算 每个child的需要的宽度, margin 属性, 将使用每一行的第一个child
      */
     private int measureEquChildWidth(List<View> lineViews, int viewWidth) {
+        if (RUtils.isListEmpty(lineViews)) {
+            return viewWidth;
+        }
+
         int consumeWidth = getPaddingLeft() + getPaddingRight() + itemHorizontalSpace * Math.max(maxCountLine - 1, 0);
         View firstChild = lineViews.get(0);
         LayoutParams lineViewParams = (LayoutParams) firstChild.getLayoutParams();
