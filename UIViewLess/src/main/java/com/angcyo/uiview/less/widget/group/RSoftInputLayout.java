@@ -500,17 +500,21 @@ public class RSoftInputLayout extends FrameLayout {
     }
 
     @Override
-    public void setEnabled(boolean enabled) {
-        super.setEnabled(enabled);
-        if (enabled) {
-            setFitsSystemWindows();
-        } else {
-            setFitsSystemWindows(false);
-        }
+    protected boolean fitSystemWindows(Rect insets) {
+        //此方法会触发 dispatchApplyWindowInsets
+        insets.set(0, 0, 0, 0);
+        super.fitSystemWindows(insets);
+        return isEnableSoftInput();
     }
 
     @Override
     public WindowInsets onApplyWindowInsets(WindowInsets insets) {
+
+        //Fragment+Fragment中使用此控件支持.
+        if (!isEnableSoftInput()) {
+            return super.onApplyWindowInsets(insets);
+        }
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
             int insetBottom = insets.getSystemWindowInsetBottom();
 
@@ -518,6 +522,11 @@ public class RSoftInputLayout extends FrameLayout {
 //                    intentAction + " w:" + getMeasuredWidth() + " h:" + getMeasuredHeight());
 
             if (getMeasuredWidth() <= 0 && getMeasuredHeight() <= 0) {
+                return super.onApplyWindowInsets(insets);
+            }
+
+            if (isSoftKeyboardShow() && insetBottom <= 0) {
+                //软件已经显示, 此时却要隐藏键盘. ViewPager中, 使用此控件支持.
                 return super.onApplyWindowInsets(insets);
             }
 
@@ -759,7 +768,8 @@ public class RSoftInputLayout extends FrameLayout {
 
         this.enableSoftInput = enableSoftInput;
         if (enableSoftInput) {
-            setFitsSystemWindows();
+            setEnabled(true);
+            setFitsSystemWindows(true);
         } else {
             setFitsSystemWindows(false);
         }
@@ -769,6 +779,10 @@ public class RSoftInputLayout extends FrameLayout {
 
     public void setFitsSystemWindows() {
         setFitsSystemWindows(isEnabled() && enableSoftInput);
+    }
+
+    public boolean isEnableSoftInput() {
+        return getFitsSystemWindows() && isEnabled() && enableSoftInput;
     }
 
     //</editor-fold defaultstate="collapsed" desc="属性操作">
@@ -1082,6 +1096,7 @@ public class RSoftInputLayout extends FrameLayout {
 //            L.i("doSizeChanged:" + oldw + "->" + w + " " + oldh + "->" + h + " " + oldBottomCurrentShowHeight + " " + intentAction);
 
             bottomCurrentShowHeight = 0;
+            boolean needAnim = enableSoftInputAnim;
             if (handleSizeChange(w, h, oldw, oldh)) {
                 //有可能是键盘弹出了
                 int diffHeight = oldh - h;
@@ -1116,7 +1131,7 @@ public class RSoftInputLayout extends FrameLayout {
                         //有可能是表情布局显示
                     }
                     notifyEmojiLayoutChangeListener(emojiLayoutShow, softKeyboardShow, diffHeight);
-                    if (enableSoftInputAnim) {
+                    if (needAnim) {
                         if (isAnimStart()) {
                             startAnim(Math.abs(bottomCurrentShowHeightAnim), diffHeight, animDuration);
                         } else {
@@ -1133,7 +1148,11 @@ public class RSoftInputLayout extends FrameLayout {
                     }
                     notifyEmojiLayoutChangeListener(emojiLayoutShow, softKeyboardShow, diffHeight);
 
-                    if (enableSoftInputAnim && !emojiLayoutShow) {
+                    if (isFirstLayout(oldw, oldh)) {
+                        needAnim = false;
+                    }
+
+                    if (needAnim && !emojiLayoutShow) {
 
                         if (isAnimStart()) {
                             startAnim(Math.abs(bottomCurrentShowHeightAnim), 0, animDuration);
@@ -1151,7 +1170,7 @@ public class RSoftInputLayout extends FrameLayout {
                 requestLayout();
             }
 
-            if (!enableSoftInputAnim) {
+            if (!needAnim) {
                 clearIntentAction();
             }
             delaySizeChanged = null;
