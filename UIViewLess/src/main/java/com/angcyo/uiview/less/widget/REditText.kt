@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Rect
 import android.util.AttributeSet
 import android.view.MotionEvent
+import android.view.View
 import com.angcyo.uiview.less.R
 import com.angcyo.uiview.less.widget.ExEditText.hideSoftInputRunnable
 
@@ -39,6 +40,11 @@ open class REditText : ClearEditText {
      */
     var autoHideSoftInputOnDetached = false
 
+    /**
+     * 当视图不可见时, 是否隐藏键盘
+     */
+    var autoHideSoftInputOnInvisible = false
+
     override fun initEditText(context: Context, attrs: AttributeSet?, defStyleAttr: Int) {
         super.initEditText(context, attrs, defStyleAttr)
 
@@ -55,6 +61,10 @@ open class REditText : ClearEditText {
         autoHideSoftInputOnDetached = typedArray.getBoolean(
             R.styleable.REditText_r_auto_hide_soft_input_on_detached,
             autoHideSoftInputOnDetached
+        )
+        autoHideSoftInputOnInvisible = typedArray.getBoolean(
+            R.styleable.REditText_r_auto_hide_soft_input_on_invisible,
+            autoHideSoftInputOnInvisible
         )
 
         typedArray.recycle()
@@ -98,6 +108,13 @@ open class REditText : ClearEditText {
         super.onDetachedFromWindow()
         isAttached = false
         if (autoHideSoftInputOnDetached) {
+            ExEditText.HideSoftInputRunnable(this).run()
+        }
+    }
+
+    override fun onVisibilityChanged(changedView: View, visibility: Int) {
+        super.onVisibilityChanged(changedView, visibility)
+        if (visibility != VISIBLE && !isInEditMode && autoHideSoftInputOnInvisible) {
             ExEditText.HideSoftInputRunnable(this).run()
         }
     }

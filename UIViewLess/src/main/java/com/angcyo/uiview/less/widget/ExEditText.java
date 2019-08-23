@@ -170,6 +170,10 @@ public class ExEditText extends AppCompatEditText {
      * 当onDetachedFromWindow时, 是否隐藏键盘
      */
     private boolean autoHideSoftInputOnDetached = false;
+    /**
+     * 当视图不可见时, 是否隐藏键盘
+     */
+    private boolean autoHideSoftInputOnInvisible = false;
 
     public ExEditText(Context context) {
         super(context);
@@ -343,6 +347,7 @@ public class ExEditText extends AppCompatEditText {
         isPasswordDrawable = typedArray.getBoolean(R.styleable.ExEditText_r_is_password_drawable, isPasswordDrawable);
         autoHideSoftInputOnLostFocus = typedArray.getBoolean(R.styleable.ExEditText_r_auto_hide_soft_input_on_lost_focus, autoHideSoftInputOnLostFocus);
         autoHideSoftInputOnDetached = typedArray.getBoolean(R.styleable.ExEditText_r_auto_hide_soft_input_on_detached, autoHideSoftInputOnDetached);
+        autoHideSoftInputOnInvisible = typedArray.getBoolean(R.styleable.ExEditText_r_auto_hide_soft_input_on_invisible, autoHideSoftInputOnInvisible);
 
         typedArray.recycle();
 
@@ -1786,8 +1791,8 @@ public class ExEditText extends AppCompatEditText {
     @Override
     protected void onVisibilityChanged(View changedView, int visibility) {
         super.onVisibilityChanged(changedView, visibility);
-        if (visibility != VISIBLE && !isInEditMode()) {
-            hideSoftInput();
+        if (visibility != VISIBLE && !isInEditMode() && autoHideSoftInputOnInvisible) {
+            new HideSoftInputRunnable(this).run();
         }
     }
 

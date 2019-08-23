@@ -305,6 +305,7 @@
 
     <attr name="r_auto_hide_soft_input_on_lost_focus" format="boolean"/>
     <attr name="r_auto_hide_soft_input_on_detached" format="boolean"/>
+    <attr name="r_auto_hide_soft_input_on_invisible" format="boolean"/>
     <declare-styleable name="ClearEditText">
         <attr name="r_show_clear"/>
         <attr name="r_clear_drawable"/>
@@ -316,6 +317,7 @@
         <attr name="r_request_focus_on_touch"/>
         <attr name="r_auto_hide_soft_input_on_lost_focus"/>
         <attr name="r_auto_hide_soft_input_on_detached"/>
+        <attr name="r_auto_hide_soft_input_on_invisible"/>
     </declare-styleable>
     <declare-styleable name="AutoEditText">
         <!--默认自动输入提示文本-->
@@ -363,6 +365,7 @@
 
         <attr name="r_auto_hide_soft_input_on_lost_focus"/>
         <attr name="r_auto_hide_soft_input_on_detached"/>
+        <attr name="r_auto_hide_soft_input_on_invisible"/>
     </declare-styleable>
 
     <declare-styleable name="JumpAdProgressBar">
