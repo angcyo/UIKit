@@ -28,11 +28,6 @@ open class DslBaseInfoItem : DslAdapterItem() {
         itemLayoutId = R.layout.dsl_info_item
     }
 
-    override var itemBind: (itemHolder: RBaseViewHolder, itemPosition: Int, adapterItem: DslAdapterItem) -> Unit =
-        { itemHolder, itemPosition, adapterItem ->
-            onItemBind(itemHolder, itemPosition, adapterItem)
-        }
-
     /**背景*/
     var itemBackgroundDrawable: Drawable? = ColorDrawable(Color.WHITE)
 
@@ -49,7 +44,7 @@ open class DslBaseInfoItem : DslAdapterItem() {
 
     var itemClickListener: ((View) -> Unit)? = null
 
-    open fun onItemBind(
+    override fun onItemBind(
         itemHolder: RBaseViewHolder,
         itemPosition: Int,
         adapterItem: DslAdapterItem

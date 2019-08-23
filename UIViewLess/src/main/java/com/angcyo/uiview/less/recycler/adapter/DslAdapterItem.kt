@@ -6,6 +6,7 @@ import android.graphics.Paint
 import android.graphics.Rect
 import androidx.annotation.LayoutRes
 import android.view.View
+import com.angcyo.lib.L
 import com.angcyo.uiview.less.recycler.RBaseViewHolder
 
 /**
@@ -21,6 +22,9 @@ open class DslAdapterItem {
     var itemDslAdapter: DslAdapter? = null
 
     open fun updateAdapterItem(useFilterList: Boolean = true) {
+        if (itemDslAdapter == null) {
+            L.e("updateAdapterItem需要[itemDslAdapter], 请赋值.")
+        }
         itemDslAdapter?.notifyItemChanged(this, useFilterList)
     }
 
@@ -46,7 +50,17 @@ open class DslAdapterItem {
 
     /**界面绑定*/
     open var itemBind: (itemHolder: RBaseViewHolder, itemPosition: Int, adapterItem: DslAdapterItem) -> Unit =
-        { _, _, _ -> }
+        { itemHolder, itemPosition, adapterItem ->
+            onItemBind(itemHolder, itemPosition, adapterItem)
+        }
+
+    open fun onItemBind(
+        itemHolder: RBaseViewHolder,
+        itemPosition: Int,
+        adapterItem: DslAdapterItem
+    ) {
+
+    }
 
     open var onItemViewAttachedToWindow: (itemHolder: RBaseViewHolder) -> Unit = {
 

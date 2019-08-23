@@ -57,6 +57,20 @@ class RPlayer {
         /**播放完成*/
         const val STATE_COMPLETION = 6
         const val STATE_ERROR = -1
+
+        fun stateString(state: Int): String {
+            return when (state) {
+                STATE_INIT -> "STATE_INIT"
+                STATE_NORMAL -> "STATE_NORMAL"
+                STATE_PLAYING -> "STATE_PLAYING"
+                STATE_STOP -> "STATE_STOP"
+                STATE_RELEASE -> "STATE_RELEASE"
+                STATE_PAUSE -> "STATE_PAUSE"
+                STATE_COMPLETION -> "STATE_COMPLETION"
+                STATE_ERROR -> "STATE_ERROR"
+                else -> "UNKNOWN"
+            }
+        }
     }
 
     private var seekToPosition = -1
@@ -220,19 +234,7 @@ class RPlayer {
 
     fun isPause() = playState.get() == STATE_PAUSE
 
-    private fun stateString(state: Int): String {
-        return when (state) {
-            STATE_INIT -> "STATE_INIT"
-            STATE_NORMAL -> "STATE_NORMAL"
-            STATE_PLAYING -> "STATE_PLAYING"
-            STATE_STOP -> "STATE_STOP"
-            STATE_RELEASE -> "STATE_RELEASE"
-            STATE_PAUSE -> "STATE_PAUSE"
-            STATE_COMPLETION -> "STATE_COMPLETION"
-            STATE_ERROR -> "STATE_ERROR"
-            else -> "UNKNOWN"
-        }
-    }
+    fun playState() = playState.get()
 
     private fun setPlayState(state: Int) {
         playUrl = playingUrl
