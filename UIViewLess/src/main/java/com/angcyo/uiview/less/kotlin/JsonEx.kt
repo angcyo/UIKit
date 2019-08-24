@@ -16,6 +16,20 @@ import com.google.gson.JsonPrimitive
 
 public fun json(): Json.Builder = Json.json()
 
+public fun jsonString(config: Json.Builder.() -> Unit = {}): String {
+    return json().run {
+        config()
+        get()
+    }
+}
+
+public fun arrayString(config: Json.Builder.() -> Unit = {}): String {
+    return json().run {
+        config()
+        get()
+    }
+}
+
 public fun JsonObject.getInt(key: String): Int {
     val element = get(key)
     if (element is JsonPrimitive) {
