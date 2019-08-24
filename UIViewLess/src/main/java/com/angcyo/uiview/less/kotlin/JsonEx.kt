@@ -3,6 +3,7 @@ package com.angcyo.uiview.less.kotlin
 import android.text.TextUtils
 import com.angcyo.http.Json
 import com.google.gson.JsonArray
+import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
 
@@ -27,6 +28,20 @@ public fun arrayString(config: Json.Builder.() -> Unit = {}): String {
     return json().run {
         config()
         get()
+    }
+}
+
+public fun jsonObject(config: Json.Builder.() -> Unit = {}): JsonElement {
+    return json().run {
+        config()
+        build()
+    }
+}
+
+public fun jsonArray(config: Json.Builder.() -> Unit = {}): JsonElement {
+    return json().run {
+        config()
+        build()
     }
 }
 
