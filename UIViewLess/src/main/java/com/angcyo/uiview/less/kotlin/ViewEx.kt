@@ -1133,6 +1133,40 @@ public fun View.showSoftInput() {
     RSoftInputLayout.showSoftInput(this)
 }
 
+/**快速操作[LayoutParams]*/
+public fun View.marginParams(config: ViewGroup.MarginLayoutParams.() -> Unit = {}): View {
+    (this.layoutParams as? ViewGroup.MarginLayoutParams)?.apply {
+        config()
+        this@marginParams.layoutParams = layoutParams
+    }
+    return this
+}
+
+public fun View.frameParams(config: FrameLayout.LayoutParams.() -> Unit = {}): View {
+    (this.layoutParams as? FrameLayout.LayoutParams)?.apply {
+        config()
+        this@frameParams.layoutParams = layoutParams
+    }
+    return this
+}
+
+public fun View.coordinatorParams(config: CoordinatorLayout.LayoutParams.() -> Unit = {}): View {
+    (this.layoutParams as? CoordinatorLayout.LayoutParams)?.apply {
+        config()
+        this@coordinatorParams.layoutParams = layoutParams
+    }
+    return this
+}
+
+public fun View.constraintParams(config: ConstraintLayout.LayoutParams.() -> Unit = {}): View {
+    (this.layoutParams as? ConstraintLayout.LayoutParams)?.apply {
+        config()
+        this@constraintParams.layoutParams = layoutParams
+    }
+    return this
+}
+
+/**将[LayoutParams]强转成指定对象*/
 public fun ViewGroup.LayoutParams.marginParams(config: ViewGroup.MarginLayoutParams.() -> Unit = {}): ViewGroup.LayoutParams {
     (this as? ViewGroup.MarginLayoutParams)?.config()
     return this

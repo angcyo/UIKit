@@ -165,6 +165,25 @@ open class DslAdapterItem {
         rect.set(itemLeftInsert, itemTopInsert, itemRightInsert, itemBottomInsert)
     }
 
+    fun marginVertical(top: Int, bottom: Int = 0) {
+        itemLeftOffset = 0
+        itemRightOffset = 0
+        itemTopInsert = top
+        itemBottomInsert = bottom
+        onlyDrawOffsetArea = false
+        itemDecorationColor = Color.TRANSPARENT
+    }
+
+    fun marginHorizontal(left: Int, right: Int = 0) {
+        itemTopOffset = 0
+        itemBottomOffset = 0
+
+        itemLeftInsert = left
+        itemRightInsert = right
+        onlyDrawOffsetArea = false
+        itemDecorationColor = Color.TRANSPARENT
+    }
+
     /**
      * 绘制不同方向的分割线时, 触发的回调, 可以用来设置不同方向分割线的颜色
      * */
