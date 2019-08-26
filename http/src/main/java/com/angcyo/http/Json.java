@@ -3,8 +3,12 @@ package com.angcyo.http;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.collection.ArrayMap;
+
+import android.text.TextUtils;
 import android.util.JsonReader;
 import android.util.Log;
+
+import com.angcyo.http.log.LogUtil;
 import com.angcyo.http.type.TypeBuilder;
 import com.google.gson.*;
 
@@ -201,7 +205,7 @@ public class Json {
         Stack<JsonElement> subElementStack;
 
         /**
-         * 当对象的值为null时, 是否忽略
+         * 当对象的值为null时, 是否忽略, 如果是json对象, 那么"{}"也会被忽略
          */
         boolean ignoreNull = true;
 
@@ -216,6 +220,9 @@ public class Json {
             subElementStack = new Stack<>();
         }
 
+        /**
+         * 操作[JsonObject]
+         */
         private static void operateElement(@Nullable JsonElement element, @NonNull String key, @Nullable Object obj, boolean ignoreNull) {
             if (element instanceof JsonObject) {
                 if (obj == null) {
@@ -231,17 +238,26 @@ public class Json {
                 } else if (obj instanceof Boolean) {
                     ((JsonObject) element).addProperty(key, (Boolean) obj);
                 } else if (obj instanceof JsonElement) {
-                    ((JsonObject) element).add(key, (JsonElement) obj);
+                    if (ignoreNull) {
+                        if (!TextUtils.equals(obj.toString(), "{}")) {
+                            ((JsonObject) element).add(key, (JsonElement) obj);
+                        }
+                    } else {
+                        ((JsonObject) element).add(key, (JsonElement) obj);
+                    }
                 } else {
                     ((JsonObject) element).addProperty(key, obj.toString());
                 }
             } else if (element instanceof WrapJsonObject) {
                 operateElement(((WrapJsonObject) element).originElement, key, obj, ignoreNull);
             } else {
-                Log.w(TAG, " 当前操作已被忽略:" + key + "->" + obj);
+                LogUtil.w(TAG, " 当前操作已被忽略:" + key + "->" + obj);
             }
         }
 
+        /**
+         * 操作[JsonArray]
+         */
         private static void operateElement(@Nullable JsonElement element, @Nullable Object obj, boolean ignoreNull) {
             if (element instanceof JsonArray) {
                 if (obj == null) {
@@ -257,14 +273,20 @@ public class Json {
                 } else if (obj instanceof Boolean) {
                     ((JsonArray) element).add((Boolean) obj);
                 } else if (obj instanceof JsonElement) {
-                    ((JsonArray) element).add((JsonElement) obj);
+                    if (ignoreNull) {
+                        if (!TextUtils.equals(obj.toString(), "{}")) {
+                            ((JsonArray) element).add((JsonElement) obj);
+                        }
+                    } else {
+                        ((JsonArray) element).add((JsonElement) obj);
+                    }
                 } else {
                     ((JsonArray) element).add(obj.toString());
                 }
             } else if (element instanceof WrapJsonArray) {
                 operateElement(((WrapJsonArray) element).originElement, obj, ignoreNull);
             } else {
-                Log.w(TAG, " 当前操作已被忽略:" + obj);
+                LogUtil.w(TAG, " 当前操作已被忽略:" + obj);
             }
         }
 
@@ -398,8 +420,8 @@ public class Json {
                         operateElement(parent, key, origin, ignoreNull);
                     }
                 }
-            }else{
-                Log.w(TAG, "不合法的操作, 请检查!");
+            } else {
+                LogUtil.w(TAG, "不合法的操作, 请检查!");
             }
             return this;
         }
