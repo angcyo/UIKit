@@ -3,6 +3,9 @@ package com.luck.picture.lib.entity;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.text.TextUtils;
+
+import com.angcyo.lib.L;
+import com.angcyo.uiview.less.kotlin.ExKt;
 import com.luck.picture.lib.config.PictureConfig;
 import com.luck.picture.lib.config.PictureMimeType;
 
@@ -72,6 +75,29 @@ public class LocalMedia implements Parcelable {
 
     public LocalMedia(String path) {
         this.path = path;
+
+        //智能通过path的后缀, 设置mimeType和pictureType
+        if (!TextUtils.isEmpty(path)) {
+            pictureType = ExKt.mimeType(path);
+
+            if (getPictureType().toLowerCase().startsWith("video")) {
+                setMimeType(PictureConfig.TYPE_VIDEO);
+                L.d("智能分析:" + path + " " + pictureType + " VIDEO");
+
+            } else if (getPictureType().toLowerCase().startsWith("audio")) {
+                setMimeType(PictureConfig.TYPE_AUDIO);
+                L.d("智能分析:" + path + " " + pictureType + " AUDIO");
+
+            } else if (getPictureType().toLowerCase().startsWith("image")) {
+                setMimeType(PictureConfig.TYPE_IMAGE);
+                L.d("智能分析:" + path + " " + pictureType + " IMAGE");
+
+            } else {
+                //默认是图片
+                setMimeType(PictureConfig.TYPE_IMAGE);
+                L.d("智能分析:" + path + " " + pictureType + " 无法识别");
+            }
+        }
     }
 
     /**

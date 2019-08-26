@@ -5,9 +5,12 @@ import android.view.View
 import com.angcyo.lib.L
 import com.angcyo.uiview.less.R
 import com.angcyo.uiview.less.base.BaseFragment
+import com.angcyo.uiview.less.base.BaseRecyclerFragment
 import com.angcyo.uiview.less.base.BaseTitleFragment
 import com.angcyo.uiview.less.base.helper.FragmentHelper
 import com.angcyo.uiview.less.base.helper.TitleItemHelper
+import com.angcyo.uiview.less.recycler.adapter.DslAdapter
+import com.angcyo.uiview.less.recycler.adapter.DslAdapterItem
 import com.angcyo.uiview.less.utils.TopToast
 import com.angcyo.uiview.less.widget.ImageTextView
 import com.luck.picture.lib.rxbus2.RxBus
@@ -168,6 +171,16 @@ public fun BaseTitleFragment.appendLeftItem(
     item.textShowColor = textColor
     leftControl().addView(item)
     return item
+}
+
+public fun BaseRecyclerFragment<DslAdapterItem>.onBaseLoadEnd(
+    pageSize: Int = 20,
+    error: Throwable? = null,
+    dataList: DslAdapter.() -> Unit
+) {
+    val dslAdapter = DslAdapter()
+    dslAdapter.dataList()
+    onBaseLoadEnd(dslAdapter.getValidFilterDataList(), pageSize, error)
 }
 
 /**RxBus*/

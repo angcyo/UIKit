@@ -19,7 +19,7 @@ import androidx.annotation.Nullable;
 
 import android.util.Log;
 import com.angcyo.lib.L;
-import com.angcyo.uiview.less.accessibility.ExKt;
+import com.angcyo.uiview.less.accessibility.AccessibilityExKt;
 import com.angcyo.uiview.less.utils.RUtils;
 import com.angcyo.uiview.less.utils.Reflect;
 
@@ -215,10 +215,10 @@ public class Screenshot {
     }
 
     private void createVirtualEnvironment() {
-        Point realSize = ExKt.displayRealSize(application);
+        Point realSize = AccessibilityExKt.displayRealSize(application);
         windowWidth = realSize.x;
         windowHeight = realSize.y;
-        mScreenDensity = (int) ExKt.density(application);
+        mScreenDensity = (int) AccessibilityExKt.density(application);
         mMediaProjectionManager = (MediaProjectionManager) application.getSystemService(Context.MEDIA_PROJECTION_SERVICE);
     }
 

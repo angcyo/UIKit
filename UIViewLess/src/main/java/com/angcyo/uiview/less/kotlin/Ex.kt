@@ -91,7 +91,11 @@ public fun Paint.textWidth(text: String): Float = this.measureText(text)
  * @param width 宽度范围
  * @param excludeAppendText 额外追加在判断文本后面的字符串, 用来打省略号(...)
  * */
-public fun Paint.findTextWidth(text: String, width: Float, excludeAppendText: String? = null): String {
+public fun Paint.findTextWidth(
+    text: String,
+    width: Float,
+    excludeAppendText: String? = null
+): String {
     val excludeWidth = if (TextUtils.isEmpty(excludeAppendText)) {
         0f
     } else {
@@ -683,4 +687,14 @@ public fun span(init: RSpan.() -> Unit): SpannableStringBuilder {
 
 public fun String?.isJsonEmpty(): Boolean {
     return TextUtils.isEmpty(this) || this == "{}"
+}
+
+/**分割字符串*/
+public fun String?.splits(
+    regex: String,
+    allowEmpty: Boolean = false,
+    checkExist: Boolean = true,
+    maxSize: Int = Int.MAX_VALUE
+): MutableList<String> {
+    return RUtils.split(this, regex, allowEmpty, checkExist, maxSize)
 }
