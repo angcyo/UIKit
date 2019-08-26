@@ -219,7 +219,7 @@ open class TouchLayout(context: Context, attributeSet: AttributeSet? = null) : F
     }
 
     open fun onFlingChange(orientation: ORIENTATION, velocityX: Float, velocityY: Float) {
-        onScrollChange(orientation, if (isVertical(orientation)) velocityY else velocityX)
+        onFlingChange(orientation, if (isVertical(orientation)) velocityY else velocityX)
     }
 
     /**Scroll操作的处理方法*/
