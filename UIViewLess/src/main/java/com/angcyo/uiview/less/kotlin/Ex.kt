@@ -680,3 +680,7 @@ public fun span(init: RSpan.() -> Unit): SpannableStringBuilder {
         this.init()
     }.create()
 }
+
+public fun String?.isJsonEmpty(): Boolean {
+    return TextUtils.isEmpty(this) || this == "{}"
+}
