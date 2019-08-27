@@ -3,8 +3,10 @@ package com.angcyo.uiview.less.recycler.adapter
 import android.content.Context
 import android.text.TextUtils
 import android.view.View
+import com.angcyo.lib.L
 import com.angcyo.uiview.less.kotlin.findViewHolder
 import com.angcyo.uiview.less.recycler.RBaseViewHolder
+import com.angcyo.uiview.less.recycler.adapter.RModelAdapter.*
 
 /**
  *
@@ -159,20 +161,34 @@ open class DslAdapter : RBaseAdapter<DslAdapterItem> {
         }
     }
 
-    override fun onChildViewAttachedToWindow(view: View, adapterPosition: Int, layoutPosition: Int) {
+    override fun onChildViewAttachedToWindow(
+        view: View,
+        adapterPosition: Int,
+        layoutPosition: Int
+    ) {
         super.onChildViewAttachedToWindow(view, adapterPosition, layoutPosition)
         if (adapterPosition in 0 until itemCount) {
             recyclerView?.findViewHolder(adapterPosition)?.let {
-                getItemData(adapterPosition)?.onItemChildViewAttachedToWindow?.invoke(it, adapterPosition)
+                getItemData(adapterPosition)?.onItemChildViewAttachedToWindow?.invoke(
+                    it,
+                    adapterPosition
+                )
             }
         }
     }
 
-    override fun onChildViewDetachedFromWindow(view: View, adapterPosition: Int, layoutPosition: Int) {
+    override fun onChildViewDetachedFromWindow(
+        view: View,
+        adapterPosition: Int,
+        layoutPosition: Int
+    ) {
         super.onChildViewDetachedFromWindow(view, adapterPosition, layoutPosition)
         if (adapterPosition in 0 until itemCount) {
             recyclerView?.findViewHolder(adapterPosition)?.let {
-                getItemData(adapterPosition)?.onItemChildViewDetachedFromWindow?.invoke(it, adapterPosition)
+                getItemData(adapterPosition)?.onItemChildViewDetachedFromWindow?.invoke(
+                    it,
+                    adapterPosition
+                )
             }
         }
     }
@@ -222,4 +238,180 @@ open class DslAdapter : RBaseAdapter<DslAdapterItem> {
 
         callback.invoke(groupItems, targetIndex)
     }
+
+    //<editor-fold desc="单选, 多选相关">
+
+    @RModelAdapter.Model
+    var selectorModel = MODEL_NORMAL
+
+    /**最小选中数量*/
+    var selectorMinLimit = 1
+
+    private val selectorModelListeners = mutableSetOf<SelectModelListener>()
+
+    fun addOnSelectorModelListener(listener: SelectModelListener) {
+        selectorModelListeners.add(listener)
+    }
+
+    fun removeOnSelectorModelListener(listener: SelectModelListener) {
+        selectorModelListeners.remove(listener)
+    }
+
+    /**更新选中状态*/
+    fun updateSelector(dslAdapterItem: DslAdapterItem, select: Boolean) {
+        if (dslAdapterItem.itemIsSelect == select) {
+            return
+        }
+
+        if (selectorModel == MODEL_SINGLE || selectorModel == MODEL_MULTI) {
+
+            val thisList = mutableListOf(dslAdapterItem)
+            val selectItemList = getSelectItemList(true, thisList)
+
+            val fromItem = selectItemList.firstOrNull()
+            val toItem = dslAdapterItem
+
+            if (select) {
+                if (toItem.isItemCanSelect(toItem.itemIsSelectInner, true)) {
+                    toItem.itemIsSelectInner = true
+                } else {
+                    return
+                }
+
+                if (selectorModel == MODEL_SINGLE) {
+                    //单选, 互斥操作
+
+                    getSelectItemList(false, thisList).forEach {
+                        //取消所有选中状态
+                        it.itemIsSelectInner = false
+                    }
+
+                    //先通知事件
+                    selectorModelListeners.forEach {
+                        it.onSingleSelectChange(fromItem, toItem)
+
+                        it.onSelectChange(
+                            toItem,
+                            thisList,
+                            mutableListOf(dslAdapterItem.itemIndexPosition)
+                        )
+                    }
+
+                    //再更新UI
+                    fromItem?.updateAdapterItem(true)
+                } else {
+                    //多选
+
+                    selectItemList.add(toItem)
+
+                    val indexList = mutableListOf<Int>()
+                    selectItemList.forEach {
+                        indexList.add(it.itemIndexPosition)
+                    }
+
+                    selectorModelListeners.forEach {
+                        it.onSelectChange(
+                            toItem,
+                            selectItemList,
+                            indexList
+                        )
+                    }
+                }
+
+                toItem.updateAdapterItem(true)
+            } else {
+                //取消选择
+                if (selectorModel == MODEL_SINGLE && toItem.itemIsSelect) {
+                    selectItemList.add(toItem)
+                }
+
+                if (selectItemList.size > selectorMinLimit) {
+
+                    if (toItem.isItemCanSelect(toItem.itemIsSelectInner, false)) {
+                        toItem.itemIsSelectInner = false
+                    } else {
+                        return
+                    }
+
+                    if (selectorModel == MODEL_SINGLE) {
+                        selectorModelListeners.forEach {
+                            it.onSingleSelectChange(toItem, toItem)
+
+                            it.onSelectChange(
+                                toItem,
+                                thisList,
+                                mutableListOf(dslAdapterItem.itemIndexPosition)
+                            )
+                        }
+                    } else {
+                        val indexList = mutableListOf<Int>()
+                        selectItemList.forEach {
+                            indexList.add(it.itemIndexPosition)
+                        }
+
+                        selectorModelListeners.forEach {
+                            it.onSelectChange(
+                                toItem,
+                                selectItemList,
+                                indexList
+                            )
+                        }
+                    }
+
+                    toItem.updateAdapterItem(true)
+                } else {
+                    selectorModelListeners.forEach {
+                        it.onSelectMinLimitNotice(selectorMinLimit)
+                    }
+                }
+            }
+        } else {
+            L.w("当前选择模式$selectorModel 不支持操作.")
+        }
+    }
+
+    /**主动调用, 通知事件*/
+    fun notifySelectListener(fromItem: DslAdapterItem? = null) {
+        if (selectorModel == MODEL_SINGLE || selectorModel == MODEL_MULTI) {
+
+            val selectItemList = getSelectItemList(true)
+
+            val indexList = mutableListOf<Int>()
+            selectItemList.forEach {
+                indexList.add(it.itemIndexPosition)
+            }
+
+            selectorModelListeners.forEach {
+                it.onSingleSelectChange(null, selectItemList.firstOrNull())
+
+                it.onSelectChange(
+                    fromItem,
+                    selectItemList,
+                    indexList
+                )
+            }
+
+        } else {
+            L.w("当前选择模式$selectorModel 不支持操作.")
+        }
+    }
+
+    /**获取所有选中的[DslAdapterItem]*/
+    fun getSelectItemList(
+        useFilterList: Boolean = true,
+        excludeItemList: List<DslAdapterItem> = listOf()
+    ): MutableList<DslAdapterItem> {
+        val result = mutableListOf<DslAdapterItem>()
+        getDataList(useFilterList).filterTo(result) {
+            if (excludeItemList.contains(it)) {
+                false
+            } else {
+                it.itemIsSelect
+            }
+        }
+        return result
+    }
+
+    //</editor-fold desc="单选, 多选相关">
+
 }

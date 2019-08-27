@@ -4,8 +4,9 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Rect
-import androidx.annotation.LayoutRes
 import android.view.View
+import androidx.annotation.LayoutRes
+import androidx.recyclerview.widget.RecyclerView
 import com.angcyo.lib.L
 import com.angcyo.uiview.less.recycler.RBaseViewHolder
 
@@ -70,13 +71,15 @@ open class DslAdapterItem {
 
     }
 
-    open var onItemChildViewDetachedFromWindow: (itemHolder: RBaseViewHolder, itemPosition: Int) -> Unit = { _, _ ->
+    open var onItemChildViewDetachedFromWindow: (itemHolder: RBaseViewHolder, itemPosition: Int) -> Unit =
+        { _, _ ->
 
-    }
+        }
 
-    open var onItemChildViewAttachedToWindow: (itemHolder: RBaseViewHolder, itemPosition: Int) -> Unit = { _, _ ->
+    open var onItemChildViewAttachedToWindow: (itemHolder: RBaseViewHolder, itemPosition: Int) -> Unit =
+        { _, _ ->
 
-    }
+        }
 
     //</editor-fold>
 
@@ -187,9 +190,10 @@ open class DslAdapterItem {
     /**
      * 绘制不同方向的分割线时, 触发的回调, 可以用来设置不同方向分割线的颜色
      * */
-    open var eachDrawItemDecoration: (left: Int, top: Int, right: Int, bottom: Int) -> Unit = { _, _, _, _ ->
+    open var eachDrawItemDecoration: (left: Int, top: Int, right: Int, bottom: Int) -> Unit =
+        { _, _, _, _ ->
 
-    }
+        }
 
     /**自定义绘制*/
     var onDraw: ((
@@ -228,7 +232,12 @@ open class DslAdapterItem {
             if (onlyDrawOffsetArea) {
                 //绘制左右区域
                 if (itemLeftOffset > 0) {
-                    drawRect.set(itemView.left, itemView.top - offsetRect.top, itemLeftOffset, itemView.top)
+                    drawRect.set(
+                        itemView.left,
+                        itemView.top - offsetRect.top,
+                        itemLeftOffset,
+                        itemView.top
+                    )
                     canvas.drawRect(drawRect, paint)
                 }
                 if (itemRightOffset > 0) {
@@ -241,7 +250,12 @@ open class DslAdapterItem {
                     canvas.drawRect(drawRect, paint)
                 }
             } else {
-                drawRect.set(itemView.left, itemView.top - offsetRect.top, itemView.right, itemView.top)
+                drawRect.set(
+                    itemView.left,
+                    itemView.top - offsetRect.top,
+                    itemView.right,
+                    itemView.top
+                )
                 canvas.drawRect(drawRect, paint)
             }
         }
@@ -253,7 +267,12 @@ open class DslAdapterItem {
             if (onlyDrawOffsetArea) {
                 //绘制左右区域
                 if (itemLeftOffset > 0) {
-                    drawRect.set(itemView.left, itemView.bottom, itemLeftOffset, itemView.bottom + offsetRect.bottom)
+                    drawRect.set(
+                        itemView.left,
+                        itemView.bottom,
+                        itemLeftOffset,
+                        itemView.bottom + offsetRect.bottom
+                    )
                     canvas.drawRect(drawRect, paint)
                 }
                 if (itemRightOffset > 0) {
@@ -266,7 +285,12 @@ open class DslAdapterItem {
                     canvas.drawRect(drawRect, paint)
                 }
             } else {
-                drawRect.set(itemView.left, itemView.bottom, itemView.right, itemView.bottom + offsetRect.bottom)
+                drawRect.set(
+                    itemView.left,
+                    itemView.bottom,
+                    itemView.right,
+                    itemView.bottom + offsetRect.bottom
+                )
                 canvas.drawRect(drawRect, paint)
             }
         }
@@ -278,7 +302,12 @@ open class DslAdapterItem {
             if (onlyDrawOffsetArea) {
                 //绘制上下区域
                 if (itemTopOffset > 0) {
-                    drawRect.set(itemView.left - offsetRect.left, itemView.top, itemView.left, itemTopOffset)
+                    drawRect.set(
+                        itemView.left - offsetRect.left,
+                        itemView.top,
+                        itemView.left,
+                        itemTopOffset
+                    )
                     canvas.drawRect(drawRect, paint)
                 }
                 if (itemBottomOffset < 0) {
@@ -291,7 +320,12 @@ open class DslAdapterItem {
                     canvas.drawRect(drawRect, paint)
                 }
             } else {
-                drawRect.set(itemView.left - offsetRect.left, itemView.top, itemView.left, itemView.bottom)
+                drawRect.set(
+                    itemView.left - offsetRect.left,
+                    itemView.top,
+                    itemView.left,
+                    itemView.bottom
+                )
                 canvas.drawRect(drawRect, paint)
             }
         }
@@ -303,7 +337,12 @@ open class DslAdapterItem {
             if (onlyDrawOffsetArea) {
                 //绘制上下区域
                 if (itemTopOffset > 0) {
-                    drawRect.set(itemView.right, itemView.top, itemView.right + offsetRect.right, itemTopOffset)
+                    drawRect.set(
+                        itemView.right,
+                        itemView.top,
+                        itemView.right + offsetRect.right,
+                        itemTopOffset
+                    )
                     canvas.drawRect(drawRect, paint)
                 }
                 if (itemBottomOffset < 0) {
@@ -316,7 +355,12 @@ open class DslAdapterItem {
                     canvas.drawRect(drawRect, paint)
                 }
             } else {
-                drawRect.set(itemView.right, itemView.top, itemView.right + offsetRect.right, itemView.bottom)
+                drawRect.set(
+                    itemView.right,
+                    itemView.top,
+                    itemView.right + offsetRect.right,
+                    itemView.bottom
+                )
                 canvas.drawRect(drawRect, paint)
             }
         }
@@ -335,14 +379,36 @@ open class DslAdapterItem {
      *
      * 返回 true 时, [checkItem] 会受到 [formChildHandleModel] 的影响, 进行 [show] or [hide] 操作
      * */
-    open var isFormItemInHandleList: (checkItem: DslAdapterItem, itemIndex: Int) -> Boolean = { _, _ -> false }
+    open var isFormItemInHandleList: (checkItem: DslAdapterItem, itemIndex: Int) -> Boolean =
+        { _, _ -> false }
 
     /**
      * [itemIndex] 最终过滤之后数据列表中的index
      * 返回 true 时, [checkItem] 会收到 来自 [this] 的 [onFormUpdateFrom] 出发的回调
      * */
-    open var isFormItemInUpdateList: (checkItem: DslAdapterItem, itemIndex: Int) -> Boolean = { _, _ -> false }
+    open var isFormItemInUpdateList: (checkItem: DslAdapterItem, itemIndex: Int) -> Boolean =
+        { _, _ -> false }
     //</editor-fold desc="Diff 相关">
+
+    //<editor-fold desc="单选, 多选相关">
+
+    /**是否选中, 需要 [DslAdapter.selectorModel] 的支持. */
+    var itemIsSelectInner = false
+    var itemIsSelect
+        set(value) {
+            itemDslAdapter?.updateSelector(this, value)
+        }
+        get() = itemIsSelectInner
+
+    /**是否 允许被选中*/
+    var isItemCanSelect: (from: Boolean, to: Boolean) -> Boolean =
+        { _, _ -> true }
+
+    val itemIndexPosition
+        get() = itemDslAdapter?.getValidFilterDataList()?.indexOf(this) ?: RecyclerView.NO_POSITION
+
+    //</editor-fold desc="单选, 多选相关">
+
 }
 
 /**
