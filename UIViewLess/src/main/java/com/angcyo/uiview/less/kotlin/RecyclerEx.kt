@@ -1,5 +1,6 @@
 package com.angcyo.uiview.less.kotlin
 
+import android.graphics.Color
 import android.text.TextUtils
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
@@ -106,16 +107,20 @@ public fun <T> DslAdapter.renderItem(data: T, init: DslAdapterItem.() -> Unit) {
 }
 
 /**空的占位item*/
-public fun DslAdapter.renderEmptyItem(height: Int = 120 * dpi) {
+public fun DslAdapter.renderEmptyItem(height: Int = 120 * dpi, color: Int = Color.TRANSPARENT) {
     val adapterItem = DslAdapterItem()
     adapterItem.itemLayoutId = R.layout.base_empty_item
     adapterItem.itemBind = { itemHolder, _, _ ->
+        itemHolder.itemView.setBackgroundColor(color)
         itemHolder.itemView.setHeight(height)
     }
     addLastItem(adapterItem)
 }
 
-public fun <T> DslAdapter.renderItem(list: List<T>, init: DslAdapterItem.(index: Int, data: T) -> Unit) {
+public fun <T> DslAdapter.renderItem(
+    list: List<T>,
+    init: DslAdapterItem.(index: Int, data: T) -> Unit
+) {
     list.forEachIndexed { index, any ->
         val adapterItem = DslAdapterItem()
         adapterItem.itemData = any
@@ -128,16 +133,24 @@ public fun androidx.recyclerview.widget.RecyclerView.onScroll(init: DslRecyclerS
     val dslRecyclerView = DslRecyclerScroll()
     dslRecyclerView.init()
     addOnScrollListener(object : androidx.recyclerview.widget.RecyclerView.OnScrollListener() {
-        override fun onScrolled(recyclerView: androidx.recyclerview.widget.RecyclerView, dx: Int, dy: Int) {
+        override fun onScrolled(
+            recyclerView: androidx.recyclerview.widget.RecyclerView,
+            dx: Int,
+            dy: Int
+        ) {
             super.onScrolled(recyclerView, dx, dy)
 
             dslRecyclerView.firstItemAdapterPosition = firstItemAdapterPosition()
-            dslRecyclerView.firstItemCompletelyVisibleAdapterPosition = firstItemCompletelyAdapterPosition()
+            dslRecyclerView.firstItemCompletelyVisibleAdapterPosition =
+                firstItemCompletelyAdapterPosition()
 
             dslRecyclerView.onRecyclerScrolled.invoke(recyclerView, dx, dy)
         }
 
-        override fun onScrollStateChanged(recyclerView: androidx.recyclerview.widget.RecyclerView, newState: Int) {
+        override fun onScrollStateChanged(
+            recyclerView: androidx.recyclerview.widget.RecyclerView,
+            newState: Int
+        ) {
             super.onScrollStateChanged(recyclerView, newState)
             dslRecyclerView.onRecyclerScrollStateChanged.invoke(recyclerView, newState)
         }
@@ -175,7 +188,8 @@ public fun androidx.recyclerview.widget.RecyclerView.noItemChangeAnim() {
             supportsChangeAnimations = false
         }
     } else if (itemAnimator is androidx.recyclerview.widget.SimpleItemAnimator) {
-        (itemAnimator as androidx.recyclerview.widget.SimpleItemAnimator).supportsChangeAnimations = false
+        (itemAnimator as androidx.recyclerview.widget.SimpleItemAnimator).supportsChangeAnimations =
+            false
     }
 }
 
