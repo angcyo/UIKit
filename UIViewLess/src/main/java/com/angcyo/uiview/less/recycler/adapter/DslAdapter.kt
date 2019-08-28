@@ -79,8 +79,11 @@ open class DslAdapter : RBaseAdapter<DslAdapterItem> {
     }
 
     override fun getItemCount(): Int {
+        if (isStateLayout) {
+            return 1
+        }
         if (dslDateFilter != null) {
-            return filterDataList.size
+            return filterDataList.size + if (isEnableLoadMore) 1 else 0
         }
         return super.getItemCount()
     }
