@@ -168,23 +168,23 @@ open class DslAdapterItem {
         rect.set(itemLeftInsert, itemTopInsert, itemRightInsert, itemBottomInsert)
     }
 
-    fun marginVertical(top: Int, bottom: Int = 0) {
+    fun marginVertical(top: Int, bottom: Int = 0, color: Int = Color.TRANSPARENT) {
         itemLeftOffset = 0
         itemRightOffset = 0
         itemTopInsert = top
         itemBottomInsert = bottom
         onlyDrawOffsetArea = false
-        itemDecorationColor = Color.TRANSPARENT
+        itemDecorationColor = color
     }
 
-    fun marginHorizontal(left: Int, right: Int = 0) {
+    fun marginHorizontal(left: Int, right: Int = 0, color: Int = Color.TRANSPARENT) {
         itemTopOffset = 0
         itemBottomOffset = 0
 
         itemLeftInsert = left
         itemRightInsert = right
         onlyDrawOffsetArea = false
-        itemDecorationColor = Color.TRANSPARENT
+        itemDecorationColor = color
     }
 
     /**

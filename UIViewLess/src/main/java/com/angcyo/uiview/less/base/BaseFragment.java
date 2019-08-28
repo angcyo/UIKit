@@ -14,6 +14,7 @@ import android.widget.EditText;
 import com.angcyo.http.HttpSubscriber;
 import com.angcyo.http.NonetException;
 import com.angcyo.uiview.less.R;
+import com.angcyo.uiview.less.RApplication;
 import com.angcyo.uiview.less.base.helper.FragmentHelper;
 import com.angcyo.uiview.less.recycler.RBaseViewHolder;
 import com.angcyo.uiview.less.utils.RUtils;
@@ -50,6 +51,7 @@ public abstract class BaseFragment extends AbsLifeCycleFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable final ViewGroup container, @Nullable final Bundle savedInstanceState) {
         View view = super.onCreateView(inflater, container, savedInstanceState);
+        enableFragmentSoftInputLayout(false);
 
         final Bundle arguments = getArguments();
 
@@ -83,8 +85,6 @@ public abstract class BaseFragment extends AbsLifeCycleFragment {
         if (interceptRootTouchEvent()) {
             viewHolder.itemView.setClickable(true);
         }
-
-        enableFragmentSoftInputLayout(false);
     }
 
     /**
@@ -94,18 +94,23 @@ public abstract class BaseFragment extends AbsLifeCycleFragment {
         return true;
     }
 
-    @Nullable
-    public FragmentManager parentFragmentManager() {
+    @NonNull
+    public Fragment topFragment() {
         Fragment parentFragment = getParentFragment();
         if (parentFragment == null) {
-            return getFragmentManager();
+            return this;
         } else {
             if (parentFragment instanceof BaseFragment) {
-                return ((BaseFragment) parentFragment).parentFragmentManager();
+                return ((BaseFragment) parentFragment).topFragment();
             } else {
-                return parentFragment.getFragmentManager();
+                return parentFragment;
             }
         }
+    }
+
+    @Nullable
+    public FragmentManager parentFragmentManager() {
+        return topFragment().getFragmentManager();
     }
 
     @Override
@@ -160,10 +165,10 @@ public abstract class BaseFragment extends AbsLifeCycleFragment {
     }
 
     public void backFragment(boolean checkBackPress, boolean defaultAnim) {
-        FragmentManager fragmentManager = getFragmentManager();
+        FragmentManager fragmentManager = parentFragmentManager();
 
         FragmentHelper.Builder builder = FragmentHelper.build(fragmentManager)
-                .parentLayoutId(this)
+                .parentLayoutId(topFragment())
                 .setCheckBackPress(checkBackPress);
 
         if (defaultAnim) {
@@ -187,7 +192,10 @@ public abstract class BaseFragment extends AbsLifeCycleFragment {
         if (subscriptions != null) {
             subscriptions.add(subscription);
         }
-        if (RUtils.isNoNet()) {
+
+        /*没有离线缓存的情况下*/
+        if (RApplication.getApp().buildCacheInterceptor() == null
+                && RUtils.isNoNet()) {
             //取消网络请求
             if (onCancel != null) {
                 onCancel.run();
@@ -224,6 +232,7 @@ public abstract class BaseFragment extends AbsLifeCycleFragment {
         });
     }
 
+    @NotNull
     public CompositeSubscription getCompositeSubscription() {
         if (mSubscriptions == null || mSubscriptions.isUnsubscribed()) {
             mSubscriptions = new CompositeSubscription();

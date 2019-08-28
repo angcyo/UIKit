@@ -141,7 +141,10 @@ public class Button extends RTextView {
                         lineColor = subColor;
                         setTextColor(ResUtil.generateTextColor(Color.WHITE, subColor));
                     } else {
-                        setTextColor(ResUtil.generateTextColor(getCurrentTextColor(), ViewExKt.getColor(this, R.color.base_text_color)));
+                        int currentTextColor = getCurrentTextColor();
+                        if (currentTextColor == -1) {
+                            setTextColor(ResUtil.generateTextColor(currentTextColor, ViewExKt.getColor(this, R.color.base_text_color)));
+                        }
                     }
 
                     setBackground(ResUtil.ripple(rippleColor,
