@@ -689,6 +689,32 @@ public fun String?.isJsonEmpty(): Boolean {
     return TextUtils.isEmpty(this) || this == "{}"
 }
 
+public fun CharSequence?.jsonOrEmpty(): String {
+    return if (TextUtils.isEmpty(this)) {
+        "{}"
+    } else {
+        this.toString()
+    }
+}
+
+public fun CharSequence?.isJson(): Boolean {
+    if (TextUtils.isEmpty(this)) {
+        return false
+    }
+
+    val char = this!!
+
+    if (char.startsWith("{") && char.endsWith("}")) {
+        return true
+    }
+
+    if (char.startsWith("[") && char.endsWith("]")) {
+        return true
+    }
+
+    return false
+}
+
 /**分割字符串*/
 public fun String?.splits(
     regex: String,

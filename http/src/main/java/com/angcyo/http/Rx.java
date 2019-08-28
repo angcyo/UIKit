@@ -1,5 +1,7 @@
 package com.angcyo.http;
 
+import android.os.Looper;
+
 import androidx.annotation.Nullable;
 import rx.Observable;
 import rx.Observer;
@@ -80,6 +82,14 @@ public class Rx<Rx> extends Observable<Rx> {
                         onMain.run();
                     }
                 });
+    }
+
+    public static void onMain(final Runnable onMain) {
+        if (Looper.myLooper() == Looper.getMainLooper()) {
+            onMain.run();
+        } else {
+            main(onMain);
+        }
     }
 
     /**
