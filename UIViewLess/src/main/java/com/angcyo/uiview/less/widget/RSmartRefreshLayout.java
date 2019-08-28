@@ -6,6 +6,10 @@ import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
+
+import androidx.annotation.NonNull;
+
+import com.angcyo.lib.L;
 import com.angcyo.uiview.less.R;
 import com.angcyo.uiview.less.smart.MaterialHeader;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
@@ -13,6 +17,7 @@ import com.scwang.smartrefresh.layout.footer.ClassicsFooter;
 
 /**
  * Email:angcyo@126.com
+ * https://github.com/scwang90/SmartRefreshLayout
  *
  * @author angcyo
  * @date 2018/12/13
@@ -200,5 +205,27 @@ public class RSmartRefreshLayout extends SmartRefreshLayout {
             return false;
         }
         return super.onTouchEvent(event);
+    }
+
+    @Override
+    public void onFinishInflate() {
+        super.onFinishInflate();
+        mRefreshContent = new RRefreshContentWrapper(mRefreshContent.getView());
+    }
+
+    public void addContentTranslationListener(@NonNull OnContentViewTranslationListener listener) {
+        if (mRefreshContent instanceof RRefreshContentWrapper) {
+            ((RRefreshContentWrapper) mRefreshContent).getTranslationListenerSet().add(listener);
+        } else {
+            L.w("被忽略的操作");
+        }
+    }
+
+    public void removeContentTranslationListener(@NonNull OnContentViewTranslationListener listener) {
+        if (mRefreshContent instanceof RRefreshContentWrapper) {
+            ((RRefreshContentWrapper) mRefreshContent).getTranslationListenerSet().remove(listener);
+        } else {
+            L.w("被忽略的操作");
+        }
     }
 }
