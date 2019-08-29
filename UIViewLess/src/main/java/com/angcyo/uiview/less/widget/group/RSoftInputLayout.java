@@ -534,6 +534,16 @@ public class RSoftInputLayout extends FrameLayout {
 
             if (isSoftKeyboardShow() && insetBottom <= 0) {
                 //软件已经显示, 此时却要隐藏键盘. ViewPager中, 使用此控件支持.
+
+                //当启动一个新的Activity时, 也会触发此场景.
+                post(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (!isSoftKeyboardShow()) {
+                            insetBottom(0);
+                        }
+                    }
+                });
                 return super.onApplyWindowInsets(insets);
             }
 
