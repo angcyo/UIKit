@@ -34,7 +34,7 @@ public class LocalMedia implements Parcelable {
     private String path;
     private String compressPath;
     private String cutPath;
-    private long duration;
+    private long duration; //毫秒
     private boolean isChecked;
     private boolean isCut;
     /**
