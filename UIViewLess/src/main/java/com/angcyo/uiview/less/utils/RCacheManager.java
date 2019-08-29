@@ -4,6 +4,11 @@ import android.content.Context;
 import android.os.Environment;
 import android.text.TextUtils;
 import android.text.format.Formatter;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.collection.ArraySet;
+
 import com.angcyo.lib.L;
 import rx.Observable;
 import rx.Observer;
@@ -14,6 +19,7 @@ import rx.schedulers.Schedulers;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 应用程序缓存管理, 用来清理, 计算缓存大小
@@ -26,12 +32,49 @@ public class RCacheManager {
      * 缓存目录列表
      */
     List<String> cachePaths = new ArrayList<>();
+    Set<CacheInterceptor> interceptors = new ArraySet<>();
 
     private RCacheManager() {
     }
 
     public static RCacheManager instance() {
         return Holder.instance;
+    }
+
+    public void addCacheInterceptor(CacheInterceptor interceptor) {
+        interceptors.add(interceptor);
+    }
+
+    public void removeCacheInterceptor(CacheInterceptor interceptor) {
+        interceptors.remove(interceptor);
+    }
+
+    private static boolean clearPath(@NonNull String path, Set<CacheInterceptor> set) {
+        if (set == null || set.isEmpty()) {
+            return true;
+        }
+        boolean result = true;
+        for (CacheInterceptor interceptor : set) {
+            if (interceptor.interceptorClearPath(path)) {
+                result = false;
+                break;
+            }
+        }
+        return result;
+    }
+
+    private static boolean clearFile(@NonNull File file, @NonNull String filePath, Set<CacheInterceptor> set) {
+        if (set == null || set.isEmpty()) {
+            return true;
+        }
+        boolean result = true;
+        for (CacheInterceptor interceptor : set) {
+            if (interceptor.interceptorClearFile(file, filePath)) {
+                result = false;
+                break;
+            }
+        }
+        return result;
     }
 
     public static Observable<Boolean> clearCacheFolder(final String... paths) {
@@ -46,7 +89,7 @@ public class RCacheManager {
                     protected Integer next(Integer state, Observer<? super Boolean> observer) {
                         if (state > 0) {
                             for (String path : paths) {
-                                deleteFolderFile(path, false);
+                                deleteFolderFile(path, false, null);
                             }
                             observer.onNext(true);
                             observer.onCompleted();
@@ -87,25 +130,27 @@ public class RCacheManager {
      * @param filePath       filePath
      * @param deleteThisPath deleteThisPath
      */
-    private static boolean deleteFolderFile(String filePath, boolean deleteThisPath) {
+    private static boolean deleteFolderFile(String filePath, boolean deleteThisPath, @Nullable Set<CacheInterceptor> set) {
         if (!TextUtils.isEmpty(filePath)) {
             File file = new File(filePath);
-            return deleteFolderFile(file, deleteThisPath);
+            return deleteFolderFile(file, deleteThisPath, set);
         }
         return false;
     }
 
-    private static boolean deleteFolderFile(File file, boolean deleteThisPath) {
+    private static boolean deleteFolderFile(File file, boolean deleteThisPath, @Nullable Set<CacheInterceptor> set) {
         try {
             if (file.isDirectory()) {
                 File files[] = file.listFiles();
                 for (File file1 : files) {
-                    deleteFolderFile(file1.getAbsolutePath(), true);
+                    deleteFolderFile(file1.getAbsolutePath(), true, set);
                 }
             }
             if (deleteThisPath) {
                 if (!file.isDirectory()) {
-                    file.delete();
+                    if (clearFile(file, file.getAbsolutePath(), set)) {
+                        file.delete();
+                    }
                 } else {
                     if (file.listFiles().length == 0) {
                         file.delete();
@@ -185,7 +230,9 @@ public class RCacheManager {
                     protected Integer next(Integer state, Observer<? super Boolean> observer) {
                         if (state > 0) {
                             for (String path : cachePaths) {
-                                deleteFolderFile(path, false);
+                                if (clearPath(path, interceptors)) {
+                                    deleteFolderFile(path, false, interceptors);
+                                }
                             }
                             observer.onNext(true);
                             observer.onCompleted();
@@ -199,5 +246,21 @@ public class RCacheManager {
 
     private static class Holder {
         static RCacheManager instance = new RCacheManager();
+    }
+
+    public interface CacheInterceptor {
+        /**
+         * 是否需要拦截清理指定路径
+         *
+         * @return true 不清理此路径
+         */
+        boolean interceptorClearPath(@NonNull String path);
+
+        /**
+         * 是否需要拦截清理指定文件
+         *
+         * @return true 不清理此文件
+         */
+        boolean interceptorClearFile(@NonNull File file, @NonNull String filePath);
     }
 }

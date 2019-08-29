@@ -15,6 +15,7 @@ import com.angcyo.http.Rx
 import com.angcyo.uiview.less.R
 import com.angcyo.uiview.less.base.BaseFragment
 import com.angcyo.uiview.less.base.helper.FragmentHelper
+import com.angcyo.uiview.less.base.helper.FragmentHelper.Builder.DEFAULT_NO_ANIM
 import com.angcyo.uiview.less.draw.view.HSProgressView
 import com.angcyo.uiview.less.kotlin.dialog.menuDialog
 import com.angcyo.uiview.less.kotlin.minValue
@@ -413,6 +414,10 @@ open class FileSelectorFragment : BaseFragment() {
                 }
             })
         )
+    }
+
+    override fun configBackBuilder(builder: FragmentHelper.Builder) {
+        builder.anim(DEFAULT_NO_ANIM, R.anim.base_tran_to_bottom_exit)
     }
 }
 

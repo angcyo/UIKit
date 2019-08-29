@@ -177,7 +177,17 @@ public abstract class BaseFragment extends AbsLifeCycleFragment {
             builder.noAnim();
         }
 
+        configBackBuilder(builder);
+
         builder.back(getActivity());
+    }
+
+    /**
+     * @see #backFragment(boolean, boolean)
+     * @see BaseAppCompatActivity#onFragmentBackPressed(int, Fragment)
+     */
+    protected void configBackBuilder(@NonNull FragmentHelper.Builder builder) {
+
     }
 
     //<editor-fold defaultstate="collapsed" desc="网络请求管理">

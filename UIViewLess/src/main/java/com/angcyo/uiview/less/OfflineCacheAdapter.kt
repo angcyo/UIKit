@@ -8,6 +8,7 @@ import com.angcyo.uiview.less.OfflineCacheAdapter.Companion.ENTRY_BODY
 import com.angcyo.uiview.less.OfflineCacheAdapter.Companion.ENTRY_METADATA
 import com.angcyo.uiview.less.kotlin.app
 import com.angcyo.uiview.less.kotlin.readString
+import com.angcyo.uiview.less.utils.RCacheManager
 import com.angcyo.uiview.less.utils.RLogFile
 import com.angcyo.uiview.less.utils.RNetwork
 import com.angcyo.uiview.less.utils.Root
@@ -25,7 +26,8 @@ import java.io.IOException
  * @date 2019/07/24
  * Copyright (c) 2019 ShenZhen O&M Cloud Co., Ltd. All rights reserved.
  */
-open class OfflineCacheAdapter : CacheAdapter() {
+open class OfflineCacheAdapter(cacheFolder: String = Root.getAppExternalFolder("http_cache")) :
+    CacheAdapter() {
 
     companion object {
         const val VERSION = 201105
@@ -36,7 +38,7 @@ open class OfflineCacheAdapter : CacheAdapter() {
 
     val cache: DiskLruCache = DiskLruCache.create(
         FileSystem.SYSTEM,
-        File(Root.getAppExternalFolder("http_cache")),
+        File(cacheFolder),
         VERSION,
         ENTRY_COUNT, 500 * 1024 * 1024L
     )
@@ -45,6 +47,9 @@ open class OfflineCacheAdapter : CacheAdapter() {
 
     init {
         cache.initialize()
+
+        RCacheManager.instance()
+            .addCachePath(cacheFolder)
     }
 
     override fun checkNeedCache(request: Request): Boolean {

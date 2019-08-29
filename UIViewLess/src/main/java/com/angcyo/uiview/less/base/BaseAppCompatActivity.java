@@ -111,7 +111,7 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
             int size = fragments.size();
 
             if (size > 1) {
-                if (!onFragmentBackPressed(fragmentParentLayoutId)) {
+                if (!onFragmentBackPressed(fragmentParentLayoutId, fragments.get(size - 1))) {
                     return;
                 }
             } else if (size == 1) {
@@ -144,11 +144,17 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
      *
      * @return true activity can back .
      */
-    protected boolean onFragmentBackPressed(int layoutId) {
-        return FragmentHelper.build(getSupportFragmentManager())
+    protected boolean onFragmentBackPressed(int layoutId, @Nullable Fragment lastFragment) {
+
+        FragmentHelper.Builder builder = FragmentHelper.build(getSupportFragmentManager())
                 .parentLayoutId(layoutId)
-                .defaultExitAnim()
-                .back(this);
+                .defaultExitAnim();
+
+        if (lastFragment instanceof BaseFragment) {
+            ((BaseFragment) lastFragment).configBackBuilder(builder);
+        }
+
+        return builder.back(this);
     }
 
     /**
