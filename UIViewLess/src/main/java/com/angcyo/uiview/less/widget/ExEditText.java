@@ -445,6 +445,8 @@ public class ExEditText extends AppCompatEditText {
     @Override
     protected void onFocusChanged(boolean focused, int direction, Rect previouslyFocusedRect) {
         super.onFocusChanged(focused, direction, previouslyFocusedRect);
+        //L.v("onFocusChanged:" + focused + " " + direction + " " + previouslyFocusedRect);
+
         checkEdit(focused);
 
         if (focused) {
@@ -483,6 +485,8 @@ public class ExEditText extends AppCompatEditText {
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
+        //L.v("onSizeChanged:" + oldw + "->" + w + " " + oldh + "->" + h);
+
         if (showClear) {
             int offset = (int) (4 * getResources().getDisplayMetrics().density);
             clearRect.set(w - getPaddingRight() - getClearDrawable().getIntrinsicWidth() - offset,
@@ -1988,9 +1992,7 @@ public class ExEditText extends AppCompatEditText {
                 View view = decorView.get();
                 if (view != null) {
 
-                    InputMethodManager manager = (InputMethodManager) view.getContext()
-                            .getSystemService(Context.INPUT_METHOD_SERVICE);
-                    manager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                    RSoftInputLayout.hideSoftInput(view);
 
                     remove();
                 }

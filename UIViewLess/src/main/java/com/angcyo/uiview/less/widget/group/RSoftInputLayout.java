@@ -67,6 +67,11 @@ public class RSoftInputLayout extends FrameLayout {
     private boolean enableSoftInputAnim = true;
 
     /**
+     * 可以关闭此开关, 当键盘弹出时, 只有事件回调, 没有界面size处理. (API>=21)
+     */
+    private boolean enableSoftInputInset = true;
+
+    /**
      * 频繁切换键盘, 延迟检查时长.
      * 如果开启了手机的安全密码输入键盘, 可以适当的加大延迟时间. 消除抖动.
      */
@@ -129,8 +134,10 @@ public class RSoftInputLayout extends FrameLayout {
         defaultKeyboardHeight = array.getDimensionPixelOffset(R.styleable.RSoftInputLayout_r_default_soft_input_height, defaultKeyboardHeight);
         animPaddingTop = array.getDimensionPixelOffset(R.styleable.RSoftInputLayout_r_soft_input_anim_padding_top, animPaddingTop);
         animPaddingMinTop = array.getDimensionPixelOffset(R.styleable.RSoftInputLayout_r_soft_input_anim_padding_min_top, animPaddingMinTop);
+        enableSoftInput = array.getBoolean(R.styleable.RSoftInputLayout_r_enable_soft_input, enableSoftInput);
         enableSoftInputAnim = array.getBoolean(R.styleable.RSoftInputLayout_r_enable_soft_input_anim, enableSoftInputAnim);
         enableEmojiRestore = array.getBoolean(R.styleable.RSoftInputLayout_r_enable_emoji_restore, enableEmojiRestore);
+        enableSoftInputInset = array.getBoolean(R.styleable.RSoftInputLayout_r_enable_soft_input_inset, enableSoftInputInset);
         switchCheckDelay = array.getInt(R.styleable.RSoftInputLayout_r_switch_check_delay, switchCheckDelay);
         animDuration = array.getInt(R.styleable.RSoftInputLayout_r_anim_duration, (int) animDuration);
         array.recycle();
@@ -1121,7 +1128,10 @@ public class RSoftInputLayout extends FrameLayout {
 
                 if (diffHeight > 0) {
                     //当用代码调整了布局的height属性, 也会回调此方法.
-                    bottomCurrentShowHeight = diffHeight;
+
+                    if (enableSoftInputInset) {
+                        bottomCurrentShowHeight = diffHeight;
+                    }
 
                     if (softKeyboardShow) {
                         lastKeyboardHeight = diffHeight;
@@ -1130,8 +1140,9 @@ public class RSoftInputLayout extends FrameLayout {
                         emojiLayoutShow = intentAction == INTENT_SHOW_EMOJI;
                         //有可能是表情布局显示
                     }
+
                     notifyEmojiLayoutChangeListener(emojiLayoutShow, softKeyboardShow, diffHeight);
-                    if (needAnim) {
+                    if (needAnim && enableSoftInputInset) {
                         if (isAnimStart()) {
                             startAnim(Math.abs(bottomCurrentShowHeightAnim), diffHeight, animDuration);
                         } else {

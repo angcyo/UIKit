@@ -31,6 +31,11 @@ import com.angcyo.uiview.less.widget.group.TitleBarLayout;
 public abstract class BaseTitleFragment extends BaseFragment implements AffectUI.OnAffectListener {
 
     /**
+     * Fragment 根布局.
+     * */
+    protected FragmentContentWrapperLayout fragmentContentWrapperLayout;
+
+    /**
      * Fragment 内容布局, 将add到这个ViewGroup
      */
     protected FrameLayout contentWrapperLayout;
@@ -49,8 +54,6 @@ public abstract class BaseTitleFragment extends BaseFragment implements AffectUI
      * 情感图控制
      */
     protected AffectUI affectUI;
-
-    protected FragmentContentWrapperLayout fragmentContentWrapperLayout;
 
     protected BaseUI.UIFragment uiFragment;
 
