@@ -5,6 +5,7 @@ import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.app.Activity
+import android.content.res.ColorStateList
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.Color
@@ -211,6 +212,8 @@ public fun TextView.setLeftIco(drawable: Drawable?) {
 }
 
 public fun View.getColor(id: Int): Int = ContextCompat.getColor(context, id)
+
+public fun View.getColorList(id: Int): ColorStateList? = ContextCompat.getColorStateList(context, id)
 
 public fun View.getDimensionPixelOffset(id: Int): Int = resources.getDimensionPixelOffset(id)
 
