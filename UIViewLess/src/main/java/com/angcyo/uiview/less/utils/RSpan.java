@@ -328,6 +328,24 @@ public class RSpan extends SpanUtils {
 
         private RectF drawRect = new RectF();
 
+        /**
+         * 当[RTextView]onMeasure时, 会赋值.
+         *
+         * @see com.angcyo.uiview.less.widget.RTextView#onMeasure(int, int)
+         */
+        public int textViewMeasureWidth = -1;
+
+        /**
+         * 宽度是[textViewMeasureWidth]多少倍.
+         * 需要[RTextView]的支持, 并且非[wrap_content]测量模式
+         */
+        protected float spanWeight = -1f;
+
+        /**
+         * 最大宽度weight限制
+         */
+        protected float spanMaxWeight = -1f;
+
         public TextSpan() {
 
         }
@@ -376,7 +394,7 @@ public class RSpan extends SpanUtils {
         }
 
         protected float measureTextWidthMargin(@NonNull Paint paint, CharSequence text, int start, int end) {
-            return measureTextWidth(paint, text, start, end) + marginLeft + marginRight + paddingLeft + paddingRight;
+            return chooseSize(measureTextWidth(paint, text, start, end) + marginLeft + marginRight + paddingLeft + paddingRight);
         }
 
         protected float measureTextWidth(@NonNull Paint paint, CharSequence text, int start, int end) {
@@ -405,6 +423,40 @@ public class RSpan extends SpanUtils {
                 }
             }
             return size;
+        }
+
+        protected float chooseSize(float textSize) {
+            float mxSize = chooseMaxSize();
+
+            float tSize = textSize;
+            if (textViewMeasureWidth > 0) {
+                if (spanWeight > 0) {
+                    tSize = textViewMeasureWidth * spanWeight;
+                }
+            }
+
+            if (minSize < 0) {
+                //未设置min size
+            } else {
+                //设置了min size
+                tSize = Math.max(tSize, minSize);
+            }
+
+            if (mxSize > 0) {
+                tSize = Math.min(tSize, mxSize);
+            }
+
+            return tSize;
+        }
+
+        protected float chooseMaxSize() {
+            float mxSize = maxSize;
+            if (textViewMeasureWidth > 0) {
+                if (spanMaxWeight > 0) {
+                    mxSize = textViewMeasureWidth * spanMaxWeight;
+                }
+            }
+            return mxSize;
         }
 
         @Override
@@ -524,7 +576,7 @@ public class RSpan extends SpanUtils {
                 float drawBottom = bottom - marginBottom;
 
                 float spanRight = drawLeft + measureTextWidth + paddingLeft + paddingRight;
-                float spanWidth = spanRight - drawLeft;
+                float spanWidth = chooseSize(spanRight - drawLeft - +paddingLeft - paddingRight) + paddingLeft + paddingRight;
                 float spanHeight = drawBottom - drawTop;
 
                 boolean keepCircle = keepCircle(validText);
@@ -577,6 +629,8 @@ public class RSpan extends SpanUtils {
 
                 start = 0;
                 end = validText.length();
+
+                float maxSize = chooseMaxSize();
 
                 if (maxSize > 0) {
                     String textString = String.valueOf(validText);
@@ -751,5 +805,12 @@ public class RSpan extends SpanUtils {
             this.backgroundRadius = backgroundRadius;
         }
 
+        public void setSpanWeight(float spanWeight) {
+            this.spanWeight = spanWeight;
+        }
+
+        public void setSpanMaxWeight(float spanMaxWeight) {
+            this.spanMaxWeight = spanMaxWeight;
+        }
     }
 }

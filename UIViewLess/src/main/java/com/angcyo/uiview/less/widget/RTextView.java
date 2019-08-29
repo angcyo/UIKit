@@ -2,11 +2,21 @@ package com.angcyo.uiview.less.widget;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.graphics.*;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.RectF;
+import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
-import android.text.*;
+import android.text.InputFilter;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+import android.text.TextPaint;
+import android.text.TextUtils;
 import android.text.style.CharacterStyle;
 import android.text.style.ForegroundColorSpan;
 import android.util.AttributeSet;
@@ -15,18 +25,21 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.TextView;
+
 import androidx.annotation.ColorInt;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatTextView;
 import androidx.core.content.ContextCompat;
+
 import com.angcyo.uiview.less.R;
 import com.angcyo.uiview.less.draw.RDrawNoRead;
 import com.angcyo.uiview.less.draw.TextDraw;
 import com.angcyo.uiview.less.kotlin.ExKt;
 import com.angcyo.uiview.less.kotlin.ViewExKt;
 import com.angcyo.uiview.less.skin.SkinHelper;
+import com.angcyo.uiview.less.utils.RSpan;
 import com.angcyo.uiview.less.utils.RUtils;
 import com.angcyo.uiview.less.utils.Reflect;
 
@@ -708,6 +721,22 @@ public class RTextView extends AppCompatTextView {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+
+        int widthSize = View.MeasureSpec.getSize(widthMeasureSpec);
+        int widthMode = View.MeasureSpec.getMode(widthMeasureSpec);
+
+        if (widthMode == View.MeasureSpec.EXACTLY) {
+            CharSequence text = getText();
+            if (text instanceof Spanned) {
+                Object[] spans = ((Spanned) text).getSpans(0, text.length(), Object.class);
+                for (Object span : spans) {
+                    if (span instanceof RSpan.TextSpan) {
+                        ((RSpan.TextSpan) span).textViewMeasureWidth = widthSize;
+                    }
+                }
+            }
+        }
+
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         if (aeqWidth) {
             int size = Math.max(getMeasuredWidth(), getMeasuredHeight());

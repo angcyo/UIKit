@@ -685,6 +685,12 @@ public fun span(init: RSpan.() -> Unit): SpannableStringBuilder {
     }.create()
 }
 
+public fun textSpan(init: RSpan.TextSpan.() -> Unit): RSpan.TextSpan {
+    return RSpan.TextSpan().apply {
+        init()
+    }
+}
+
 public fun String?.isJsonEmpty(): Boolean {
     return TextUtils.isEmpty(this) || this == "{}"
 }
