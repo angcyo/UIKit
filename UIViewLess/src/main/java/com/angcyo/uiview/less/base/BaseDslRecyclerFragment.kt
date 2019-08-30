@@ -25,12 +25,26 @@ open class BaseDslRecyclerFragment : BaseRecyclerFragment<DslAdapterItem>() {
     var baseDslItemDecoration = DslItemDecoration()
 
     override fun onCreateAdapter(datas: MutableList<DslAdapterItem>?): RBaseAdapter<DslAdapterItem> {
-        return DslAdapter(mAttachContext, datas).apply {
-            dslDateFilter = DslDateFilter(this)
+        return object : DslAdapter() {
+            init {
+                dslDateFilter = DslDateFilter(this)
+            }
+
+            override fun onScrollStateChanged(recyclerView: RRecyclerView, newState: Int) {
+                this@BaseDslRecyclerFragment.onRecyclerScrollStateChanged(recyclerView, newState)
+            }
+
+            override fun onScrolled(recyclerView: RRecyclerView, dx: Int, dy: Int) {
+                this@BaseDslRecyclerFragment.onRecyclerScrolled(recyclerView, dx, dy)
+            }
         }
     }
 
-    override fun onInitBaseView(viewHolder: RBaseViewHolder, arguments: Bundle?, savedInstanceState: Bundle?) {
+    override fun onInitBaseView(
+        viewHolder: RBaseViewHolder,
+        arguments: Bundle?,
+        savedInstanceState: Bundle?
+    ) {
         super.onInitBaseView(viewHolder, arguments, savedInstanceState)
     }
 

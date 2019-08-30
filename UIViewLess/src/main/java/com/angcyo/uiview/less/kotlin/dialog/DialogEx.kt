@@ -4,7 +4,6 @@ import android.app.Dialog
 import android.content.Context
 import android.graphics.Color
 import android.os.Build
-import androidx.fragment.app.Fragment
 import android.text.InputType
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -36,16 +35,23 @@ fun Context.buildBottomDialog(): RDialog.Builder {
         .setDialogGravity(Gravity.BOTTOM)
 }
 
-public fun configDialogBuilder(builder: RDialog.Builder, dialogConfig: BaseDialogConfig): RDialog.Builder {
+public fun configDialogBuilder(
+    builder: RDialog.Builder,
+    dialogConfig: BaseDialogConfig
+): RDialog.Builder {
     builder.setCancelable(dialogConfig.dialogCancel)
         .setCanceledOnTouchOutside(dialogConfig.dialogCanceledOnTouchOutside)
         .setOnCancelListener {
-            dialogConfig.onDialogCancel(it as Dialog)
-            dialogConfig.onDialogCancel.invoke(it)
+            (it as? Dialog)?.also { dialog ->
+                dialogConfig.onDialogCancel(dialog)
+                dialogConfig.onDialogCancel.invoke(dialog)
+            }
         }
         .setOnDismissListener {
-            dialogConfig.onDialogDismiss(it as Dialog)
-            dialogConfig.onDialogDismiss.invoke(it)
+            (it as? Dialog)?.also { dialog ->
+                dialogConfig.onDialogDismiss(dialog)
+                dialogConfig.onDialogDismiss.invoke(dialog)
+            }
         }
         .setContentLayoutId(dialogConfig.dialogLayoutId)
         .setInitListener(object : RDialog.OnInitListener() {
@@ -217,7 +223,10 @@ fun Context.popupWindow(anchor: View? = null, config: PopupConfig.() -> Unit): P
         popupConfig.anchor?.let {
             val viewRect = it.getViewRect()
             if (popupConfig.exactlyHeight) {
-                height = max(RUtils.getContentViewHeight(it.context), RUtils.getScreenHeight()) - viewRect.bottom
+                height = max(
+                    RUtils.getContentViewHeight(it.context),
+                    RUtils.getScreenHeight()
+                ) - viewRect.bottom
             }
 
             if (viewRect.bottom >= RUtils.getScreenHeight()) {
@@ -260,9 +269,19 @@ fun Context.popupWindow(anchor: View? = null, config: PopupConfig.() -> Unit): P
     }
 
     if (popupConfig.parent != null) {
-        window.showAtLocation(popupConfig.parent, popupConfig.gravity, popupConfig.xoff, popupConfig.yoff)
+        window.showAtLocation(
+            popupConfig.parent,
+            popupConfig.gravity,
+            popupConfig.xoff,
+            popupConfig.yoff
+        )
     } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-        window.showAsDropDown(popupConfig.anchor, popupConfig.xoff, popupConfig.yoff, popupConfig.gravity)
+        window.showAsDropDown(
+            popupConfig.anchor,
+            popupConfig.xoff,
+            popupConfig.yoff,
+            popupConfig.gravity
+        )
     } else {
         window.showAsDropDown(popupConfig.anchor, popupConfig.xoff, popupConfig.yoff)
     }
@@ -300,7 +319,10 @@ fun Context.calendarDialog(config: CalendarDialogConfig.() -> Unit): Dialog {
     return buildBottomDialog().show(dialogConfig)
 }
 
-fun <T : BaseDialogConfig> Context.customBottomDialog(customConfig: T, config: T.() -> Unit): Dialog {
+fun <T : BaseDialogConfig> Context.customBottomDialog(
+    customConfig: T,
+    config: T.() -> Unit
+): Dialog {
     customConfig.config()
 
     return buildBottomDialog().show(customConfig)
@@ -352,7 +374,10 @@ fun androidx.fragment.app.Fragment.gridDialog(config: GridDialogConfig.() -> Uni
     return context!!.gridDialog(config)
 }
 
-fun androidx.fragment.app.Fragment.popupWindow(anchor: View? = null, config: PopupConfig.() -> Unit): PopupWindow {
+fun androidx.fragment.app.Fragment.popupWindow(
+    anchor: View? = null,
+    config: PopupConfig.() -> Unit
+): PopupWindow {
     return context!!.popupWindow(anchor, config)
 }
 
@@ -364,7 +389,10 @@ fun androidx.fragment.app.Fragment.optionDialog(config: OptionDialogConfig.() ->
     return context!!.optionDialog(config)
 }
 
-fun <T : BaseDialogConfig> androidx.fragment.app.Fragment.customBottomDialog(customConfig: T, config: T.() -> Unit): Dialog {
+fun <T : BaseDialogConfig> androidx.fragment.app.Fragment.customBottomDialog(
+    customConfig: T,
+    config: T.() -> Unit
+): Dialog {
     return context!!.customBottomDialog(customConfig, config)
 }
 
@@ -430,7 +458,10 @@ fun RBaseViewHolder.optionDialog(config: OptionDialogConfig.() -> Unit): Dialog 
     return context!!.optionDialog(config)
 }
 
-fun <T : BaseDialogConfig> RBaseViewHolder.customBottomDialog(customConfig: T, config: T.() -> Unit): Dialog {
+fun <T : BaseDialogConfig> RBaseViewHolder.customBottomDialog(
+    customConfig: T,
+    config: T.() -> Unit
+): Dialog {
     return context!!.customBottomDialog(customConfig, config)
 }
 

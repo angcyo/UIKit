@@ -47,6 +47,8 @@ public abstract class BaseRecyclerFragment<T> extends BaseLoadFragment
      */
     protected int requestPageIndex = FIRST_PAGE_INDEX;
 
+    //<editor-fold desc="初始化部分">
+
     @Override
     protected int getContentLayoutId() {
         return R.layout.base_recycler_fragment_layout;
@@ -131,6 +133,10 @@ public abstract class BaseRecyclerFragment<T> extends BaseLoadFragment
         }
     }
 
+    //</editor-fold desc="初始化部分">
+
+    //<editor-fold desc="属性和方法">
+
     /**
      * 禁掉下拉刷新效果
      */
@@ -164,8 +170,6 @@ public abstract class BaseRecyclerFragment<T> extends BaseLoadFragment
         resetAdapterStatus();
     }
 
-    //<editor-fold desc="事件回调">
-
     public void resetRefreshStatus() {
         if (smartRefreshLayout != null) {
             if (smartRefreshLayout.isEnableRefresh()) {
@@ -196,6 +200,10 @@ public abstract class BaseRecyclerFragment<T> extends BaseLoadFragment
         }
     }
 
+    //</editor-fold desc="属性和方法">
+
+    //<editor-fold desc="Adapter相关">
+
     /**
      * 创建适配器
      */
@@ -217,8 +225,36 @@ public abstract class BaseRecyclerFragment<T> extends BaseLoadFragment
             protected void onLoadMore() {
                 super.onLoadMore();
             }
+
+            @Override
+            public void onScrollStateChanged(@NonNull RRecyclerView recyclerView, int newState) {
+                BaseRecyclerFragment.this.onRecyclerScrollStateChanged(recyclerView, newState);
+            }
+
+            @Override
+            public void onScrolled(@NonNull RRecyclerView recyclerView, int dx, int dy) {
+                BaseRecyclerFragment.this.onRecyclerScrolled(recyclerView, dx, dy);
+            }
         };
     }
+
+    /**
+     * @see RRecyclerView#mScrollListener
+     */
+    public void onRecyclerScrolled(@NonNull RRecyclerView recyclerView, int dx, int dy) {
+
+    }
+
+    /**
+     * @see RRecyclerView#mScrollListener
+     */
+    public void onRecyclerScrollStateChanged(@NonNull RRecyclerView recyclerView, int newState) {
+
+    }
+
+    //</editor-fold desc="Adapter相关">
+
+    //<editor-fold desc="事件回调">
 
     /**
      * 刷新控件, 刷新事件
@@ -243,10 +279,6 @@ public abstract class BaseRecyclerFragment<T> extends BaseLoadFragment
     public void onAdapterLodeMore(@NonNull final RBaseAdapter<T> adapter) {
         onBaseLoadMore(null, adapter);
     }
-
-    //</editor-fold>
-
-    //<editor-fold desc="分页加载相关">
 
     @Override
     public boolean onAdapterRefresh(@NonNull RBaseAdapter<T> baseAdapter) {
@@ -352,7 +384,7 @@ public abstract class BaseRecyclerFragment<T> extends BaseLoadFragment
         }
     }
 
-    //</editor-fold desc="分页加载相关">
+    //</editor-fold desc="事件回调">
 
     /**
      * 获取缓存池
