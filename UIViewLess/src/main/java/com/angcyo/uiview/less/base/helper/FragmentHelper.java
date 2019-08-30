@@ -1161,7 +1161,7 @@ public class FragmentHelper {
             } else if (canBack && size == 1) {
                 if (finishActivity) {
                     //关闭Activity
-                    activity.finish();
+                    ActivityHelper.build(activity).defaultExitAnim().finish();
                 }
             }
 
