@@ -676,6 +676,11 @@ public class FragmentHelper {
          * 是否要确认允许返回, 如果false, 则不会回调 onBackPressed 方法
          */
         boolean checkBackPress = true;
+
+        /**
+         * 当Activity只有一个Fragment, 触发back, 是否需要关闭Activity
+         */
+        boolean finishActivity = false;
         private List<Fragment> replaceKeepFragmentList = new ArrayList<>();
         private FragmentTransaction fragmentTransaction;
 
@@ -1000,6 +1005,11 @@ public class FragmentHelper {
             return this;
         }
 
+        public Builder setFinishActivity(boolean finishActivity) {
+            this.finishActivity = finishActivity;
+            return this;
+        }
+
         private void parent(Fragment lastFragment) {
             if (lastFragment == null || parentFragment == null) {
                 return;
@@ -1149,8 +1159,10 @@ public class FragmentHelper {
             if (needCommit) {
                 commitInner(fragmentTransaction);
             } else if (canBack && size == 1) {
-                //关闭Activity
-                activity.finish();
+                if (finishActivity) {
+                    //关闭Activity
+                    activity.finish();
+                }
             }
 
             return canBack;
