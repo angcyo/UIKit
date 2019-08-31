@@ -677,6 +677,20 @@ public fun SpanUtils.appendln() {
     append(System.getProperty("line.separator")!!)
 }
 
+public fun SpanUtils.appendlnNotEmpty(char: CharSequence?) {
+    if (!TextUtils.isEmpty(char)) {
+        append(char!!)
+        appendln()
+    }
+}
+
+public fun StringBuilder.appendlnNotEmpty(char: CharSequence?) {
+    if (!TextUtils.isEmpty(char)) {
+        append(char)
+        appendln()
+    }
+}
+
 public fun span(init: RSpan.() -> Unit): SpannableStringBuilder {
     return RSpan.get().apply {
         this.init()
