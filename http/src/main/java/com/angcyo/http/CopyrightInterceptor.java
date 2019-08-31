@@ -60,15 +60,12 @@ public class CopyrightInterceptor implements Interceptor {
         return result;
     }
 
-    StringBuilder builder;
-
     public CopyrightInterceptor() {
-        builder = new StringBuilder();
     }
 
     @Override
     public Response intercept(Chain chain) throws IOException {
-        builder.delete(0, builder.length());
+        StringBuilder builder = new StringBuilder();
 
         builder.append(Build.VERSION.RELEASE).append("/");
         builder.append(Build.VERSION.SDK_INT).append(" ");
