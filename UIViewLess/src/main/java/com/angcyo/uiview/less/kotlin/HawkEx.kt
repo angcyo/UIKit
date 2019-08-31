@@ -57,7 +57,13 @@ public fun String?.hawkPut(value: String?) {
 public fun String?.hawkGet(): String? {
     var result: String? = null
     this?.let {
-        result = Hawk.get(it, null)
+        result = Hawk.get<String>(it, null)
     }
     return result
+}
+
+public fun String?.hawkDelete() {
+    this?.let {
+        Hawk.delete(it)
+    }
 }

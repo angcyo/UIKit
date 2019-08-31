@@ -23,9 +23,7 @@ import com.angcyo.uiview.less.utils.utilcode.utils.ImageUtils
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
 import okio.Buffer
-import java.io.ByteArrayOutputStream
-import java.io.File
-import java.io.FileOutputStream
+import java.io.*
 import java.net.URLDecoder
 import java.net.URLEncoder
 import java.nio.charset.Charset
@@ -729,4 +727,13 @@ public fun String?.splits(
     maxSize: Int = Int.MAX_VALUE
 ): MutableList<String> {
     return RUtils.split(this, regex, allowEmpty, checkExist, maxSize)
+}
+
+/**堆栈信息转成字符串*/
+public fun Throwable.printString(): String {
+    val stringWriter = StringWriter()
+    val pw = PrintWriter(BufferedWriter(stringWriter))
+    printStackTrace(pw)
+    pw.close()
+    return stringWriter.toString()
 }

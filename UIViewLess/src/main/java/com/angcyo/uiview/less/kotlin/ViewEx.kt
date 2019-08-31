@@ -1189,3 +1189,14 @@ public fun ViewGroup.LayoutParams.constraintParams(config: ConstraintLayout.Layo
     (this as? ConstraintLayout.LayoutParams)?.config()
     return this
 }
+
+public fun TextView.setTextSizeWithDp(textSize: Any) {
+    setTextSize(
+        TypedValue.COMPLEX_UNIT_PX,
+        when (textSize) {
+            is Int -> textSize.toFloat()
+            is Float -> textSize
+            else -> getTextSize()
+        }
+    )
+}

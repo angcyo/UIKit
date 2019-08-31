@@ -1,8 +1,16 @@
 package com.angcyo.uiview.less.recycler.dslitem
 
+import android.view.Gravity
 import androidx.annotation.LayoutRes
+import com.angcyo.uiview.less.R
+import com.angcyo.uiview.less.base.BaseFragment
+import com.angcyo.uiview.less.component.FileSelectorFragment
+import com.angcyo.uiview.less.kotlin.*
 import com.angcyo.uiview.less.recycler.adapter.DslAdapter
 import com.angcyo.uiview.less.recycler.adapter.DslAdapterItem
+import com.angcyo.uiview.less.utils.RUtils
+import com.angcyo.uiview.less.utils.Root
+import com.angcyo.uiview.less.utils.Tip
 
 /**
  *
@@ -39,4 +47,41 @@ public fun DslAdapter.dslTextInfoItem(config: DslTextInfoItem.() -> Unit = {}) {
 /**单行文本+开关*/
 public fun DslAdapter.dslSwitchInfoItem(config: DslSwitchInfoItem.() -> Unit = {}) {
     dslCustomItem(DslSwitchInfoItem(), config)
+}
+
+public fun DslAdapter.dslDeviceInfoItem(
+    fragment: BaseFragment,
+    config: DslAdapterItem.() -> Unit = {}
+) {
+    //设备信息
+    dslItem(R.layout.base_single_text_layout) {
+        itemBind = { itemHolder, _, _ ->
+            itemHolder.tv(R.id.base_text_view).apply {
+                text = span {
+                    append(RUtils.getIP(fragment.requireContext()))
+                    append(" ")
+                    append(RUtils.getMobileIP())
+                    appendln()
+                    append(Root.device_info(fragment.requireContext()))
+                }
+
+                gravity = Gravity.CENTER
+                setTextColor(getColor(R.color.base_text_color_dark))
+                setTextSizeWithDp(getDimen(R.dimen.base_dark_text_size))
+
+                clickIt {
+                    RUtils.copyText(itemHolder.tv(R.id.base_text_view).text)
+                    Tip.ok("已复制")
+
+                    FileSelectorFragment.show(fragment.parentFragmentManager()) {
+                        targetPath = Root.getAppExternalFolder()
+                        showFileMd5 = true
+                        showFileMenu = true
+                        showHideFile = true
+                    }
+                }
+            }
+        }
+        config()
+    }
 }

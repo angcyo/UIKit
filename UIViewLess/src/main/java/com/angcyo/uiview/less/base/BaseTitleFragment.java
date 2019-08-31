@@ -109,6 +109,11 @@ public abstract class BaseTitleFragment extends BaseFragment implements AffectUI
 
         //设置标题
         setTitleString(getFragmentTitle());
+
+        //标题栏事件拦截
+        if (interceptRootTouchEvent()) {
+            titleBarLayout.setClickable(true);
+        }
     }
 
     /**
