@@ -3,15 +3,20 @@ package com.angcyo.uiview.less.widget;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.os.Build;
+import android.util.AttributeSet;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewConfiguration;
+import android.view.ViewGroup;
+import android.widget.OverScroller;
+
 import androidx.annotation.Px;
 import androidx.core.view.GestureDetectorCompat;
 import androidx.core.view.MotionEventCompat;
 import androidx.recyclerview.widget.RecyclerView;
-import android.util.AttributeSet;
-import android.view.*;
-import android.widget.OverScroller;
+
 import com.angcyo.uiview.less.R;
-import com.angcyo.uiview.less.kotlin.ViewExKt;
 import com.angcyo.uiview.less.kotlin.ViewGroupExKt;
 import com.angcyo.uiview.less.recycler.RRecyclerView;
 import com.angcyo.uiview.less.utils.RUtils;
@@ -268,9 +273,7 @@ public class StickLayout2 extends ViewGroup {
         }
 
         if (mFloatView != null) {
-            if (mFloatView.getVisibility() == View.GONE) {
-                measureChild(mFloatView, ViewExKt.exactlyMeasure(this, 0), ViewExKt.exactlyMeasure(this, 0));
-            } else {
+            if (mFloatView.getVisibility() != View.GONE) {
                 measureChild(mFloatView, widthMeasureSpec, heightMeasureSpec);
             }
         }
@@ -290,7 +293,7 @@ public class StickLayout2 extends ViewGroup {
     }
 
     int floatViewHeight() {
-        if (mFloatView != null) {
+        if (mFloatView != null && mFloatView.getVisibility() != GONE) {
             return mFloatView.getMeasuredHeight();
         }
         return 0;
@@ -307,7 +310,7 @@ public class StickLayout2 extends ViewGroup {
         lastView.layout(0, firstView.getMeasuredHeight() + floatViewHeight(), r,
                 firstView.getMeasuredHeight() + floatViewHeight() + lastView.getMeasuredHeight());
 
-        if (mFloatView != null) {
+        if (mFloatView != null && mFloatView.getVisibility() == View.VISIBLE) {
             int scrollY = getScrollY();
             if (isFloat()) {
                 mFloatView.layout(mFloatView.getLeft(), scrollY + floatTopOffset, r,

@@ -1,6 +1,7 @@
 package com.angcyo.uiview.less.base.helper;
 
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
@@ -17,7 +18,12 @@ import android.transition.TransitionSet;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import androidx.annotation.*;
+
+import androidx.annotation.AnimRes;
+import androidx.annotation.ColorInt;
+import androidx.annotation.IdRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.arch.core.util.Function;
@@ -27,6 +33,7 @@ import androidx.core.util.Pair;
 import androidx.core.view.ViewCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+
 import com.angcyo.lib.L;
 import com.angcyo.uiview.less.base.BaseAppCompatActivity;
 import com.angcyo.uiview.less.kotlin.ExKt;
@@ -347,6 +354,12 @@ public class ActivityHelper {
             return this;
         }
 
+        public Builder setComponent(@NonNull ComponentName component) {
+            this.intent = new Intent();
+            this.intent.setComponent(component);
+            return this;
+        }
+
         /**
          * 用包名, 启动Activity
          */
@@ -515,22 +528,22 @@ public class ActivityHelper {
          * 步骤1: 获取共享元素属性值
          * 步骤2: 传递属性
          * 步骤3: 播放动画
-         *
-         *  示例:
-         *  1.启动新的Activity:
-         *   ActivityHelper.build(mAttachContext)
-         *             .setClass(cls)
-         *             .setBundle(BaseCallActivity.DATA, bundle)
-         *             .transitionView(userName, BaseCallActivity.USER_NAME)
-         *             .transitionView(userAvatar, BaseCallActivity.USER_AVATAR)
-         *             .doIt()
-         *
-         *  2.新的Activity#onCreate
-         *   ActivityHelper.transition(this)
-         *             .transitionView(avatarImg, USER_AVATAR)
-         *             .transitionView(userName, USER_NAME)
-         *             .defaultTransition()
-         *             .doIt()
+         * <p>
+         * 示例:
+         * 1.启动新的Activity:
+         * ActivityHelper.build(mAttachContext)
+         * .setClass(cls)
+         * .setBundle(BaseCallActivity.DATA, bundle)
+         * .transitionView(userName, BaseCallActivity.USER_NAME)
+         * .transitionView(userAvatar, BaseCallActivity.USER_AVATAR)
+         * .doIt()
+         * <p>
+         * 2.新的Activity#onCreate
+         * ActivityHelper.transition(this)
+         * .transitionView(avatarImg, USER_AVATAR)
+         * .transitionView(userName, USER_NAME)
+         * .defaultTransition()
+         * .doIt()
          */
         public Builder transitionView(@NonNull View sharedElement, @Nullable String sharedElementName) {
             if (!TextUtils.isEmpty(sharedElementName)) {
