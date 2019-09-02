@@ -3,12 +3,11 @@ package com.angcyo.uiview.less.picture
 import android.app.Activity
 import android.graphics.Rect
 import android.os.Bundle
-import androidx.transition.*
-import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import android.view.ViewGroup
+import androidx.interpolator.view.animation.FastOutSlowInInterpolator
+import androidx.transition.*
 import com.angcyo.uiview.less.R
 import com.angcyo.uiview.less.base.BaseFragment
-import com.angcyo.uiview.less.base.helper.FragmentHelper
 import com.angcyo.uiview.less.kotlin.inflate
 import com.angcyo.uiview.less.kotlin.setWidthHeight
 import com.angcyo.uiview.less.picture.transition.ColorTransition
@@ -23,7 +22,7 @@ import com.angcyo.uiview.less.utils.RUtils
  * Copyright (c) 2019 ShenZhen O&M Cloud Co., Ltd. All rights reserved.
  */
 
-open abstract class BaseTransitionFragment : BaseFragment() {
+abstract class BaseTransitionFragment : BaseFragment() {
 
     companion object {
         const val ANIM_DURATION = 300L
@@ -37,13 +36,21 @@ open abstract class BaseTransitionFragment : BaseFragment() {
         return R.layout.base_transition_fragment
     }
 
-    override fun initBaseView(viewHolder: RBaseViewHolder, arguments: Bundle?, savedInstanceState: Bundle?) {
+    override fun initBaseView(
+        viewHolder: RBaseViewHolder,
+        arguments: Bundle?,
+        savedInstanceState: Bundle?
+    ) {
         super.initBaseView(viewHolder, arguments, savedInstanceState)
         onInitBaseView(viewHolder, arguments, savedInstanceState)
         doTransitionShow()
     }
 
-    open fun onInitBaseView(viewHolder: RBaseViewHolder, arguments: Bundle?, savedInstanceState: Bundle?) {
+    open fun onInitBaseView(
+        viewHolder: RBaseViewHolder,
+        arguments: Bundle?,
+        savedInstanceState: Bundle?
+    ) {
         rootLayout = viewHolder.v(R.id.base_root_content_layout)
         rootLayout.inflate(getContentLayoutId())
     }

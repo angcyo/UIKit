@@ -515,6 +515,22 @@ public class ActivityHelper {
          * 步骤1: 获取共享元素属性值
          * 步骤2: 传递属性
          * 步骤3: 播放动画
+         *
+         *  示例:
+         *  1.启动新的Activity:
+         *   ActivityHelper.build(mAttachContext)
+         *             .setClass(cls)
+         *             .setBundle(BaseCallActivity.DATA, bundle)
+         *             .transitionView(userName, BaseCallActivity.USER_NAME)
+         *             .transitionView(userAvatar, BaseCallActivity.USER_AVATAR)
+         *             .doIt()
+         *
+         *  2.新的Activity#onCreate
+         *   ActivityHelper.transition(this)
+         *             .transitionView(avatarImg, USER_AVATAR)
+         *             .transitionView(userName, USER_NAME)
+         *             .defaultTransition()
+         *             .doIt()
          */
         public Builder transitionView(@NonNull View sharedElement, @Nullable String sharedElementName) {
             if (!TextUtils.isEmpty(sharedElementName)) {
