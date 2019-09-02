@@ -7,6 +7,7 @@ import com.angcyo.lib.L
 import com.angcyo.uiview.less.OfflineCacheAdapter.Companion.ENTRY_BODY
 import com.angcyo.uiview.less.OfflineCacheAdapter.Companion.ENTRY_METADATA
 import com.angcyo.uiview.less.kotlin.app
+import com.angcyo.uiview.less.kotlin.pattern
 import com.angcyo.uiview.less.kotlin.readString
 import com.angcyo.uiview.less.utils.RCacheManager
 import com.angcyo.uiview.less.utils.RLogFile
@@ -34,6 +35,9 @@ open class OfflineCacheAdapter(cacheFolder: String = Root.getAppExternalFolder("
         const val ENTRY_METADATA = 0
         const val ENTRY_BODY = 0
         const val ENTRY_COUNT = 1
+
+        /**需要忽略缓存的url正则*/
+        val IGNORE_URL_PATTERNS = mutableSetOf<String>()
     }
 
     val cache: DiskLruCache = DiskLruCache.create(
@@ -55,6 +59,11 @@ open class OfflineCacheAdapter(cacheFolder: String = Root.getAppExternalFolder("
     override fun checkNeedCache(request: Request): Boolean {
         if (RNetwork.isConnect(app())) {
             return false
+        }
+        if (IGNORE_URL_PATTERNS.isNotEmpty()) {
+            if (request.url().toString().pattern(IGNORE_URL_PATTERNS, false)) {
+                return false
+            }
         }
         if (isForceCache(request)) {
             return true

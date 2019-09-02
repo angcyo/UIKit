@@ -45,6 +45,9 @@ public fun jsonArray(config: Json.Builder.() -> Unit = {}): JsonElement {
     }
 }
 
+
+//<editor-fold desc="JsonObject 扩展">
+
 public fun JsonObject.getInt(key: String): Int {
     val element = get(key)
     if (element is JsonPrimitive) {
@@ -100,6 +103,62 @@ public fun JsonObject.getDouble(key: String): Double {
     }
     return (-1).toDouble()
 }
+
+//</editor-fold desc="JsonObject">
+
+//<editor-fold desc="JsonElement 扩展">
+
+public fun JsonElement.getInt(key: String): Int {
+    if (this is JsonObject) {
+        return this.getInt(key)
+    }
+    throw IllegalAccessException("不允许使用[JsonArray]操作.")
+}
+
+public fun JsonElement.getString(key: String): String? {
+    if (this is JsonObject) {
+        return this.getString(key)
+    }
+    throw IllegalAccessException("不允许使用[JsonArray]操作.")
+}
+
+public fun JsonElement.getJson(key: String): JsonObject? {
+    if (this is JsonObject) {
+        return this.getJson(key)
+    }
+    throw IllegalAccessException("不允许使用[JsonArray]操作.")
+}
+
+public fun JsonElement.getArray(key: String): JsonArray? {
+    if (this is JsonObject) {
+        return this.getArray(key)
+    }
+    throw IllegalAccessException("不允许使用[JsonArray]操作.")
+}
+
+public fun JsonElement.getLong(key: String): Long {
+    if (this is JsonObject) {
+        return this.getLong(key)
+    }
+    throw IllegalAccessException("不允许使用[JsonArray]操作.")
+}
+
+public fun JsonElement.getDouble(key: String): Double {
+    if (this is JsonObject) {
+        return this.getDouble(key)
+    }
+    throw IllegalAccessException("不允许使用[JsonArray]操作.")
+}
+
+public fun JsonElement.array(index: Int): JsonElement {
+    if (this is JsonArray) {
+        return get(index)
+    }
+    throw IllegalAccessException("不允许使用[JsonObject]操作.")
+}
+
+//</editor-fold desc="JsonElement 扩展">
+
 
 public fun String?.trim(char: Char): String? {
     return this?.trimStart(char)?.trimEnd(char)

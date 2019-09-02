@@ -21,6 +21,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import com.angcyo.lib.L;
 import com.angcyo.uiview.less.RApplication;
+import com.angcyo.uiview.less.kotlin.ViewExKt;
 import com.angcyo.uiview.less.utils.ScreenUtil;
 import com.angcyo.uiview.less.widget.*;
 import com.angcyo.uiview.less.widget.group.ItemInfoLayout;
@@ -333,9 +334,17 @@ public class RBaseViewHolder extends RecyclerView.ViewHolder {
 
         if (textView != null) {
             if (hawkKey == null) {
-                textView.setText(defaultValue);
+                if (textView instanceof EditText) {
+                    ViewExKt.setInputText((EditText) textView, defaultValue);
+                } else {
+                    textView.setText(defaultValue);
+                }
             } else {
-                textView.setText(Hawk.get(hawkKey, defaultValue));
+                if (textView instanceof EditText) {
+                    ViewExKt.setInputText((EditText) textView, Hawk.get(hawkKey, defaultValue));
+                } else {
+                    textView.setText(Hawk.get(hawkKey, defaultValue));
+                }
             }
         }
 
