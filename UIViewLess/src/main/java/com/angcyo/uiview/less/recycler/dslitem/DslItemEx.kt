@@ -1,5 +1,6 @@
 package com.angcyo.uiview.less.recycler.dslitem
 
+import android.text.TextUtils
 import android.view.Gravity
 import androidx.annotation.LayoutRes
 import com.angcyo.uiview.less.R
@@ -19,6 +20,46 @@ import com.angcyo.uiview.less.utils.Tip
  * @date 2019/08/09
  * Copyright (c) 2019 ShenZhen O&M Cloud Co., Ltd. All rights reserved.
  */
+
+/**通过[itemTag]查找指定的[DslAdapterItem]*/
+public fun DslAdapter.findItemByTag(itemTag: String?): DslAdapterItem? {
+    if (TextUtils.isEmpty(itemTag)) {
+        return null
+    }
+
+    var result: DslAdapterItem? = null
+    getValidFilterDataList().forEach {
+        if (it.itemTag == itemTag) {
+            result = it
+            return@forEach
+        }
+    }
+
+    return result
+}
+
+/**通过[itemTag]查找指定的[DslAdapterItem], 并且更新对应的[DslAdapterItem]*/
+public fun DslAdapter.updateItemByTag(
+    itemTag: String?,
+    config: DslAdapterItem.() -> Unit = {}
+): DslAdapterItem? {
+    if (TextUtils.isEmpty(itemTag)) {
+        return null
+    }
+
+    var result: DslAdapterItem? = null
+    getValidFilterDataList().forEachIndexed { index, dslAdapterItem ->
+        if (dslAdapterItem.itemTag == itemTag) {
+            result = dslAdapterItem
+            dslAdapterItem.config()
+
+            notifyItemChanged(index)
+            return@forEachIndexed
+        }
+    }
+    return result
+}
+
 public fun DslAdapter.dslItem(@LayoutRes layoutId: Int, config: DslAdapterItem.() -> Unit = {}) {
     val item = DslAdapterItem()
     item.itemLayoutId = layoutId

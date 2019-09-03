@@ -18,6 +18,9 @@ public class TypeBuilder {
         this.parent = parent;
     }
 
+    /**
+     * List
+     */
     public static TypeBuilder newInstance(Class raw) {
         return new TypeBuilder(raw, null);
     }
@@ -38,6 +41,9 @@ public class TypeBuilder {
         return new TypeBuilder(raw, parent);
     }
 
+    /**
+     * Map<String, List<String>>
+     */
     public TypeBuilder beginSubType(Class raw) {
         return newInstance(raw, this);
     }
@@ -52,6 +58,10 @@ public class TypeBuilder {
         return parent;
     }
 
+    /**
+     * List<String>
+     * Map<String, String[]>
+     */
     public TypeBuilder addTypeParam(Class clazz) {
         return addTypeParam((Type) clazz);
     }
@@ -66,6 +76,9 @@ public class TypeBuilder {
         return addTypeParam(wildcardType);
     }
 
+    /**
+     * List<? super String>
+     */
     public TypeBuilder addTypeParamSuper(Class... classes) {
         if (classes == null) {
             throw new NullPointerException("addTypeParamSuper() expect not null Class");
