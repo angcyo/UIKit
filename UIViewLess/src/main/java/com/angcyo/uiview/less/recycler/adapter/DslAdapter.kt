@@ -145,6 +145,39 @@ open class DslAdapter : RBaseAdapter<DslAdapterItem> {
         }
     }
 
+    /**支持过滤数据源*/
+    fun deleteAdapterItem(item: DslAdapterItem?, useFilterList: Boolean = true) {
+        if (item == null) {
+            return
+        }
+
+        val dataList = getDataList(useFilterList)
+
+        val indexOf = dataList.indexOf(item)
+
+        val size = itemCount
+        if (indexOf != -1 && size > indexOf) {
+            if (onDeleteItem(indexOf)) {
+
+                dataList.removeAt(indexOf)
+
+                if (dataList != allDatas) {
+                    //非全部数据源时, 总数据源的数据也要删除
+                    allDatas.remove(item)
+                }
+
+                notifyItemRemoved(indexOf)
+                notifyItemRangeChanged(indexOf, size - indexOf)
+
+                onDeleteItemEnd(indexOf)
+            }
+        }
+    }
+
+    override fun deleteItem(position: Int) {
+        super.deleteItem(position)
+    }
+
     /**获取数据列表*/
     fun getDataList(useFilterList: Boolean): MutableList<DslAdapterItem> {
         return if (useFilterList) getValidFilterDataList() else allDatas

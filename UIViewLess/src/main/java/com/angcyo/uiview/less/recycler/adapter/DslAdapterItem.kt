@@ -22,11 +22,20 @@ open class DslAdapterItem {
     /**适配器*/
     var itemDslAdapter: DslAdapter? = null
 
+    /**[notifyItemChanged]*/
     open fun updateAdapterItem(useFilterList: Boolean = true) {
         if (itemDslAdapter == null) {
             L.e("updateAdapterItem需要[itemDslAdapter], 请赋值.")
         }
         itemDslAdapter?.notifyItemChanged(this, useFilterList)
+    }
+
+    /**[notifyItemRemoved]*/
+    open fun deleteAdapterItem(useFilterList: Boolean = true) {
+        if (itemDslAdapter == null) {
+            L.e("updateAdapterItem需要[itemDslAdapter], 请赋值.")
+        }
+        itemDslAdapter?.deleteAdapterItem(this, useFilterList)
     }
 
     //<editor-fold desc="Grid相关属性">
