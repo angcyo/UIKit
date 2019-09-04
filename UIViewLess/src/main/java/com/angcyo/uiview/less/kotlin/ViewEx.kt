@@ -7,10 +7,7 @@ import android.animation.ValueAnimator
 import android.app.Activity
 import android.content.res.ColorStateList
 import android.content.res.Resources
-import android.graphics.Bitmap
-import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.Rect
+import android.graphics.*
 import android.graphics.drawable.Drawable
 import android.os.Build
 import android.text.InputFilter
@@ -213,7 +210,8 @@ public fun TextView.setLeftIco(drawable: Drawable?) {
 
 public fun View.getColor(id: Int): Int = ContextCompat.getColor(context, id)
 
-public fun View.getColorList(id: Int): ColorStateList? = ContextCompat.getColorStateList(context, id)
+public fun View.getColorList(id: Int): ColorStateList? =
+    ContextCompat.getColorStateList(context, id)
 
 public fun View.getDimensionPixelOffset(id: Int): Int = resources.getDimensionPixelOffset(id)
 
@@ -1199,4 +1197,20 @@ public fun TextView.setTextSizeWithDp(textSize: Any) {
             else -> getTextSize()
         }
     )
+}
+
+/**视图 变灰*/
+public fun View.grayscale(enable: Boolean = true) {
+    if (enable) {
+        //变灰, 界面灰度处理
+        val matrix = ColorMatrix()
+        matrix.setSaturation(0f)//饱和度 0灰色 100过度彩色，50正常
+        val filter = ColorMatrixColorFilter(matrix)
+        val paint = Paint()
+        paint.colorFilter = filter
+
+        setLayerType(View.LAYER_TYPE_SOFTWARE, paint)
+    } else {
+        setLayerType(View.LAYER_TYPE_NONE, null)
+    }
 }

@@ -1,13 +1,17 @@
 package com.angcyo.uiview.less.kotlin
 
 import android.graphics.Color
+import android.os.Bundle
 import android.view.View
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import com.angcyo.lib.L
 import com.angcyo.uiview.less.R
 import com.angcyo.uiview.less.base.BaseFragment
 import com.angcyo.uiview.less.base.BaseRecyclerFragment
 import com.angcyo.uiview.less.base.BaseTitleFragment
 import com.angcyo.uiview.less.base.helper.FragmentHelper
+import com.angcyo.uiview.less.base.helper.FragmentHelper.Builder.KEY_JSON_DATA
 import com.angcyo.uiview.less.base.helper.TitleItemHelper
 import com.angcyo.uiview.less.recycler.adapter.DslAdapter
 import com.angcyo.uiview.less.recycler.adapter.DslAdapterItem
@@ -25,13 +29,13 @@ import kotlin.coroutines.CoroutineContext
  * Copyright (c) 2019 ShenZhen O&M Cloud Co., Ltd. All rights reserved.
  */
 
-public fun get(fm: androidx.fragment.app.FragmentManager?): FragmentHelper.Builder {
+public fun get(fm: FragmentManager?): FragmentHelper.Builder {
     return FragmentHelper.build(fm)
         .defaultEnterAnim()
         .hideBeforeIndex(2)
 }
 
-public fun only(fm: androidx.fragment.app.FragmentManager?): FragmentHelper.Builder {
+public fun only(fm: FragmentManager?): FragmentHelper.Builder {
     return FragmentHelper.build(fm)
         .anim(R.anim.base_scale_alpha_enter, R.anim.base_no_alpha)
         .keepFragment(emptyList())
@@ -49,9 +53,9 @@ public fun BaseFragment.only(): FragmentHelper.Builder {
  * 移除其他, 只显示 f
  * */
 public fun BaseFragment.only(
-    f: Class<out androidx.fragment.app.Fragment>,
+    f: Class<out Fragment>,
     init: FragmentHelper.Builder.() -> Unit = {}
-): androidx.fragment.app.Fragment? {
+): Fragment? {
     val builder = only().showFragment(f).apply {
         init()
     }
@@ -62,9 +66,9 @@ public fun BaseFragment.only(
  * 移除其他, 只显示 f
  * */
 public fun BaseFragment.only(
-    f: androidx.fragment.app.Fragment,
+    f: Fragment,
     init: FragmentHelper.Builder.() -> Unit = {}
-): androidx.fragment.app.Fragment? {
+): Fragment? {
     val builder = only().showFragment(f).apply {
         init()
     }
@@ -72,9 +76,9 @@ public fun BaseFragment.only(
 }
 
 public fun BaseFragment.show(
-    f: Class<out androidx.fragment.app.Fragment>,
+    f: Class<out Fragment>,
     init: FragmentHelper.Builder.() -> Unit = {}
-): androidx.fragment.app.Fragment? {
+): Fragment? {
     val builder = wtf().showFragment(f).apply {
         init()
     }
@@ -82,9 +86,9 @@ public fun BaseFragment.show(
 }
 
 public fun BaseFragment.show(
-    f: androidx.fragment.app.Fragment,
+    f: Fragment,
     init: FragmentHelper.Builder.() -> Unit = {}
-): androidx.fragment.app.Fragment? {
+): Fragment? {
     val builder = wtf().showFragment(f).apply {
         init()
     }
@@ -179,7 +183,9 @@ public fun BaseRecyclerFragment<DslAdapterItem>.onBaseLoadEnd(
     dataList: DslAdapter.() -> Unit
 ) {
     val dslAdapter = DslAdapter()
-    dslAdapter.dataList()
+    if (error == null) {
+        dslAdapter.dataList()
+    }
     onBaseLoadEnd(dslAdapter.getValidFilterDataList(), pageSize, error)
 }
 
@@ -283,3 +289,25 @@ public fun <T> BaseFragment.load(loader: suspend CoroutineScope.() -> T): Job {
 //
 //    return result
 //}
+
+public fun Fragment.putData(data: Any) {
+    val bundle = Bundle()
+
+    when (data) {
+        is String -> bundle.putString(KEY_JSON_DATA, data)
+        is Number -> bundle.putString(KEY_JSON_DATA, data.toString())
+        else -> bundle.putString(KEY_JSON_DATA, data.toJson())
+    }
+
+    arguments = bundle
+}
+
+public fun <T> Fragment.getData(cls: Class<T>): T? {
+    return arguments?.getString(KEY_JSON_DATA)?.run {
+        when {
+            cls.isAssignableFrom(String::class.java) -> this as? T
+            cls.isAssignableFrom(Number::class.java) -> this.toFloat() as? T
+            else -> this.fromJson(cls)
+        }
+    }
+}

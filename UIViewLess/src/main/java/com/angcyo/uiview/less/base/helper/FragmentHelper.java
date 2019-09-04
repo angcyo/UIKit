@@ -27,6 +27,7 @@ import com.angcyo.uiview.less.BuildConfig;
 import com.angcyo.uiview.less.R;
 import com.angcyo.uiview.less.RApplication;
 import com.angcyo.uiview.less.base.IFragment;
+import com.angcyo.uiview.less.kotlin.ExKt;
 import com.angcyo.uiview.less.utils.RLogFile;
 
 import java.lang.reflect.Field;
@@ -635,6 +636,7 @@ public class FragmentHelper {
         public static int DEFAULT_EXIT_ANIM = R.anim.base_scale_from_exit;
         public static int DEFAULT_ENTER_ANIM = R.anim.base_scale_to_enter;
         public static int DEFAULT_NO_ANIM = R.anim.base_no_alpha;
+        public final static String KEY_JSON_DATA = "key_json_data";
 
         FragmentManager fragmentManager;
         /**
@@ -959,6 +961,21 @@ public class FragmentHelper {
 
         public Builder setArgs(Bundle args) {
             this.args = args;
+            return this;
+        }
+
+        public Builder putData(Object data) {
+            Bundle bundle = new Bundle();
+
+            if (data instanceof String) {
+                bundle.putString(KEY_JSON_DATA, (String) data);
+            } else if (data instanceof Number) {
+                bundle.putString(KEY_JSON_DATA, String.valueOf(data));
+            } else {
+                bundle.putString(KEY_JSON_DATA, ExKt.toJson(data));
+            }
+
+            setArgs(bundle);
             return this;
         }
 
