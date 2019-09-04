@@ -388,6 +388,11 @@ public class ActivityHelper {
             return this;
         }
 
+        public Builder putData(Object data) {
+            setBundle(FragmentHelper.Builder.createBundle(data));
+            return this;
+        }
+
         public Builder setBundle(@NonNull String key, Bundle bundle) {
             bundleKey = key;
             setBundle(bundle);

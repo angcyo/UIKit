@@ -1,7 +1,7 @@
 package com.angcyo.uiview.less.kotlin
 
+import android.app.Activity
 import android.graphics.Color
-import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -10,6 +10,7 @@ import com.angcyo.uiview.less.R
 import com.angcyo.uiview.less.base.BaseFragment
 import com.angcyo.uiview.less.base.BaseRecyclerFragment
 import com.angcyo.uiview.less.base.BaseTitleFragment
+import com.angcyo.uiview.less.base.helper.ActivityHelper
 import com.angcyo.uiview.less.base.helper.FragmentHelper
 import com.angcyo.uiview.less.base.helper.FragmentHelper.Builder.KEY_JSON_DATA
 import com.angcyo.uiview.less.base.helper.TitleItemHelper
@@ -291,15 +292,7 @@ public fun <T> BaseFragment.load(loader: suspend CoroutineScope.() -> T): Job {
 //}
 
 public fun Fragment.putData(data: Any) {
-    val bundle = Bundle()
-
-    when (data) {
-        is String -> bundle.putString(KEY_JSON_DATA, data)
-        is Number -> bundle.putString(KEY_JSON_DATA, data.toString())
-        else -> bundle.putString(KEY_JSON_DATA, data.toJson())
-    }
-
-    arguments = bundle
+    arguments = FragmentHelper.Builder.createBundle(data)
 }
 
 public fun <T> Fragment.getData(cls: Class<T>): T? {
@@ -310,4 +303,15 @@ public fun <T> Fragment.getData(cls: Class<T>): T? {
             else -> this.fromJson(cls)
         }
     }
+}
+
+public fun <T> Activity.getData(cls: Class<T>): T? {
+    return intent?.getBundleExtra(ActivityHelper.KEY_EXTRA)
+        ?.getString(KEY_JSON_DATA)?.run {
+            when {
+                cls.isAssignableFrom(String::class.java) -> this as? T
+                cls.isAssignableFrom(Number::class.java) -> this.toFloat() as? T
+                else -> this.fromJson(cls)
+            }
+        }
 }

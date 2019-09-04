@@ -964,7 +964,7 @@ public class FragmentHelper {
             return this;
         }
 
-        public Builder putData(Object data) {
+        public static Bundle createBundle(Object data) {
             Bundle bundle = new Bundle();
 
             if (data instanceof String) {
@@ -975,7 +975,11 @@ public class FragmentHelper {
                 bundle.putString(KEY_JSON_DATA, ExKt.toJson(data));
             }
 
-            setArgs(bundle);
+            return bundle;
+        }
+
+        public Builder putData(Object data) {
+            setArgs(createBundle(data));
             return this;
         }
 
