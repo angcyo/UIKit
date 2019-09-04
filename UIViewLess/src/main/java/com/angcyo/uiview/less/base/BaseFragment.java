@@ -2,15 +2,17 @@ package com.angcyo.uiview.less.base;
 
 import android.animation.Animator;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.widget.EditText;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+
 import com.angcyo.http.HttpSubscriber;
 import com.angcyo.http.NonetException;
 import com.angcyo.uiview.less.R;
@@ -19,9 +21,11 @@ import com.angcyo.uiview.less.base.helper.FragmentHelper;
 import com.angcyo.uiview.less.recycler.RBaseViewHolder;
 import com.angcyo.uiview.less.utils.RUtils;
 import com.angcyo.uiview.less.widget.group.RSoftInputLayout;
+
+import org.jetbrains.annotations.NotNull;
+
 import kotlinx.coroutines.CoroutineScope;
 import kotlinx.coroutines.CoroutineScopeKt;
-import org.jetbrains.annotations.NotNull;
 import rx.Subscription;
 import rx.observers.SafeSubscriber;
 import rx.subscriptions.CompositeSubscription;
@@ -310,7 +314,9 @@ public abstract class BaseFragment extends AbsLifeCycleFragment {
     public void onFragmentHide() {
         super.onFragmentHide();
 
-        enableFragmentSoftInputLayout(false);
+        if (FragmentHelper.findLastShowFragment(getFragmentManager(), null) != this) {
+            enableFragmentSoftInputLayout(false);
+        }
     }
 
     //</editor-fold">

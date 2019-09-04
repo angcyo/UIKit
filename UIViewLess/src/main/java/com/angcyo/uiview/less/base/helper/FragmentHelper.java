@@ -552,6 +552,44 @@ public class FragmentHelper {
     }
 
     /**
+     * 查找最后一个可见的[Fragment]
+     */
+    public static Fragment findLastShowFragment(@Nullable FragmentManager fragmentManager, @Nullable Fragment anchor) {
+        if (fragmentManager == null) {
+            return null;
+        }
+        boolean isFindAnchor = anchor == null;
+
+        List<Fragment> fragments = fragmentManager.getFragments();
+
+        Fragment fragment = null;
+
+        boolean isFragmentHide = false;
+
+        for (int i = fragments.size() - 1; i >= 0; i--) {
+            Fragment f = fragments.get(i);
+            if (isFindAnchor) {
+                if (f.isAdded() && f.getView() != null) {
+
+                    if (f instanceof IFragment) {
+                        isFragmentHide = ((IFragment) f).isFragmentHide();
+                    } else {
+                        isFragmentHide = f.isHidden() || !f.getUserVisibleHint();
+                    }
+
+                    if (!isFragmentHide) {
+                        fragment = f;
+                        break;
+                    }
+                }
+            } else {
+                isFindAnchor = anchor == f;
+            }
+        }
+        return fragment;
+    }
+
+    /**
      * 根据给定的View, 拿到对应的Fragment
      */
     public static Fragment findFragment(@Nullable FragmentManager fragmentManager, @Nullable View view) {

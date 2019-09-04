@@ -65,6 +65,11 @@ public class RSoftInputLayout extends FrameLayout {
      */
     private boolean enableSoftInput = true;
     private boolean enableSoftInputAnim = true;
+    /**
+     * 隐藏和显示的动画 分开控制
+     */
+    private boolean enableSoftInputAnimShow = true;
+    private boolean enableSoftInputAnimHide = true;
 
     /**
      * 可以关闭此开关, 当键盘弹出时, 只有事件回调, 没有界面size处理. (API>=21)
@@ -75,7 +80,7 @@ public class RSoftInputLayout extends FrameLayout {
      * 频繁切换键盘, 延迟检查时长.
      * 如果开启了手机的安全密码输入键盘, 可以适当的加大延迟时间. 消除抖动.
      */
-    private int switchCheckDelay = 64;
+    private int switchCheckDelay = 0;
 
     private long animDuration = 240;
 
@@ -136,6 +141,11 @@ public class RSoftInputLayout extends FrameLayout {
         animPaddingMinTop = array.getDimensionPixelOffset(R.styleable.RSoftInputLayout_r_soft_input_anim_padding_min_top, animPaddingMinTop);
         enableSoftInput = array.getBoolean(R.styleable.RSoftInputLayout_r_enable_soft_input, enableSoftInput);
         enableSoftInputAnim = array.getBoolean(R.styleable.RSoftInputLayout_r_enable_soft_input_anim, enableSoftInputAnim);
+        setEnableSoftInputAnim(enableSoftInputAnim);
+
+        enableSoftInputAnimShow = array.getBoolean(R.styleable.RSoftInputLayout_r_enable_soft_input_anim_show, enableSoftInputAnimShow);
+        enableSoftInputAnimHide = array.getBoolean(R.styleable.RSoftInputLayout_r_enable_soft_input_anim_hide, enableSoftInputAnimHide);
+
         enableEmojiRestore = array.getBoolean(R.styleable.RSoftInputLayout_r_enable_emoji_restore, enableEmojiRestore);
         enableSoftInputInset = array.getBoolean(R.styleable.RSoftInputLayout_r_enable_soft_input_inset, enableSoftInputInset);
         switchCheckDelay = array.getInt(R.styleable.RSoftInputLayout_r_switch_check_delay, switchCheckDelay);
@@ -158,8 +168,11 @@ public class RSoftInputLayout extends FrameLayout {
         int maxHeight = heightSize - getPaddingTop() - getPaddingBottom() - animPaddingTop;
 
         boolean layoutFullScreen = isLayoutFullScreen(getContext());
+        boolean softKeyboardShow = isSoftKeyboardShow();
+        boolean emojiLayoutShow = isEmojiLayoutShow();
 
         int bottomHeight = bottomCurrentShowHeight;
+
         if (isInEditMode()) {
             if (emojiLayout == null) {
                 defaultKeyboardHeight = 0;
@@ -177,7 +190,7 @@ public class RSoftInputLayout extends FrameLayout {
             if (layoutFullScreen) {
                 contentLayoutMaxHeight = maxHeight - bottomHeight - layoutParams.topMargin - layoutParams.bottomMargin;
             } else {
-                if (isSoftKeyboardShow()) {
+                if (softKeyboardShow) {
                     //这里加动画, 体验不好.
 //                    if (isAnimStart()) {
 //                        contentLayoutMaxHeight = (int) (maxHeight - layoutParams.topMargin - layoutParams.bottomMargin
@@ -241,7 +254,7 @@ public class RSoftInputLayout extends FrameLayout {
         if (emojiLayout != null) {
             if (isSoftKeyboardShow()) {
                 t = getMeasuredHeight();
-            } else if (!enableSoftInputAnim && intentAction == INTENT_HIDE_KEYBOARD) {
+            } else if (!isEnableSoftInputAnim() && intentAction == INTENT_HIDE_KEYBOARD) {
                 t = getMeasuredHeight();
             }
 
@@ -317,7 +330,11 @@ public class RSoftInputLayout extends FrameLayout {
             removeCallbacks(delaySizeChanged);
         }
         delaySizeChanged = new DelaySizeChangeRunnable(w, h, oldw, oldh, wantIntentAction);
-        postDelayed(delaySizeChanged, switchCheckDelay);
+        if (switchCheckDelay > 0) {
+            postDelayed(delaySizeChanged, switchCheckDelay);
+        } else {
+            delaySizeChanged.run();
+        }
     }
 
     //</editor-fold defaultstate="collapsed" desc="核心方法">
@@ -547,20 +564,26 @@ public class RSoftInputLayout extends FrameLayout {
                 return super.onApplyWindowInsets(insets);
             }
 
+            int action;
             if (insetBottom > 0) {
-                wantIntentAction = INTENT_SHOW_KEYBOARD;
+                action = INTENT_SHOW_KEYBOARD;
             } else {
-                wantIntentAction = INTENT_HIDE_KEYBOARD;
+                action = INTENT_HIDE_KEYBOARD;
             }
 
             if (insetRunnable != null) {
+                if (action == wantIntentAction) {
+                    //之前已有相同操作
+                    return insets.replaceSystemWindowInsets(0, 0, 0, 0);
+                }
+                wantIntentAction = action;
                 removeCallbacks(insetRunnable);
             }
 
             insetRunnable = new InsetRunnable(insetBottom);
 
             //键盘切换到键盘, 延迟检查. 防止是普通键盘切换到密码键盘
-            if (lastIntentAction == INTENT_NONE) {
+            if (lastIntentAction == INTENT_NONE || switchCheckDelay <= 0) {
                 //第一次不检查
                 insetRunnable.run();
             } else {
@@ -589,8 +612,12 @@ public class RSoftInputLayout extends FrameLayout {
                     measuredWidth, measuredHeight);
         } else {
             //键盘隐藏
+            int hideHeight = bottomCurrentShowHeight;
+            if (bottomCurrentShowHeight <= 0) {
+                hideHeight = lastKeyboardHeight;
+            }
             checkSizeChanged = new KeyboardRunnable(measuredWidth, measuredHeight,
-                    measuredWidth, measuredHeight - bottomCurrentShowHeight);
+                    measuredWidth, measuredHeight - hideHeight);
         }
         checkOnSizeChanged(false);
     }
@@ -806,6 +833,10 @@ public class RSoftInputLayout extends FrameLayout {
 
     //<editor-fold defaultstate="collapsed" desc="方法控制">
 
+    public boolean isEnableSoftInputAnim() {
+        return enableSoftInputAnimHide || enableSoftInputAnimShow;
+    }
+
     public boolean isEmojiLayoutShow() {
         boolean result = false;
 
@@ -897,6 +928,17 @@ public class RSoftInputLayout extends FrameLayout {
 
     public void setEnableSoftInputAnim(boolean enableSoftInputAnim) {
         this.enableSoftInputAnim = enableSoftInputAnim;
+
+        enableSoftInputAnimHide = enableSoftInputAnim;
+        enableSoftInputAnimShow = enableSoftInputAnim;
+    }
+
+    public void setEnableSoftInputAnimShow(boolean enableSoftInputAnimShow) {
+        this.enableSoftInputAnimShow = enableSoftInputAnimShow;
+    }
+
+    public void setEnableSoftInputAnimHide(boolean enableSoftInputAnimHide) {
+        this.enableSoftInputAnimHide = enableSoftInputAnimHide;
     }
 
     public void setSwitchCheckDelay(int switchCheckDelay) {
@@ -922,10 +964,6 @@ public class RSoftInputLayout extends FrameLayout {
 
     public long getAnimDuration() {
         return animDuration;
-    }
-
-    public boolean isEnableSoftInputAnim() {
-        return enableSoftInputAnim;
     }
 
     //</editor-fold defaultstate="collapsed" desc="方法控制">
@@ -1113,7 +1151,7 @@ public class RSoftInputLayout extends FrameLayout {
 //            L.i("doSizeChanged:" + oldw + "->" + w + " " + oldh + "->" + h + " " + oldBottomCurrentShowHeight + " " + intentAction);
 
             bottomCurrentShowHeight = 0;
-            boolean needAnim = enableSoftInputAnim;
+            boolean needAnim = isEnableSoftInputAnim();
             if (handleSizeChange(w, h, oldw, oldh)) {
                 //有可能是键盘弹出了
                 int diffHeight = oldh - h;
@@ -1151,6 +1189,11 @@ public class RSoftInputLayout extends FrameLayout {
                         //有可能是表情布局显示
                     }
 
+                    //键盘显示
+                    if (!enableSoftInputAnimShow) {
+                        needAnim = false;
+                    }
+
                     notifyEmojiLayoutChangeListener(emojiLayoutShow, softKeyboardShow, diffHeight);
                     if (needAnim && enableSoftInputInset) {
                         if (isAnimStart()) {
@@ -1170,6 +1213,11 @@ public class RSoftInputLayout extends FrameLayout {
                     notifyEmojiLayoutChangeListener(emojiLayoutShow, softKeyboardShow, diffHeight);
 
                     if (isFirstLayout(oldw, oldh)) {
+                        needAnim = false;
+                    }
+
+                    //键盘显示或者表情显示
+                    if (!enableSoftInputAnimHide) {
                         needAnim = false;
                     }
 
