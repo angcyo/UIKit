@@ -41,6 +41,10 @@ open class DslAdapter : RBaseAdapter<DslAdapterItem> {
         return super.getAllDatas()
     }
 
+    override fun getAllDataCount(): Int {
+        return getValidFilterDataList().size
+    }
+
     /**获取有效过滤后的数据集合*/
     fun getValidFilterDataList(): MutableList<DslAdapterItem> {
         return if (dslDateFilter == null && filterDataList.isEmpty()) {
