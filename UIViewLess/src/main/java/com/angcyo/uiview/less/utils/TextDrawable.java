@@ -5,6 +5,9 @@ import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
 import android.graphics.drawable.shapes.RectShape;
 import android.graphics.drawable.shapes.RoundRectShape;
+import android.graphics.drawable.shapes.Shape;
+
+import androidx.annotation.NonNull;
 
 /**
  * 2019-2-19
@@ -71,10 +74,38 @@ public class TextDrawable extends ShapeDrawable {
     }
 
     @Override
-    public void draw(Canvas canvas) {
-        super.draw(canvas);
+    public void setBounds(@NonNull Rect bounds) {
+        super.setBounds(bounds);
+    }
+
+    @Override
+    public void setBounds(int left, int top, int right, int bottom) {
+        super.setBounds(left, top, right, bottom);
+    }
+
+    private Rect getDrawBounds(Canvas canvas) {
         Rect r = getBounds();
 
+        if (r.height() < 0 && r.width() < 0) {
+            //在转场动画中, width height 会 = -1
+            r = canvas.getClipBounds();
+        }
+        return r;
+    }
+
+    @Override
+    protected void onDraw(Shape shape, Canvas canvas, Paint paint) {
+        if (shape.getWidth() <= 0 && shape.getHeight() <= 0) {
+            Rect drawBounds = getDrawBounds(canvas);
+            shape.resize(drawBounds.width(), drawBounds.height());
+        }
+        super.onDraw(shape, canvas, paint);
+    }
+
+    @Override
+    public void draw(Canvas canvas) {
+        super.draw(canvas);
+        Rect r = getDrawBounds(canvas);
 
         // draw border
         if (borderThickness > 0) {
@@ -89,14 +120,14 @@ public class TextDrawable extends ShapeDrawable {
         int height = this.height < 0 ? r.height() : this.height;
         int fontSize = this.fontSize < 0 ? (Math.min(width, height) / 2) : this.fontSize;
         textPaint.setTextSize(fontSize);
-        canvas.drawText(text, width / 2, height / 2 - ((textPaint.descent() + textPaint.ascent()) / 2), textPaint);
+        canvas.drawText(text, width / 2, height * 1f / 2 - ((textPaint.descent() + textPaint.ascent()) / 2), textPaint);
 
         canvas.restoreToCount(count);
 
     }
 
     private void drawBorder(Canvas canvas) {
-        RectF rect = new RectF(getBounds());
+        RectF rect = new RectF(getDrawBounds(canvas));
         rect.inset(borderThickness / 2, borderThickness / 2);
 
         if (shape instanceof OvalShape) {

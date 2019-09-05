@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.*
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.text.SpannableStringBuilder
 import android.text.TextUtils
@@ -11,6 +12,7 @@ import android.util.Base64
 import android.view.MotionEvent
 import android.view.ViewConfiguration
 import android.webkit.MimeTypeMap
+import android.widget.ImageView
 import androidx.core.math.MathUtils
 import com.angcyo.http.Http
 import com.angcyo.http.Json
@@ -20,10 +22,14 @@ import com.angcyo.uiview.less.utils.*
 import com.angcyo.uiview.less.utils.utilcode.utils.EncodeUtils
 import com.angcyo.uiview.less.utils.utilcode.utils.FileUtils
 import com.angcyo.uiview.less.utils.utilcode.utils.ImageUtils
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
 import okio.Buffer
 import java.io.*
+import java.lang.ref.WeakReference
 import java.net.URLDecoder
 import java.net.URLEncoder
 import java.nio.charset.Charset
@@ -427,6 +433,34 @@ public fun ByteArray.toBitmap(): Bitmap {
 
 public fun Bitmap.share(context: Context, shareQQ: Boolean = false, chooser: Boolean = true) {
     RUtils.shareBitmap(context, this, shareQQ, chooser)
+}
+
+public fun String.toBlur(
+    imageView: ImageView,
+    scale: Float = 1f /*0~1*/,
+    radius: Float = 25f /*1~25*/
+) {
+    if (TextUtils.isEmpty(this)) {
+        return
+    }
+
+    if (this.startsWith("http")) {
+        val weakImageView = WeakReference(imageView)
+        Glide.with(imageView)
+            .asBitmap()
+            .load(this)
+            .into(object : CustomTarget<Bitmap>() {
+                override fun onLoadCleared(placeholder: Drawable?) {
+
+                }
+
+                override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                    weakImageView.get()?.setImageBitmap(resource.blur(scale, radius))
+                }
+            })
+    } else {
+        imageView.setImageBitmap(toBitmap().blur(scale, radius))
+    }
 }
 
 /**模糊图片*/
