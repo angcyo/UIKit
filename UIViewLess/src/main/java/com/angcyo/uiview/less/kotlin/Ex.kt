@@ -314,7 +314,10 @@ public fun String.https(): String {
 
 /**判断字符串是否是纯数字*/
 public fun String.isNumber(): Boolean {
-    val pattern = Pattern.compile("^[-\\+]?[\\d]*$")
+    if (TextUtils.isEmpty(this)) {
+        return false
+    }
+    val pattern = Pattern.compile("^[-\\+]?[\\d]+$")
     return pattern.matcher(this).matches()
 }
 
