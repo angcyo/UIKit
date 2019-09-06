@@ -777,6 +777,9 @@ public fun String?.splits(
     return RUtils.split(this, regex, allowEmpty, checkExist, maxSize)
 }
 
+public fun CharSequence?.orDefault(df: CharSequence = "--"): CharSequence =
+    if (this.isNullOrEmpty()) df else this
+
 /**堆栈信息转成字符串*/
 public fun Throwable.printString(): String {
     val stringWriter = StringWriter()
