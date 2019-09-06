@@ -5,12 +5,6 @@ package com.angcyo.uiview.less.recycler;
  */
 
 import android.content.Context;
-import androidx.annotation.IdRes;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.viewpager.widget.ViewPager;
-import androidx.appcompat.widget.AppCompatImageView;
-import androidx.recyclerview.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.SparseArray;
 import android.view.View;
@@ -19,11 +13,27 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.annotation.IdRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.AppCompatImageView;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager.widget.ViewPager;
+
 import com.angcyo.lib.L;
 import com.angcyo.uiview.less.RApplication;
 import com.angcyo.uiview.less.kotlin.ViewExKt;
 import com.angcyo.uiview.less.utils.ScreenUtil;
-import com.angcyo.uiview.less.widget.*;
+import com.angcyo.uiview.less.widget.AutoEditText;
+import com.angcyo.uiview.less.widget.Button;
+import com.angcyo.uiview.less.widget.ExEditText;
+import com.angcyo.uiview.less.widget.GlideImageView;
+import com.angcyo.uiview.less.widget.RClickListener;
+import com.angcyo.uiview.less.widget.REditText;
+import com.angcyo.uiview.less.widget.RExTextView;
+import com.angcyo.uiview.less.widget.RImageView;
+import com.angcyo.uiview.less.widget.RTextView;
 import com.angcyo.uiview.less.widget.group.ItemInfoLayout;
 import com.angcyo.uiview.less.widget.group.RFlowLayout;
 import com.angcyo.uiview.less.widget.group.RTabLayout;
@@ -718,6 +728,25 @@ public class RBaseViewHolder extends RecyclerView.ViewHolder {
             return true;
         }
         return false;
+    }
+
+    /**
+     * 检查所有指定的edit text 是否有空
+     *
+     * @return true 有空数据
+     */
+    public boolean checkEmpty(int... ids) {
+        boolean empty = false;
+        for (int id : ids) {
+            View view = v(id);
+            if (view instanceof EditText) {
+                if (ViewExKt.checkEmpty(((EditText) view), false)) {
+                    empty = true;
+                    break;
+                }
+            }
+        }
+        return empty;
     }
 
     /**
