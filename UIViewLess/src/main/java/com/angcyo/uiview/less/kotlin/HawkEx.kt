@@ -54,6 +54,15 @@ public fun String?.hawkPut(value: String?) {
     }
 }
 
+public fun String?.hawkAppend(value: String?) {
+    if (TextUtils.isEmpty(value)) {
+        return
+    }
+    this?.let {
+        Hawk.put(it, "${hawkGet() ?: ""}${value ?: ""}")
+    }
+}
+
 public fun String?.hawkGet(): String? {
     var result: String? = null
     this?.let {

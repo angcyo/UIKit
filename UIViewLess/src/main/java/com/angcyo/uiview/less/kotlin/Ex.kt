@@ -471,6 +471,20 @@ public fun Bitmap.blur(scale: Float = 1f /*0~1*/, radius: Float = 25f /*1~25*/):
     return ImageUtils.fastBlur(this, scale, radius)
 }
 
+/**旋转图片*/
+public fun Bitmap.rotate(angle: Float = 90f): Bitmap {
+    val matrix = Matrix()
+    matrix.postRotate(angle)
+    val rotatedBitmap = Bitmap.createBitmap(
+        this, 0, 0, this.width, this.height, matrix, false
+    )
+    if (this != rotatedBitmap) {
+        // 有时候 createBitmap会复用对象
+        this.recycle()
+    }
+    return rotatedBitmap
+}
+
 /**将base64字符串, 转换成图片*/
 public fun String.toBitmap(): Bitmap {
     val bytes = Base64.decode(this, Base64.NO_WRAP)
