@@ -29,23 +29,36 @@ public fun String?.hawkGetList(maxCount: Int = Integer.MAX_VALUE): MutableList<S
     return result
 }
 
-/**将 value, 追加到 原来的value中*/
-public fun String?.hawkPutList(value: String?) {
+/**
+ * 将 value, 追加到 原来的value中
+ *
+ * @param sort 默认排序, 最后追加的在首位显示
+ *
+ * */
+public fun String?.hawkPutList(value: String?, sort: Boolean = true) {
     if (TextUtils.isEmpty(value)) {
         return
     }
     this?.let {
+
+        val oldString = Hawk.get(it, "")
+        if (!sort) {
+            if (oldString?.contains("$value") == true) {
+                return@let
+            }
+        }
+
         Hawk.put(
             it,
             //最新的在前面
-            "$value," + Hawk.get(it, "")
+            "$value," + oldString
                 .replace(",,", ",")
                 .replace(value ?: " ", "")
         )
     }
 }
 
-public fun String?.hawkPut(value: String?) {
+public fun String?.hawkPut(value: CharSequence?) {
     if (TextUtils.isEmpty(value)) {
         return
     }
@@ -54,7 +67,7 @@ public fun String?.hawkPut(value: String?) {
     }
 }
 
-public fun String?.hawkAppend(value: String?) {
+public fun String?.hawkAppend(value: CharSequence?) {
     if (TextUtils.isEmpty(value)) {
         return
     }
