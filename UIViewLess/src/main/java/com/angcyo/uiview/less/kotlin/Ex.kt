@@ -805,3 +805,22 @@ public fun Throwable.printString(): String {
     pw.close()
     return stringWriter.toString()
 }
+
+public fun File.unzip(
+    deleteOld: Boolean = true,
+    checkExist: Boolean = true,
+    deleteZip: Boolean = true
+): String? {
+    if (isFile && canRead()) {
+        return RUtils.unzip(absolutePath, deleteOld, checkExist, deleteZip)
+    }
+    return null
+}
+
+public fun String.unzip(
+    deleteOld: Boolean = true,
+    checkExist: Boolean = true,
+    deleteZip: Boolean = true
+): String? {
+    return file().unzip(deleteOld, checkExist, deleteZip)
+}

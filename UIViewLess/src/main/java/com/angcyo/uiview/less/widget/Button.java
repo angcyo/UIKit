@@ -4,9 +4,11 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import androidx.core.content.ContextCompat;
 import android.util.AttributeSet;
 import android.view.Gravity;
+
+import androidx.core.content.ContextCompat;
+
 import com.angcyo.uiview.less.R;
 import com.angcyo.uiview.less.kotlin.ViewExKt;
 import com.angcyo.uiview.less.resources.ResUtil;
@@ -164,7 +166,7 @@ public class Button extends RTextView {
                             ResUtil.selector(
                                     ResUtil.createGradientDrawable(gradientStartColor, gradientEndColor, roundRadii),
                                     ResUtil.createGradientDrawable(gradientStartColor, gradientEndColor, roundRadii),
-                                    ResUtil.createGradientDrawable(gradientStartColor, gradientEndColor, roundRadii))
+                                    ResUtil.createDrawable(disableColor, roundRadii))
                     ));
                     break;
                 default:

@@ -5,17 +5,39 @@ import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.Application;
 import android.app.DownloadManager;
-import android.content.*;
-import android.content.pm.*;
+import android.content.ActivityNotFoundException;
+import android.content.ComponentName;
+import android.content.ContentResolver;
+import android.content.ContentValues;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.content.res.Configuration;
 import android.content.res.Resources;
-import android.graphics.*;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Matrix;
+import android.graphics.Paint;
+import android.graphics.Point;
+import android.graphics.Rect;
+import android.graphics.RectF;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.hardware.Camera;
 import android.location.Criteria;
 import android.location.LocationManager;
-import android.media.*;
+import android.media.AudioFormat;
+import android.media.AudioManager;
+import android.media.AudioRecord;
+import android.media.MediaMetadataRetriever;
+import android.media.MediaRecorder;
+import android.media.MediaScannerConnection;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -33,15 +55,22 @@ import android.text.format.Formatter;
 import android.util.DisplayMetrics;
 import android.util.LruCache;
 import android.util.TypedValue;
-import android.view.*;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+
 import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.arch.core.util.Function;
 import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.angcyo.http.Json;
 import com.angcyo.http.RIo;
 import com.angcyo.http.Rx;
 import com.angcyo.lib.L;
@@ -56,7 +85,19 @@ import com.angcyo.uiview.less.utils.utilcode.utils.MD5;
 import com.angcyo.uiview.less.widget.ExEditText;
 import com.angcyo.uiview.less.widget.RExTextView;
 
-import java.io.*;
+import java.io.BufferedOutputStream;
+import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -65,7 +106,18 @@ import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -2691,12 +2743,13 @@ public class RUtils {
      * 解压到当前文件夹
      */
     public static String unzip(String filePath) {
-        return unzip(filePath, false, true);
+        return unzip(filePath, false, true, false);
     }
 
     public static String unzip(String filePath,
                                boolean deleteOld, /*先清空目前文件夹*/
-                               boolean checkExist /*如果目标文件夹有文件, 则不解压*/) {
+                               boolean checkExist /*如果目标文件夹有文件, 则不解压*/,
+                               boolean deleteZip /*解压完成之后, 是否删除zip包*/) {
         File file = new File(filePath);
         String destDirPath = file.getParent() + File.separator + FileUtils.getFileNameNoEx(file.getName());
         try {
@@ -2722,6 +2775,10 @@ public class RUtils {
                 ZipUtils.unzipFileSteam(filePath, destDirPath);
             }
 //            unzip(filePath, destDirPath);
+
+            if (deleteZip) {
+                FileUtils.deleteFile(file);
+            }
             return destDirPath;
         } catch (Exception e) {
             e.printStackTrace();
@@ -2782,19 +2839,24 @@ public class RUtils {
     }
 
     /**
-     * 不支持中文
+     * 不支持中文, 解压文件
      */
-    public static void unzip(String zipFilePath, String targetPath)
-            throws Exception {
+    public static void unzip(@NonNull String zipFilePath, @Nullable String targetPath) {
 
         OutputStream os = null;
         InputStream is = null;
         ZipFile zipFile = null;
         try {
             zipFile = new ZipFile(zipFilePath);
-            String directoryPath = zipFilePath.substring(0,
-                    zipFilePath.lastIndexOf("."));
+            String directoryPath = targetPath;
+
+            if (TextUtils.isEmpty(targetPath)) {
+                directoryPath = zipFilePath.substring(0,
+                        zipFilePath.lastIndexOf("."));
+            }
+
             new File(directoryPath).mkdir();
+
             Enumeration entryEnum = zipFile.entries();
             if (null != entryEnum) {
                 ZipEntry zipEntry = null;
@@ -2871,7 +2933,10 @@ public class RUtils {
 
     /**
      * 组装成Json对象字符创
+     *
+     * @see Json#json()
      */
+    @Deprecated
     public static String toJson(String... args) {
         final StringBuilder stringBuilder = new StringBuilder("{");
         foreach(new OnPutValue() {
