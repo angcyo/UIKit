@@ -32,7 +32,7 @@ public abstract class BaseTitleFragment extends BaseFragment implements AffectUI
 
     /**
      * Fragment 根布局.
-     * */
+     */
     protected FragmentContentWrapperLayout fragmentContentWrapperLayout;
 
     /**
@@ -146,9 +146,18 @@ public abstract class BaseTitleFragment extends BaseFragment implements AffectUI
     }
 
     /**
+     * 内容布局的parent
+     */
+    protected ViewGroup getContentWrapperLayout() {
+        return contentWrapperLayout;
+    }
+
+    /**
      * 初始化内容部分
      */
     protected void initContentLayout(@Nullable Bundle arguments) {
+        ViewGroup contentWrapperLayout = getContentWrapperLayout();
+
         if (contentWrapperLayout == null) {
             return;
         }

@@ -1214,3 +1214,11 @@ public fun View.grayscale(enable: Boolean = true) {
         setLayerType(View.LAYER_TYPE_NONE, null)
     }
 }
+
+public fun View.padding(config: Padding.() -> Unit) {
+    val padding = Padding(paddingLeft, paddingTop, paddingRight, paddingBottom)
+    padding.config()
+    setPadding(padding.left, padding.top, padding.right, padding.bottom)
+}
+
+data class Padding(var left: Int, var top: Int, var right: Int, var bottom: Int)

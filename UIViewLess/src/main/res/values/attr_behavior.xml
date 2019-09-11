@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="BaseDependsBehavior_Layout">
+        <attr name="layout_depends_layout_index" format="integer" />
+    </declare-styleable>
+
+    <declare-styleable name="ContentBehavior_Layout">
+        <attr name="layout_content_layout_state" format="flags">
+            <flag name="LAYOUT_FLAG_EXCLUDE" value="0x00000001" />
+            <flag name="LAYOUT_FLAG_PADDING_TOP" value="0x00000002" />
+            <flag name="LAYOUT_FLAG_OFFSET" value="0x00000004" />
+        </attr>
+    </declare-styleable>
+
+    <declare-styleable name="OffsetBehavior_Layout">
+        <attr name="layout_offset_child_index" format="integer" />
+    </declare-styleable>
+
+
+    <declare-styleable name="ColorBehavior_Layout">
+        <attr name="layout_color_from" format="color" />
+        <attr name="layout_color_to" format="color" />
+    </declare-styleable>
+</resources>

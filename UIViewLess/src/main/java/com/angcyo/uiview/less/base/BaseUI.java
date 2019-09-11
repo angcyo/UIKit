@@ -96,7 +96,7 @@ public class BaseUI {
 
         @Override
         public AffectUI.Builder createAffectUI(@NonNull BaseTitleFragment titleFragment) {
-            return createAffectUI(titleFragment.contentWrapperLayout, titleFragment)
+            return createAffectUI(titleFragment.getContentWrapperLayout(), titleFragment)
                     .setContentAffect(AffectUI.CONTENT_AFFECT_INVISIBLE);
         }
 

@@ -14,8 +14,7 @@
             android:id="@+id/base_content_wrapper_layout"
             android:layout_width="match_parent"
             tools:background="@color/base_orange_dark"
-            android:layout_height="match_parent">
-    </FrameLayout>
+            android:layout_height="match_parent"/>
 
     <!--标题栏-->
     <com.angcyo.uiview.less.widget.group.TitleBarLayout

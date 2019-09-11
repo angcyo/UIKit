@@ -784,6 +784,34 @@ public fun CharSequence?.isJson(): Boolean {
     return false
 }
 
+public fun CharSequence?.isJsonObject(): Boolean {
+    if (TextUtils.isEmpty(this)) {
+        return false
+    }
+
+    val char = this!!
+
+    if (char.startsWith("{") && char.endsWith("}")) {
+        return true
+    }
+
+    return false
+}
+
+public fun CharSequence?.isJsonArray(): Boolean {
+    if (TextUtils.isEmpty(this)) {
+        return false
+    }
+
+    val char = this!!
+
+    if (char.startsWith("[") && char.endsWith("]")) {
+        return true
+    }
+
+    return false
+}
+
 /**分割字符串*/
 public fun String?.splits(
     regex: String,
