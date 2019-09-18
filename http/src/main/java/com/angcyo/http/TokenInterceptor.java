@@ -31,8 +31,6 @@ public class TokenInterceptor implements Interceptor {
      */
     int tryCount = 1;
 
-    StringBuilder responseBodyBuilder = new StringBuilder();
-
     /**
      * body 允许读取的最大值 64kb
      */
@@ -92,7 +90,7 @@ public class TokenInterceptor implements Interceptor {
             return "";
         }
 
-        responseBodyBuilder.delete(0, responseBodyBuilder.length());
+        StringBuilder responseBodyBuilder = new StringBuilder();
 
         ResponseBody responseBody = response.body();
         if (responseBody != null
