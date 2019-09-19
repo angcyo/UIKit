@@ -104,7 +104,7 @@ public class FragmentHelper {
             String tag = f.getSimpleName();
             Fragment fragmentByTag = fragmentManager.findFragmentByTag(tag);
             if (fragmentByTag == null) {
-                fragmentByTag = instantiateFragment(context, f);
+                fragmentByTag = instantiateFragment(context, f, false);
                 builder.append("创建:");
             } else {
                 builder.append("恢复:");
@@ -119,10 +119,10 @@ public class FragmentHelper {
         return fragments;
     }
 
-    public static Fragment instantiateFragment(@NonNull Context context, Class cls) {
+    public static Fragment instantiateFragment(@NonNull Context context, Class cls, boolean dex) {
         Fragment result = null;
         try {
-            if (cls.getClassLoader().getClass().getName().contains("RDexClassLoader")) {
+            if (dex || cls.getClassLoader().getClass().getName().contains("RDexClassLoader")) {
                 result = (Fragment) cls.getClassLoader().loadClass(cls.getName()).newInstance();
             } else {
                 result = Fragment.instantiate(context, cls.getName());
@@ -220,7 +220,7 @@ public class FragmentHelper {
         List<Fragment> oldFragment = fragmentManager.getFragments();
         List<Fragment> newFragments = new ArrayList<>();
         for (Class f : cls) {
-            newFragments.add(instantiateFragment(context, f));
+            newFragments.add(instantiateFragment(context, f, false));
         }
 
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -740,6 +740,8 @@ public class FragmentHelper {
          * 当Activity只有一个Fragment, 触发back, 是否需要关闭Activity
          */
         boolean finishActivity = false;
+
+        boolean loadFragmentFromDex = false;
         private List<Fragment> replaceKeepFragmentList = new ArrayList<>();
         private FragmentTransaction fragmentTransaction;
 
@@ -749,6 +751,11 @@ public class FragmentHelper {
                 //当调用了onSaveInstanceState,则允许状态丢失
                 allowStateLoss(fragmentManager.isStateSaved());
             }
+        }
+
+        public Builder loadFragmentFromDex(boolean loadFragmentFromDex) {
+            this.loadFragmentFromDex = loadFragmentFromDex;
+            return this;
         }
 
         public Builder hideFragment(Fragment hideFragment) {
@@ -782,7 +789,7 @@ public class FragmentHelper {
         }
 
         public Builder showFragment(Context context, Class<? extends Fragment> showFragment) {
-            this.showFragment = instantiateFragment(context, showFragment);
+            this.showFragment = instantiateFragment(context, showFragment, loadFragmentFromDex);
             //关闭从恢复模式获取Fragment
             isFromCreate = false;
             return this;
