@@ -5,7 +5,15 @@ import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
-import androidx.annotation.*;
+import android.text.TextUtils;
+import android.view.View;
+import android.view.ViewGroup;
+
+import androidx.annotation.AnimRes;
+import androidx.annotation.IdRes;
+import androidx.annotation.IntRange;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.util.Pair;
 import androidx.core.view.ViewCompat;
 import androidx.fragment.app.Fragment;
@@ -19,9 +27,6 @@ import androidx.transition.Fade;
 import androidx.transition.Transition;
 import androidx.transition.TransitionSet;
 
-import android.text.TextUtils;
-import android.view.View;
-import android.view.ViewGroup;
 import com.angcyo.lib.L;
 import com.angcyo.uiview.less.BuildConfig;
 import com.angcyo.uiview.less.R;
@@ -99,7 +104,16 @@ public class FragmentHelper {
             String tag = f.getSimpleName();
             Fragment fragmentByTag = fragmentManager.findFragmentByTag(tag);
             if (fragmentByTag == null) {
-                fragmentByTag = Fragment.instantiate(context, f.getName());
+                try {
+                    if (f.getClassLoader().getClass().getName().contains("RDexClassLoader")) {
+                        fragmentByTag = (Fragment) f.getClassLoader().loadClass(f.getName()).newInstance();
+                    } else {
+                        fragmentByTag = Fragment.instantiate(context, f.getName());
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    fragmentByTag = Fragment.instantiate(context, f.getName());
+                }
                 builder.append("创建:");
             } else {
                 builder.append("恢复:");
