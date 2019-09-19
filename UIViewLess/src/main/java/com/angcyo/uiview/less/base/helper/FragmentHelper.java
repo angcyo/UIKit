@@ -104,16 +104,7 @@ public class FragmentHelper {
             String tag = f.getSimpleName();
             Fragment fragmentByTag = fragmentManager.findFragmentByTag(tag);
             if (fragmentByTag == null) {
-                try {
-                    if (f.getClassLoader().getClass().getName().contains("RDexClassLoader")) {
-                        fragmentByTag = (Fragment) f.getClassLoader().loadClass(f.getName()).newInstance();
-                    } else {
-                        fragmentByTag = Fragment.instantiate(context, f.getName());
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    fragmentByTag = Fragment.instantiate(context, f.getName());
-                }
+                fragmentByTag = instantiateFragment(context, f);
                 builder.append("创建:");
             } else {
                 builder.append("恢复:");
@@ -126,6 +117,20 @@ public class FragmentHelper {
         }
         L.w(builder.toString());
         return fragments;
+    }
+
+    public static Fragment instantiateFragment(@NonNull Context context, Class cls) {
+        Fragment result = null;
+        try {
+            if (cls.getClassLoader().getClass().getName().contains("RDexClassLoader")) {
+                result = (Fragment) cls.getClassLoader().loadClass(cls.getName()).newInstance();
+            } else {
+                result = Fragment.instantiate(context, cls.getName());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
     }
 
     /**
@@ -215,7 +220,7 @@ public class FragmentHelper {
         List<Fragment> oldFragment = fragmentManager.getFragments();
         List<Fragment> newFragments = new ArrayList<>();
         for (Class f : cls) {
-            newFragments.add(Fragment.instantiate(context, f.getName()));
+            newFragments.add(instantiateFragment(context, f));
         }
 
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -777,7 +782,7 @@ public class FragmentHelper {
         }
 
         public Builder showFragment(Context context, Class<? extends Fragment> showFragment) {
-            this.showFragment = Fragment.instantiate(context, showFragment.getName());
+            this.showFragment = instantiateFragment(context, showFragment);
             //关闭从恢复模式获取Fragment
             isFromCreate = false;
             return this;
