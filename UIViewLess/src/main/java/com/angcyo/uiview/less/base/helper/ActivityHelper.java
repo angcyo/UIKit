@@ -550,17 +550,19 @@ public class ActivityHelper {
          * .defaultTransition()
          * .doIt()
          */
-        public Builder transitionView(@NonNull View sharedElement, @Nullable String sharedElementName) {
-            if (!TextUtils.isEmpty(sharedElementName)) {
-                if (sharedElementList == null) {
-                    sharedElementList = new ArrayList<>();
+        public Builder transitionView(@Nullable View sharedElement, @Nullable String sharedElementName) {
+            if (sharedElement != null) {
+                if (!TextUtils.isEmpty(sharedElementName)) {
+                    if (sharedElementList == null) {
+                        sharedElementList = new ArrayList<>();
+                    }
+                    sharedElementList.add(new Pair<View, String>(sharedElement, sharedElementName));
                 }
-                sharedElementList.add(new Pair<View, String>(sharedElement, sharedElementName));
             }
             return this;
         }
 
-        public Builder transitionView(@NonNull View sharedElement) {
+        public Builder transitionView(@Nullable View sharedElement) {
             return transitionView(sharedElement, ViewCompat.getTransitionName(sharedElement));
         }
     }
