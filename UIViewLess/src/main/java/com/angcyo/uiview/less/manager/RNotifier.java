@@ -11,7 +11,11 @@
  */
 package com.angcyo.uiview.less.manager;
 
-import android.app.*;
+import android.annotation.SuppressLint;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -23,17 +27,22 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Vibrator;
 import android.provider.Settings;
+import android.text.TextUtils;
+
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
-import android.text.TextUtils;
+
 import com.angcyo.lib.L;
 import com.angcyo.uiview.less.R;
 import com.angcyo.uiview.less.utils.T_;
 import com.angcyo.uiview.less.utils.ThreadExecutor;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Random;
 
 import static androidx.core.app.NotificationCompat.VISIBILITY_PUBLIC;
 
@@ -42,6 +51,7 @@ import static androidx.core.app.NotificationCompat.VISIBILITY_PUBLIC;
  * <p>
  * this class is subject to be inherited and implement the relative APIs
  */
+@SuppressLint("MissingPermission")
 public class RNotifier {
     private final static String TAG = "RNotifier";
     protected NotificationManager notificationManager = null;
@@ -84,6 +94,30 @@ public class RNotifier {
         vibrator = (Vibrator) appContext.getSystemService(Context.VIBRATOR_SERVICE);
 
         return this;
+    }
+
+    /**
+     * 800, 1000, 800, 1000, 800, 1000
+     *
+     * @param pattern 自定义震动模式 。数组中数字的含义依次是[静止时长，震动时长，静止时长，震动时长。。。]时长的单位是毫秒
+     * @param repeat  是否反复震动，如果是true，反复震动，如果是false，只震动一次
+     */
+    public void vibrate(long[] pattern, boolean repeat) {
+        if (vibrator == null) {
+            throw new IllegalStateException("请先调用 init() 方法.");
+        } else {
+            vibrator.vibrate(pattern, repeat ? 1 : -1);
+        }
+    }
+
+    public void vibrate() {
+        vibrate(new long[]{800, 1000, 800, 1000, 800, 1000}, true);
+    }
+
+    public void stop() {
+        if (vibrator != null) {
+            vibrator.cancel();
+        }
     }
 
     /**
@@ -301,10 +335,10 @@ public class RNotifier {
 
         /**
          * 锁定屏幕通知
-         *   VISIBILITY_PRIVATE：显示通知图标等基本信息，但隐藏通知的完整内容。
-         *   VISIBILITY_PUBLIC：显示通知的完整内容。
-         *   VISIBILITY_SECRET：不显示任何内容，甚至不显示通知图标。
-         * */
+         * VISIBILITY_PRIVATE：显示通知图标等基本信息，但隐藏通知的完整内容。
+         * VISIBILITY_PUBLIC：显示通知的完整内容。
+         * VISIBILITY_SECRET：不显示任何内容，甚至不显示通知图标。
+         */
         public Builder setVisibility(int visibility) {
             this.visibility = visibility;
             return this;
@@ -337,17 +371,18 @@ public class RNotifier {
                     .setAutoCancel(autoCancel)
                     //设置删除通知时的响应事件
                     .setDeleteIntent(deleteIntent)
-            //.setStyle()
-            //.setCustomContentView()
-            //.setCustomBigContentView()
-            //.setCustomBigContentView()
+                    //.setStyle()
+                    //.setCustomContentView()
+                    //.setCustomBigContentView()
+                    //.setCustomBigContentView()
+                    //.setVibrate()
 
                     /*锁定屏幕通知
                     VISIBILITY_PRIVATE：显示通知图标等基本信息，但隐藏通知的完整内容。
                     VISIBILITY_PUBLIC：显示通知的完整内容。
                     VISIBILITY_SECRET：不显示任何内容，甚至不显示通知图标。
                     * */
-            .setVisibility(visibility)
+                    .setVisibility(visibility)
             //.setPublicVersion()
             //.setCategory()
 
@@ -513,6 +548,18 @@ public class RNotifier {
 
             L.w("显示通知:" + notifyId);
             return notifyId;
+        }
+
+        public Builder cancel(int notifyId) {
+            nm.cancel(channelName, notifyId);
+            L.w("取消通知:" + notifyId);
+            return this;
+        }
+
+        public Builder cancelAll() {
+            nm.cancelAll();
+            L.w("取消所有通知");
+            return this;
         }
     }
 }

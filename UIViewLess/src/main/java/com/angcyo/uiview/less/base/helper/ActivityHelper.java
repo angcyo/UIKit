@@ -441,33 +441,36 @@ public class ActivityHelper {
             return this;
         }
 
+        public Intent bundleIntent() {
+            if (intent == null) {
+                L.e("必要的参数不合法,请检查参数:" + "\n1->intent:null ×");
+            } else {
+                configIntent();
+            }
+            return intent;
+        }
+
         /**
          * 用来启动Activity
          */
         public Intent start() {
-            if (intent == null) {
-                L.e("必要的参数不合法,请检查参数:" + "\n1->intent:null ×");
+            bundleIntent();
+            if (context instanceof Activity) {
+                if (sharedElementList != null) {
+                    transitionOptions = ActivityOptionsCompat.makeSceneTransitionAnimation((Activity) context,
+                            sharedElementList.toArray(new Pair[sharedElementList.size()])).toBundle();
+                }
+            }
+
+            if (requestCode != -1 && context instanceof Activity) {
+                ActivityCompat.startActivityForResult((Activity) context, intent, requestCode, transitionOptions);
             } else {
+                ActivityCompat.startActivity(context, intent, transitionOptions);
+            }
 
-                configIntent();
-
-                if (context instanceof Activity) {
-                    if (sharedElementList != null) {
-                        transitionOptions = ActivityOptionsCompat.makeSceneTransitionAnimation((Activity) context,
-                                sharedElementList.toArray(new Pair[sharedElementList.size()])).toBundle();
-                    }
-                }
-
-                if (requestCode != -1 && context instanceof Activity) {
-                    ActivityCompat.startActivityForResult((Activity) context, intent, requestCode, transitionOptions);
-                } else {
-                    ActivityCompat.startActivity(context, intent, transitionOptions);
-                }
-
-                if (context instanceof Activity) {
-                    if (enterAnim != -1 || exitAnim != -1) {
-                        ((Activity) context).overridePendingTransition(enterAnim, exitAnim);
-                    }
+            if (context instanceof Activity) {
+                if (enterAnim != -1 || exitAnim != -1) {
+                    ((Activity) context).overridePendingTransition(enterAnim, exitAnim);
                 }
             }
             return intent;
