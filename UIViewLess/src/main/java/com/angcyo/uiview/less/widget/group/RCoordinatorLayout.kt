@@ -12,7 +12,7 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
  * @date 2019/09/10
  * Copyright (c) 2019 ShenZhen O&M Cloud Co., Ltd. All rights reserved.
  */
-class RCoordinatorLayout : CoordinatorLayout {
+open class RCoordinatorLayout : CoordinatorLayout {
 
     constructor(context: Context) : super(context) {
         initLayout(context, null)
@@ -30,7 +30,7 @@ class RCoordinatorLayout : CoordinatorLayout {
         initLayout(context, attrs)
     }
 
-    protected fun initLayout(context: Context, attrs: AttributeSet?) {
+    protected open fun initLayout(context: Context, attrs: AttributeSet?) {
 
     }
 

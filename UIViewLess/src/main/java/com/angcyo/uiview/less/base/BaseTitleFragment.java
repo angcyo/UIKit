@@ -18,6 +18,7 @@ import com.angcyo.uiview.less.base.helper.ViewGroupHelper;
 import com.angcyo.uiview.less.iview.AffectUI;
 import com.angcyo.uiview.less.recycler.RBaseViewHolder;
 import com.angcyo.uiview.less.resources.ResUtil;
+import com.angcyo.uiview.less.resources.ViewResConfig;
 import com.angcyo.uiview.less.widget.group.FragmentContentWrapperLayout;
 import com.angcyo.uiview.less.widget.group.TitleBarLayout;
 
@@ -56,6 +57,8 @@ public abstract class BaseTitleFragment extends BaseFragment implements AffectUI
     protected AffectUI affectUI;
 
     protected BaseUI.UIFragment uiFragment;
+
+    public ViewResConfig viewResConfig = new ViewResConfig();
 
     //<editor-fold desc="初始化方法">
 
@@ -303,7 +306,7 @@ public abstract class BaseTitleFragment extends BaseFragment implements AffectUI
     }
 
     public ViewGroupHelper rootControl() {
-        return new ViewGroupHelper(getView());
+        return new ViewGroupHelper(baseViewHolder.itemView);
     }
 
     public ViewGroupHelper contentControl() {

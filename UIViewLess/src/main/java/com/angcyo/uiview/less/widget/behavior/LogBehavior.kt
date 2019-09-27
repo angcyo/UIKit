@@ -6,6 +6,7 @@ import android.os.Parcelable
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.angcyo.lib.L
@@ -19,7 +20,7 @@ import com.angcyo.uiview.less.BuildConfig
  * Copyright (c) 2019 ShenZhen O&M Cloud Co., Ltd. All rights reserved.
  */
 open class LogBehavior<T : View>(context: Context? = null, attrs: AttributeSet? = null) :
-    androidx.coordinatorlayout.widget.CoordinatorLayout.Behavior<T>(context, attrs) {
+    CoordinatorLayout.Behavior<T>(context, attrs) {
     var showLog = BuildConfig.DEBUG
 
     init {
@@ -33,7 +34,7 @@ open class LogBehavior<T : View>(context: Context? = null, attrs: AttributeSet? 
     }
 
     override fun onNestedPreScroll(
-        coordinatorLayout: androidx.coordinatorlayout.widget.CoordinatorLayout,
+        coordinatorLayout: CoordinatorLayout,
         child: T,
         target: View,
         dx: Int,
@@ -42,11 +43,11 @@ open class LogBehavior<T : View>(context: Context? = null, attrs: AttributeSet? 
         type: Int
     ) {
         super.onNestedPreScroll(coordinatorLayout, child, target, dx, dy, consumed, type)
-        w("this....dx:$dx dy:$dy")
+        i("this....dx:$dx dy:$dy")
     }
 
     override fun onNestedScroll(
-        coordinatorLayout: androidx.coordinatorlayout.widget.CoordinatorLayout,
+        coordinatorLayout: CoordinatorLayout,
         child: T,
         target: View,
         dxConsumed: Int,
@@ -69,7 +70,7 @@ open class LogBehavior<T : View>(context: Context? = null, attrs: AttributeSet? 
     }
 
     override fun onSaveInstanceState(
-        parent: androidx.coordinatorlayout.widget.CoordinatorLayout,
+        parent: CoordinatorLayout,
         child: T
     ): Parcelable? {
         w("this....")
@@ -77,7 +78,7 @@ open class LogBehavior<T : View>(context: Context? = null, attrs: AttributeSet? 
     }
 
     override fun onNestedScrollAccepted(
-        coordinatorLayout: androidx.coordinatorlayout.widget.CoordinatorLayout,
+        coordinatorLayout: CoordinatorLayout,
         child: T,
         directTargetChild: View,
         target: View,
@@ -92,11 +93,11 @@ open class LogBehavior<T : View>(context: Context? = null, attrs: AttributeSet? 
             axes,
             type
         )
-        w("this....")
+        i("this....")
     }
 
     override fun getScrimColor(
-        parent: androidx.coordinatorlayout.widget.CoordinatorLayout,
+        parent: CoordinatorLayout,
         child: T
     ): Int {
         w("this....")
@@ -104,7 +105,7 @@ open class LogBehavior<T : View>(context: Context? = null, attrs: AttributeSet? 
     }
 
     override fun onNestedFling(
-        coordinatorLayout: androidx.coordinatorlayout.widget.CoordinatorLayout,
+        coordinatorLayout: CoordinatorLayout,
         child: T,
         target: View,
         velocityX: Float,
@@ -116,7 +117,7 @@ open class LogBehavior<T : View>(context: Context? = null, attrs: AttributeSet? 
     }
 
     override fun onLayoutChild(
-        parent: androidx.coordinatorlayout.widget.CoordinatorLayout,
+        parent: CoordinatorLayout,
         child: T,
         layoutDirection: Int
     ): Boolean {
@@ -125,7 +126,7 @@ open class LogBehavior<T : View>(context: Context? = null, attrs: AttributeSet? 
     }
 
     override fun onNestedPreFling(
-        coordinatorLayout: androidx.coordinatorlayout.widget.CoordinatorLayout,
+        coordinatorLayout: CoordinatorLayout,
         child: T,
         target: View,
         velocityX: Float,
@@ -136,7 +137,7 @@ open class LogBehavior<T : View>(context: Context? = null, attrs: AttributeSet? 
     }
 
     override fun getInsetDodgeRect(
-        parent: androidx.coordinatorlayout.widget.CoordinatorLayout,
+        parent: CoordinatorLayout,
         child: T,
         rect: Rect
     ): Boolean {
@@ -150,7 +151,7 @@ open class LogBehavior<T : View>(context: Context? = null, attrs: AttributeSet? 
     }
 
     override fun onRestoreInstanceState(
-        parent: androidx.coordinatorlayout.widget.CoordinatorLayout,
+        parent: CoordinatorLayout,
         child: T,
         state: Parcelable
     ) {
@@ -160,17 +161,17 @@ open class LogBehavior<T : View>(context: Context? = null, attrs: AttributeSet? 
 
 
     override fun onStopNestedScroll(
-        coordinatorLayout: androidx.coordinatorlayout.widget.CoordinatorLayout,
+        coordinatorLayout: CoordinatorLayout,
         child: T,
         target: View,
         type: Int
     ) {
         super.onStopNestedScroll(coordinatorLayout, child, target, type)
-        w("this....")
+        i("this....")
     }
 
     override fun layoutDependsOn(
-        parent: androidx.coordinatorlayout.widget.CoordinatorLayout,
+        parent: CoordinatorLayout,
         child: T,
         dependency: View
     ): Boolean {
@@ -179,7 +180,7 @@ open class LogBehavior<T : View>(context: Context? = null, attrs: AttributeSet? 
     }
 
     override fun onDependentViewChanged(
-        parent: androidx.coordinatorlayout.widget.CoordinatorLayout,
+        parent: CoordinatorLayout,
         child: T,
         dependency: View
     ): Boolean {
@@ -188,7 +189,7 @@ open class LogBehavior<T : View>(context: Context? = null, attrs: AttributeSet? 
     }
 
     override fun onDependentViewRemoved(
-        parent: androidx.coordinatorlayout.widget.CoordinatorLayout,
+        parent: CoordinatorLayout,
         child: T,
         dependency: View
     ) {
@@ -197,7 +198,7 @@ open class LogBehavior<T : View>(context: Context? = null, attrs: AttributeSet? 
     }
 
     override fun onRequestChildRectangleOnScreen(
-        coordinatorLayout: androidx.coordinatorlayout.widget.CoordinatorLayout,
+        coordinatorLayout: CoordinatorLayout,
         child: T,
         rectangle: Rect,
         immediate: Boolean
@@ -207,7 +208,7 @@ open class LogBehavior<T : View>(context: Context? = null, attrs: AttributeSet? 
     }
 
     override fun onApplyWindowInsets(
-        coordinatorLayout: androidx.coordinatorlayout.widget.CoordinatorLayout,
+        coordinatorLayout: CoordinatorLayout,
         child: T,
         insets: WindowInsetsCompat
     ): WindowInsetsCompat {
@@ -216,7 +217,7 @@ open class LogBehavior<T : View>(context: Context? = null, attrs: AttributeSet? 
     }
 
     override fun blocksInteractionBelow(
-        parent: androidx.coordinatorlayout.widget.CoordinatorLayout,
+        parent: CoordinatorLayout,
         child: T
     ): Boolean {
         w("this....")
@@ -225,7 +226,7 @@ open class LogBehavior<T : View>(context: Context? = null, attrs: AttributeSet? 
 
     /**[blocksInteractionBelow]*/
     override fun getScrimOpacity(
-        parent: androidx.coordinatorlayout.widget.CoordinatorLayout,
+        parent: CoordinatorLayout,
         child: T
     ): Float {
         return super.getScrimOpacity(parent, child).apply {
@@ -234,7 +235,7 @@ open class LogBehavior<T : View>(context: Context? = null, attrs: AttributeSet? 
     }
 
     override fun onTouchEvent(
-        parent: androidx.coordinatorlayout.widget.CoordinatorLayout,
+        parent: CoordinatorLayout,
         child: T,
         ev: MotionEvent
     ): Boolean {
@@ -243,7 +244,7 @@ open class LogBehavior<T : View>(context: Context? = null, attrs: AttributeSet? 
     }
 
     override fun onInterceptTouchEvent(
-        parent: androidx.coordinatorlayout.widget.CoordinatorLayout,
+        parent: CoordinatorLayout,
         child: T,
         ev: MotionEvent
     ): Boolean {
@@ -251,7 +252,7 @@ open class LogBehavior<T : View>(context: Context? = null, attrs: AttributeSet? 
         return super.onInterceptTouchEvent(parent, child, ev)
     }
 
-    override fun onAttachedToLayoutParams(params: androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams) {
+    override fun onAttachedToLayoutParams(params: CoordinatorLayout.LayoutParams) {
         super.onAttachedToLayoutParams(params)
         w("this...")
     }
@@ -262,14 +263,14 @@ open class LogBehavior<T : View>(context: Context? = null, attrs: AttributeSet? 
      * @return true 接收内嵌滚动事件
      * */
     override fun onStartNestedScroll(
-        coordinatorLayout: androidx.coordinatorlayout.widget.CoordinatorLayout,
+        coordinatorLayout: CoordinatorLayout,
         child: T,
         directTargetChild: View,
         target: View,
         axes: Int,
         type: Int
     ): Boolean {
-        w("this...${target.javaClass.simpleName} axes:$axes type:$type")
+        i("this...${target.javaClass.simpleName} axes:$axes type:$type")
         return super.onStartNestedScroll(
             coordinatorLayout,
             child,
@@ -281,7 +282,7 @@ open class LogBehavior<T : View>(context: Context? = null, attrs: AttributeSet? 
     }
 
     override fun onMeasureChild(
-        parent: androidx.coordinatorlayout.widget.CoordinatorLayout,
+        parent: CoordinatorLayout,
         child: T,
         parentWidthMeasureSpec: Int,
         widthUsed: Int,
@@ -302,6 +303,12 @@ open class LogBehavior<T : View>(context: Context? = null, attrs: AttributeSet? 
     fun w(msg: String? = null) {
         if (showLog) {
             L.w(msg ?: "")
+        }
+    }
+
+    fun i(msg: String? = null) {
+        if (showLog) {
+            L.i(msg ?: "")
         }
     }
 }

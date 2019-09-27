@@ -21,7 +21,7 @@ import kotlin.math.min
  * Copyright (c) 2019 ShenZhen O&M Cloud Co., Ltd. All rights reserved.
  */
 
-class ContentBehavior(context: Context, attributeSet: AttributeSet? = null) :
+open class ContentBehavior(context: Context? = null, attributeSet: AttributeSet? = null) :
     BaseDependsBehavior<View>(context, attributeSet) {
 
     companion object {
@@ -42,16 +42,19 @@ class ContentBehavior(context: Context, attributeSet: AttributeSet? = null) :
     init {
         showLog = false
 
-        val array = context.obtainStyledAttributes(attributeSet, R.styleable.ContentBehavior_Layout)
+        context?.let {
+            val array =
+                context.obtainStyledAttributes(attributeSet, R.styleable.ContentBehavior_Layout)
 
-        //行为控制
-        contentLayoutState =
-            array.getInt(
-                R.styleable.ContentBehavior_Layout_layout_content_layout_state,
-                contentLayoutState
-            )
+            //行为控制
+            contentLayoutState =
+                array.getInt(
+                    R.styleable.ContentBehavior_Layout_layout_content_layout_state,
+                    contentLayoutState
+                )
 
-        array.recycle()
+            array.recycle()
+        }
     }
 
     //<editor-fold desc="方法区">
@@ -81,6 +84,7 @@ class ContentBehavior(context: Context, attributeSet: AttributeSet? = null) :
         dependency: View
     ): Boolean {
         super.layoutDependsOn(parent, child, dependency)
+        //取消默认的依赖关系建立, 某种会出现闭环依赖关系
         return false
     }
 
@@ -178,7 +182,7 @@ class ContentBehavior(context: Context, attributeSet: AttributeSet? = null) :
         child: View
     ): Int {
         var offsetTop = 0
-        if (dependsLayout != child) {
+        if (dependsLayout != null && dependsLayout != child) {
             dependsLayout!!.layoutParams.coordinatorParams {
                 offsetTop = dependsLayout!!.measuredHeight + topMargin + bottomMargin
             }
@@ -216,28 +220,30 @@ class ContentBehavior(context: Context, attributeSet: AttributeSet? = null) :
     ) {
         super.onNestedPreScroll(coordinatorLayout, child, target, dx, dy, consumed, type)
 
-        if (dy < 0) {
-            //手指往下滑动
-            if (!UI.canChildScrollUp(target)) {
-                //RecyclerView的顶部没有滚动空间
-                val offsetTopMax = getOffsetTopMax(coordinatorLayout, child)
+        if (contentLayoutState.have(LAYOUT_FLAG_OFFSET)) {
+            if (dy < 0) {
+                //手指往下滑动
+                if (!UI.canChildScrollUp(target)) {
+                    //RecyclerView的顶部没有滚动空间
+                    val offsetTopMax = getOffsetTopMax(coordinatorLayout, child)
 
-                if (offsetTop < offsetTopMax) {
-                    val consumedY = min(-dy, offsetTopMax - offsetTop)
-                    consumed[1] = -consumedY
+                    if (offsetTop < offsetTopMax) {
+                        val consumedY = min(-dy, offsetTopMax - offsetTop)
+                        consumed[1] = -consumedY
 
-                    child.offsetTop(consumedY)
+                        child.offsetTop(consumedY)
+                        offsetTop = child.top
+                    }
+                }
+            } else if (dy > 0) {
+                //手指往上滑动
+                if (offsetTop > 0) {
+                    val consumedY = min(dy, offsetTop)
+                    consumed[1] = consumedY
+
+                    child.offsetTop(-consumedY)
                     offsetTop = child.top
                 }
-            }
-        } else if (dy > 0) {
-            //手指往上滑动
-            if (offsetTop > 0) {
-                val consumedY = min(dy, offsetTop)
-                consumed[1] = consumedY
-
-                child.offsetTop(-consumedY)
-                offsetTop = child.top
             }
         }
     }

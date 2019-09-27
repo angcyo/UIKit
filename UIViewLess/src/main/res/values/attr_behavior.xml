@@ -17,9 +17,14 @@
         <attr name="layout_offset_child_index" format="integer" />
     </declare-styleable>
 
-
     <declare-styleable name="ColorBehavior_Layout">
         <attr name="layout_color_from" format="color" />
         <attr name="layout_color_to" format="color" />
+    </declare-styleable>
+
+    <declare-styleable name="TitleBarBehavior_Layout">
+    </declare-styleable>
+
+    <declare-styleable name="BackgroundBehavior_Layout">
     </declare-styleable>
 </resources>

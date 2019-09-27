@@ -2,8 +2,6 @@ package com.angcyo.uiview.less.base.helper;
 
 import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
-import androidx.annotation.*;
-import androidx.core.view.ViewCompat;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +10,15 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import androidx.annotation.ColorInt;
+import androidx.annotation.DrawableRes;
+import androidx.annotation.IdRes;
+import androidx.annotation.LayoutRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.view.ViewCompat;
+
 import com.angcyo.uiview.less.kotlin.ViewExKt;
 import com.angcyo.uiview.less.resources.ResUtil;
 import com.angcyo.uiview.less.widget.ImageTextView;
@@ -292,6 +299,13 @@ public class ViewGroupHelper {
     public ViewGroupHelper setVisibility(int visibility) {
         if (selectorView != null) {
             selectorView.setVisibility(visibility);
+        }
+        return this;
+    }
+
+    public ViewGroupHelper setAlpha(float alpha) {
+        if (selectorView != null) {
+            selectorView.setAlpha(alpha);
         }
         return this;
     }

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.angcyo.uiview.less.widget.group.RCoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/base_coordinator_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!--背景behavior层-->
+    <FrameLayout
+        android:id="@+id/base_behavior_bg_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="com.angcyo.uiview.less.widget.behavior.BackgroundBehavior"
+        tools:background="@color/base_orange_dark" />
+
+    <!--内容层-->
+    <com.angcyo.uiview.less.widget.RSmartRefreshLayout
+        android:id="@+id/base_refresh_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="com.angcyo.uiview.less.widget.behavior.ContentBehavior">
+
+        <com.angcyo.uiview.less.recycler.RRecyclerView
+            android:id="@+id/base_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </com.angcyo.uiview.less.widget.RSmartRefreshLayout>
+
+    <!--标题栏-->
+    <com.angcyo.uiview.less.widget.group.TitleBarLayout
+        android:id="@+id/base_title_bar_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_behavior="com.angcyo.uiview.less.widget.behavior.TitleBarBehavior"
+        tools:background="@color/transparent_dark">
+
+        <!--动态添加配置-->
+    </com.angcyo.uiview.less.widget.group.TitleBarLayout>
+
+</com.angcyo.uiview.less.widget.group.RCoordinatorLayout>

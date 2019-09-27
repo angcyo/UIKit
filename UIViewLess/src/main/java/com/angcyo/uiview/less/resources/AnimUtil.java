@@ -7,11 +7,26 @@ import android.animation.ValueAnimator;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.os.Build;
-import androidx.core.view.ViewCompat;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.view.animation.*;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
+import android.view.animation.AnticipateInterpolator;
+import android.view.animation.BounceInterpolator;
+import android.view.animation.DecelerateInterpolator;
+import android.view.animation.LayoutAnimationController;
+import android.view.animation.LinearInterpolator;
+import android.view.animation.OvershootInterpolator;
+import android.view.animation.RotateAnimation;
+import android.view.animation.ScaleAnimation;
+import android.view.animation.TranslateAnimation;
+
+import androidx.core.math.MathUtils;
+import androidx.core.view.ViewCompat;
+
 import com.angcyo.uiview.less.R;
 import com.angcyo.uiview.less.RApplication;
 import com.angcyo.uiview.less.utils.ScreenUtil;
@@ -25,6 +40,7 @@ public class AnimUtil {
      * 计算2个颜色之间的颜色值
      */
     public static int evaluateColor(float fraction /*0-1*/, int startColor, int endColor) {
+        fraction = MathUtils.clamp(fraction, 0f, 1f);
         int startInt = startColor;
         int startA = (startInt >> 24) & 0xff;
         int startR = (startInt >> 16) & 0xff;

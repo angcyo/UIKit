@@ -2,11 +2,13 @@ package com.angcyo.uiview.less.base;
 
 import android.content.Context;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.angcyo.uiview.less.R;
 import com.angcyo.uiview.less.base.helper.TitleItemHelper;
 import com.angcyo.uiview.less.iview.AffectUI;
@@ -14,7 +16,6 @@ import com.angcyo.uiview.less.recycler.RBaseViewHolder;
 import com.angcyo.uiview.less.recycler.adapter.RBaseAdapter;
 import com.angcyo.uiview.less.recycler.widget.ItemLoadMoreLayout;
 import com.angcyo.uiview.less.recycler.widget.ItemShowStateLayout;
-import com.angcyo.uiview.less.skin.SkinHelper;
 import com.angcyo.uiview.less.widget.ImageTextView;
 
 /**
@@ -74,7 +75,7 @@ public class BaseUI {
         public void initBaseTitleLayout(@NonNull BaseTitleFragment titleFragment, @Nullable Bundle arguments) {
             titleFragment.titleControl()
                     .selector(R.id.base_title_bar_layout)
-                    .setBackgroundColor(SkinHelper.getSkin().getThemeColor());
+                    .setBackgroundColor(titleFragment.viewResConfig.getTitleBarBackgroundColor());
         }
 
         @Override
