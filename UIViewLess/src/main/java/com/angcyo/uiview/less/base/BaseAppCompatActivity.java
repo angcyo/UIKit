@@ -1,8 +1,10 @@
 package com.angcyo.uiview.less.base;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.PixelFormat;
@@ -11,6 +13,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.PowerManager;
+
 import androidx.annotation.DrawableRes;
 import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
@@ -20,6 +23,8 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.angcyo.http.Json;
 import com.angcyo.lib.L;
 import com.angcyo.uiview.less.BuildConfig;
 import com.angcyo.uiview.less.RCrashHandler;
@@ -28,16 +33,18 @@ import com.angcyo.uiview.less.base.helper.FragmentHelper;
 import com.angcyo.uiview.less.picture.RPicture;
 import com.angcyo.uiview.less.recycler.RBaseViewHolder;
 import com.angcyo.uiview.less.utils.RUtils;
+import com.angcyo.uiview.less.utils.Reflect;
 import com.angcyo.uiview.less.utils.Root;
 import com.angcyo.uiview.less.utils.Tip;
 import com.angcyo.uiview.less.widget.group.FragmentSwipeBackLayout;
 import com.tbruyelle.rxpermissions.Permission;
 import com.tbruyelle.rxpermissions.RxPermissions;
+
+import java.util.List;
+
 import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.functions.Func2;
-
-import java.util.List;
 
 /**
  * Email:angcyo@126.com
@@ -55,8 +62,20 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
 
     protected int fragmentParentLayoutId = -1;
 
-    //<editor-fold desc="生命周期, 系统的方法">
     long lastBackTime = 0L;
+
+    @NonNull
+    public static String logActivityInfo(ActivityInfo activityInfo) {
+        StringBuilder builder = new StringBuilder();
+        if (activityInfo != null) {
+            L.i("ActivityInfo:");
+            String to = Json.to(activityInfo);
+            L.json(to);
+        }
+        return builder.toString();
+    }
+
+    //<editor-fold desc="生命周期, 系统的方法">
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -72,9 +91,40 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
         //系统Fragment操作日志输出
         //FragmentManager.enableDebugLogging(BuildConfig.DEBUG);
 
-        L.v(this.getClass().getSimpleName() + " taskId:" + getTaskId());
+        String className = this.getClass().getSimpleName();
+        Intent parentActivityIntent = getParentActivityIntent();
+        Intent supportParentActivityIntent = getSupportParentActivityIntent();
+
+        ActivityInfo mActivityInfo = (ActivityInfo) Reflect.getFieldValue(this, Activity.class, "mActivityInfo");
+        logActivityInfo(mActivityInfo);
+        if (mActivityInfo != null) {
+            L.v(className +
+                    " taskId:" + getTaskId() +
+                    " root:" + isTaskRoot() +
+                    " taskAffinity:" + mActivityInfo.taskAffinity);
+        } else {
+            L.v(className +
+                    " taskId:" + getTaskId() +
+                    " root:" + isTaskRoot());
+        }
+
+        L.v(className + " parentActivityIntent:" + parentActivityIntent);
+        L.v(className + " supportParentActivityIntent:" + supportParentActivityIntent);
+
         //ActivityHelper.setStatusBarColor(this, Color.YELLOW);
         //ActivityHelper.setStatusBarDrawable(this, getDrawableCompat(R.drawable.base_nav_shadow));
+    }
+
+    @Override
+    protected void onPostCreate(@Nullable Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        checkCrash();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        clearRecycledViewPool();
     }
 
     @Override
@@ -227,6 +277,8 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
         }
     }
 
+    //</editor-fold desc="生命周期, 系统的方法">
+
     //<editor-fold desc="权限相关方法">
 
     protected String[] needPermissions() {
@@ -344,8 +396,6 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
         Tip.tip("权限被拒绝!");
     }
 
-    //</editor-fold>
-
     public Drawable getDrawableCompat(@DrawableRes int res) {
         return ContextCompat.getDrawable(this, res);
     }
@@ -369,6 +419,10 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
         }
     }
 
+    //</editor-fold desc="权限相关方法">
+
+    //<editor-fold desc="其他方法">
+
     public void setFragmentSwipeBackLayout(FragmentSwipeBackLayout fragmentSwipeBackLayout) {
         this.fragmentSwipeBackLayout = fragmentSwipeBackLayout;
     }
@@ -379,12 +433,6 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
                 Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             fragmentSwipeBackLayout.setDimStatusBar(lightStatusBar);
         }
-    }
-
-    @Override
-    protected void onPostCreate(@Nullable Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-        checkCrash();
     }
 
     protected void checkCrash() {
@@ -432,6 +480,8 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
 
     }
 
+    //</editor-fold desc="其他方法">
+
     //<editor-fold desc="画中画支持">
 
     /**
@@ -454,12 +504,6 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
     //</editor-fold desc="画中画支持">
 
     //<editor-fold desc="RecyclerView共享二级缓存池">
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        clearRecycledViewPool();
-    }
 
     protected RecyclerView.RecycledViewPool recycledViewPool;
 

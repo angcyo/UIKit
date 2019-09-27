@@ -227,6 +227,12 @@ public class RSpan extends SpanUtils {
     }
 
     @Override
+    public RSpan setBold() {
+        super.setBold();
+        return this;
+    }
+
+    @Override
     public RSpan setSpans(@NonNull Object... spans) {
         super.setSpans(spans);
         return this;

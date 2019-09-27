@@ -3,15 +3,28 @@ package com.angcyo.uiview.less.utils;
 import android.graphics.Color;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
+
 import com.angcyo.lib.L;
 import com.angcyo.uiview.less.recycler.RBaseViewHolder;
 import com.angcyo.uiview.less.utils.utilcode.utils.SpannableStringUtils;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.*;
-import java.util.*;
+import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Member;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
+ * 反射操作相关类
  * Created by angcyo on 2016-11-26.
  */
 
@@ -187,8 +200,16 @@ public class Reflect {
         if (obj == null || TextUtils.isEmpty(fieldName)) {
             return null;
         }
-
         Class<?> clazz = obj.getClass();
+        return getFieldValue(obj, clazz, fieldName);
+    }
+
+    public static Object getFieldValue(Object obj, Class cls, String fieldName) {
+        if (obj == null || TextUtils.isEmpty(fieldName) || cls == null) {
+            return null;
+        }
+
+        Class<?> clazz = cls;
         while (clazz != Object.class) {
             try {
                 Field field = clazz.getDeclaredField(fieldName);

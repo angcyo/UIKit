@@ -62,6 +62,7 @@ open class DslAdapterItem {
     open var itemBind: (itemHolder: RBaseViewHolder, itemPosition: Int, adapterItem: DslAdapterItem) -> Unit =
         { itemHolder, itemPosition, adapterItem ->
             onItemBind(itemHolder, itemPosition, adapterItem)
+            onItemBindOverride(itemHolder, itemPosition, adapterItem)
         }
 
     open fun onItemBind(
@@ -71,6 +72,12 @@ open class DslAdapterItem {
     ) {
 
     }
+
+    /**用于覆盖默认操作*/
+    open var onItemBindOverride: (itemHolder: RBaseViewHolder, itemPosition: Int, adapterItem: DslAdapterItem) -> Unit =
+        { _, _, _ ->
+
+        }
 
     open var onItemViewAttachedToWindow: (itemHolder: RBaseViewHolder) -> Unit = {
 
