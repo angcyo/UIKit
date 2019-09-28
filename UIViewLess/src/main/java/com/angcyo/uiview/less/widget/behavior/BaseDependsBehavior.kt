@@ -107,6 +107,8 @@ abstract class BaseDependsBehavior<T : View>(
         )
         dxConsumedAll += dxConsumed
         dyConsumedAll += dyConsumed
+
+        w("this....dxConsumedAll:$dxConsumedAll dyConsumedAll:$dyConsumedAll")
     }
 
     //<editor-fold desc="辅助方法">

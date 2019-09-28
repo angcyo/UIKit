@@ -45,7 +45,7 @@ open class TitleBarBehavior(context: Context? = null, attributeSet: AttributeSet
     var onTitleBarBehaviorCallback: OnTitleBarBehaviorCallback = OnTitleBarBehaviorCallback()
 
     init {
-        showLog = true
+        showLog = false
 
         context?.let {
             val array =

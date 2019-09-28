@@ -11,7 +11,7 @@
         android:id="@+id/base_behavior_bg_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="com.angcyo.uiview.less.widget.behavior.BackgroundBehavior"
+        tools:layout_behavior="com.angcyo.uiview.less.widget.behavior.BackgroundBehavior"
         tools:background="@color/base_orange_dark" />
 
     <!--内容层-->
@@ -19,7 +19,7 @@
         android:id="@+id/base_refresh_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="com.angcyo.uiview.less.widget.behavior.ContentBehavior">
+        tools:layout_behavior="com.angcyo.uiview.less.widget.behavior.ContentBehavior">
 
         <com.angcyo.uiview.less.recycler.RRecyclerView
             android:id="@+id/base_recycler_view"
@@ -33,7 +33,7 @@
         android:id="@+id/base_title_bar_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_behavior="com.angcyo.uiview.less.widget.behavior.TitleBarBehavior"
+        tools:layout_behavior="com.angcyo.uiview.less.widget.behavior.TitleBarBehavior"
         tools:background="@color/transparent_dark">
 
         <!--动态添加配置-->

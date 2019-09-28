@@ -24,4 +24,6 @@ class ViewResConfig {
 
     var fragmentBackgroundColor: Int = getColor(R.color.line_color)
     var titleBarBackgroundColor: Int = SkinHelper.getSkin().themeSubColor
+
+    var defaultBehaviorBgViewHeight = -1
 }

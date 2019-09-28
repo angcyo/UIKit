@@ -112,7 +112,7 @@ open class LogBehavior<T : View>(context: Context? = null, attrs: AttributeSet? 
         velocityY: Float,
         consumed: Boolean
     ): Boolean {
-        w("this....")
+        d("this....onNestedFling")
         return super.onNestedFling(coordinatorLayout, child, target, velocityX, velocityY, consumed)
     }
 
@@ -132,7 +132,7 @@ open class LogBehavior<T : View>(context: Context? = null, attrs: AttributeSet? 
         velocityX: Float,
         velocityY: Float
     ): Boolean {
-        w("this....")
+        d("this....onNestedPreFling")
         return super.onNestedPreFling(coordinatorLayout, child, target, velocityX, velocityY)
     }
 
@@ -230,7 +230,7 @@ open class LogBehavior<T : View>(context: Context? = null, attrs: AttributeSet? 
         child: T
     ): Float {
         return super.getScrimOpacity(parent, child).apply {
-            w("this....scrimOpacity:$this")
+            d("this....scrimOpacity:$this")
         }
     }
 
@@ -309,6 +309,12 @@ open class LogBehavior<T : View>(context: Context? = null, attrs: AttributeSet? 
     fun i(msg: String? = null) {
         if (showLog) {
             L.i(msg ?: "")
+        }
+    }
+
+    fun d(msg: String? = null) {
+        if (showLog) {
+            L.d(msg ?: "")
         }
     }
 }

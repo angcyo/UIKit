@@ -26,5 +26,6 @@
     </declare-styleable>
 
     <declare-styleable name="BackgroundBehavior_Layout">
+        <attr name="layout_child_height" format="dimension" />
     </declare-styleable>
 </resources>
