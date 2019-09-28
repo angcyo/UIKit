@@ -3,7 +3,6 @@ package com.angcyo.uiview.less.kotlin
 import android.app.Activity
 import android.graphics.Rect
 import androidx.annotation.LayoutRes
-import androidx.recyclerview.widget.RecyclerView
 import android.view.*
 import android.view.animation.Animation
 import android.view.animation.AnticipateInterpolator
@@ -510,8 +509,8 @@ abstract class OnAddViewCallback<T> {
     }
 }
 
-public fun ViewGroup.inflate(@LayoutRes id: Int, attachToRoot: Boolean = true): View {
-    return LayoutInflater.from(context).inflate(id, this, attachToRoot)
+public fun ViewGroup.inflate(@LayoutRes layoutId: Int, attachToRoot: Boolean = true): View {
+    return LayoutInflater.from(context).inflate(layoutId, this, attachToRoot)
 }
 
 /**

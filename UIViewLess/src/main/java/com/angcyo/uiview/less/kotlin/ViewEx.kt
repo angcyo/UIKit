@@ -15,6 +15,7 @@ import android.text.TextUtils
 import android.util.LayoutDirection
 import android.util.TypedValue
 import android.view.*
+import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import android.view.animation.DecelerateInterpolator
 import android.view.animation.LinearInterpolator
 import android.widget.*
@@ -23,6 +24,7 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.GestureDetectorCompat
 import androidx.core.view.ViewCompat
+import androidx.recyclerview.widget.RecyclerView
 import com.angcyo.uiview.less.draw.RDrawNoRead
 import com.angcyo.uiview.less.recycler.RBaseViewHolder
 import com.angcyo.uiview.less.recycler.RRecyclerView
@@ -788,16 +790,41 @@ public fun View.setWidthHeight(width: Int, height: Int) {
     layoutParams = params
 }
 
-public fun View.setWidth(width: Int) {
+public fun View.setWidth(width: Int, keepOffset: Boolean = false) {
+    val offsetTop = top
+    val offsetLeft = left
+
     val params = layoutParams
     params.width = width
     layoutParams = params
+
+    if (keepOffset) {
+        viewTreeObserver.addOnGlobalLayoutListener(
+            RestoreOffsetLayoutListener(
+                this,
+                offsetTop,
+                offsetLeft
+            )
+        )
+    }
 }
 
-public fun View.setHeight(height: Int) {
+public fun View.setHeight(height: Int, keepOffset: Boolean = false) {
+    val offsetTop = top
+    val offsetLeft = left
     val params = layoutParams
     params.height = height
     layoutParams = params
+
+    if (keepOffset) {
+        viewTreeObserver.addOnGlobalLayoutListener(
+            RestoreOffsetLayoutListener(
+                this,
+                offsetTop,
+                offsetLeft
+            )
+        )
+    }
 }
 
 /**
@@ -1168,24 +1195,39 @@ public fun View.constraintParams(config: ConstraintLayout.LayoutParams.() -> Uni
 }
 
 /**将[LayoutParams]强转成指定对象*/
-public fun ViewGroup.LayoutParams.marginParams(config: ViewGroup.MarginLayoutParams.() -> Unit = {}): ViewGroup.LayoutParams {
-    (this as? ViewGroup.MarginLayoutParams)?.config()
-    return this
+public fun ViewGroup.LayoutParams.marginParams(config: ViewGroup.MarginLayoutParams.() -> Unit = {}): ViewGroup.MarginLayoutParams? {
+    return (this as? ViewGroup.MarginLayoutParams)?.run {
+        config()
+        this
+    }
 }
 
-public fun ViewGroup.LayoutParams.frameParams(config: FrameLayout.LayoutParams.() -> Unit = {}): ViewGroup.LayoutParams {
-    (this as? FrameLayout.LayoutParams)?.config()
-    return this
+public fun ViewGroup.LayoutParams.frameParams(config: FrameLayout.LayoutParams.() -> Unit = {}): FrameLayout.LayoutParams? {
+    return (this as? FrameLayout.LayoutParams)?.run {
+        config()
+        this
+    }
 }
 
-public fun ViewGroup.LayoutParams.coordinatorParams(config: CoordinatorLayout.LayoutParams.() -> Unit = {}): ViewGroup.LayoutParams {
-    (this as? CoordinatorLayout.LayoutParams)?.config()
-    return this
+public fun ViewGroup.LayoutParams.coordinatorParams(config: CoordinatorLayout.LayoutParams.() -> Unit = {}): CoordinatorLayout.LayoutParams? {
+    return (this as? CoordinatorLayout.LayoutParams)?.run {
+        config()
+        this
+    }
 }
 
-public fun ViewGroup.LayoutParams.constraintParams(config: ConstraintLayout.LayoutParams.() -> Unit = {}): ViewGroup.LayoutParams {
-    (this as? ConstraintLayout.LayoutParams)?.config()
-    return this
+public fun ViewGroup.LayoutParams.constraintParams(config: ConstraintLayout.LayoutParams.() -> Unit = {}): ConstraintLayout.LayoutParams? {
+    return (this as? ConstraintLayout.LayoutParams)?.run {
+        config()
+        this
+    }
+}
+
+public fun ViewGroup.LayoutParams.recyclerParams(config: RecyclerView.LayoutParams.() -> Unit = {}): RecyclerView.LayoutParams? {
+    return (this as? RecyclerView.LayoutParams)?.run {
+        config()
+        this
+    }
 }
 
 public fun TextView.setTextSizeWithDp(textSize: Any) {
@@ -1222,3 +1264,12 @@ public fun View.padding(config: Padding.() -> Unit) {
 }
 
 data class Padding(var left: Int, var top: Int, var right: Int, var bottom: Int)
+
+class RestoreOffsetLayoutListener(val view: View, val offsetTop: Int, val offsetLeft: Int) :
+    OnGlobalLayoutListener {
+    override fun onGlobalLayout() {
+        view.offsetTopAndBottom(offsetTop)
+        view.offsetLeftAndRight(offsetLeft)
+        view.viewTreeObserver.removeOnGlobalLayoutListener(this)
+    }
+}
