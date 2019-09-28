@@ -67,7 +67,7 @@ public fun <T> T.getDrawable(resId: Int): Drawable? {
 }
 
 public fun <T> T.getColor(resId: Int): Int {
-    if (resId == -1) {
+    if (resId == -1 || app() == null) {
         return Color.TRANSPARENT
     }
     return ContextCompat.getColor(app(), resId)

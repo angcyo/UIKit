@@ -21,7 +21,9 @@ public class BaseSkin extends SkinImpl {
     protected Context mContext;
 
     public BaseSkin(Context context) {
-        mContext = context.getApplicationContext();
+        if (context != null) {
+            mContext = context.getApplicationContext();
+        }
     }
 
     final public int getColor(@ColorRes int id) {

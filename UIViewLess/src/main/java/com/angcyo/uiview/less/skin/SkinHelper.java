@@ -4,8 +4,10 @@ import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+
 import androidx.annotation.ColorInt;
 import androidx.core.graphics.ColorUtils;
+
 import com.angcyo.uiview.less.R;
 import com.angcyo.uiview.less.RApplication;
 import com.angcyo.uiview.less.resources.ResUtil;
@@ -44,8 +46,8 @@ public class SkinHelper {
      */
     public static ISkin getSkin() {
         if (mSkin == null) {
-            throw new NullPointerException("please call SkinHelper#init method.");
-            //init(RApplication.getApp());
+            //throw new NullPointerException("please call SkinHelper#init method.");
+            mSkin = new PreviewSkin();
         }
         return mSkin;
     }

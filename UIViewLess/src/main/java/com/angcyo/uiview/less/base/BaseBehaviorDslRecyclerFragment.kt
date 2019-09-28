@@ -1,6 +1,7 @@
 package com.angcyo.uiview.less.base
 
 import android.os.Bundle
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import com.angcyo.uiview.less.R
 import com.angcyo.uiview.less.kotlin.coordinatorParams
 import com.angcyo.uiview.less.kotlin.inflate
@@ -26,18 +27,6 @@ open class BaseBehaviorDslRecyclerFragment : BaseDslRecyclerFragment() {
         return super.getContentLayoutId()
     }
 
-    override fun initBaseView(
-        viewHolder: RBaseViewHolder,
-        arguments: Bundle?,
-        savedInstanceState: Bundle?
-    ) {
-        super.initBaseView(viewHolder, arguments, savedInstanceState)
-
-        if (getBehaviorBgLayoutId() > 0) {
-            viewHolder.vg(R.id.base_behavior_bg_layout).inflate(getBehaviorBgLayoutId())
-        }
-    }
-
     override fun onInitBaseView(
         viewHolder: RBaseViewHolder,
         arguments: Bundle?,
@@ -45,24 +34,34 @@ open class BaseBehaviorDslRecyclerFragment : BaseDslRecyclerFragment() {
     ) {
         super.onInitBaseView(viewHolder, arguments, savedInstanceState)
 
+        if (getBehaviorBgLayoutId() > 0) {
+            viewHolder.vg(R.id.base_behavior_bg_layout).inflate(getBehaviorBgLayoutId())
+        }
+
         initBehavior()
     }
 
-    open fun initBehavior() {
+    open fun initBehavior(config: CoordinatorLayout.Behavior<*>.() -> Unit = {}) {
         baseViewHolder.view(R.id.base_behavior_bg_layout).coordinatorParams {
             behavior = BackgroundBehavior().apply {
                 childHeight = viewResConfig.defaultBehaviorBgViewHeight
+
+                config()
             }
         }
 
         baseViewHolder.view(R.id.base_content_wrapper_layout).coordinatorParams {
-            behavior = ContentBehavior()
+            behavior = ContentBehavior().apply {
+                config()
+            }
         }
 
         baseViewHolder.view(R.id.base_title_bar_layout).coordinatorParams {
             behavior = TitleBarBehavior().apply {
                 //gradientStartConfig = viewResConfig
                 gradientEndConfig = viewResConfig
+
+                config()
             }
         }
     }
