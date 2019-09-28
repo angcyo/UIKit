@@ -6,26 +6,28 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.os.Build;
+import android.text.TextUtils;
+import android.util.AttributeSet;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewTreeObserver;
+import android.widget.LinearLayout;
+import android.widget.OverScroller;
+
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.view.MotionEventCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.widget.ScrollerCompat;
-import androidx.appcompat.widget.*;
-import android.text.TextUtils;
-import android.util.AttributeSet;
-import android.view.GestureDetector;
-import android.view.MotionEvent;
-import android.view.View;
-import android.widget.LinearLayout;
-import android.widget.OverScroller;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.SimpleItemAnimator;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
+
 import com.angcyo.lib.L;
 import com.angcyo.uiview.less.R;
 import com.angcyo.uiview.less.draw.RDrawIndicator;
@@ -820,18 +822,7 @@ public class RRecyclerView extends RecyclerView implements CanScrollUpCallBack {
 
         if (manager instanceof LinearLayoutManager) {
             ((LinearLayoutManager) manager).scrollToPositionWithOffset(position, 0);
-            post(new Runnable() {
-                @Override
-                public void run() {
-                    View target = manager.findViewByPosition(position);//然后才能拿到这个View
-                    if (target != null) {
-                        int offset = getMeasuredHeight() - target.getMeasuredHeight();
-                        ((LinearLayoutManager) manager).scrollToPositionWithOffset(position, offset);//滚动偏移到底部
-                        //L.i("滚动至:" + position + " offset:" + offset);
-                    }
-                }
-            });
-
+            restoreLayoutListener.attach();
         } else {
             ((StaggeredGridLayoutManager) manager).scrollToPositionWithOffset(position, 0);
             post(new Runnable() {
@@ -847,6 +838,12 @@ public class RRecyclerView extends RecyclerView implements CanScrollUpCallBack {
                 }
             });
         }
+    }
+
+    protected int getScrollOffset(View targetView) {
+        //int offset = getMeasuredHeight() - getPaddingTop() - getPaddingBottom() - targetView.getMeasuredHeight();
+        int offset = targetView.getTop() - getPaddingTop();
+        return offset;
     }
 
     @Override
@@ -1183,6 +1180,48 @@ public class RRecyclerView extends RecyclerView implements CanScrollUpCallBack {
                 L.e("StaggeredGridLayoutManagerWrap onLayoutChildren异常-> " + e.getMessage());
                 e.printStackTrace();
             }
+        }
+    }
+
+    protected RestoreLayoutListener restoreLayoutListener = new RestoreLayoutListener();
+
+    private class RestoreLayoutListener implements ViewTreeObserver.OnGlobalLayoutListener {
+
+        private int position = -1;
+
+        private void attach() {
+            detach();
+            getViewTreeObserver().addOnGlobalLayoutListener(this);
+        }
+
+        private void detach() {
+            getViewTreeObserver().removeOnGlobalLayoutListener(this);
+        }
+
+        @Override
+        public void onGlobalLayout() {
+            final LayoutManager manager = getLayoutManager();
+            if (manager == null || position < 0 || position >= manager.getItemCount()) {
+                detach();
+                return;
+            }
+            if (manager instanceof LinearLayoutManager) {
+                View target = manager.findViewByPosition(position);
+                if (target != null) {
+                    int offset = getScrollOffset(target);
+                    ((LinearLayoutManager) manager).scrollToPositionWithOffset(position, offset);//滚动偏移到底部
+                    //L.i("滚动至:" + position + " offset:" + offset);
+                }
+            } else {
+                View target = manager.findViewByPosition(position);
+                if (target != null) {
+                    int offset = getScrollOffset(target);
+                    ((StaggeredGridLayoutManager) manager).scrollToPositionWithOffset(position,
+                            offset);//滚动偏移到底部
+                    //L.i("滚动至:" + position + " offset:" + offset);
+                }
+            }
+            detach();
         }
     }
 }
