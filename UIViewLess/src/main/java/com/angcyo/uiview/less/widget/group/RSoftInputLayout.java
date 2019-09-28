@@ -809,6 +809,7 @@ public class RSoftInputLayout extends FrameLayout {
         if (this.enableSoftInput == enableSoftInput) {
             return;
         }
+        boolean keyboardShow = isSoftKeyboardShow();
 
         this.enableSoftInput = enableSoftInput;
         if (enableSoftInput) {
@@ -818,7 +819,13 @@ public class RSoftInputLayout extends FrameLayout {
             setFitsSystemWindows(false);
         }
 
-        requestLayout();
+        if (keyboardShow && !enableSoftInput) {
+            //已经显示了软键盘, 这个时候禁用控件, 恢复默认布局
+            setIntentAction(INTENT_HIDE_KEYBOARD);
+            insetBottom(0);
+        } else {
+            requestLayout();
+        }
     }
 
     public void setFitsSystemWindows() {
@@ -1210,7 +1217,8 @@ public class RSoftInputLayout extends FrameLayout {
                         bottomCurrentShowHeight = diffHeight;
                         lastRestoreIntentAction2 = INTENT_NONE;
                     }
-                    notifyEmojiLayoutChangeListener(emojiLayoutShow, softKeyboardShow, diffHeight);
+
+                    notifyEmojiLayoutChangeListener(emojiLayoutShow, false, diffHeight);
 
                     if (isFirstLayout(oldw, oldh)) {
                         needAnim = false;
@@ -1222,7 +1230,6 @@ public class RSoftInputLayout extends FrameLayout {
                     }
 
                     if (needAnim && !emojiLayoutShow) {
-
                         if (isAnimStart()) {
                             startAnim(Math.abs(bottomCurrentShowHeightAnim), 0, animDuration);
                         } else {

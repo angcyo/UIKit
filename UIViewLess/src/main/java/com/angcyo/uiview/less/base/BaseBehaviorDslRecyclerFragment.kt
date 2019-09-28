@@ -22,6 +22,10 @@ open class BaseBehaviorDslRecyclerFragment : BaseDslRecyclerFragment() {
         return R.layout.base_behavior_fragment_layout
     }
 
+    override fun getContentLayoutId(): Int {
+        return super.getContentLayoutId()
+    }
+
     override fun initBaseView(
         viewHolder: RBaseViewHolder,
         arguments: Bundle?,
@@ -47,11 +51,11 @@ open class BaseBehaviorDslRecyclerFragment : BaseDslRecyclerFragment() {
     open fun initBehavior() {
         baseViewHolder.view(R.id.base_behavior_bg_layout).coordinatorParams {
             behavior = BackgroundBehavior().apply {
-                childViewDefaultHeight = viewResConfig.defaultBehaviorBgViewHeight
+                childHeight = viewResConfig.defaultBehaviorBgViewHeight
             }
         }
 
-        baseViewHolder.view(R.id.base_refresh_layout).coordinatorParams {
+        baseViewHolder.view(R.id.base_content_wrapper_layout).coordinatorParams {
             behavior = ContentBehavior()
         }
 

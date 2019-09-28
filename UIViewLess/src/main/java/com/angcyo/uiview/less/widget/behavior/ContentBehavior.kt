@@ -5,6 +5,7 @@ import android.util.AttributeSet
 import android.view.View
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.ViewCompat
+import androidx.recyclerview.widget.RecyclerView
 import com.angcyo.uiview.less.R
 import com.angcyo.uiview.less.kotlin.coordinatorParams
 import com.angcyo.uiview.less.kotlin.have
@@ -219,6 +220,19 @@ open class ContentBehavior(context: Context? = null, attributeSet: AttributeSet?
         type: Int
     ) {
         super.onNestedPreScroll(coordinatorLayout, child, target, dx, dy, consumed, type)
+
+        //滚动到边界时, 终止越界滚动
+        if (dy > 0) {
+            //手指向上滑动
+            if (!UI.canChildScrollDown(target)) {
+                (target as? RecyclerView)?.stopScroll()
+            }
+        } else if (dy < 0) {
+            //手指向下滑动
+            if (!UI.canChildScrollUp(target)) {
+                (target as? RecyclerView)?.stopScroll()
+            }
+        }
 
         if (contentLayoutState.have(LAYOUT_FLAG_OFFSET)) {
             if (dy < 0) {

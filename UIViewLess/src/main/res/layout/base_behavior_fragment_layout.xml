@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.angcyo.uiview.less.widget.group.RCoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/base_coordinator_layout"
     android:layout_width="match_parent"
@@ -11,30 +10,24 @@
         android:id="@+id/base_behavior_bg_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:layout_behavior="com.angcyo.uiview.less.widget.behavior.BackgroundBehavior"
-        tools:background="@color/base_orange_dark" />
+        tools:background="@color/base_orange_dark"
+        tools:layout_behavior="com.angcyo.uiview.less.widget.behavior.BackgroundBehavior" />
 
     <!--内容层-->
-    <com.angcyo.uiview.less.widget.RSmartRefreshLayout
-        android:id="@+id/base_refresh_layout"
+    <FrameLayout
+        android:id="@+id/base_content_wrapper_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:layout_behavior="com.angcyo.uiview.less.widget.behavior.ContentBehavior">
-
-        <com.angcyo.uiview.less.recycler.RRecyclerView
-            android:id="@+id/base_recycler_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
-    </com.angcyo.uiview.less.widget.RSmartRefreshLayout>
+        tools:background="@color/base_orange_dark"
+        tools:layout_behavior="com.angcyo.uiview.less.widget.behavior.ContentBehavior" />
 
     <!--标题栏-->
     <com.angcyo.uiview.less.widget.group.TitleBarLayout
         android:id="@+id/base_title_bar_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:layout_behavior="com.angcyo.uiview.less.widget.behavior.TitleBarBehavior"
-        tools:background="@color/transparent_dark">
+        tools:background="@color/transparent_dark"
+        tools:layout_behavior="com.angcyo.uiview.less.widget.behavior.TitleBarBehavior">
 
         <!--动态添加配置-->
     </com.angcyo.uiview.less.widget.group.TitleBarLayout>

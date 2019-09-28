@@ -5,8 +5,11 @@ import android.util.AttributeSet
 import android.view.View
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.ViewCompat
+import androidx.recyclerview.widget.RecyclerView
+import com.angcyo.lib.L
 import com.angcyo.uiview.less.R
 import com.angcyo.uiview.less.kotlin.exactly
+import com.angcyo.uiview.less.kotlin.find
 import com.angcyo.uiview.less.kotlin.offsetTop
 import com.angcyo.uiview.less.kotlin.setHeight
 import com.angcyo.uiview.less.widget.OnContentViewTranslationListener
@@ -25,6 +28,10 @@ open class BackgroundBehavior(context: Context? = null, attributeSet: AttributeS
 
     /**强制指定child的高度*/
     var childHeight: Int = -1
+        set(value) {
+            field = value
+            childViewDefaultHeight = value
+        }
 
     var onBackgroundBehaviorCallback: OnBackgroundBehaviorCallback = OnBackgroundBehaviorCallback()
 
@@ -35,25 +42,30 @@ open class BackgroundBehavior(context: Context? = null, attributeSet: AttributeS
             }
 
             //恢复默认的child高度
-            if (translationY == 0f && childViewDefaultHeight > 0) {
-                childViewDefaultHeight = childView!!.measuredHeight
-            }
+//            if (translationY == 0f && childViewDefaultHeight > 0) {
+//                childViewDefaultHeight = max(childView!!.measuredHeight, childHeight)
+//            }
 
             //放大or缩小child的高度
             onBackgroundBehaviorCallback.onContentOverScroll(
                 this@BackgroundBehavior,
                 childView!!,
+                (translationY - lastContentTranslationY).toInt(),
                 translationY,
-                translationY / contentView.measuredHeight
+                contentView.measuredHeight
             )
+
+            lastContentTranslationY = translationY
         }
     }
 
     protected var childView: View? = null
-    var childViewDefaultHeight: Int = -1
+    internal var childViewDefaultHeight: Int = -1
+    internal var nestedScrollState: Int = RecyclerView.SCROLL_STATE_IDLE
+    internal var lastContentTranslationY: Float = 0f
 
     init {
-        showLog = true
+        showLog = false
 
         context?.let {
             val array =
@@ -75,6 +87,11 @@ open class BackgroundBehavior(context: Context? = null, attributeSet: AttributeS
         if (dependency is RSmartRefreshLayout) {
             childView = child
             dependency.addContentTranslationListener(contentViewTranslationListener)
+        } else {
+            dependency.find<RSmartRefreshLayout>(R.id.base_refresh_layout)?.apply {
+                childView = child
+                addContentTranslationListener(contentViewTranslationListener)
+            }
         }
         return result
     }
@@ -129,7 +146,7 @@ open class BackgroundBehavior(context: Context? = null, attributeSet: AttributeS
             dyUnconsumed,
             type
         )
-
+        nestedScrollState = (target as? RecyclerView)?.scrollState ?: nestedScrollState
         childView = child
         onBackgroundBehaviorCallback.onContentScroll(
             this,
@@ -218,16 +235,21 @@ open class OnBackgroundBehaviorCallback {
     /**激活内容越界滚动时, 高度跟随变化*/
     var enableOverScroll = true
 
+    /**当内容边界滚动时, 采用[Translation]的方式,移动[child]而非改变高度*/
+    var enableOverScrollTranslation = true
+
     /**
      * 当内容边界滚动时, 一同时间内改变view的高度和offset, 会出现BUG.
      * 因为修改高度时, offset会被系统重置.
      * 而如果异步修改offset, 就会出现更严重的问题.
+     * 尽量避免这种情况的存在.
      * */
     open fun onContentOverScroll(
         behavior: BackgroundBehavior,
         child: View,
+        dy: Int,
         translationY: Float,
-        ratio: Float
+        translationMax: Int
     ) {
         if (enableOverScroll) {
             if (translationY > 0) {
@@ -236,12 +258,44 @@ open class OnBackgroundBehaviorCallback {
                     child.offsetTopAndBottom(-child.top)
                 }
             }
-            child.setHeight(
-                (behavior.childViewDefaultHeight + translationY).toInt(),
-                child.top != 0
-            )
-            if (enableOverScale) {
-                child.scaleX = max(1f, 1 + ratio)
+
+            val scrollState = behavior.nestedScrollState
+
+            if (child.bottom <= 0 || child.top >= translationMax) {
+                //超出屏幕外
+            } else {
+
+                var doDefault = true
+
+                if (translationY >= 0) {
+                    //内容向下偏移
+                } else {
+                    //内容向上偏移
+
+                    if (enableOverScrollTranslation) {
+                        doDefault = false
+
+                        val offset = if (child.top + dy >= 0) {
+                            -child.top
+                        } else {
+                            dy
+                        }
+
+                        child.offsetTop(offset)
+                        //L.e("offsetTop...$offset $dy")
+                    }
+                }
+
+                if (doDefault) {
+                    child.setHeight(
+                        (behavior.childViewDefaultHeight + translationY).toInt(),
+                        child.top != 0 && scrollState == RecyclerView.SCROLL_STATE_IDLE
+                    )
+                    val ratio = translationY / translationMax
+                    if (enableOverScale) {
+                        child.scaleX = max(1f, 1 + ratio)
+                    }
+                }
             }
         }
     }
@@ -255,18 +309,21 @@ open class OnBackgroundBehaviorCallback {
         dxAll: Int,
         dyAll: Int
     ) {
-        if (enableTranslation) {
+        if (enableTranslation && dy != 0) {
             //限制一下允许偏移的top值, 和偏移时机
-            if (-dy > 0) {
+            val offset = if (-dy > 0) {
                 //手指往下滚动
                 if (child.top - dy >= 0) {
-                    child.offsetTop(-child.top)
+                    -child.top
                 } else {
-                    child.offsetTop(-dy)
+                    -dy
                 }
             } else {
-                child.offsetTop(-dy)
+                -dy
             }
+
+            child.offsetTop(offset)
+            //L.e("offsetTop2...$offset")
         }
     }
 }
