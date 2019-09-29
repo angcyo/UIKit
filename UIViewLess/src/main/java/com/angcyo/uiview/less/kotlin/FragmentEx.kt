@@ -2,6 +2,7 @@ package com.angcyo.uiview.less.kotlin
 
 import android.app.Activity
 import android.graphics.Color
+import android.text.TextUtils
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -16,7 +17,10 @@ import com.angcyo.uiview.less.base.helper.FragmentHelper.Builder.KEY_JSON_DATA
 import com.angcyo.uiview.less.base.helper.TitleItemHelper
 import com.angcyo.uiview.less.recycler.adapter.DslAdapter
 import com.angcyo.uiview.less.recycler.adapter.DslAdapterItem
+import com.angcyo.uiview.less.resources.ResUtil
+import com.angcyo.uiview.less.utils.TextDrawable
 import com.angcyo.uiview.less.utils.TopToast
+import com.angcyo.uiview.less.widget.GlideImageView
 import com.angcyo.uiview.less.widget.ImageTextView
 import com.luck.picture.lib.rxbus2.RxBus
 import kotlinx.coroutines.*
@@ -130,6 +134,22 @@ public fun BaseFragment.createItem(
     return item
 }
 
+public fun BaseFragment.createItem(
+    res: Int,
+    text: String,
+    config: TitleItemHelper.Builder.() -> Unit = {},
+    click: (View) -> Unit
+): ImageTextView {
+    val item = TitleItemHelper.createItem(requireContext(), res, text) {
+        click(it)
+    }
+    val builder = TitleItemHelper.Builder(requireContext())
+    builder.targetView = item
+    builder.config()
+    builder.doIt()
+    return item
+}
+
 public fun BaseTitleFragment.appendRightItem(
     res: Int,
     textColor: Int = Color.WHITE,
@@ -149,6 +169,19 @@ public fun BaseTitleFragment.appendRightItem(
     click: (View) -> Unit
 ): ImageTextView {
     val item = createItem(text, config, click)
+    item.textShowColor = textColor
+    rightControl().addView(item)
+    return item
+}
+
+public fun BaseTitleFragment.appendRightItem(
+    res: Int,
+    text: String,
+    textColor: Int = Color.WHITE,
+    config: TitleItemHelper.Builder.() -> Unit = {},
+    click: (View) -> Unit
+): ImageTextView {
+    val item = createItem(res, text, config, click)
     item.textShowColor = textColor
     rightControl().addView(item)
     return item
@@ -173,6 +206,19 @@ public fun BaseTitleFragment.appendLeftItem(
     click: (View) -> Unit
 ): ImageTextView {
     val item = createItem(text, config, click)
+    item.textShowColor = textColor
+    leftControl().addView(item)
+    return item
+}
+
+public fun BaseTitleFragment.appendLeftItem(
+    res: Int,
+    text: String,
+    textColor: Int = Color.WHITE,
+    config: TitleItemHelper.Builder.() -> Unit = {},
+    click: (View) -> Unit
+): ImageTextView {
+    val item = createItem(res, text, config, click)
     item.textShowColor = textColor
     leftControl().addView(item)
     return item
@@ -314,4 +360,29 @@ public fun <T> Activity.getData(cls: Class<T>): T? {
                 else -> this.fromJson(cls)
             }
         }
+}
+
+/**core 头像设置*/
+public fun GlideImageView.avatar(
+    url: String?,
+    fullName: CharSequence,
+    fontSizeDp: Int = 14 * dpi,
+    radius: Int = 45 * dpi
+) {
+    if (TextUtils.isEmpty(url)) {
+        setImageDrawable(
+            TextDrawable.build()
+                .beginConfig()
+                .fontSize(fontSizeDp)
+                .endConfig()
+                .buildRoundRect(
+                    fullName.toString(),
+                    ResUtil.getColor(R.color.colorPrimaryDark),
+                    radius
+                )
+        )
+    } else {
+        reset()
+        this.url = url
+    }
 }

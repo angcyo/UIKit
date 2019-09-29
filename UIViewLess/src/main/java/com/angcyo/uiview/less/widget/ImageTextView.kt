@@ -4,16 +4,17 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
-import androidx.appcompat.widget.AppCompatImageView
 import android.text.TextPaint
 import android.text.TextUtils
 import android.util.AttributeSet
+import androidx.appcompat.widget.AppCompatImageView
 import com.angcyo.uiview.less.R
 import com.angcyo.uiview.less.draw.RDrawNoRead
 import com.angcyo.uiview.less.kotlin.density
 import com.angcyo.uiview.less.kotlin.dpi
 import com.angcyo.uiview.less.kotlin.getDrawCenterCx
 import com.angcyo.uiview.less.kotlin.textWidth
+import kotlin.math.max
 
 /**
  * Copyright (C) 2016,深圳市红鸟网络科技股份有限公司 All rights reserved.
@@ -26,7 +27,8 @@ import com.angcyo.uiview.less.kotlin.textWidth
  * 修改备注：
  * Version: 1.0.0
  */
-class ImageTextView(context: Context, attributeSet: AttributeSet? = null) : AppCompatImageView(context, attributeSet) {
+class ImageTextView(context: Context, attributeSet: AttributeSet? = null) :
+    AppCompatImageView(context, attributeSet) {
 
     /**需要绘制显示的文本*/
     var showText: String? = null
@@ -56,6 +58,10 @@ class ImageTextView(context: Context, attributeSet: AttributeSet? = null) : AppC
         }
 
     var textShowColor: Int = Color.WHITE
+        set(value) {
+            field = value
+            postInvalidate()
+        }
 
     var imageSize: Int = 0
 
@@ -69,10 +75,15 @@ class ImageTextView(context: Context, attributeSet: AttributeSet? = null) : AppC
         val typedArray = context.obtainStyledAttributes(attributeSet, R.styleable.ImageTextView)
         showText = typedArray.getString(R.styleable.ImageTextView_r_show_text)
         showTextSize =
-            typedArray.getDimensionPixelOffset(R.styleable.ImageTextView_r_show_text_size, showTextSize.toInt())
+            typedArray.getDimensionPixelOffset(
+                R.styleable.ImageTextView_r_show_text_size,
+                showTextSize.toInt()
+            )
                 .toFloat()
-        textOffset = typedArray.getDimensionPixelOffset(R.styleable.ImageTextView_r_text_offset, 6 * dpi)
-        textShowColor = typedArray.getColor(R.styleable.ImageTextView_r_show_text_color, textShowColor)
+        textOffset =
+            typedArray.getDimensionPixelOffset(R.styleable.ImageTextView_r_text_offset, 6 * dpi)
+        textShowColor =
+            typedArray.getColor(R.styleable.ImageTextView_r_show_text_color, textShowColor)
         typedArray.recycle()
 
         drawNoRead = RDrawNoRead(this)
@@ -87,15 +98,18 @@ class ImageTextView(context: Context, attributeSet: AttributeSet? = null) : AppC
 
         val minWidth = minimumWidth
 
+        val textMeasureWidth = textWidth
+
         if (drawable == null || drawable.intrinsicWidth < 0) {
             imageSize = 0
 
             //无图片
             if (wMode != MeasureSpec.EXACTLY) {
                 if (!TextUtils.isEmpty(showText)) {
-                    val width = (paddingLeft + paddingRight + textPaint.textWidth(showText!!)).toInt()
+                    val width =
+                        (paddingLeft + paddingRight + textMeasureWidth).toInt()
                     setMeasuredDimension(
-                        Math.max(width, minWidth),
+                        max(width, minWidth),
                         measuredHeight
                     )
                 }
@@ -107,10 +121,10 @@ class ImageTextView(context: Context, attributeSet: AttributeSet? = null) : AppC
 
                 if (!TextUtils.isEmpty(showText)) {
                     val width =
-                        (paddingLeft + paddingRight + imageSize + textOffset + textPaint.textWidth(showText!!)).toInt()
+                        (paddingLeft + paddingRight + imageSize + textOffset + textMeasureWidth).toInt()
 
                     setMeasuredDimension(
-                        Math.max(width, minWidth),
+                        max(width, minWidth),
                         measuredHeight
                     )
                 }
@@ -122,21 +136,28 @@ class ImageTextView(context: Context, attributeSet: AttributeSet? = null) : AppC
 
     override fun onDraw(canvas: Canvas) {
         if (!TextUtils.isEmpty(showText)) {
+
             textPaint.color = textShowColor
 
             val drawHeight = measuredHeight - paddingTop - paddingBottom
             val drawWidth = measuredWidth - paddingLeft - paddingRight
 
+            val textMeasureWidth = textWidth
             if (imageSize > 0) {
+                val centerWidth = imageSize + textOffset + textMeasureWidth
+                val centerX = paddingLeft + centerWidth / 2
+                val textDrawX = paddingLeft + imageSize + textOffset
+                val srcOffset = imageSize / 2 + textOffset + (centerX - textDrawX)
+
                 canvas.save()
-                canvas.translate(-textWidth / 2 - textOffset, 0f)
+                canvas.translate(-srcOffset, 0f)
                 super.onDraw(canvas)
                 canvas.restore()
 
                 //绘制需要显示的文本文本
                 canvas.drawText(
                     showText!!,
-                    getDrawCenterCx() - textWidth / 2 + textOffset,//paddingLeft + textOffset - 4 * density + drawWidth / 2 - imageSize / 2,
+                    textDrawX.toFloat(),//getDrawCenterCx() - textMeasureWidth / 2 + textOffset,//paddingLeft + textOffset - 4 * density + drawWidth / 2 - imageSize / 2,
                     paddingTop + drawHeight / 2 + textHeight / 2 - textPaint.descent() / 2,
                     textPaint
                 )
@@ -145,8 +166,10 @@ class ImageTextView(context: Context, attributeSet: AttributeSet? = null) : AppC
 
                 //绘制需要显示的文本文本
                 canvas.drawText(
-                    showText!!, getDrawCenterCx() - textWidth / 2,
-                    paddingTop + drawHeight / 2 + textHeight / 2 - textPaint.descent() / 2, textPaint
+                    showText!!,
+                    getDrawCenterCx() - textMeasureWidth / 2,
+                    paddingTop + drawHeight / 2 + textHeight / 2 - textPaint.descent() / 2,
+                    textPaint
                 )
             }
         } else {

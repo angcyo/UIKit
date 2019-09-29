@@ -33,6 +33,8 @@ open class TitleBarBehavior(context: Context? = null, attributeSet: AttributeSet
 
     var gradientStartConfig: ViewResConfig = ViewResConfig().apply {
         titleBarBackgroundColor = Color.TRANSPARENT
+        titleItemTextColor = Color.WHITE
+        titleTextColor = Color.WHITE
     }
 
     var gradientEndConfig: ViewResConfig = ViewResConfig()
@@ -131,9 +133,18 @@ open class OnTitleBarBehaviorCallback {
     /**标题栏上的item,icon是否渐变颜色*/
     var titleBarItemGradient = false
 
+    /**标题是否需要颜色渐变*/
+    var titleTextGradient = true
+
+    /**渐变因子, 值越小, 颜色渐变越慢*/
+    var titleGradientFactor = 0.8f
+
+    /**滑动到多少比例时, 显示标题配合[alwaysShowTitle]使用*/
+    var titleShowThreshold = 0.8f
+
     /**控制渐变阈值*/
     open fun onTitleBarGradientValue(currentScrollY: Int, maxScrollY: Int): Float {
-        return currentScrollY * 0.8f / maxScrollY
+        return currentScrollY * titleGradientFactor / maxScrollY
     }
 
     /**控制背景颜色*/
@@ -157,7 +168,7 @@ open class OnTitleBarBehaviorCallback {
             ViewGroupHelper.build(child)
                 .selector(R.id.base_title_view)
                 .setAlpha(
-                    if (ratio >= 1f) {
+                    if (ratio >= titleShowThreshold) {
                         1f
                     } else {
                         0f
@@ -165,21 +176,47 @@ open class OnTitleBarBehaviorCallback {
                 )
         }
 
+        if (titleTextGradient) {
+            val titleEvaluateColor = AnimUtil.evaluateColor(
+                ratio,
+                behavior.gradientStartConfig.titleTextColor,
+                behavior.gradientEndConfig.titleTextColor
+            )
+            evaluateTextColor(child.find(R.id.base_title_view), titleEvaluateColor)
+        }
+
         //item icon控制
         if (titleBarItemGradient) {
-            val evaluateColor = AnimUtil.evaluateColor(
+
+            //图标颜色控制
+            val iconEvaluateColor = AnimUtil.evaluateColor(
                 ratio,
                 behavior.gradientStartConfig.titleItemIconColor,
                 behavior.gradientEndConfig.titleItemIconColor
             )
+            evaluateIconColor(child.find(R.id.base_title_left_layout), iconEvaluateColor)
+            evaluateIconColor(child.find(R.id.base_title_right_layout), iconEvaluateColor)
 
-            ViewGroupHelper.build(child.find(R.id.base_title_left_layout))
-                .selector()
-                .colorFilter(evaluateColor)
-
-            ViewGroupHelper.build(child.find(R.id.base_title_right_layout))
-                .selector()
-                .colorFilter(evaluateColor)
+            //文本颜色控制
+            val textEvaluateColor = AnimUtil.evaluateColor(
+                ratio,
+                behavior.gradientStartConfig.titleItemTextColor,
+                behavior.gradientEndConfig.titleItemTextColor
+            )
+            evaluateTextColor(child.find(R.id.base_title_left_layout), textEvaluateColor)
+            evaluateTextColor(child.find(R.id.base_title_right_layout), textEvaluateColor)
         }
+    }
+
+    private fun evaluateTextColor(view: View?, color: Int) {
+        ViewGroupHelper.build(view)
+            .selector()
+            .textColorFilter(color)
+    }
+
+    private fun evaluateIconColor(view: View?, color: Int) {
+        ViewGroupHelper.build(view)
+            .selector()
+            .colorFilter(color)
     }
 }

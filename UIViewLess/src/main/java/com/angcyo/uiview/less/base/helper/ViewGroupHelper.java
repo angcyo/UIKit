@@ -206,7 +206,10 @@ public class ViewGroupHelper {
             } else if (view instanceof TextView) {
                 // ((TextView) view).setTextColor(color);
             } else if (view instanceof ImageView) {
-                ((ImageView) view).setImageDrawable(ResUtil.filterDrawable(((ImageView) view).getDrawable(), color));
+                Drawable drawable = ((ImageView) view).getDrawable();
+                if (drawable != null) {
+                    ((ImageView) view).setImageDrawable(ResUtil.filterDrawable(drawable, color));
+                }
             }
         }
         return this;
