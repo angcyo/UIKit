@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.angcyo.lib.L
+import com.angcyo.uiview.less.kotlin.nowTime
 
 /**
  *
@@ -107,11 +108,22 @@ class ScrollHelper {
 
     private var lockScrollLayoutListener: LockScrollLayoutListener? = null
 
+    /**短时间之内, 锁定滚动到0的位置*/
+    fun scrollToFirst(config: FirstPositionListener.() -> Unit = {}) {
+        recyclerView?.let {
+            FirstPositionListener().apply {
+                lockDuration = 60
+                config()
+                attach(it)
+            }
+        }
+    }
+
     /**
      * 当界面有变化时, 自动滚动到最后一个位置
-     * [unlockLastPosition]
+     * [unlockPosition]
      * */
-    fun lockLastPosition(config: LockScrollLayoutListener.() -> Unit = {}) {
+    fun lockPosition(config: LockScrollLayoutListener.() -> Unit = {}) {
         if (lockScrollLayoutListener == null && recyclerView != null) {
             lockScrollLayoutListener = LockScrollLayoutListener().apply {
                 scrollAnim = isScrollAnim
@@ -121,7 +133,7 @@ class ScrollHelper {
         }
     }
 
-    fun unlockLastPosition() {
+    fun unlockPosition() {
         lockScrollLayoutListener?.detach()
         lockScrollLayoutListener = null
     }
@@ -197,8 +209,8 @@ class ScrollHelper {
         return true
     }
 
-    fun log(recyclerView: RecyclerView) {
-        recyclerView.viewTreeObserver.apply {
+    fun log(recyclerView: RecyclerView? = this.recyclerView) {
+        recyclerView?.viewTreeObserver?.apply {
             this.addOnDrawListener {
                 L.i("onDraw")
             }
@@ -272,8 +284,8 @@ class ScrollHelper {
         }
     }
 
-    /**锁定滚动到最后一个位置*/
-    inner class LockScrollLayoutListener : ViewTreeObserver.OnGlobalLayoutListener,
+    inner abstract class LockScrollListener : ViewTreeObserver.OnGlobalLayoutListener,
+        ViewTreeObserver.OnDrawListener,
         IAttachListener, Runnable {
 
         /**激活滚动动画*/
@@ -296,6 +308,16 @@ class ScrollHelper {
         /**是否激活功能*/
         var enableLock = true
 
+        /**锁定时长, 毫秒*/
+        var lockDuration: Long = -1
+            set(value) {
+                field = value
+                _lockStartTime = nowTime()
+            }
+
+        //记录开始的统计时间
+        var _lockStartTime = 0L
+
         override fun run() {
             if (!enableLock || recyclerView?.layoutManager?.itemCount ?: 0 <= 0) {
                 return
@@ -309,16 +331,32 @@ class ScrollHelper {
 
             if (force || firstForce) {
                 scroll(position)
+                onScrollTrigger()
+                L.i("锁定滚动至->$position $force $firstForce")
             } else {
                 val lastItemPosition = lastItemPosition()
                 if (lastItemPosition != RecyclerView.NO_POSITION) {
-                    val findLastVisibleItemPosition =
-                        recyclerView?.layoutManager.findLastVisibleItemPosition()
-
                     //智能判断是否可以锁定
-                    if (lastItemPosition - findLastVisibleItemPosition <= scrollThreshold) {
-                        //最后第一个或者最后第2个可见, 智能判断为可以滚动到尾部
-                        scroll(position)
+                    if (position == 0) {
+                        //滚动到顶部
+                        val findFirstVisibleItemPosition =
+                            recyclerView?.layoutManager.findFirstVisibleItemPosition()
+
+                        if (findFirstVisibleItemPosition <= scrollThreshold) {
+                            scroll(position)
+                            onScrollTrigger()
+                            L.i("锁定滚动至->$position")
+                        }
+                    } else {
+                        val findLastVisibleItemPosition =
+                            recyclerView?.layoutManager.findLastVisibleItemPosition()
+
+                        if (lastItemPosition - findLastVisibleItemPosition <= scrollThreshold) {
+                            //最后第一个或者最后第2个可见, 智能判断为可以滚动到尾部
+                            scroll(position)
+                            onScrollTrigger()
+                            L.i("锁定滚动至->$position")
+                        }
                     }
                 }
             }
@@ -331,18 +369,84 @@ class ScrollHelper {
         override fun attach(view: View) {
             detach()
             attachView = view
-            view.viewTreeObserver.addOnGlobalLayoutListener(this)
         }
 
         override fun detach() {
             attachView?.removeCallbacks(this)
-            attachView?.viewTreeObserver?.removeOnGlobalLayoutListener(this)
+        }
+
+        override fun onDraw() {
+            onLockScroll()
         }
 
         override fun onGlobalLayout() {
+            onLockScroll()
+        }
+
+        open fun isLockTimeout(): Boolean {
+            return if (lockDuration > 0) {
+                val nowTime = nowTime()
+                nowTime - _lockStartTime > lockDuration
+            } else {
+                false
+            }
+        }
+
+        open fun onLockScroll() {
             attachView?.removeCallbacks(this)
             if (enableLock) {
-                attachView?.post(this)
+                if (isLockTimeout()) {
+
+                } else {
+                    attachView?.post(this)
+                }
+            }
+        }
+
+        open fun onScrollTrigger() {
+
+        }
+    }
+
+    /**锁定滚动到最后一个位置*/
+    inner class LockScrollLayoutListener : LockScrollListener() {
+
+        override fun attach(view: View) {
+            super.attach(view)
+            view.viewTreeObserver.addOnGlobalLayoutListener(this)
+        }
+
+        override fun detach() {
+            super.detach()
+            attachView?.viewTreeObserver?.removeOnGlobalLayoutListener(this)
+        }
+    }
+
+    /**滚动到0*/
+    inner class FirstPositionListener : LockScrollListener() {
+
+        init {
+            lockPosition = 0
+            firstScrollAnim = true
+            scrollAnim = true
+            force = true
+            firstForce = true
+        }
+
+        override fun attach(view: View) {
+            super.attach(view)
+            view.viewTreeObserver.addOnDrawListener(this)
+        }
+
+        override fun detach() {
+            super.detach()
+            attachView?.viewTreeObserver?.addOnDrawListener(this)
+        }
+
+        override fun onScrollTrigger() {
+            super.onScrollTrigger()
+            if (isLockTimeout() || lockDuration == -1L) {
+                detach()
             }
         }
     }
