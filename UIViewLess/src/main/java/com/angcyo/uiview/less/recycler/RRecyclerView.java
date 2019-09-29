@@ -758,6 +758,10 @@ public class RRecyclerView extends RecyclerView implements CanScrollUpCallBack {
         scrollHelper.scroll(position);
     }
 
+    public ScrollHelper getScrollHelper() {
+        return scrollHelper;
+    }
+
     /**
      * 滚动到底部
      */

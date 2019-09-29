@@ -338,11 +338,19 @@ public fun <T> BaseFragment.load(loader: suspend CoroutineScope.() -> T): Job {
 //}
 
 public fun Fragment.putData(data: Any) {
-    arguments = FragmentHelper.Builder.createBundle(data)
+    putData(KEY_JSON_DATA, data)
+}
+
+public fun Fragment.putData(key: String, data: Any) {
+    arguments = FragmentHelper.Builder.createBundle(key, data)
 }
 
 public fun <T> Fragment.getData(cls: Class<T>): T? {
-    return arguments?.getString(KEY_JSON_DATA)?.run {
+    return getData(KEY_JSON_DATA, cls)
+}
+
+public fun <T> Fragment.getData(key: String, cls: Class<T>): T? {
+    return arguments?.getString(key)?.run {
         when {
             cls.isAssignableFrom(String::class.java) -> this as? T
             cls.isAssignableFrom(Number::class.java) -> this.toFloat() as? T

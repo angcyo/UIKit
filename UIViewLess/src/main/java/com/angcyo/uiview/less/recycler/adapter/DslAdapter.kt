@@ -122,6 +122,11 @@ open class DslAdapter : RBaseAdapter<DslAdapterItem> {
         updateFilterDataList()
     }
 
+    override fun insertItem(position: Int, bean: DslAdapterItem?) {
+        super.insertItem(position, bean)
+        updateFilterDataList()
+    }
+
     /**
      * 折叠这个分组
      * */

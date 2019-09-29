@@ -991,21 +991,30 @@ public class FragmentHelper {
         }
 
         public static Bundle createBundle(Object data) {
+            return createBundle(KEY_JSON_DATA, data);
+        }
+
+        public static Bundle createBundle(String key, Object data) {
             Bundle bundle = new Bundle();
 
             if (data instanceof String) {
-                bundle.putString(KEY_JSON_DATA, (String) data);
+                bundle.putString(key, (String) data);
             } else if (data instanceof Number) {
-                bundle.putString(KEY_JSON_DATA, String.valueOf(data));
+                bundle.putString(key, String.valueOf(data));
             } else {
-                bundle.putString(KEY_JSON_DATA, ExKt.toJson(data));
+                bundle.putString(key, ExKt.toJson(data));
             }
 
             return bundle;
         }
 
         public Builder putData(Object data) {
-            setArgs(createBundle(data));
+            putData(KEY_JSON_DATA, data);
+            return this;
+        }
+
+        public Builder putData(String key, Object data) {
+            setArgs(createBundle(key, data));
             return this;
         }
 
