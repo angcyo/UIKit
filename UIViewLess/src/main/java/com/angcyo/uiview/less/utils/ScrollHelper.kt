@@ -310,10 +310,6 @@ class ScrollHelper {
 
         /**锁定时长, 毫秒*/
         var lockDuration: Long = -1
-            set(value) {
-                field = value
-                _lockStartTime = nowTime()
-            }
 
         //记录开始的统计时间
         var _lockStartTime = 0L
@@ -375,12 +371,22 @@ class ScrollHelper {
             attachView?.removeCallbacks(this)
         }
 
+        /**[ViewTreeObserver.OnDrawListener]*/
         override fun onDraw() {
+            initLockStartTime()
             onLockScroll()
         }
 
+        /**[ViewTreeObserver.OnGlobalLayoutListener]*/
         override fun onGlobalLayout() {
+            initLockStartTime()
             onLockScroll()
+        }
+
+        open fun initLockStartTime() {
+            if (_lockStartTime <= 0) {
+                _lockStartTime = nowTime()
+            }
         }
 
         open fun isLockTimeout(): Boolean {
@@ -396,7 +402,7 @@ class ScrollHelper {
             attachView?.removeCallbacks(this)
             if (enableLock) {
                 if (isLockTimeout()) {
-
+                    //锁定超时, 放弃操作
                 } else {
                     attachView?.post(this)
                 }
@@ -440,7 +446,7 @@ class ScrollHelper {
 
         override fun detach() {
             super.detach()
-            attachView?.viewTreeObserver?.addOnDrawListener(this)
+            attachView?.viewTreeObserver?.removeOnDrawListener(this)
         }
 
         override fun onScrollTrigger() {
