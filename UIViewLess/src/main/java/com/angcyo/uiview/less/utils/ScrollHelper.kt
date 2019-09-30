@@ -40,7 +40,7 @@ class ScrollHelper {
     var scrollType = SCROLL_TYPE_NORMAL
 
     /**额外的偏移距离*/
-    var scrollOffset: Int = 100
+    var scrollOffset: Int = 0
 
     init {
         resetValue()
@@ -61,7 +61,7 @@ class ScrollHelper {
     fun resetValue() {
         isFromAddItem = false
         isScrollAnim = false
-        //scrollOffset = 0
+        scrollOffset = 0
         scrollType = SCROLL_TYPE_NORMAL
     }
 
