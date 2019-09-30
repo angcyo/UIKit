@@ -118,16 +118,18 @@ class ScrollHelper {
         }
     }
 
-    private var lockScrollLayoutListener: LockScrollLayoutListener? = null
+    private var lockLayoutListener: LockLayoutListener? = null
 
     /**短时间之内, 锁定滚动到0的位置*/
-    fun scrollToFirst(config: FirstPositionListener.() -> Unit = {}) {
-        recyclerView?.let {
-            FirstPositionListener().apply {
-                lockDuration = 60
-                config()
-                attach(it)
-            }
+    fun scrollToFirst(config: LockDrawListener.() -> Unit = {}) {
+        lockPositionByDraw {
+            lockPosition = 0
+            firstScrollAnim = true
+            scrollAnim = true
+            force = true
+            firstForce = true
+            lockDuration = 60
+            autoDetach = true
         }
     }
 
@@ -135,9 +137,9 @@ class ScrollHelper {
      * 当界面有变化时, 自动滚动到最后一个位置
      * [unlockPosition]
      * */
-    fun lockPosition(config: LockScrollLayoutListener.() -> Unit = {}) {
-        if (lockScrollLayoutListener == null && recyclerView != null) {
-            lockScrollLayoutListener = LockScrollLayoutListener().apply {
+    fun lockPosition(config: LockLayoutListener.() -> Unit = {}) {
+        if (lockLayoutListener == null && recyclerView != null) {
+            lockLayoutListener = LockLayoutListener().apply {
                 scrollAnim = isScrollAnim
                 config()
                 attach(recyclerView!!)
@@ -145,9 +147,27 @@ class ScrollHelper {
         }
     }
 
+    fun lockPositionByDraw(config: LockDrawListener.() -> Unit = {}) {
+        recyclerView?.let {
+            LockDrawListener().apply {
+                config()
+                attach(it)
+            }
+        }
+    }
+
+    fun lockPositionByLayout(config: LockLayoutListener.() -> Unit = {}) {
+        recyclerView?.let {
+            LockLayoutListener().apply {
+                config()
+                attach(it)
+            }
+        }
+    }
+
     fun unlockPosition() {
-        lockScrollLayoutListener?.detach()
-        lockScrollLayoutListener = null
+        lockLayoutListener?.detach()
+        lockLayoutListener = null
     }
 
     /**当需要滚动的目标位置已经在屏幕上可见*/
@@ -348,6 +368,9 @@ class ScrollHelper {
         /**是否激活功能*/
         var enableLock = true
 
+        /**滚动到目标后, 自动调用[detach]*/
+        var autoDetach = false
+
         /**锁定时长, 毫秒*/
         var lockDuration: Long = -1
 
@@ -450,12 +473,16 @@ class ScrollHelper {
         }
 
         open fun onScrollTrigger() {
-
+            if (autoDetach) {
+                if (isLockTimeout() || lockDuration == -1L) {
+                    detach()
+                }
+            }
         }
     }
 
     /**锁定滚动到最后一个位置*/
-    inner class LockScrollLayoutListener : LockScrollListener() {
+    inner class LockLayoutListener : LockScrollListener() {
 
         override fun attach(view: View) {
             super.attach(view)
@@ -469,15 +496,7 @@ class ScrollHelper {
     }
 
     /**滚动到0*/
-    inner class FirstPositionListener : LockScrollListener() {
-
-        init {
-            lockPosition = 0
-            firstScrollAnim = true
-            scrollAnim = true
-            force = true
-            firstForce = true
-        }
+    inner class LockDrawListener : LockScrollListener() {
 
         override fun attach(view: View) {
             super.attach(view)
@@ -487,13 +506,6 @@ class ScrollHelper {
         override fun detach() {
             super.detach()
             attachView?.viewTreeObserver?.removeOnDrawListener(this)
-        }
-
-        override fun onScrollTrigger() {
-            super.onScrollTrigger()
-            if (isLockTimeout() || lockDuration == -1L) {
-                detach()
-            }
         }
     }
 
