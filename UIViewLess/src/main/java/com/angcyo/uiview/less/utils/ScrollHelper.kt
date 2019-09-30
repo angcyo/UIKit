@@ -130,6 +130,7 @@ class ScrollHelper {
             firstForce = true
             lockDuration = 60
             autoDetach = true
+            config()
         }
     }
 
