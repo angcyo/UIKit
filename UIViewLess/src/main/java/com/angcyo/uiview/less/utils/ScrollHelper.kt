@@ -24,6 +24,8 @@ class ScrollHelper {
         const val SCROLL_TYPE_TOP = 1
         /**滚动类别: 将item滚动到最后一个位置*/
         const val SCROLL_TYPE_BOTTOM = 2
+        /**滚动类别: 将item滚动到居中位置*/
+        const val SCROLL_TYPE_CENTER = 3
     }
 
     internal var recyclerView: RecyclerView? = null
@@ -36,6 +38,9 @@ class ScrollHelper {
 
     /**滚动类别*/
     var scrollType = SCROLL_TYPE_NORMAL
+
+    /**额外的偏移距离*/
+    var scrollOffset: Int = 100
 
     init {
         resetValue()
@@ -56,7 +61,7 @@ class ScrollHelper {
     fun resetValue() {
         isFromAddItem = false
         isScrollAnim = false
-
+        //scrollOffset = 0
         scrollType = SCROLL_TYPE_NORMAL
     }
 
@@ -73,7 +78,7 @@ class ScrollHelper {
             recyclerView?.stopScroll()
 
             if (isPositionVisible(position)) {
-                scrollWithVisible(position, scrollType, isScrollAnim)
+                scrollWithVisible(ScrollParams(position, scrollType, isScrollAnim, scrollOffset))
             } else {
                 if (isScrollAnim) {
                     if (isFromAddItem) {
@@ -99,7 +104,14 @@ class ScrollHelper {
                 }
                 if (scrollType != SCROLL_TYPE_NORMAL) {
                     //不可见时, 需要现滚动到可见位置, 再进行微调
-                    OnScrollIdleListener(position, scrollType, isScrollAnim).attach(recyclerView!!)
+                    OnScrollIdleListener(
+                        ScrollParams(
+                            position,
+                            scrollType,
+                            isScrollAnim,
+                            scrollOffset
+                        )
+                    ).attach(recyclerView!!)
                 }
             }
             resetValue()
@@ -139,36 +151,67 @@ class ScrollHelper {
     }
 
     /**当需要滚动的目标位置已经在屏幕上可见*/
-    internal fun scrollWithVisible(position: Int, scrollType: Int, anim: Boolean) {
+    internal fun scrollWithVisible(scrollParams: ScrollParams) {
         when (scrollType) {
             SCROLL_TYPE_NORMAL -> {
                 //nothing
             }
             SCROLL_TYPE_TOP -> {
-                viewByPosition(position)?.apply {
-                    val dx = recyclerView!!.layoutManager!!.getDecoratedLeft(this) -
-                            recyclerView!!.paddingLeft
-                    val dy = recyclerView!!.layoutManager!!.getDecoratedTop(this) -
-                            recyclerView!!.paddingTop
+                viewByPosition(scrollParams.scrollPosition)?.also { child ->
+                    recyclerView?.apply {
+                        val dx = layoutManager!!.getDecoratedLeft(child) -
+                                paddingLeft - scrollParams.scrollOffset
 
-                    if (anim) {
-                        recyclerView?.smoothScrollBy(dx, dy)
-                    } else {
-                        recyclerView?.scrollBy(dx, dy)
+                        val dy = layoutManager!!.getDecoratedTop(child) -
+                                paddingTop - scrollParams.scrollOffset
+
+                        if (scrollParams.scrollAnim) {
+                            smoothScrollBy(dx, dy)
+                        } else {
+                            scrollBy(dx, dy)
+                        }
                     }
                 }
             }
             SCROLL_TYPE_BOTTOM -> {
-                viewByPosition(position)?.apply {
-                    val dx = recyclerView!!.layoutManager!!.getDecoratedRight(this) -
-                            recyclerView!!.measuredWidth + recyclerView!!.paddingRight
-                    val dy = recyclerView!!.layoutManager!!.getDecoratedBottom(this) -
-                            recyclerView!!.measuredHeight + recyclerView!!.paddingBottom
+                viewByPosition(scrollParams.scrollPosition)?.also { child ->
+                    recyclerView?.apply {
+                        val dx =
+                            layoutManager!!.getDecoratedRight(child) -
+                                    measuredWidth + paddingRight + scrollParams.scrollOffset
+                        val dy =
+                            layoutManager!!.getDecoratedBottom(child) -
+                                    measuredHeight + paddingBottom + scrollParams.scrollOffset
 
-                    if (anim) {
-                        recyclerView?.smoothScrollBy(dx, dy)
-                    } else {
-                        recyclerView?.scrollBy(dx, dy)
+                        if (scrollParams.scrollAnim) {
+                            smoothScrollBy(dx, dy)
+                        } else {
+                            scrollBy(dx, dy)
+                        }
+                    }
+                }
+            }
+            SCROLL_TYPE_CENTER -> {
+                viewByPosition(scrollParams.scrollPosition)?.also { child ->
+
+                    recyclerView?.apply {
+                        val recyclerCenterX =
+                            (measuredWidth - paddingLeft - paddingRight) / 2 + paddingLeft
+
+                        val recyclerCenterY =
+                            (measuredHeight - paddingTop - paddingBottom) / 2 + paddingTop
+
+                        val dx = layoutManager!!.getDecoratedLeft(child) - recyclerCenterX +
+                                layoutManager!!.getDecoratedMeasuredWidth(child) / 2 + scrollParams.scrollOffset
+
+                        val dy = layoutManager!!.getDecoratedTop(child) - recyclerCenterY +
+                                layoutManager!!.getDecoratedMeasuredHeight(child) / 2 + scrollParams.scrollOffset
+
+                        if (scrollParams.scrollAnim) {
+                            smoothScrollBy(dx, dy)
+                        } else {
+                            scrollBy(dx, dy)
+                        }
                     }
                 }
             }
@@ -260,20 +303,17 @@ class ScrollHelper {
     }
 
     /**滚动结束之后, 根据类别, 继续滚动.*/
-    private inner class OnScrollIdleListener(
-        val position: Int,
-        val scrollType: Int,
-        val anim: Boolean
-    ) :
+    private inner class OnScrollIdleListener(val scrollParams: ScrollParams) :
         OnScrollListener() {
 
         override fun onScrollChanged(state: Int) {
             if (state == RecyclerView.SCROLL_STATE_IDLE) {
-                scrollWithVisible(position, scrollType, anim)
+                scrollWithVisible(scrollParams)
             }
         }
     }
 
+    /**临时去掉动画滚动, 之后恢复动画*/
     private inner class OnNoAnimScrollIdleListener(val itemAnimator: RecyclerView.ItemAnimator?) :
         OnScrollListener() {
 
@@ -462,6 +502,14 @@ class ScrollHelper {
 
         fun detach()
     }
+
+    //滚动参数
+    internal data class ScrollParams(
+        var scrollPosition: Int = RecyclerView.NO_POSITION,
+        var scrollType: Int = SCROLL_TYPE_NORMAL,
+        var scrollAnim: Boolean = true,
+        var scrollOffset: Int = 0
+    )
 }
 
 fun RecyclerView.LayoutManager?.findFirstVisibleItemPosition(): Int {
