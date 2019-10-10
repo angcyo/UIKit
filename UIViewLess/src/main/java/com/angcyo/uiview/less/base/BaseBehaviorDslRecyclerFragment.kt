@@ -35,14 +35,16 @@ open class BaseBehaviorDslRecyclerFragment : BaseDslRecyclerFragment() {
         super.onInitBaseView(viewHolder, arguments, savedInstanceState)
 
         if (getBehaviorBgLayoutId() > 0) {
-            viewHolder.vg(R.id.base_behavior_bg_layout).inflate(getBehaviorBgLayoutId())
+            viewHolder.vg(R.id.base_behavior_bg_layout)?.inflate(getBehaviorBgLayoutId())
         }
 
-        initBehavior()
+        initBehavior {
+            onInitBehavior(this)
+        }
     }
 
     open fun initBehavior(config: CoordinatorLayout.Behavior<*>.() -> Unit = {}) {
-        baseViewHolder.view(R.id.base_behavior_bg_layout).coordinatorParams {
+        baseViewHolder.view(R.id.base_behavior_bg_layout)?.coordinatorParams {
             behavior = BackgroundBehavior().apply {
                 childHeight = viewResConfig.defaultBehaviorBgViewHeight
 
@@ -50,13 +52,13 @@ open class BaseBehaviorDslRecyclerFragment : BaseDslRecyclerFragment() {
             }
         }
 
-        baseViewHolder.view(R.id.base_content_wrapper_layout).coordinatorParams {
+        baseViewHolder.view(R.id.base_content_wrapper_layout)?.coordinatorParams {
             behavior = ContentBehavior().apply {
                 config()
             }
         }
 
-        baseViewHolder.view(R.id.base_title_bar_layout).coordinatorParams {
+        baseViewHolder.view(R.id.base_title_bar_layout)?.coordinatorParams {
             behavior = TitleBarBehavior().apply {
                 //gradientStartConfig = viewResConfig
                 gradientEndConfig = viewResConfig
@@ -67,4 +69,8 @@ open class BaseBehaviorDslRecyclerFragment : BaseDslRecyclerFragment() {
     }
 
     open fun getBehaviorBgLayoutId(): Int = -1
+
+    open fun onInitBehavior(behavior: CoordinatorLayout.Behavior<*>) {
+
+    }
 }
