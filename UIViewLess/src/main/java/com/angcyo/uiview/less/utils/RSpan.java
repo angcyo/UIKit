@@ -667,6 +667,10 @@ public class RSpan extends SpanUtils {
                     drawLeft = x + marginLeft + (spanWidth - measureTextWidth) / 2;
                 }
 
+                if (ViewExKt.isGravityRight(textGravity)) {
+                    drawLeft = x + spanWidth - measureTextWidth - paddingRight;
+                }
+
                 canvas.drawText(validText, start, end, drawLeft, drawY, textPaint);
             }
         }
