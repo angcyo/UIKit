@@ -78,6 +78,12 @@ public abstract class BaseTitleFragment extends BaseFragment implements AffectUI
     }
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        getUiFragment().initFragment(this);
+    }
+
+    @Override
     protected void initBaseView(@NonNull RBaseViewHolder viewHolder, @Nullable Bundle arguments, @Nullable Bundle savedInstanceState) {
         super.initBaseView(viewHolder, arguments, savedInstanceState);
 
@@ -427,6 +433,7 @@ public abstract class BaseTitleFragment extends BaseFragment implements AffectUI
 
     //<editor-fold desc="页面样式定制">
 
+    @NonNull
     public BaseUI.UIFragment getUiFragment() {
         if (uiFragment == null) {
             return BaseUI.uiFragment;
@@ -434,7 +441,7 @@ public abstract class BaseTitleFragment extends BaseFragment implements AffectUI
         return uiFragment;
     }
 
-    public void setUiFragment(BaseUI.UIFragment uiFragment) {
+    public void setUiFragment(@NonNull BaseUI.UIFragment uiFragment) {
         this.uiFragment = uiFragment;
     }
 

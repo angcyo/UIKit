@@ -41,6 +41,8 @@ public class BaseUI {
      * UIFragment 界面定制
      */
     public interface UIFragment {
+        void initFragment(@NonNull BaseTitleFragment titleFragment);
+
         void initBaseTitleLayout(@NonNull BaseTitleFragment titleFragment, @Nullable Bundle arguments);
 
         View createBackItem(@NonNull BaseTitleFragment titleFragment);
@@ -70,6 +72,11 @@ public class BaseUI {
 
     //默认实现
     public static class DefaultUIFragment implements UIFragment {
+
+        @Override
+        public void initFragment(@NonNull BaseTitleFragment titleFragment) {
+
+        }
 
         @Override
         public void initBaseTitleLayout(@NonNull BaseTitleFragment titleFragment, @Nullable Bundle arguments) {
