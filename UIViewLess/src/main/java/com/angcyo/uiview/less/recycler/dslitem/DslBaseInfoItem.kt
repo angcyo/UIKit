@@ -65,7 +65,24 @@ open class DslBaseInfoItem : DslAdapterItem() {
 
         //扩展布局
         if (itemExtendLayoutId > 0) {
-            itemHolder.group(R.id.wrap_layout)?.inflate(itemExtendLayoutId)
+            itemHolder.group(R.id.wrap_layout)?.apply {
+                var inflate = true
+                if (childCount > 0) {
+                    val tag = getChildAt(0).getTag(R.id.tag)
+                    if (tag == itemExtendLayoutId) {
+                        inflate = false
+                    } else {
+                        removeAllViews()
+                    }
+                }
+
+                if (inflate) {
+                    inflate(itemExtendLayoutId, true)
+                    val view = getChildAt(0)
+                    view.setTag(R.id.tag, itemExtendLayoutId)
+                    addView(view)
+                }
+            }
         } else {
             itemHolder.group(R.id.wrap_layout)?.removeAllViews()
         }
