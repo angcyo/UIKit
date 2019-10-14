@@ -1,19 +1,17 @@
 package com.angcyo.uiview.less.widget.behavior
 
 import android.content.Context
+import android.os.Build
 import android.util.AttributeSet
 import android.view.View
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.angcyo.lib.L
 import com.angcyo.uiview.less.R
-import com.angcyo.uiview.less.kotlin.exactly
-import com.angcyo.uiview.less.kotlin.find
-import com.angcyo.uiview.less.kotlin.offsetTop
-import com.angcyo.uiview.less.kotlin.setHeight
+import com.angcyo.uiview.less.kotlin.*
 import com.angcyo.uiview.less.widget.OnContentViewTranslationListener
 import com.angcyo.uiview.less.widget.RSmartRefreshLayout
+import com.angcyo.uiview.less.widget.behavior.ContentBehavior.Companion.NO_INIT
 import kotlin.math.max
 
 /**
@@ -104,7 +102,32 @@ open class BackgroundBehavior(context: Context? = null, attributeSet: AttributeS
         if (childViewDefaultHeight <= 0) {
             childViewDefaultHeight = child.measuredHeight
         }
-        return super.onLayoutChild(parent, child, layoutDirection)
+
+        var top = NO_INIT
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            if (child.isLaidOut) {
+                //已经布局过
+                top = child.top
+            }
+        } else {
+            if (child.top < 0) {
+                top = child.top
+            }
+        }
+
+        return if (top != NO_INIT) {
+            val lp = child.layoutParams.coordinatorParams()!!
+            val left = lp.leftMargin
+            child.layout(
+                left,
+                top,
+                left + child.measuredWidth,
+                top + child.measuredHeight
+            )
+            true
+        } else {
+            super.onLayoutChild(parent, child, layoutDirection)
+        }
     }
 
     override fun onStartNestedScroll(
