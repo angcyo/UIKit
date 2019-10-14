@@ -414,6 +414,14 @@
         <attr name="r_is_screen_height" format="boolean"/>
     </declare-styleable>
 
+    <declare-styleable name="TitleBarLayout_Layout">
+        <attr name="layout_r_fix_status_bar" format="enum">
+            <enum name="MARGIN_TOP" value="1" />
+            <enum name="PADDING_TOP" value="2" />
+            <enum name="MATCH_PARENT" value="3" />
+        </attr>
+    </declare-styleable>
+
     <!--默认按钮样式-->
     <attr name="defaultButtonStyle" format="reference"/>
 

@@ -6,8 +6,11 @@ import android.content.res.TypedArray;
 import android.os.Build;
 import android.util.AttributeSet;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.FrameLayout;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.angcyo.uiview.less.R;
 import com.angcyo.uiview.less.base.helper.ActivityHelper;
 import com.angcyo.uiview.less.utils.RUtils;
@@ -78,40 +81,43 @@ public class TitleBarLayout extends FrameLayout {
     }
 
     @Override
-    public void addView(View child, int index, ViewGroup.LayoutParams params) {
-        super.addView(child, index, params);
-        if (getChildCount() > 1) {
-            throw new IllegalArgumentException("只能包含一个子视图. Need Only One Child View.");
-        }
-    }
-
-    @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+
         int heightMode = MeasureSpec.getMode(heightMeasureSpec);
         int widthMode = MeasureSpec.getMode(widthMeasureSpec);
         int heightSize = MeasureSpec.getSize(heightMeasureSpec);
         int widthSize = MeasureSpec.getSize(widthMeasureSpec);
 
-        int topHeight = 0;
+        int topHeight = topHeight();
         int viewHeight = 0;
 
         int screenHeight = getResources().getDisplayMetrics().heightPixels;
 
         screenHeight = Math.max(screenHeight, heightSize);
 
-        if (fitActionBar && enablePadding) {
-            topHeight = statusBarHeight + actionBarHeight;
-        } else if (enablePadding) {
-            topHeight = statusBarHeight;
-        } else if (fitActionBar) {
-            topHeight = actionBarHeight;
-        } else {
-            topHeight = 0;
-        }
-
-        setPadding(getPaddingLeft(), topHeight, getPaddingRight(), getPaddingBottom());
         if (maxHeight > 0) {
             maxHeight += topHeight;
+        }
+
+        for (int i = 0; i < getChildCount(); i++) {
+            final View child = getChildAt(i);
+            if (child.getVisibility() != GONE) {
+                final LayoutParams lp = (LayoutParams) child.getLayoutParams();
+                if (lp.fixStatusBar == LayoutParams.FIX_STATUS_BAR_MARGIN_TOP) {
+                    lp.topMargin = topHeight;
+                } else if (lp.fixStatusBar == LayoutParams.FIX_STATUS_BAR_PADDING_TOP) {
+                    child.setPadding(child.getPaddingLeft(), topHeight, child.getPaddingRight(), child.getPaddingBottom());
+                    int height = lp.height;
+                    if (height > 0) {
+                        lp.height = lp.getOldHeight() + topHeight;
+                        //如果手动设置过height
+                        if (height != lp.height) {
+                            lp.setOldHeight(height);
+                            lp.height = lp.getOldHeight() + topHeight;
+                        }
+                    }
+                }
+            }
         }
 
         if (maxHeight > 0) {
@@ -135,6 +141,84 @@ public class TitleBarLayout extends FrameLayout {
             } else {
                 super.onMeasure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(viewHeight, heightMode));
             }
+        }
+
+        for (int i = 0; i < getChildCount(); i++) {
+            final View child = getChildAt(i);
+            if (child.getVisibility() != GONE) {
+                final LayoutParams lp = (LayoutParams) child.getLayoutParams();
+                if (lp.fixStatusBar == LayoutParams.FIX_STATUS_BAR_MATCH_PARENT) {
+                    //重新测量child的高度
+                    if (child.getMeasuredHeight() != getMeasuredHeight()) {
+                        child.measure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(getMeasuredHeight(), MeasureSpec.EXACTLY));
+                    }
+                }
+            }
+        }
+    }
+
+    private int topHeight() {
+        int topHeight = 0;
+        if (fitActionBar && enablePadding) {
+            topHeight = statusBarHeight + actionBarHeight;
+        } else if (enablePadding) {
+            topHeight = statusBarHeight;
+        } else if (fitActionBar) {
+            topHeight = actionBarHeight;
+        } else {
+            topHeight = 0;
+        }
+        return topHeight;
+    }
+
+    @Override
+    protected FrameLayout.LayoutParams generateDefaultLayoutParams() {
+        return new LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT);
+    }
+
+    @Override
+    public FrameLayout.LayoutParams generateLayoutParams(AttributeSet attrs) {
+        return new LayoutParams(getContext(), attrs);
+    }
+
+    public static class LayoutParams extends FrameLayout.LayoutParams {
+
+        public static final int FIX_STATUS_BAR_MARGIN_TOP = 1;
+        public static final int FIX_STATUS_BAR_PADDING_TOP = 2;
+        /**
+         * 与TitleBarLayout同高度
+         */
+        public static final int FIX_STATUS_BAR_MATCH_PARENT = 3;
+
+        public int fixStatusBar = FIX_STATUS_BAR_MARGIN_TOP;
+
+        public LayoutParams(@NonNull Context context, @Nullable AttributeSet attrs) {
+            super(context, attrs);
+
+            final TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.TitleBarLayout_Layout);
+            fixStatusBar = a.getInt(R.styleable.TitleBarLayout_Layout_layout_r_fix_status_bar, fixStatusBar);
+            a.recycle();
+        }
+
+        public LayoutParams(int width, int height) {
+            super(width, height);
+        }
+
+        public int getHeight() {
+            return height;
+        }
+
+        public int oldHeight = -1;
+
+        public int getOldHeight() {
+            if (oldHeight == -1) {
+                oldHeight = getHeight();
+            }
+            return oldHeight;
+        }
+
+        public void setOldHeight(int oldHeight) {
+            this.oldHeight = oldHeight;
         }
     }
 }

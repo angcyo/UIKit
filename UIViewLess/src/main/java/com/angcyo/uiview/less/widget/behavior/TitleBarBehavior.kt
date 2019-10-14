@@ -2,16 +2,19 @@ package com.angcyo.uiview.less.widget.behavior
 
 import android.content.Context
 import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.util.AttributeSet
 import android.view.View
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.ViewCompat
 import com.angcyo.uiview.less.R
 import com.angcyo.uiview.less.base.helper.ViewGroupHelper
+import com.angcyo.uiview.less.kotlin.color
 import com.angcyo.uiview.less.kotlin.find
 import com.angcyo.uiview.less.kotlin.have
 import com.angcyo.uiview.less.resources.AnimUtil
 import com.angcyo.uiview.less.resources.ViewResConfig
+import kotlin.math.min
 
 /**
  * 标题栏行为控制
@@ -24,7 +27,7 @@ open class TitleBarBehavior(context: Context? = null, attributeSet: AttributeSet
     BaseDependsBehavior<View>(context, attributeSet) {
 
     companion object {
-        /**渐变改变背景颜色*/
+        /**激活渐变改变背景颜色*/
         const val TITLE_BAR_GRADIENT = 0x00000001
     }
 
@@ -60,13 +63,34 @@ open class TitleBarBehavior(context: Context? = null, attributeSet: AttributeSet
     /**渐变改变背景颜色*/
     fun dispatchGradient(child: View) {
         if (titleBarScrollBehavior.have(TITLE_BAR_GRADIENT)) {
-            val ratio = if (titleBarHeight > 0) {
-                onTitleBarBehaviorCallback.onTitleBarGradientValue(contentScrollY, titleBarHeight)
+            var currentScrollY = 0
+            var maxScrollY = titleBarHeight
+
+            if (titleBarHeight > 0) {
+                currentScrollY = contentScrollY
             } else {
-                onTitleBarBehaviorCallback.onTitleBarGradientValue(0, 1)
+                maxScrollY = 1
             }
-            onTitleBarBehaviorCallback.onTitleBarGradient(this, child, ratio)
+
+            dispatchGradient(child, currentScrollY, maxScrollY)
         }
+    }
+
+    fun dispatchGradient(child: View, currentScrollY: Int, maxScrollY: Int) {
+        val ratio =
+            onTitleBarBehaviorCallback.onTitleBarGradientValue(
+                this,
+                child,
+                currentScrollY,
+                maxScrollY
+            )
+        onTitleBarBehaviorCallback.onTitleBarGradient(
+            this,
+            child,
+            currentScrollY,
+            maxScrollY,
+            ratio
+        )
     }
 
     override fun onLayoutChild(
@@ -76,6 +100,7 @@ open class TitleBarBehavior(context: Context? = null, attributeSet: AttributeSet
     ): Boolean {
         super.onLayoutChild(parent, child, layoutDirection)
         titleBarHeight = child.measuredHeight
+        onTitleBarBehaviorCallback.onChildLayout(this, child)
         dispatchGradient(child)
         return false
     }
@@ -122,6 +147,14 @@ open class TitleBarBehavior(context: Context? = null, attributeSet: AttributeSet
         contentScrollY = dyConsumedAll
         dispatchGradient(child)
     }
+
+    override fun onDependentViewChanged(
+        parent: CoordinatorLayout,
+        child: View,
+        dependency: View
+    ): Boolean {
+        return super.onDependentViewChanged(parent, child, dependency)
+    }
 }
 
 /**具体的行为控制回调*/
@@ -133,6 +166,9 @@ open class OnTitleBarBehaviorCallback {
     /**标题栏上的item,icon是否渐变颜色*/
     var titleBarItemGradient = false
 
+    /**标题栏背景是否渐变颜色*/
+    var titleBackgroundGradient = true
+
     /**标题是否需要颜色渐变*/
     var titleTextGradient = true
 
@@ -142,22 +178,47 @@ open class OnTitleBarBehaviorCallback {
     /**滑动到多少比例时, 显示标题配合[alwaysShowTitle]使用*/
     var titleShowThreshold = 0.8f
 
+    open fun onChildLayout(behavior: TitleBarBehavior, child: View) {
+
+    }
+
     /**控制渐变阈值*/
-    open fun onTitleBarGradientValue(currentScrollY: Int, maxScrollY: Int): Float {
-        return currentScrollY * titleGradientFactor / maxScrollY
+    open fun onTitleBarGradientValue(
+        behavior: TitleBarBehavior,
+        child: View,
+        currentScrollY: Int, maxScrollY: Int
+    ): Float {
+        return min(1f, currentScrollY * titleGradientFactor / maxScrollY)
+    }
+
+    open fun titleBarBackgroundView(child: View): View? {
+        return child
     }
 
     /**控制背景颜色*/
-    open fun onTitleBarGradient(behavior: TitleBarBehavior, child: View, ratio: Float) {
+    open fun onTitleBarGradient(
+        behavior: TitleBarBehavior,
+        child: View,
+        currentScrollY: Int,
+        maxScrollY: Int,
+        ratio: Float
+    ) {
 
         //背景颜色控制
-        child.setBackgroundColor(
-            AnimUtil.evaluateColor(
-                ratio,
-                behavior.gradientStartConfig.titleBarBackgroundColor,
-                behavior.gradientEndConfig.titleBarBackgroundColor
-            )
-        )
+        if (titleBackgroundGradient) {
+            titleBarBackgroundView(child)?.apply {
+                val evaluateColor = AnimUtil.evaluateColor(
+                    ratio,
+                    behavior.gradientStartConfig.titleBarBackgroundColor,
+                    behavior.gradientEndConfig.titleBarBackgroundColor
+                )
+                if (background == null || background is ColorDrawable) {
+                    setBackgroundColor(evaluateColor)
+                } else {
+                    background.color(evaluateColor)
+                }
+            }
+        }
 
         //标题显示控制
         if (alwaysShowTitle) {

@@ -35,6 +35,7 @@ import com.angcyo.uiview.less.utils.ScreenUtil.density
 import com.angcyo.uiview.less.widget.*
 import com.angcyo.uiview.less.widget.ExEditText.isPhone
 import com.angcyo.uiview.less.widget.group.RSoftInputLayout
+import com.angcyo.uiview.less.widget.group.SwipeBackLayout.clamp
 import com.angcyo.uiview.less.widget.rsen.RGestureDetector
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestBuilder
@@ -1152,8 +1153,36 @@ public fun View.offsetTop(offset: Int) {
     ViewCompat.offsetTopAndBottom(this, offset)
 }
 
+/**限制滚动偏移的范围, 返回值表示 需要消耗的 距离*/
+public fun View.offsetTop(offset: Int, minTop: Int, maxTop: Int): Int {
+    val offsetTop = top + offset
+    val newTop = clamp(offsetTop, minTop, maxTop)
+
+    offsetTopTo(newTop)
+
+    return -(offset - (offsetTop - newTop))
+}
+
 public fun View.offsetTopTo(newTop: Int) {
-    ViewCompat.offsetTopAndBottom(this, newTop - top)
+    offsetTop(newTop - top)
+}
+
+public fun View.offsetLeft(offset: Int) {
+    ViewCompat.offsetLeftAndRight(this, offset)
+}
+
+/**限制滚动偏移的范围, 返回值表示 需要消耗的 距离*/
+public fun View.offsetLeft(offset: Int, minLeft: Int, maxLeft: Int): Int {
+    val offsetLeft = left + offset
+    val newLeft = clamp(offsetLeft, minLeft, maxLeft)
+
+    offsetTopTo(newLeft)
+
+    return -(offset - (offsetLeft - newLeft))
+}
+
+public fun View.offsetLeftTo(newLeft: Int) {
+    offsetLeft(newLeft - left)
 }
 
 /**显示软键盘, [EditText]*/
@@ -1272,4 +1301,33 @@ class RestoreOffsetLayoutListener(val view: View, val offsetTop: Int, val offset
         view.offsetLeftAndRight(offsetLeft)
         view.viewTreeObserver.removeOnGlobalLayoutListener(this)
     }
+}
+
+/**获取[View]在指定[parent]中的矩形坐标*/
+public fun View.getLocationInParent(parent: View? = null): Rect {
+    val result: Rect
+
+    if (parent == null) {
+        result = getViewRect()
+    } else {
+        result = Rect(0, 0, 0, 0)
+        if (this != parent) {
+            fun doIt(view: View, parent: View, rect: Rect) {
+                val viewParent = view.parent
+                if (viewParent is View) {
+                    rect.left += view.left
+                    rect.top += view.top
+                    if (viewParent != parent) {
+                        doIt(viewParent, parent, rect)
+                    }
+                }
+            }
+            doIt(this, parent, result)
+        }
+
+        result.right = result.left + this.measuredWidth
+        result.bottom = result.top + this.measuredHeight
+    }
+
+    return result
 }

@@ -179,6 +179,7 @@ open class LogBehavior<T : View>(context: Context? = null, attrs: AttributeSet? 
         return super.layoutDependsOn(parent, child, dependency)
     }
 
+    /**如果在此方法中, 改变了[child]的size, 需要return true*/
     override fun onDependentViewChanged(
         parent: CoordinatorLayout,
         child: T,

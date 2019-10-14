@@ -3,17 +3,22 @@ package com.angcyo.uiview.less.draw;
 import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
-import android.graphics.*;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.Rect;
+import android.graphics.RectF;
+import android.text.TextPaint;
+import android.util.AttributeSet;
+import android.view.View;
+import android.view.ViewGroup;
+
 import androidx.annotation.ColorInt;
 import androidx.annotation.ColorRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
-import android.text.TextPaint;
-import android.util.AttributeSet;
-import android.view.View;
-import android.view.ViewGroup;
+
 import com.angcyo.uiview.less.R;
 import com.angcyo.uiview.less.skin.SkinHelper;
 
@@ -91,6 +96,10 @@ public abstract class BaseDraw {
 
     protected void postInvalidate() {
         mView.postInvalidate();
+    }
+
+    protected void invalidate() {
+        mView.invalidate();
     }
 
     protected void postInvalidateOnAnimation() {

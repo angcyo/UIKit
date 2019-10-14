@@ -69,8 +69,8 @@ fun View.animScale(
 fun View.anim(
     from: Float = 0f,
     to: Float = 1f,
-    interpolator: TimeInterpolator = LinearInterpolator(),
     duration: Long = 300L,
+    interpolator: TimeInterpolator = LinearInterpolator(),
     end: (() -> Unit)? = null,
     update: (Float) -> Unit = {}
 ): Animator {

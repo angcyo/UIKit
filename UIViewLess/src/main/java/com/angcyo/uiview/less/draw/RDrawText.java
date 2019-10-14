@@ -4,10 +4,14 @@ import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import androidx.annotation.NonNull;
+import android.text.Layout;
+import android.text.StaticLayout;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.View;
+
+import androidx.annotation.NonNull;
+
 import com.angcyo.uiview.less.R;
 
 
@@ -27,7 +31,7 @@ public class RDrawText extends BaseDraw {
     public static final int GRAVITY_CENTER_V = 64;
 
     protected ColorStateList textColor;
-    protected String drawText;
+    protected CharSequence drawText;
 
     /**
      * 文本大小, 用来控制测量
@@ -41,6 +45,13 @@ public class RDrawText extends BaseDraw {
     protected int textGravity = GRAVITY_TOP | GRAVITY_LEFT;
 
     protected int textOffsetX, textOffsetY;
+
+    protected Layout textLayout;
+
+    /**
+     * 行间距
+     */
+    protected float lineSpacingExtra;
 
     public static boolean haveInt(int src, int i) {
         int maskSrc = src & 0xff;
@@ -79,6 +90,8 @@ public class RDrawText extends BaseDraw {
 
         array.recycle();
 
+        lineSpacingExtra = getResources().getDimensionPixelOffset(R.dimen.base_ldpi);
+
         mBasePaint.setTextSize(textSize);
     }
 
@@ -89,15 +102,43 @@ public class RDrawText extends BaseDraw {
     @Override
     public int[] measureDraw(int widthMeasureSpec, int heightMeasureSpec) {
         mBasePaint.setTextSize(textSize);
+        int widthSize = View.MeasureSpec.getSize(widthMeasureSpec);
+
+        /**
+         * CharSequence source : 需要分行的字符串
+         * int bufstart : 需要分行的字符串从第几的位置开始
+         * int bufend : 需要分行的字符串到哪里结束
+         * TextPaint paint : 画笔对象
+         * int outerwidth : layout的宽度，超出时换行
+         * Alignment align : layout的对其方式，有ALIGN_CENTER， ALIGN_NORMAL， ALIGN_OPPOSITE 三种
+         * float spacingmult : 相对行间距，相对字体大小，1.5f表示行间距为1.5倍的字体高度。
+         * float spacingadd : 在基础行距上添加多少
+         * boolean includepad,
+         * TextUtils.TruncateAt ellipsize : 从什么位置开始省略
+         * int ellipsizedWidth : 超过多少开始省略
+         * */
+        textLayout = new StaticLayout(
+                drawText, mBasePaint, widthSize - getPaddingHorizontal(),
+                Layout.Alignment.ALIGN_NORMAL,
+                1.0f, lineSpacingExtra, false);
+
         return super.measureDraw(widthMeasureSpec, heightMeasureSpec);
     }
 
     @Override
     public int measureDrawWidth() {
+        if (TextUtils.isEmpty(drawText) || textLayout.getLineCount() < 1) {
+            return 0;
+        }
+        return Math.min(textLayout.getWidth(), ((int) textLayout.getLineRight(0)));
+    }
+
+    @Override
+    public int measureDrawHeight() {
         if (TextUtils.isEmpty(drawText)) {
             return 0;
         }
-        return (int) mBasePaint.measureText(drawText);
+        return textLayout.getHeight();
     }
 
     public float getTextSize() {
@@ -136,22 +177,33 @@ public class RDrawText extends BaseDraw {
     public void onDraw(@NonNull Canvas canvas) {
         super.onDraw(canvas);
 
+        canvas.save();
+
+        canvas.translate(getPaddingLeft(), getPaddingRight());
         if (!TextUtils.isEmpty(drawText)) {
             mBasePaint.setTextSize(drawTextSize);
             mBasePaint.setColor(getDrawTextColor());
-            canvas.drawText(drawText, getTextDrawX(), getTextDrawY(), mBasePaint);
+            //canvas.drawText(drawText, getTextDrawX(), getTextDrawY(), mBasePaint);
+            textLayout.draw(canvas);
         }
+        canvas.restore();
     }
 
     public void setTextSize(float textSize) {
+        if (this.textSize == textSize) {
+            return;
+        }
         this.textSize = textSize;
         this.drawTextSize = textSize;
         requestLayout();
     }
 
     public void setDrawTextSize(float drawTextSize) {
+        if (this.drawTextSize == drawTextSize) {
+            return;
+        }
         this.drawTextSize = drawTextSize;
-        postInvalidate();
+        invalidate();
     }
 
     public float getDrawTextSize() {
@@ -167,22 +219,34 @@ public class RDrawText extends BaseDraw {
         postInvalidate();
     }
 
-    public void setDrawText(String drawText) {
+    public void setDrawText(CharSequence drawText) {
+        if (TextUtils.equals(this.drawText, drawText)) {
+            return;
+        }
         this.drawText = drawText;
         requestLayout();
     }
 
     public void setTextGravity(int textGravity) {
+        if (this.textGravity == textGravity) {
+            return;
+        }
         this.textGravity = textGravity;
         postInvalidate();
     }
 
     public void setTextOffsetX(int textOffsetX) {
+        if (this.textOffsetX == textOffsetX) {
+            return;
+        }
         this.textOffsetX = textOffsetX;
         postInvalidate();
     }
 
     public void setTextOffsetY(int textOffsetY) {
+        if (this.textOffsetY == textOffsetY) {
+            return;
+        }
         this.textOffsetY = textOffsetY;
         postInvalidate();
     }

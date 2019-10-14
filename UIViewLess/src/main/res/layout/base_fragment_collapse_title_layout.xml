@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!--动态控制此view的高度和base_collapse_title_bar_wrap_layout一致-->
+    <View
+        android:id="@+id/base_collapse_title_bar_background_layout"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_r_fix_status_bar="MATCH_PARENT" />
+
+    <FrameLayout
+        android:id="@+id/base_title_bar_content_layout"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/action_bar_height"
+        app:layout_r_fix_status_bar="PADDING_TOP">
+
+        <!--左右item控制布局-->
+        <LinearLayout
+            android:id="@+id/base_title_left_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="left"
+            android:orientation="horizontal" />
+
+        <LinearLayout
+            android:id="@+id/base_title_right_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="right"
+            android:orientation="horizontal" />
+
+        <!--可以让标题布局在中间显示, 并且加载视图在左边-->
+        <com.angcyo.uiview.less.widget.group.RTitleCenterLayout
+            android:id="@+id/base_title_center_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center">
+
+            <com.angcyo.uiview.less.widget.LoadingImageView
+                android:id="@+id/base_title_loading_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:tag="loading_view"
+                android:visibility="gone"
+                tools:visibility="visible" />
+
+            <com.angcyo.uiview.less.widget.RDrawTextView
+                android:id="@+id/base_title_view"
+                style="@style/BaseMainTextStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:tag="title_view"
+                android:textColor="@color/base_white"
+                app:r_draw_text_color="@color/base_white"
+                app:r_draw_text_size="@dimen/default_text_size"
+                tools:background="@color/base_link_color_dark"
+                tools:r_draw_text_string="这里显示标题" />
+
+        </com.angcyo.uiview.less.widget.group.RTitleCenterLayout>
+
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/base_collapse_title_bar_wrap_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_r_fix_status_bar="PADDING_TOP">
+
+        <com.angcyo.uiview.less.widget.RDrawTextView
+            android:id="@+id/base_collapse_title_view"
+            style="@style/BaseMainTextStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/base_padding_left"
+            android:layout_marginTop="80dp"
+            android:layout_marginBottom="@dimen/base_padding_left"
+            android:singleLine="false"
+            android:textColor="@color/base_white"
+            app:r_draw_text_color="@color/base_white"
+            app:r_draw_text_size="@dimen/default_text_size"
+            tools:r_draw_text_string="这里显示标题这里显示标题这里显示标题这里显示标题这里显示标题这里显示标题这里显示标题这里显示标题这里显示标题这里显示标题这里显示标题这里显示标题" />
+    </FrameLayout>
+
+</merge>

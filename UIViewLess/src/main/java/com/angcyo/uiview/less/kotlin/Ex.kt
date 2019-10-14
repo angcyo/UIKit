@@ -852,3 +852,15 @@ public fun String.unzip(
 ): String? {
     return file().unzip(deleteOld, checkExist, deleteZip)
 }
+
+public fun IntRange.evaluate(fraction: Float): Float {
+    return first + fraction * (last - first)
+}
+
+public fun evaluate(startValue: Int, endValue: Int, fraction: Float): Float {
+    return startValue + fraction * (endValue - startValue)
+}
+
+public fun evaluate(startValue: Float, endValue: Float, fraction: Float): Float {
+    return startValue + fraction * (endValue - startValue)
+}

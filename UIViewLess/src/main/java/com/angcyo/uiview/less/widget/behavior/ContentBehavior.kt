@@ -1,6 +1,7 @@
 package com.angcyo.uiview.less.widget.behavior
 
 import android.content.Context
+import android.os.Build
 import android.util.AttributeSet
 import android.view.View
 import androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -12,7 +13,6 @@ import com.angcyo.uiview.less.kotlin.have
 import com.angcyo.uiview.less.kotlin.offsetTop
 import com.angcyo.uiview.less.kotlin.padding
 import com.angcyo.uiview.less.utils.UI
-import kotlin.math.min
 
 /**
  * 用来控制 内容布局 和 标题栏布局 之间的布局关系
@@ -32,16 +32,22 @@ open class ContentBehavior(context: Context? = null, attributeSet: AttributeSet?
         const val LAYOUT_FLAG_PADDING_TOP = 0x00000002
         /**具有偏移特性, 当内容滚动的时候, 会移动[dependsLayout]的高度*/
         const val LAYOUT_FLAG_OFFSET = 0x00000004
+
+        const val NO_INIT = -0xfffff
     }
 
     /**多个flag可以组合*/
     var contentLayoutState = 0b00
 
+    /**配合[LAYOUT_FLAG_EXCLUDE]使用, 内容布局的高度需要排除多少, -1表示标题栏的高度*/
+    var contentLayoutExcludeHeight = -1
+
     //当前Top偏移量
-    protected var offsetTop = -1
+    protected var offsetTop = NO_INIT
 
     init {
         showLog = false
+        enableDependsOn = false
 
         context?.let {
             val array =
@@ -71,12 +77,6 @@ open class ContentBehavior(context: Context? = null, attributeSet: AttributeSet?
 
     //</editor-fold desc="方法区">
 
-    //<editor-fold desc="辅助方法">
-
-    protected fun needDependsLayout(): Boolean = contentLayoutState != 0 && dependsLayout != null
-
-    //</editor-fold desc="辅助方法">
-
     //<editor-fold desc="布局方法">
 
     override fun layoutDependsOn(
@@ -84,9 +84,8 @@ open class ContentBehavior(context: Context? = null, attributeSet: AttributeSet?
         child: View,
         dependency: View
     ): Boolean {
-        super.layoutDependsOn(parent, child, dependency)
-        //取消默认的依赖关系建立, 某种会出现闭环依赖关系
-        return false
+        //注意出现闭环依赖关系的情况
+        return super.layoutDependsOn(parent, child, dependency)
     }
 
     override fun onMeasureChild(
@@ -101,8 +100,15 @@ open class ContentBehavior(context: Context? = null, attributeSet: AttributeSet?
             var handle = false
             if (contentLayoutState.have(LAYOUT_FLAG_EXCLUDE)) {
 
-                dependsLayout?.apply {
-                    val usedHeight = measuredHeight + clp().topMargin + clp().bottomMargin
+                var usedHeight = 0
+
+                val flagExcludeTop = getFlagExcludeTop(-1)
+                if (flagExcludeTop > 0) {
+                    usedHeight = flagExcludeTop
+                    handle = true
+                }
+
+                if (handle) {
                     parent.onMeasureChild(
                         child,
                         parentWidthMeasureSpec,
@@ -110,7 +116,6 @@ open class ContentBehavior(context: Context? = null, attributeSet: AttributeSet?
                         parentHeightMeasureSpec,
                         heightUsed + usedHeight
                     )
-                    handle = true
                 }
             }
             handle
@@ -124,11 +129,10 @@ open class ContentBehavior(context: Context? = null, attributeSet: AttributeSet?
         child: View,
         layoutDirection: Int
     ): Boolean {
-
         return if (needDependsLayout()) {
             if (contentLayoutState.have(LAYOUT_FLAG_PADDING_TOP)) {
                 child.padding {
-                    top = dependsLayout?.measuredHeight ?: top
+                    top = getFlagPaddingTop(top)
                 }
             }
 
@@ -139,33 +143,39 @@ open class ContentBehavior(context: Context? = null, attributeSet: AttributeSet?
 
             if (contentLayoutState.have(LAYOUT_FLAG_EXCLUDE)) {
 
-                dependsLayout?.apply {
-                    val usedHeight = measuredHeight + clp().topMargin + clp().bottomMargin
-                    top += usedHeight
+                val flagExcludeTop = getFlagExcludeTop(-1)
+                if (flagExcludeTop > 0) {
+                    top += flagExcludeTop
                     handle = true
                 }
             }
 
             if (contentLayoutState.have(LAYOUT_FLAG_OFFSET)) {
-                val offsetTopMax = getOffsetTopMax(parent, child)
+                val offsetTopMax = getFlagOffsetTop(parent, child)
                 if (offsetTopMax > 0) {
-                    if (offsetTop == -1) {
-                        offsetTop = offsetTopMax
-                    }
-
-                    top += offsetTop
-
+                    top += offsetTopMax
                     handle = true
                 }
             }
 
             if (handle) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                    if (child.isLaidOut) {
+                        //已经布局过
+                        top = offsetTop
+                    }
+                } else {
+                    if (offsetTop != NO_INIT) {
+                        top = offsetTop
+                    }
+                }
                 child.layout(
                     left,
                     top,
                     left + child.measuredWidth,
                     top + child.measuredHeight
                 )
+                offsetTop = child.top
             }
             handle
         } else {
@@ -175,10 +185,26 @@ open class ContentBehavior(context: Context? = null, attributeSet: AttributeSet?
 
     //</editor-fold desc="布局方法">
 
-    //<editor-fold desc="偏移滚动相关">
+    //<editor-fold desc="辅助方法">
 
-    /**顶部最大偏移距离*/
-    protected fun getOffsetTopMax(
+    open fun needDependsLayout(): Boolean = contentLayoutState != 0 && dependsLayout != null
+
+    open fun getFlagPaddingTop(default: Int = 0): Int {
+        return dependsLayout?.measuredHeight ?: default
+    }
+
+    open fun getFlagExcludeTop(default: Int = 0): Int {
+        return when {
+            contentLayoutState.have(LAYOUT_FLAG_EXCLUDE) -> 0
+            contentLayoutExcludeHeight > 0 -> contentLayoutExcludeHeight
+            else -> dependsLayout?.run {
+                measuredHeight + clp().topMargin + clp().bottomMargin
+            } ?: default
+        }
+    }
+
+    /**顶部布局偏移的最大距离*/
+    open fun getFlagOffsetTop(
         parent: CoordinatorLayout,
         child: View
     ): Int {
@@ -190,6 +216,25 @@ open class ContentBehavior(context: Context? = null, attributeSet: AttributeSet?
         }
         return offsetTop
     }
+
+    /**顶部最大偏移的[Top]值*/
+    open fun getOffsetTopMax(
+        parent: CoordinatorLayout,
+        child: View
+    ): Int {
+        return getFlagExcludeTop(0) + getFlagOffsetTop(parent, child)
+    }
+
+    /**顶部滚动最小的[Top]值*/
+    open fun getOffsetTopMin(
+        parent: CoordinatorLayout,
+        child: View
+    ): Int {
+        return getFlagExcludeTop(0)
+    }
+    //</editor-fold desc="辅助方法">
+
+    //<editor-fold desc="偏移滚动相关">
 
     /**
      * 关闭嵌套的内嵌滚动
@@ -235,29 +280,28 @@ open class ContentBehavior(context: Context? = null, attributeSet: AttributeSet?
         }
 
         if (contentLayoutState.have(LAYOUT_FLAG_OFFSET)) {
+            val offsetTopMin = getOffsetTopMin(coordinatorLayout, child)
+            val offsetTopMax = getOffsetTopMax(coordinatorLayout, child)
+
             if (dy < 0) {
                 //手指往下滑动
                 if (!UI.canChildScrollUp(target)) {
                     //RecyclerView的顶部没有滚动空间
-                    val offsetTopMax = getOffsetTopMax(coordinatorLayout, child)
-
-                    if (offsetTop < offsetTopMax) {
-                        val consumedY = min(-dy, offsetTopMax - offsetTop)
-                        consumed[1] = -consumedY
-
-                        child.offsetTop(consumedY)
-                        offsetTop = child.top
-                    }
+                    consumed[1] = child.offsetTop(
+                        -dy,
+                        offsetTopMin,
+                        offsetTopMax
+                    )
+                    offsetTop = child.top
                 }
             } else if (dy > 0) {
                 //手指往上滑动
-                if (offsetTop > 0) {
-                    val consumedY = min(dy, offsetTop)
-                    consumed[1] = consumedY
-
-                    child.offsetTop(-consumedY)
-                    offsetTop = child.top
-                }
+                consumed[1] = child.offsetTop(
+                    -dy,
+                    offsetTopMin,
+                    offsetTopMax
+                )
+                offsetTop = child.top
             }
         }
     }

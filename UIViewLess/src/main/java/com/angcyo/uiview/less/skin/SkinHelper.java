@@ -28,9 +28,7 @@ public class SkinHelper {
     static ISkin mSkin;
 
     public static void init(Context context) {
-        if (mSkin == null) {
-            createDefaultSkin(context);
-        }
+        createDefaultSkin(context);
     }
 
     public static void init(ISkin skin) {

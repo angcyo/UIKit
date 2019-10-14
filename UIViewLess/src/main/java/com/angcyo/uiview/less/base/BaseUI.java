@@ -82,7 +82,13 @@ public class BaseUI {
         public void initBaseTitleLayout(@NonNull BaseTitleFragment titleFragment, @Nullable Bundle arguments) {
             titleFragment.titleControl()
                     .selector(R.id.base_title_bar_layout)
-                    .setBackgroundColor(titleFragment.viewResConfig.getTitleBarBackgroundColor());
+                    .setBackground(titleFragment.viewResConfig.getTitleBarBackgroundDrawable())
+                    .selector(R.id.base_title_view)
+                    .setTextSize(titleFragment.viewResConfig.getTitleTextSize())
+                    .setTextColor(titleFragment.viewResConfig.getTitleTextColor());
+
+            titleFragment.rootControl().selector()
+                    .setBackground(titleFragment.viewResConfig.getFragmentBackgroundDrawable());
         }
 
         @Override

@@ -23,6 +23,7 @@ import com.angcyo.uiview.less.kotlin.ViewExKt;
 import com.angcyo.uiview.less.resources.ResUtil;
 import com.angcyo.uiview.less.widget.ImageTextView;
 import com.angcyo.uiview.less.widget.RClickListener;
+import com.angcyo.uiview.less.widget.RDrawTextView;
 
 public class ViewGroupHelper {
     View parentView;
@@ -146,6 +147,8 @@ public class ViewGroupHelper {
                 } else {
                     ((ImageTextView) selectorView).setShowText(text.toString());
                 }
+            } else if (selectorView instanceof RDrawTextView) {
+                ((RDrawTextView) selectorView).getDrawText().setDrawText(text);
             }
         }
         return this;
@@ -159,6 +162,8 @@ public class ViewGroupHelper {
                 ((TextView) selectorView).setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
             } else if (selectorView instanceof ImageTextView) {
                 ((ImageTextView) selectorView).setShowTextSize(textSize);
+            } else if (selectorView instanceof RDrawTextView) {
+                ((RDrawTextView) selectorView).getDrawText().setTextSize(textSize);
             }
         }
         return this;
@@ -170,6 +175,8 @@ public class ViewGroupHelper {
                 ((TextView) selectorView).setTextColor(color);
             } else if (selectorView instanceof ImageTextView) {
                 ((ImageTextView) selectorView).setTextShowColor(color);
+            } else if (selectorView instanceof RDrawTextView) {
+                ((RDrawTextView) selectorView).getDrawText().setTextColor(color);
             }
         }
         return this;
@@ -246,6 +253,8 @@ public class ViewGroupHelper {
                 ((TextView) view).setTextColor(color);
             } else if (view instanceof ImageTextView) {
                 ((ImageTextView) view).setTextShowColor(color);
+            } else if (selectorView instanceof RDrawTextView) {
+                ((RDrawTextView) selectorView).getDrawText().setTextColor(color);
             }
         }
         return this;

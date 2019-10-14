@@ -21,11 +21,14 @@ abstract class BaseDependsBehavior<T : View>(
 ) :
     LogBehavior<T>(context, attrs) {
 
-    /**依赖的视图*/
+    /**依赖的视图, 用于触发[onDependentViewChanged]*/
     var dependsLayout: View? = null
 
     /**辅助确定依赖视图的索引值*/
-    protected var dependsLayoutIndex = -1
+    var dependsLayoutIndex = -1
+
+    /**是否需要监听[dependsLayout]的改变*/
+    var enableDependsOn = true
 
     /**依赖视图的 l t r b*/
     protected val dependsRect: Rect by lazy {
@@ -64,7 +67,7 @@ abstract class BaseDependsBehavior<T : View>(
                 dependsLayout = parent.getChildAt(dependsLayoutIndex)
             }
         }
-        return dependsLayout == dependency
+        return enableDependsOn && dependsLayout == dependency
     }
 
     @CallSuper
