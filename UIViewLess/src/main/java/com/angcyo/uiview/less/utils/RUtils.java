@@ -76,6 +76,7 @@ import com.angcyo.http.Rx;
 import com.angcyo.lib.L;
 import com.angcyo.uiview.less.RApplication;
 import com.angcyo.uiview.less.RCrashHandler;
+import com.angcyo.uiview.less.kotlin.AppExKt;
 import com.angcyo.uiview.less.utils.permission.SettingsCompat;
 import com.angcyo.uiview.less.utils.rsa.Base64Utils;
 import com.angcyo.uiview.less.utils.utilcode.utils.AppUtils;
@@ -122,7 +123,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import static android.content.Context.WIFI_SERVICE;
-import static com.angcyo.uiview.less.RCrashHandler.FILE_NAME_SUFFIX;
+import static com.angcyo.uiview.less.RCrashHandler.*;
 
 /**
  * Created by angcyo on 15-12-16 016 15:41 下午.
@@ -2465,6 +2466,16 @@ public class RUtils {
     }
 
     /**
+     * 重启APP
+     */
+    public static void restart() {
+        //重启APP
+        RUtils.startApp(AppExKt.app(), AppExKt.app().getPackageName());
+        System.exit(0);
+        Process.killProcess(Process.myPid());
+    }
+
+    /**
      * 根据包名 启动其他应用
      */
     public static String startApp(Context context, String packageName) {
@@ -3389,5 +3400,9 @@ public class RUtils {
     public static class QueryAppBean {
         public AppInfo mAppInfo;
         public Intent startIntent;
+    }
+
+    public interface IGetItemString<T> {
+        String getStringFrom(T bean);
     }
 }

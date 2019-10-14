@@ -834,6 +834,13 @@ public fun Throwable.printString(): String {
     return stringWriter.toString()
 }
 
+/**堆栈信息保存到文件*/
+public fun Throwable.save(filePath: String, append: Boolean = true) {
+    val pw = PrintWriter(BufferedWriter(FileWriter(filePath, append)))
+    printStackTrace(pw)
+    pw.close()
+}
+
 public fun File.unzip(
     deleteOld: Boolean = true,
     checkExist: Boolean = true,

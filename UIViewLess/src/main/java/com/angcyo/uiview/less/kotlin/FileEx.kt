@@ -46,6 +46,15 @@ public fun String.writeData(data: String, append: Boolean = true) {
     FileUtils.writeFileFromString(this, data, append)
 }
 
+/**读取文件数据*/
+public fun String.readData(): String? {
+    return RUtils.readFile(this)
+}
+
+public fun File.readData(): String? {
+    return RUtils.readFile(this.absolutePath)
+}
+
 /**将文件内容, 转移到另一个文件*/
 public fun String.transferToFile(filePath: String) {
     com.yalantis.ucrop.util.FileUtils.copyFile(this, filePath)
