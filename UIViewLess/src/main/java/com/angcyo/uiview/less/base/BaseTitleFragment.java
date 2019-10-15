@@ -20,6 +20,7 @@ import com.angcyo.uiview.less.recycler.RBaseViewHolder;
 import com.angcyo.uiview.less.resources.ResUtil;
 import com.angcyo.uiview.less.resources.ViewResConfig;
 import com.angcyo.uiview.less.widget.group.FragmentContentWrapperLayout;
+import com.angcyo.uiview.less.widget.group.RSoftInputLayout;
 import com.angcyo.uiview.less.widget.group.TitleBarLayout;
 
 /**
@@ -31,34 +32,32 @@ import com.angcyo.uiview.less.widget.group.TitleBarLayout;
  */
 public abstract class BaseTitleFragment extends BaseFragment implements AffectUI.OnAffectListener {
 
+    public ViewResConfig viewResConfig = new ViewResConfig();
+    /**
+     * 内容布局是否需要被软键盘布局包裹
+     */
+    public boolean contentNeedSoftInputLayout = false;
     /**
      * Fragment 根布局.
      */
     protected FragmentContentWrapperLayout fragmentContentWrapperLayout;
-
     /**
      * Fragment 内容布局, 将add到这个ViewGroup
      */
     protected FrameLayout contentWrapperLayout;
-
     /**
      * 标题栏和padding控制的布局
      */
     protected TitleBarLayout titleBarLayout;
-
     /**
      * 子类的内容布局
      */
     protected View contentView;
-
     /**
      * 情感图控制
      */
     protected AffectUI affectUI;
-
     protected BaseUI.UIFragment uiFragment;
-
-    public ViewResConfig viewResConfig = new ViewResConfig();
 
     //<editor-fold desc="初始化方法">
 
@@ -102,6 +101,8 @@ public abstract class BaseTitleFragment extends BaseFragment implements AffectUI
         initLeftControlLayout();
         initRightControlLayout();
         initContentLayout(arguments);
+        //情感图
+        affectUI = createAffectUI();
     }
 
     /**
@@ -176,10 +177,16 @@ public abstract class BaseTitleFragment extends BaseFragment implements AffectUI
         } else {
             contentView = LayoutInflater.from(mAttachContext).inflate(contentLayoutId, contentWrapperLayout, false);
         }
-        contentWrapperLayout.addView(contentView);
 
-        //情感图
-        affectUI = createAffectUI();
+        if (contentNeedSoftInputLayout) {
+            RSoftInputLayout inputLayout = new RSoftInputLayout(mAttachContext);
+            inputLayout.setId(R.id.base_soft_input_layout);
+            inputLayout.addView(contentView, new ViewGroup.LayoutParams(-1, -1));
+            inputLayout.setLayoutParams(new ViewGroup.LayoutParams(-1, -1));
+            contentView = inputLayout;
+        }
+
+        contentWrapperLayout.addView(contentView);
     }
 
     /**
