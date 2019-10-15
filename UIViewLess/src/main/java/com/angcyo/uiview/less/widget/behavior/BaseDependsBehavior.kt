@@ -126,6 +126,34 @@ abstract class BaseDependsBehavior<T : View>(
 
     }
 
+    override fun onMeasureChild(
+        parent: CoordinatorLayout,
+        child: T,
+        parentWidthMeasureSpec: Int,
+        widthUsed: Int,
+        parentHeightMeasureSpec: Int,
+        heightUsed: Int
+    ): Boolean {
+        return super.onMeasureChild(
+            parent,
+            child,
+            parentWidthMeasureSpec,
+            widthUsed,
+            parentHeightMeasureSpec,
+            heightUsed
+        )
+    }
+
+    open fun onMeasureChildAfter(
+        parent: CoordinatorLayout,
+        child: T,
+        parentWidthMeasureSpec: Int,
+        widthUsed: Int,
+        parentHeightMeasureSpec: Int,
+        heightUsed: Int
+    ) {
+    }
+
     //<editor-fold desc="辅助方法">
 
     protected fun View.clp(): CoordinatorLayout.LayoutParams =

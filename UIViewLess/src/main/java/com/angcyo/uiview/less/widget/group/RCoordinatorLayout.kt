@@ -35,6 +35,32 @@ open class RCoordinatorLayout : CoordinatorLayout {
 
     }
 
+    override fun onMeasureChild(
+        child: View,
+        parentWidthMeasureSpec: Int,
+        widthUsed: Int,
+        parentHeightMeasureSpec: Int,
+        heightUsed: Int
+    ) {
+        super.onMeasureChild(
+            child,
+            parentWidthMeasureSpec,
+            widthUsed,
+            parentHeightMeasureSpec,
+            heightUsed
+        )
+
+        val lp = child.layoutParams as LayoutParams
+        (lp.behavior as? BaseDependsBehavior)?.onMeasureChildAfter(
+            this,
+            child,
+            parentWidthMeasureSpec,
+            widthUsed,
+            parentHeightMeasureSpec,
+            heightUsed
+        )
+    }
+
     override fun onLayoutChild(child: View, layoutDirection: Int) {
         super.onLayoutChild(child, layoutDirection)
         val lp = child.layoutParams as LayoutParams
