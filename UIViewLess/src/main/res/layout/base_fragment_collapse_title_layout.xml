@@ -4,11 +4,17 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <!--动态控制此view的高度和base_collapse_title_bar_wrap_layout一致-->
-    <View
-        android:id="@+id/base_collapse_title_bar_background_layout"
+    <!--此布局会进行offsetTop操作-->
+    <FrameLayout
+        android:id="@+id/base_collapse_title_bar_background_wrap_layout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_r_fix_status_bar="MATCH_PARENT" />
+        app:layout_r_fix_status_bar="MATCH_PARENT" >
+
+        <!--允许动态设置layout,核心控件的id不要变-->
+        <!--<include layout="@layout/base_collapse_title_bar_background_layout" />-->
+
+    </FrameLayout>
 
     <FrameLayout
         android:id="@+id/base_title_bar_content_layout"
@@ -46,7 +52,7 @@
                 android:visibility="gone"
                 tools:visibility="visible" />
 
-            <com.angcyo.uiview.less.widget.RDrawTextView
+            <TextView
                 android:id="@+id/base_title_view"
                 style="@style/BaseMainTextStyle"
                 android:layout_width="wrap_content"
@@ -54,10 +60,8 @@
                 android:singleLine="true"
                 android:tag="title_view"
                 android:textColor="@color/base_white"
-                app:r_draw_text_color="@color/base_white"
-                app:r_draw_text_size="@dimen/default_text_size"
                 tools:background="@color/base_link_color_dark"
-                tools:r_draw_text_string="这里显示标题" />
+                tools:text="这里显示标题" />
 
         </com.angcyo.uiview.less.widget.group.RTitleCenterLayout>
 
@@ -69,19 +73,8 @@
         android:layout_height="wrap_content"
         app:layout_r_fix_status_bar="PADDING_TOP">
 
-        <com.angcyo.uiview.less.widget.RDrawTextView
-            android:id="@+id/base_collapse_title_view"
-            style="@style/BaseMainTextStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/base_padding_left"
-            android:layout_marginTop="80dp"
-            android:layout_marginBottom="@dimen/base_padding_left"
-            android:singleLine="false"
-            android:textColor="@color/base_white"
-            app:r_draw_text_color="@color/base_white"
-            app:r_draw_text_size="@dimen/default_text_size"
-            tools:r_draw_text_string="这里显示标题这里显示标题这里显示标题这里显示标题这里显示标题这里显示标题这里显示标题这里显示标题这里显示标题这里显示标题这里显示标题这里显示标题" />
+        <!--允许动态设置layout,核心控件的id不要变-->
+        <!--<include layout="@layout/base_collapse_title_layout" />-->
     </FrameLayout>
 
 </merge>

@@ -6,6 +6,7 @@ import com.angcyo.uiview.less.R
 import com.angcyo.uiview.less.base.helper.ViewGroupHelper
 import com.angcyo.uiview.less.kotlin.coordinatorParams
 import com.angcyo.uiview.less.kotlin.dp
+import com.angcyo.uiview.less.kotlin.getDimen
 import com.angcyo.uiview.less.kotlin.inflate
 import com.angcyo.uiview.less.recycler.RBaseViewHolder
 import com.angcyo.uiview.less.widget.behavior.*
@@ -23,6 +24,9 @@ open class BaseBehaviorDslRecyclerFragment : BaseDslRecyclerFragment() {
     /**开启折叠标题后, 标题栏的背景颜色请不要用 [titleBarLayout] 设置*/
     var isCollapseTitle = false
 
+    /**坍塌标题的一些配置参数*/
+    var titleBarCollapseCallback: TitleBarCollapseCallback = TitleBarCollapseCallback()
+
     override fun getLayoutId(): Int {
         return R.layout.base_behavior_fragment_layout
     }
@@ -33,6 +37,13 @@ open class BaseBehaviorDslRecyclerFragment : BaseDslRecyclerFragment() {
         }
         return super.getTitleBarLayoutId()
     }
+
+    /**展开状态时的标题布局, 需要激活[isCollapseTitle]*/
+    open fun getCollapseTitleLayoutId(): Int = R.layout.base_collapse_title_layout
+
+    /**坍塌时, 背景需要被[offsetTop]的背景布局, 需要激活[isCollapseTitle]*/
+    open fun getCollapseTitleBarBackgroundLayoutId(): Int =
+        R.layout.base_collapse_title_background_layout
 
     override fun getContentLayoutId(): Int {
         return super.getContentLayoutId()
@@ -54,14 +65,25 @@ open class BaseBehaviorDslRecyclerFragment : BaseDslRecyclerFragment() {
 
     open fun initCollapseTitleLayout() {
         if (isCollapseTitle) {
+
+            //填充
+            baseViewHolder.group(R.id.base_collapse_title_bar_wrap_layout)
+                .inflate(getCollapseTitleLayoutId())
+            baseViewHolder.group(R.id.base_collapse_title_bar_background_wrap_layout)
+                .inflate(getCollapseTitleBarBackgroundLayoutId())
+
             //坍塌模式, 标题栏背景初始化
             titleBarLayout.isClickable = false
             titleControl()
                 .selector(R.id.base_title_bar_layout)
                 .setBackground(null)
-                .selector(R.id.base_collapse_title_bar_background_layout)
+                .selector(titleBarCollapseCallback.collapseBackgroundViewId)
                 .setBackground(viewResConfig.titleBarBackgroundDrawable)
 //                .setBackgroundColor(Color.TRANSPARENT)
+                .selector(titleBarCollapseCallback.collapseViewId)
+                .setTextColor(viewResConfig.titleTextColor)
+
+            setTitleString(fragmentTitle)
         }
     }
 
@@ -97,8 +119,12 @@ open class BaseBehaviorDslRecyclerFragment : BaseDslRecyclerFragment() {
             //标题行为控制
             behavior = if (isCollapseTitle) {
                 TitleBarCollapseBehavior().apply {
+
+                    titleBarCollapseCallback =
+                        this@BaseBehaviorDslRecyclerFragment.titleBarCollapseCallback
+
                     //设置倒塌前的字体大小
-                    gradientStartConfig.titleTextSize = 22 * dp
+                    gradientStartConfig.titleTextSize = getDimen(R.dimen.base_collapse_text_size).toFloat()
                     gradientStartConfig.titleTextColor = viewResConfig.titleTextColor
                     ViewGroupHelper.build(baseViewHolder.view(R.id.base_collapse_title_view))
                         .selector()

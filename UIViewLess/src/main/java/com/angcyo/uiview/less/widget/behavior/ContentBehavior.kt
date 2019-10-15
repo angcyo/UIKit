@@ -33,7 +33,7 @@ open class ContentBehavior(context: Context? = null, attributeSet: AttributeSet?
         /**具有偏移特性, 当内容滚动的时候, 会移动[dependsLayout]的高度*/
         const val LAYOUT_FLAG_OFFSET = 0x00000004
 
-        const val NO_INIT = -0xfffff
+        const val NO_INIT = -0xffffff
     }
 
     /**多个flag可以组合*/
@@ -43,7 +43,10 @@ open class ContentBehavior(context: Context? = null, attributeSet: AttributeSet?
     var contentLayoutExcludeHeight = -1
 
     //当前Top偏移量
-    protected var offsetTop = NO_INIT
+    var _offsetTop = NO_INIT
+
+    //是否发生过内嵌滚动, 保持 child 的 top 属性
+    var _isNestedScroll = false
 
     init {
         showLog = false
@@ -159,14 +162,17 @@ open class ContentBehavior(context: Context? = null, attributeSet: AttributeSet?
             }
 
             if (handle) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                    if (child.isLaidOut) {
-                        //已经布局过
-                        top = offsetTop
-                    }
-                } else {
-                    if (offsetTop != NO_INIT) {
-                        top = offsetTop
+                if (_isNestedScroll) {
+                    //所有通过[Offset]的操作, 都需要在[onLayout]的时候, 恢复之前的值. 恢复top值
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                        if (child.isLaidOut) {
+                            //已经布局过
+                            top = _offsetTop
+                        }
+                    } else {
+                        if (_offsetTop != NO_INIT) {
+                            top = _offsetTop
+                        }
                     }
                 }
                 child.layout(
@@ -175,7 +181,7 @@ open class ContentBehavior(context: Context? = null, attributeSet: AttributeSet?
                     left + child.measuredWidth,
                     top + child.measuredHeight
                 )
-                offsetTop = child.top
+                _offsetTop = child.top
             }
             handle
         } else {
@@ -280,6 +286,9 @@ open class ContentBehavior(context: Context? = null, attributeSet: AttributeSet?
         }
 
         if (contentLayoutState.have(LAYOUT_FLAG_OFFSET)) {
+
+            _isNestedScroll = _isNestedScroll || dy != 0
+
             val offsetTopMin = getOffsetTopMin(coordinatorLayout, child)
             val offsetTopMax = getOffsetTopMax(coordinatorLayout, child)
 
@@ -292,7 +301,7 @@ open class ContentBehavior(context: Context? = null, attributeSet: AttributeSet?
                         offsetTopMin,
                         offsetTopMax
                     )
-                    offsetTop = child.top
+                    _offsetTop = child.top
                 }
             } else if (dy > 0) {
                 //手指往上滑动
@@ -301,7 +310,7 @@ open class ContentBehavior(context: Context? = null, attributeSet: AttributeSet?
                     offsetTopMin,
                     offsetTopMax
                 )
-                offsetTop = child.top
+                _offsetTop = child.top
             }
         }
     }

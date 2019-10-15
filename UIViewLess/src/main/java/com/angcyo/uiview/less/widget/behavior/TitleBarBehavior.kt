@@ -100,9 +100,13 @@ open class TitleBarBehavior(context: Context? = null, attributeSet: AttributeSet
     ): Boolean {
         super.onLayoutChild(parent, child, layoutDirection)
         titleBarHeight = child.measuredHeight
+        return false
+    }
+
+    override fun onLayoutChildAfter(parent: CoordinatorLayout, child: View, layoutDirection: Int) {
+        super.onLayoutChildAfter(parent, child, layoutDirection)
         onTitleBarBehaviorCallback.onChildLayout(this, child)
         dispatchGradient(child)
-        return false
     }
 
     override fun onStartNestedScroll(

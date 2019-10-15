@@ -8,6 +8,7 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import com.angcyo.uiview.less.R
 import com.angcyo.uiview.less.base.helper.ViewGroupHelper
 import com.angcyo.uiview.less.kotlin.*
+import com.angcyo.uiview.less.widget.behavior.ContentBehavior.Companion.NO_INIT
 
 /**
  *
@@ -18,6 +19,8 @@ import com.angcyo.uiview.less.kotlin.*
  */
 open class TitleBarCollapseBehavior(context: Context? = null, attributeSet: AttributeSet? = null) :
     TitleBarBehavior(context, attributeSet) {
+
+    var titleBarCollapseCallback: TitleBarCollapseCallback = TitleBarCollapseCallback()
 
     init {
         onTitleBarBehaviorCallback = OnTitleBarCollapseBehaviorCallback()
@@ -43,6 +46,31 @@ open class TitleBarCollapseBehavior(context: Context? = null, attributeSet: Attr
         }
     }
 
+    var _lastOffsetTop = NO_INIT
+
+    override fun onLayoutChild(
+        parent: CoordinatorLayout,
+        child: View,
+        layoutDirection: Int
+    ): Boolean {
+
+        _lastOffsetTop =
+            child.find<View>(titleBarCollapseCallback.collapseBackgroundWrapViewId)?.top ?: NO_INIT
+
+        return super.onLayoutChild(parent, child, layoutDirection)
+    }
+
+    override fun onLayoutChildAfter(parent: CoordinatorLayout, child: View, layoutDirection: Int) {
+        super.onLayoutChildAfter(parent, child, layoutDirection)
+        //背景布局偏移恢复操作
+        if (_lastOffsetTop != NO_INIT) {
+            titleBarCollapseCallback.let {
+                child.find<View>(titleBarCollapseCallback.collapseBackgroundWrapViewId)
+                    ?.offsetTopTo(_lastOffsetTop)
+            }
+        }
+    }
+
     override fun onDependentViewChanged(
         parent: CoordinatorLayout,
         child: View,
@@ -50,34 +78,34 @@ open class TitleBarCollapseBehavior(context: Context? = null, attributeSet: Attr
     ): Boolean {
         super.onDependentViewChanged(parent, child, dependency)
 
-        val titleBarMaxHeight =
-            (onTitleBarBehaviorCallback as OnTitleBarCollapseBehaviorCallback).run {
-                titleBarCollapseCallback.getTitleBarMaxHeight(child)
-            }
+        (onTitleBarBehaviorCallback as OnTitleBarCollapseBehaviorCallback).also { onTitleBarCollapseBehaviorCallback ->
 
-        val maxScroll =
-            (onTitleBarBehaviorCallback as OnTitleBarCollapseBehaviorCallback).run {
-                titleBarCollapseCallback.getTitleBarMaxHeight(child) - titleBarCollapseCallback.getTitleBarMinHeight(
-                    child
-                )
-            }
+            if (onTitleBarCollapseBehaviorCallback.isInit()) {
+                //初始化过, 有 有效的Rect数据
+                val titleBarMaxHeight =
+                    (onTitleBarBehaviorCallback as OnTitleBarCollapseBehaviorCallback).run {
+                        titleBarCollapseCallback.getTitleBarMaxHeight(child)
+                    }
 
-        dispatchGradient(child, titleBarMaxHeight - dependency.top, maxScroll)
+                val maxScroll =
+                    (onTitleBarBehaviorCallback as OnTitleBarCollapseBehaviorCallback).run {
+                        titleBarCollapseCallback.getTitleBarMaxHeight(child) - titleBarCollapseCallback.getTitleBarMinHeight(
+                            child
+                        )
+                    }
+
+                dispatchGradient(child, titleBarMaxHeight - dependency.top, maxScroll)
+            } else {
+                //未初始化, 回归开始的位置
+                dispatchGradient(child, 0, 1)
+            }
+        }
 
         return false
     }
 }
 
 open class OnTitleBarCollapseBehaviorCallback : OnTitleBarBehaviorCallback() {
-
-    /**需要移动到的目标view*/
-    var targetViewId: Int = R.id.base_title_view
-
-    /**需要移动的view*/
-    var collapseViewId: Int = R.id.base_collapse_title_view
-
-    /**背景view*/
-    var collapseBackgroundViewId: Int = R.id.base_collapse_title_bar_background_layout
 
     var startRect: Rect? = null
     var endRect: Rect? = null
@@ -88,8 +116,6 @@ open class OnTitleBarCollapseBehaviorCallback : OnTitleBarBehaviorCallback() {
     /**left 改变时, 额外追加的增量*/
     var leftIncrement = 0f * dp
 
-    var titleBarCollapseCallback: TitleBarCollapseCallback = TitleBarCollapseCallback()
-
     init {
         alwaysShowTitle = false
         titleBackgroundGradient = false
@@ -97,24 +123,44 @@ open class OnTitleBarCollapseBehaviorCallback : OnTitleBarBehaviorCallback() {
         titleShowThreshold = 1f
     }
 
+    fun isInit(): Boolean {
+        return startRect?.isEmpty == false && endRect?.isEmpty == false
+    }
+
     override fun onChildLayout(behavior: TitleBarBehavior, child: View) {
         super.onChildLayout(behavior, child)
 
-        if (startRect == null || endRect == null) {
-            //延迟获取[View]在[child]中的[Rect]位置
-            child.post {
-                if (startRect == null) {
-                    startRect = child.find<View>(collapseViewId)?.run {
-                        getLocationInParent(child)
-                    }
-                }
-                if (endRect == null) {
-                    endRect = child.find<View>(targetViewId)?.run {
-                        getLocationInParent(child)
-                    }
+        val titleBarCollapseCallback =
+            (behavior as TitleBarCollapseBehavior).titleBarCollapseCallback
+
+        //获取[View]在[child]中的[Rect]位置
+        val startRectTemp = child.find<View>(titleBarCollapseCallback.collapseViewId)
+            ?.getLocationInParent(child)?.run {
+                if (this.isEmpty) {
+                    null
+                } else {
+                    this
                 }
             }
+
+        val endRectTemp = child.find<View>(titleBarCollapseCallback.targetViewId)
+            ?.getLocationInParent(child)?.run {
+                if (this.isEmpty) {
+                    null
+                } else {
+                    this
+                }
+            }
+
+        if (!isInit()) {
+            startRect = startRectTemp
+        } else {
+            if (endRect?.width() != endRectTemp?.width()) {
+                startRect = startRectTemp
+            }
         }
+
+        endRect = endRectTemp
     }
 
     override fun onTitleBarGradientValue(
@@ -127,7 +173,7 @@ open class OnTitleBarCollapseBehaviorCallback : OnTitleBarBehaviorCallback() {
     }
 
     override fun titleBarBackgroundView(child: View): View? {
-        return child.find(collapseBackgroundViewId)
+        return null
     }
 
     override fun onTitleBarGradient(
@@ -137,25 +183,29 @@ open class OnTitleBarCollapseBehaviorCallback : OnTitleBarBehaviorCallback() {
         maxScrollY: Int,
         ratio: Float
     ) {
+
         super.onTitleBarGradient(behavior, child, currentScrollY, maxScrollY, ratio)
+
+        val titleBarCollapseCallback =
+            (behavior as TitleBarCollapseBehavior).titleBarCollapseCallback
 
         if (ratio >= titleShowThreshold) {
             ViewGroupHelper.build(child)
-                .selector(targetViewId)
+                .selector(titleBarCollapseCallback.targetViewId)
                 .setAlpha(1f)
-                .selector(collapseViewId)
+                .selector(titleBarCollapseCallback.collapseViewId)
                 .setAlpha(0f)
         } else {
             ViewGroupHelper.build(child)
-                .selector(targetViewId)
+                .selector(titleBarCollapseCallback.targetViewId)
                 .setAlpha(0f)
-                .selector(collapseViewId)
+                .selector(titleBarCollapseCallback.collapseViewId)
                 .setAlpha(1f)
         }
 
-        //背景颜色的偏移
+        //背景布局偏移操作
         titleBarCollapseCallback.let {
-            titleBarBackgroundView(child)?.offsetTopTo(
+            child.find<View>(titleBarCollapseCallback.collapseBackgroundWrapViewId)?.offsetTopTo(
                 (0..-(it.getTitleBarMaxHeight(child) - it.getTitleBarMinHeight(child)))
                     .evaluate(ratio).toInt()
             )
@@ -165,7 +215,7 @@ open class OnTitleBarCollapseBehaviorCallback : OnTitleBarBehaviorCallback() {
             val startRect = startRect!!
             val endRect = endRect!!
 
-            child.find<View>(collapseViewId)?.apply {
+            child.find<View>(titleBarCollapseCallback.collapseViewId)?.apply {
                 val left = (startRect.left..endRect.left).evaluate(ratio) + leftIncrement
                 val top = (startRect.top..endRect.top).evaluate(ratio) + topIncrement
 
@@ -188,11 +238,35 @@ open class OnTitleBarCollapseBehaviorCallback : OnTitleBarBehaviorCallback() {
 
 /**标题栏高度提供回调*/
 open class TitleBarCollapseCallback {
+
+    /**需要移动到的目标view*/
+    var targetViewId: Int = R.id.base_title_view
+
+    /**需要移动的view*/
+    var collapseViewId: Int = R.id.base_collapse_title_view
+
+    /**背景颜色view*/
+    var collapseBackgroundViewId: Int = R.id.base_collapse_title_bar_background_layout
+
+    /**背景需要偏移的view*/
+    var collapseBackgroundWrapViewId: Int = R.id.base_collapse_title_bar_background_wrap_layout
+
+    /**真实标题栏布局id*/
+    var titleBarContentLayoutId: Int = R.id.base_title_bar_content_layout
+
     open fun getTitleBarMaxHeight(titleBarLayout: View): Int {
         return titleBarLayout.measuredHeight
     }
 
     open fun getTitleBarMinHeight(titleBarLayout: View): Int {
-        return titleBarLayout.v<View>(R.id.base_title_bar_content_layout)?.measuredHeight ?: 0
+        return titleBarLayout.v<View>(titleBarContentLayoutId)?.measuredHeight ?: 0
+    }
+
+    open fun isTitleBarHeightValid(titleBarLayout: View): Boolean {
+        return titleBarLayout.v<View>(targetViewId)?.run {
+            measuredWidth > 0 && measuredHeight > 0
+        } == true && titleBarLayout.v<View>(collapseViewId)?.run {
+            measuredWidth > 0 && measuredHeight > 0
+        } == true
     }
 }

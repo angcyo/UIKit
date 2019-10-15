@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import com.angcyo.uiview.less.widget.behavior.BaseDependsBehavior
 
 /**
  *
@@ -32,6 +33,12 @@ open class RCoordinatorLayout : CoordinatorLayout {
 
     protected open fun initLayout(context: Context, attrs: AttributeSet?) {
 
+    }
+
+    override fun onLayoutChild(child: View, layoutDirection: Int) {
+        super.onLayoutChild(child, layoutDirection)
+        val lp = child.layoutParams as LayoutParams
+        (lp.behavior as? BaseDependsBehavior)?.onLayoutChildAfter(this, child, layoutDirection)
     }
 
     override fun onStartNestedScroll(child: View, target: View, axes: Int, type: Int): Boolean {

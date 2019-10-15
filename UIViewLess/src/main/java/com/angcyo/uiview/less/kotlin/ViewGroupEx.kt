@@ -2,13 +2,13 @@ package com.angcyo.uiview.less.kotlin
 
 import android.app.Activity
 import android.graphics.Rect
-import androidx.annotation.LayoutRes
 import android.view.*
 import android.view.animation.Animation
 import android.view.animation.AnticipateInterpolator
 import android.view.animation.OvershootInterpolator
 import android.widget.EditText
 import android.widget.TextView
+import androidx.annotation.LayoutRes
 import com.angcyo.uiview.less.R
 import com.angcyo.uiview.less.resources.AnimUtil
 import com.angcyo.uiview.less.widget.group.RSoftInputLayout
@@ -66,7 +66,10 @@ public fun View.getLayoutOffsetTopWidthSoftInput(): Int {
 
 
 /**获取touch坐标对应的RecyclerView, 如果没有则null*/
-public fun ViewGroup.getTouchOnRecyclerView(touchRawX: Float, touchRawY: Float): androidx.recyclerview.widget.RecyclerView? {
+public fun ViewGroup.getTouchOnRecyclerView(
+    touchRawX: Float,
+    touchRawY: Float
+): androidx.recyclerview.widget.RecyclerView? {
     return findRecyclerView(touchRawX, touchRawY)
 }
 
@@ -82,7 +85,14 @@ public fun ViewGroup.findView(
     intercept: (View, Rect) -> Boolean = { _, _ -> false },
     jumpTarget: (View, Rect) -> Boolean = { _, _ -> false }
 ): View? {
-    return findView(this, event.rawX, event.rawY, getLayoutOffsetTopWidthSoftInput(), intercept, jumpTarget)
+    return findView(
+        this,
+        event.rawX,
+        event.rawY,
+        getLayoutOffsetTopWidthSoftInput(),
+        intercept,
+        jumpTarget
+    )
 }
 
 public fun ViewGroup.findView(
@@ -91,7 +101,14 @@ public fun ViewGroup.findView(
     intercept: (View, Rect) -> Boolean = { _, _ -> false },
     jumpTarget: (View, Rect) -> Boolean = { _, _ -> false }
 ): View? {
-    return findView(this, touchRawX, touchRawY, getLayoutOffsetTopWidthSoftInput(), intercept, jumpTarget)
+    return findView(
+        this,
+        touchRawX,
+        touchRawY,
+        getLayoutOffsetTopWidthSoftInput(),
+        intercept,
+        jumpTarget
+    )
 }
 
 public fun ViewGroup.findView(
@@ -145,7 +162,8 @@ public fun ViewGroup.findView(
         }
 
         if (childAt is ViewGroup && childAt.childCount > 0) {
-            val resultView = childAt.findView(targetView, touchRawX, touchRawY, offsetTop, intercept, jumpTarget)
+            val resultView =
+                childAt.findView(targetView, touchRawX, touchRawY, offsetTop, intercept, jumpTarget)
             if (resultView != null && resultView != targetView) {
                 if (jumpTarget.invoke(resultView, rect)) {
 
@@ -245,11 +263,19 @@ public fun <T> ViewGroup.resetChild(
     })
 }
 
-public fun <T> ViewGroup.resetChild(size: Int, datas: List<T>? = null, onAddViewCallback: OnAddViewCallback<T>) {
+public fun <T> ViewGroup.resetChild(
+    size: Int,
+    datas: List<T>? = null,
+    onAddViewCallback: OnAddViewCallback<T>
+) {
     addView(size, datas, onAddViewCallback)
 }
 
-public fun <T> ViewGroup.addView(size: Int, datas: List<T>? = null, onAddViewCallback: OnAddViewCallback<T>) {
+public fun <T> ViewGroup.addView(
+    size: Int,
+    datas: List<T>? = null,
+    onAddViewCallback: OnAddViewCallback<T>
+) {
     val layoutId = onAddViewCallback.getLayoutId()
 
     //如果布局id不一样, 说明child不一样, 需要remove
@@ -277,7 +303,11 @@ public fun <T> ViewGroup.addView(size: Int, datas: List<T>? = null, onAddViewCal
     }
 
     for (i in 0 until size) {
-        onAddViewCallback.onInitView(getChildAt(i), if (datas != null && i < datas.size) datas[i] else null, i)
+        onAddViewCallback.onInitView(
+            getChildAt(i),
+            if (datas != null && i < datas.size) datas[i] else null,
+            i
+        )
     }
 }
 
@@ -343,7 +373,10 @@ public fun ViewGroup.show(@LayoutRes layoutId: Int, animType: IViewAnimationType
     return show(layoutId, enterAnimation, otherExitAnimation)
 }
 
-public fun ViewGroup.show(@LayoutRes layoutId: Int, enterAnimation: Animation?, otherExitAnimation: Animation?): View {
+public fun ViewGroup.show(
+    @LayoutRes layoutId: Int, enterAnimation: Animation?,
+    otherExitAnimation: Animation?
+): View {
     val viewWithTag = findViewWithTag<View>(layoutId)
     if (viewWithTag == null) {
 
@@ -425,7 +458,10 @@ public fun ViewGroup.hide(@LayoutRes layoutId: Int, animType: IViewAnimationType
     return hide(layoutId, exitAnimation, otherEnterAnimation)
 }
 
-public fun ViewGroup.hide(@LayoutRes layoutId: Int, exitAnimation: Animation?, otherEnterAnimation: Animation?): View? {
+public fun ViewGroup.hide(
+    @LayoutRes layoutId: Int, exitAnimation: Animation?,
+    otherEnterAnimation: Animation?
+): View? {
     val viewWithTag = findViewWithTag<View>(layoutId)
     if (viewWithTag == null || viewWithTag.parent == null) {
     } else {
@@ -510,6 +546,9 @@ abstract class OnAddViewCallback<T> {
 }
 
 public fun ViewGroup.inflate(@LayoutRes layoutId: Int, attachToRoot: Boolean = true): View {
+    if (layoutId == -1) {
+        return this
+    }
     return LayoutInflater.from(context).inflate(layoutId, this, attachToRoot)
 }
 

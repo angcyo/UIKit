@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <TextView
+        android:id="@+id/base_collapse_title_view"
+        style="@style/BaseMainTextStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/base_padding_left"
+        android:layout_marginTop="80dp"
+        android:layout_marginBottom="@dimen/base_padding_left"
+        android:textColor="@color/base_white"
+        tools:text="这里显示标题这里显示标题这里显示标题这里显示标题这里显示标题这里显示标题这里显示标题这里显示标题这里显示标题这里显示标题这里显示标题这里显示标题" />
+</merge>

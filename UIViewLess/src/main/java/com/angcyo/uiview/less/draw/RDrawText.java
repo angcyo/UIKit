@@ -53,15 +53,15 @@ public class RDrawText extends BaseDraw {
      */
     protected float lineSpacingExtra;
 
+    public RDrawText(View view, AttributeSet attr) {
+        super(view, attr);
+        initAttribute(attr);
+    }
+
     public static boolean haveInt(int src, int i) {
         int maskSrc = src & 0xff;
         int maskI = i & 0xff;
         return (maskSrc & maskI) == maskI;
-    }
-
-    public RDrawText(View view, AttributeSet attr) {
-        super(view, attr);
-        initAttribute(attr);
     }
 
     /**
@@ -99,11 +99,11 @@ public class RDrawText extends BaseDraw {
         return new int[]{};
     }
 
-    @Override
-    public int[] measureDraw(int widthMeasureSpec, int heightMeasureSpec) {
+    private void makeLayout(int widthSize) {
+        if (drawText == null) {
+            drawText = "";
+        }
         mBasePaint.setTextSize(textSize);
-        int widthSize = View.MeasureSpec.getSize(widthMeasureSpec);
-
         /**
          * CharSequence source : 需要分行的字符串
          * int bufstart : 需要分行的字符串从第几的位置开始
@@ -121,7 +121,14 @@ public class RDrawText extends BaseDraw {
                 drawText, mBasePaint, widthSize - getPaddingHorizontal(),
                 Layout.Alignment.ALIGN_NORMAL,
                 1.0f, lineSpacingExtra, false);
+    }
 
+    @Override
+    public int[] measureDraw(int widthMeasureSpec, int heightMeasureSpec) {
+        if (textLayout == null) {
+            int widthSize = View.MeasureSpec.getSize(widthMeasureSpec);
+            makeLayout(widthSize);
+        }
         return super.measureDraw(widthMeasureSpec, heightMeasureSpec);
     }
 
@@ -143,6 +150,16 @@ public class RDrawText extends BaseDraw {
 
     public float getTextSize() {
         return textSize;
+    }
+
+    public void setTextSize(float textSize) {
+        if (this.textSize == textSize) {
+            return;
+        }
+        this.textSize = textSize;
+        this.drawTextSize = textSize;
+        textLayout = null;
+        requestLayout();
     }
 
     protected boolean isCenter() {
@@ -189,13 +206,8 @@ public class RDrawText extends BaseDraw {
         canvas.restore();
     }
 
-    public void setTextSize(float textSize) {
-        if (this.textSize == textSize) {
-            return;
-        }
-        this.textSize = textSize;
-        this.drawTextSize = textSize;
-        requestLayout();
+    public float getDrawTextSize() {
+        return drawTextSize;
     }
 
     public void setDrawTextSize(float drawTextSize) {
@@ -204,10 +216,6 @@ public class RDrawText extends BaseDraw {
         }
         this.drawTextSize = drawTextSize;
         invalidate();
-    }
-
-    public float getDrawTextSize() {
-        return drawTextSize;
     }
 
     public void setTextColor(int textColor) {
@@ -224,6 +232,7 @@ public class RDrawText extends BaseDraw {
             return;
         }
         this.drawText = drawText;
+        textLayout = null;
         requestLayout();
     }
 

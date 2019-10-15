@@ -114,6 +114,18 @@ abstract class BaseDependsBehavior<T : View>(
         w("this....dxConsumedAll:$dxConsumedAll dyConsumedAll:$dyConsumedAll")
     }
 
+    override fun onLayoutChild(parent: CoordinatorLayout, child: T, layoutDirection: Int): Boolean {
+        return super.onLayoutChild(parent, child, layoutDirection)
+    }
+
+    /**
+     * 某一个 [child] 布局结束之后的回调, 可以用来恢复[offset]的值
+     * [com.wayto.ui.widget.group.RCoordinatorLayout.onLayoutChild]
+     * */
+    open fun onLayoutChildAfter(parent: CoordinatorLayout, child: T, layoutDirection: Int) {
+
+    }
+
     //<editor-fold desc="辅助方法">
 
     protected fun View.clp(): CoordinatorLayout.LayoutParams =

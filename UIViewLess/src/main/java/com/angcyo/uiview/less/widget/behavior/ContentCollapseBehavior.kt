@@ -28,13 +28,12 @@ open class ContentCollapseBehavior(context: Context? = null, attributeSet: Attri
         child: View,
         dependency: View
     ): Boolean {
+        //获取需要依赖的目标, 拿到目标的一些数据
         dependency.layoutParams.coordinatorParams {
             if (behavior is TitleBarCollapseBehavior) {
-                (behavior as TitleBarCollapseBehavior).onTitleBarBehaviorCallback.let {
-                    dependsLayout = dependency
-                    titleBarCollapseCallback =
-                        (it as OnTitleBarCollapseBehaviorCallback).titleBarCollapseCallback
-                }
+                dependsLayout = dependency
+                titleBarCollapseCallback =
+                    (behavior as TitleBarCollapseBehavior).titleBarCollapseCallback
             }
         }
         return super.layoutDependsOn(parent, child, dependency)
