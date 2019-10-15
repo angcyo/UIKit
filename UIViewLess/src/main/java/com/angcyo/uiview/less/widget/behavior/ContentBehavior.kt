@@ -200,12 +200,16 @@ open class ContentBehavior(context: Context? = null, attributeSet: AttributeSet?
     }
 
     open fun getFlagExcludeTop(default: Int = 0): Int {
-        return when {
-            contentLayoutState.have(LAYOUT_FLAG_EXCLUDE) -> 0
-            contentLayoutExcludeHeight > 0 -> contentLayoutExcludeHeight
-            else -> dependsLayout?.run {
-                measuredHeight + clp().topMargin + clp().bottomMargin
-            } ?: default
+        return if (contentLayoutState.have(LAYOUT_FLAG_EXCLUDE)) {
+            if (contentLayoutExcludeHeight > 0) {
+                contentLayoutExcludeHeight
+            } else {
+                dependsLayout?.run {
+                    measuredHeight + clp().topMargin + clp().bottomMargin
+                } ?: default
+            }
+        } else {
+            0
         }
     }
 
