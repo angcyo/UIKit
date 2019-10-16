@@ -1,19 +1,29 @@
 package com.angcyo.uiview.less;
 
-import android.app.*;
+import android.app.Activity;
+import android.app.ActivityManager;
+import android.app.AlarmManager;
+import android.app.Dialog;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
-import android.os.*;
+import android.os.Build;
+import android.os.Bundle;
+import android.os.Environment;
 import android.os.Process;
-import androidx.annotation.NonNull;
+import android.os.StatFs;
 import android.text.format.Formatter;
 import android.util.Log;
 import android.view.View;
+
+import androidx.annotation.NonNull;
+
 import com.angcyo.lib.L;
+import com.angcyo.uiview.less.base.helper.FragmentHelper;
 import com.angcyo.uiview.less.recycler.RBaseViewHolder;
 import com.angcyo.uiview.less.utils.RDialog;
 import com.angcyo.uiview.less.utils.RUtils;
@@ -22,7 +32,15 @@ import com.angcyo.uiview.less.utils.utilcode.utils.ClipboardUtils;
 import com.angcyo.uiview.less.utils.utilcode.utils.FileUtils;
 import com.orhanobut.hawk.Hawk;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.Serializable;
+import java.io.StringWriter;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -675,7 +693,7 @@ public class RCrashHandler implements Thread.UncaughtExceptionHandler {
         PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(file)));
         // 导出发生异常的时间
         pw.println(dataTime);
-        //pw.println(UILayoutImpl.LAYOUT_INFO);
+        pw.println(FragmentHelper.LAST_FRAGMENT_LOG);
         pw.println(Root.device_info(RApplication.getApp()));
         pw.println();
         // 导出手机信息

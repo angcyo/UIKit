@@ -237,14 +237,12 @@ public class FragmentHelper {
             }
         }
 
-        if (L.LOG_DEBUG) {
-            fragmentTransaction.runOnCommit(new Runnable() {
-                @Override
-                public void run() {
-                    logFragments(fragmentManager);
-                }
-            });
-        }
+        fragmentTransaction.runOnCommit(new Runnable() {
+            @Override
+            public void run() {
+                logFragments(fragmentManager, L.LOG_DEBUG);
+            }
+        });
 
         fragmentTransaction.commitNow();
 
@@ -255,7 +253,9 @@ public class FragmentHelper {
         return new Builder(fragmentManager);
     }
 
-    public static String logFragments(FragmentManager fragmentManager) {
+    public static String LAST_FRAGMENT_LOG;
+
+    public static String logFragments(FragmentManager fragmentManager, boolean log) {
         if (fragmentManager == null) {
             return "";
         }
@@ -286,8 +286,11 @@ public class FragmentHelper {
         }
 
         String string = builder.toString();
+        LAST_FRAGMENT_LOG = string;
         RLogFile.logFile("ui.log", string);
-        L.w(TAG, string);
+        if (log) {
+            L.w(TAG, string);
+        }
         return string;
     }
 
@@ -1485,18 +1488,16 @@ public class FragmentHelper {
         }
 
         private void logInner(FragmentTransaction transaction, boolean needCommit) {
-            if (BuildConfig.DEBUG) {
-                Runnable runnable = new Runnable() {
-                    @Override
-                    public void run() {
-                        logFragments(fragmentManager);
-                    }
-                };
-                if (needCommit) {
-                    transaction.runOnCommit(runnable);
-                } else {
-                    runnable.run();
+            Runnable runnable = new Runnable() {
+                @Override
+                public void run() {
+                    logFragments(fragmentManager, BuildConfig.DEBUG);
                 }
+            };
+            if (needCommit) {
+                transaction.runOnCommit(runnable);
+            } else {
+                runnable.run();
             }
         }
 
