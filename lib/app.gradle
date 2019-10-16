@@ -207,3 +207,5 @@ dependencies {
     //_devCompile 'com.github.markzhai:blockcanary-android:1.5.0'
     //preCompile 'com.github.markzhai:blockcanary-android:1.5.0'
 }
+
+apply from: allGradle.version
