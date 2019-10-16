@@ -67,6 +67,13 @@ public fun DslAdapter.dslItem(@LayoutRes layoutId: Int, config: DslAdapterItem.(
     item.config()
 }
 
+public fun <T : DslAdapterItem> DslAdapter.dslItem(
+    dslItem: T,
+    config: T.() -> Unit = {}
+) {
+    dslCustomItem(dslItem, config)
+}
+
 public fun <T : DslAdapterItem> DslAdapter.dslCustomItem(
     dslItem: T,
     config: T.() -> Unit = {}
@@ -89,6 +96,11 @@ public fun DslAdapter.dslTextInfoItem(config: DslTextInfoItem.() -> Unit = {}) {
 public fun DslAdapter.dslSwitchInfoItem(config: DslSwitchInfoItem.() -> Unit = {}) {
     dslCustomItem(DslSwitchInfoItem(), config)
 }
+
+///**语音播放展示item*/
+//public fun DslAdapter.dslRecordVoiceItem(config: DslRecordVoiceItem.() -> Unit = {}) {
+//    dslCustomItem(DslRecordVoiceItem(), config)
+//}
 
 public fun DslAdapter.dslDeviceInfoItem(
     fragment: BaseFragment,
