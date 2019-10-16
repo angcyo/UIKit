@@ -67,7 +67,7 @@ public class RBaseViewHolder extends RecyclerView.ViewHolder {
 
     public RBaseViewHolder(View itemView, int viewType, int initialCapacity) {
         super(itemView);
-        sparseArray = new SparseArray(initialCapacity);
+        sparseArray = new SparseArray<>(initialCapacity);
         this.viewType = viewType;
     }
 
