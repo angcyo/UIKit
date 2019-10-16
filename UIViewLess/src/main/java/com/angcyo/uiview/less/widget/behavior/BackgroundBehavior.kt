@@ -13,6 +13,7 @@ import com.angcyo.uiview.less.widget.OnContentViewTranslationListener
 import com.angcyo.uiview.less.widget.RSmartRefreshLayout
 import com.angcyo.uiview.less.widget.behavior.ContentBehavior.Companion.NO_INIT
 import kotlin.math.max
+import kotlin.math.min
 
 /**
  * 背景布局行为控制
@@ -333,20 +334,7 @@ open class OnBackgroundBehaviorCallback {
         dyAll: Int
     ) {
         if (enableTranslation && dy != 0) {
-            //限制一下允许偏移的top值, 和偏移时机
-            val offset = if (-dy > 0) {
-                //手指往下滚动
-                if (child.top - dy >= 0) {
-                    -child.top
-                } else {
-                    -dy
-                }
-            } else {
-                -dy
-            }
-
-            child.offsetTop(offset)
-            //L.e("offsetTop2...$offset")
+            child.offsetTop(-dy, -min(child.measuredHeight, dyAll), 0)
         }
     }
 }
