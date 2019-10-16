@@ -3,10 +3,10 @@ package com.angcyo.uiview.less.recycler
 
 import android.app.Activity
 import android.graphics.*
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import android.view.*
 import android.widget.FrameLayout
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.angcyo.uiview.less.kotlin.dp
 import com.angcyo.uiview.less.kotlin.getViewRect
 import com.angcyo.uiview.less.kotlin.nowTime
@@ -20,8 +20,8 @@ import com.angcyo.uiview.less.recycler.adapter.DslAdapter
  * Copyright (c) 2019 ShenZhen O&M Cloud Co., Ltd. All rights reserved.
  */
 
-open class HoverItemDecoration : androidx.recyclerview.widget.RecyclerView.ItemDecoration() {
-    internal var recyclerView: androidx.recyclerview.widget.RecyclerView? = null
+open class HoverItemDecoration : RecyclerView.ItemDecoration() {
+    internal var recyclerView: RecyclerView? = null
     internal var hoverCallback: HoverCallback? = null
     internal var isDownInHoverItem = false
 
@@ -51,8 +51,11 @@ open class HoverItemDecoration : androidx.recyclerview.widget.RecyclerView.ItemD
         Paint(Paint.ANTI_ALIAS_FLAG)
     }
 
-    private val itemTouchListener = object : androidx.recyclerview.widget.RecyclerView.SimpleOnItemTouchListener() {
-        override fun onInterceptTouchEvent(recyclerView: androidx.recyclerview.widget.RecyclerView, event: MotionEvent): Boolean {
+    private val itemTouchListener = object : RecyclerView.SimpleOnItemTouchListener() {
+        override fun onInterceptTouchEvent(
+            recyclerView: RecyclerView,
+            event: MotionEvent
+        ): Boolean {
             val action = event.actionMasked
             if (action == MotionEvent.ACTION_DOWN) {
                 isDownInHoverItem = overDecorationRect.contains(event.x.toInt(), event.y.toInt())
@@ -68,7 +71,7 @@ open class HoverItemDecoration : androidx.recyclerview.widget.RecyclerView.ItemD
             return isDownInHoverItem
         }
 
-        override fun onTouchEvent(recyclerView: androidx.recyclerview.widget.RecyclerView, event: MotionEvent) {
+        override fun onTouchEvent(recyclerView: RecyclerView, event: MotionEvent) {
             //L.w("onTouchEvent:$event")
 
             if (isDownInHoverItem) {
@@ -111,10 +114,10 @@ open class HoverItemDecoration : androidx.recyclerview.widget.RecyclerView.ItemD
         }
     }
 
-    private val scrollListener = object : androidx.recyclerview.widget.RecyclerView.OnScrollListener() {
-        override fun onScrollStateChanged(recyclerView: androidx.recyclerview.widget.RecyclerView, newState: Int) {
+    private val scrollListener = object : RecyclerView.OnScrollListener() {
+        override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
             super.onScrollStateChanged(recyclerView, newState)
-            if (newState == androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_IDLE) {
+            if (newState == RecyclerView.SCROLL_STATE_IDLE) {
                 //滚动状态结束
                 removeAllHoverView()
             }
@@ -124,7 +127,7 @@ open class HoverItemDecoration : androidx.recyclerview.widget.RecyclerView.ItemD
     /**
      * 调用此方法, 安装悬浮分割线
      * */
-    fun attachToRecyclerView(recyclerView: androidx.recyclerview.widget.RecyclerView?, init: HoverCallback.() -> Unit = {}) {
+    fun attachToRecyclerView(recyclerView: RecyclerView?, init: HoverCallback.() -> Unit = {}) {
         hoverCallback = HoverCallback()
         hoverCallback?.init()
 
@@ -190,7 +193,16 @@ open class HoverItemDecoration : androidx.recyclerview.widget.RecyclerView.ItemD
      * */
     private fun removeHoverView() {
         overViewHolder?.itemView?.apply {
-            dispatchTouchEvent(MotionEvent.obtain(nowTime(), nowTime(), MotionEvent.ACTION_CANCEL, 0f, 0f, 0))
+            dispatchTouchEvent(
+                MotionEvent.obtain(
+                    nowTime(),
+                    nowTime(),
+                    MotionEvent.ACTION_CANCEL,
+                    0f,
+                    0f,
+                    0
+                )
+            )
             //(parent as? ViewGroup)?.removeView(this)
 
             removeViews.add(this)
@@ -204,7 +216,10 @@ open class HoverItemDecoration : androidx.recyclerview.widget.RecyclerView.ItemD
         if (view.parent == null) {
             windowContent?.addView(
                 view, 0,
-                FrameLayout.LayoutParams(overDecorationRect.width(), overDecorationRect.height()).apply {
+                FrameLayout.LayoutParams(
+                    overDecorationRect.width(),
+                    overDecorationRect.height()
+                ).apply {
                     val viewRect = recyclerView?.getViewRect()
 
                     leftMargin = overDecorationRect.left + (viewRect?.left ?: 0)
@@ -214,7 +229,7 @@ open class HoverItemDecoration : androidx.recyclerview.widget.RecyclerView.ItemD
         }
     }
 
-    override fun onDrawOver(canvas: Canvas, parent: androidx.recyclerview.widget.RecyclerView, state: androidx.recyclerview.widget.RecyclerView.State) {
+    override fun onDrawOver(canvas: Canvas, parent: RecyclerView, state: RecyclerView.State) {
         if (state.isPreLayout || state.willRunSimpleAnimations()) {
             return
         }
@@ -236,7 +251,7 @@ open class HoverItemDecoration : androidx.recyclerview.widget.RecyclerView.ItemD
         }
     }
 
-    private fun childViewHolder(parent: androidx.recyclerview.widget.RecyclerView, childIndex: Int): androidx.recyclerview.widget.RecyclerView.ViewHolder? {
+    private fun childViewHolder(parent: RecyclerView, childIndex: Int): RecyclerView.ViewHolder? {
         if (parent.childCount > childIndex) {
             return parent.findContainingViewHolder(parent.getChildAt(childIndex))
         }
@@ -244,37 +259,39 @@ open class HoverItemDecoration : androidx.recyclerview.widget.RecyclerView.ItemD
     }
 
     /**当前悬浮的分割线, 如果有.*/
-    internal var overViewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder? = null
+    internal var overViewHolder: RecyclerView.ViewHolder? = null
 
     /**当前悬浮分割线的坐标.*/
     val overDecorationRect = Rect()
     /**下一个悬浮分割线的坐标.*/
     internal val nextDecorationRect = Rect()
     /**分割线的所在位置*/
-    var overAdapterPosition = androidx.recyclerview.widget.RecyclerView.NO_POSITION
+    var overAdapterPosition = RecyclerView.NO_POSITION
 
     private var tempRect = Rect()
     /**
      * 核心方法, 用来实时监测界面上 需要浮动的 分割线.
      * */
-    internal fun checkOverDecoration(parent: androidx.recyclerview.widget.RecyclerView) {
+    internal fun checkOverDecoration(parent: RecyclerView) {
         childViewHolder(parent, 0)?.let { viewHolder ->
             val firstChildAdapterPosition = viewHolder.adapterPosition
 
-            if (firstChildAdapterPosition != androidx.recyclerview.widget.RecyclerView.NO_POSITION) {
+            if (firstChildAdapterPosition != RecyclerView.NO_POSITION) {
 
                 parent.adapter?.let { adapter ->
                     hoverCallback?.let { callback ->
 
-                        var firstChildHaveOver = callback.haveOverDecoration.invoke(adapter, firstChildAdapterPosition)
+                        var firstChildHaveOver =
+                            callback.haveOverDecoration.invoke(adapter, firstChildAdapterPosition)
 
                         //第一个child, 需要分割线的 position 的位置
                         var firstChildHaveOverPosition = firstChildAdapterPosition
 
                         if (!firstChildHaveOver) {
                             //第一个child没有分割线, 查找之前最近有分割线的position
-                            val findOverPrePosition = findOverPrePosition(adapter, firstChildAdapterPosition)
-                            if (findOverPrePosition != androidx.recyclerview.widget.RecyclerView.NO_POSITION) {
+                            val findOverPrePosition =
+                                findOverPrePosition(adapter, firstChildAdapterPosition)
+                            if (findOverPrePosition != RecyclerView.NO_POSITION) {
                                 //找到了最近的分割线
                                 firstChildHaveOver = true
 
@@ -284,9 +301,10 @@ open class HoverItemDecoration : androidx.recyclerview.widget.RecyclerView.ItemD
 
                         if (firstChildHaveOver) {
 
-                            val overStartPosition = findOverStartPosition(adapter, firstChildHaveOverPosition)
+                            val overStartPosition =
+                                findOverStartPosition(adapter, firstChildHaveOverPosition)
 
-                            if (overStartPosition == androidx.recyclerview.widget.RecyclerView.NO_POSITION) {
+                            if (overStartPosition == RecyclerView.NO_POSITION) {
                                 clearOverDecoration()
                                 return
                             } else {
@@ -302,13 +320,22 @@ open class HoverItemDecoration : androidx.recyclerview.widget.RecyclerView.ItemD
                                 )
 
                             val overView = firstViewHolder.itemView
-                            tempRect.set(overView.left, overView.top, overView.right, overView.bottom)
+                            tempRect.set(
+                                overView.left,
+                                overView.top,
+                                overView.right,
+                                overView.bottom
+                            )
 
-                            val nextViewHolder = findNextDecoration(parent, adapter, tempRect.height())
+                            val nextViewHolder =
+                                findNextDecoration(parent, adapter, tempRect.height())
                             if (nextViewHolder != null) {
                                 //紧挨着的下一个child也有分割线, 监测是否需要上推
 
-                                if (callback.haveOverDecoration.invoke(adapter, nextViewHolder.adapterPosition) &&
+                                if (callback.haveOverDecoration.invoke(
+                                        adapter,
+                                        nextViewHolder.adapterPosition
+                                    ) &&
                                     !callback.isOverDecorationSame.invoke(
                                         adapter,
                                         firstChildAdapterPosition,
@@ -352,27 +379,36 @@ open class HoverItemDecoration : androidx.recyclerview.widget.RecyclerView.ItemD
 
     /**查找下一个满足条件的分割线Holder*/
     fun findNextDecoration(
-        parent: androidx.recyclerview.widget.RecyclerView,
-        adapter: androidx.recyclerview.widget.RecyclerView.Adapter<*>,
+        parent: RecyclerView,
+        adapter: RecyclerView.Adapter<*>,
         decorationHeight: Int,
         offsetIndex: Int = 1
-    ): androidx.recyclerview.widget.RecyclerView.ViewHolder? {
-        var result: androidx.recyclerview.widget.RecyclerView.ViewHolder? = null
+    ): RecyclerView.ViewHolder? {
+        var result: RecyclerView.ViewHolder? = null
         if (hoverCallback != null) {
             val callback: HoverCallback = hoverCallback!!
             val childIndex = findNextChildIndex(offsetIndex)
-            if (childIndex != androidx.recyclerview.widget.RecyclerView.NO_POSITION) {
+            if (childIndex != RecyclerView.NO_POSITION) {
                 val childViewHolder = childViewHolder(parent, childIndex)
                 if (childViewHolder != null) {
 
-                    if (callback.haveOverDecoration.invoke(adapter, childViewHolder.adapterPosition)) {
+                    if (callback.haveOverDecoration.invoke(
+                            adapter,
+                            childViewHolder.adapterPosition
+                        )
+                    ) {
                         //如果下一个item 具有分割线
                         result = childViewHolder
                     } else {
                         //不具有分割线
                         if (childViewHolder.itemView.bottom < decorationHeight) {
                             //item的高度, 没有分割线那么高, 继续往下查找
-                            result = findNextDecoration(parent, adapter, decorationHeight, offsetIndex + 1)
+                            result = findNextDecoration(
+                                parent,
+                                adapter,
+                                decorationHeight,
+                                offsetIndex + 1
+                            )
                         } else {
 
                         }
@@ -396,11 +432,11 @@ open class HoverItemDecoration : androidx.recyclerview.widget.RecyclerView.ItemD
     fun findGridNextChildIndex(offsetIndex: Int): Int {
         var result = offsetIndex
         recyclerView?.layoutManager?.apply {
-            if (this is androidx.recyclerview.widget.GridLayoutManager) {
+            if (this is GridLayoutManager) {
 
                 for (i in offsetIndex until recyclerView!!.childCount) {
                     childViewHolder(recyclerView!!, i)?.let {
-                        if (it.adapterPosition != androidx.recyclerview.widget.RecyclerView.NO_POSITION) {
+                        if (it.adapterPosition != RecyclerView.NO_POSITION) {
                             if (spanSizeLookup?.getSpanSize(it.adapterPosition) == this.spanCount) {
                                 result = i
 
@@ -419,12 +455,12 @@ open class HoverItemDecoration : androidx.recyclerview.widget.RecyclerView.ItemD
         nextDecorationRect.clear()
         removeHoverView()
         overViewHolder = null
-        overAdapterPosition = androidx.recyclerview.widget.RecyclerView.NO_POSITION
+        overAdapterPosition = RecyclerView.NO_POSITION
     }
 
     /**更新分割线*/
     fun refreshItemDecoration() {
-        overAdapterPosition = androidx.recyclerview.widget.RecyclerView.NO_POSITION
+        overAdapterPosition = RecyclerView.NO_POSITION
         recyclerView?.postInvalidate()
     }
 
@@ -432,7 +468,7 @@ open class HoverItemDecoration : androidx.recyclerview.widget.RecyclerView.ItemD
      * 查找指定位置类型相同的分割线, 最开始的adapterPosition
      * */
     internal fun findOverStartPosition(
-        adapter: androidx.recyclerview.widget.RecyclerView.Adapter<androidx.recyclerview.widget.RecyclerView.ViewHolder>,
+        adapter: RecyclerView.Adapter<RecyclerView.ViewHolder>,
         adapterPosition: Int
     ): Int {
         var result = adapterPosition
@@ -451,7 +487,7 @@ open class HoverItemDecoration : androidx.recyclerview.widget.RecyclerView.ItemD
         if (result == 0) {
             hoverCallback?.let {
                 if (!it.haveOverDecoration.invoke(adapter, result)) {
-                    result = androidx.recyclerview.widget.RecyclerView.NO_POSITION
+                    result = RecyclerView.NO_POSITION
                 }
             }
         }
@@ -462,8 +498,8 @@ open class HoverItemDecoration : androidx.recyclerview.widget.RecyclerView.ItemD
     /**
      * 查找指定位置 没有分割线时, 最前出现分割线的adapterPosition
      * */
-    internal fun findOverPrePosition(adapter: androidx.recyclerview.widget.RecyclerView.Adapter<*>, adapterPosition: Int): Int {
-        var result = androidx.recyclerview.widget.RecyclerView.NO_POSITION
+    internal fun findOverPrePosition(adapter: RecyclerView.Adapter<*>, adapterPosition: Int): Int {
+        var result = RecyclerView.NO_POSITION
         for (i in adapterPosition - 1 downTo 0) {
             if (hoverCallback!!.haveOverDecoration.invoke(adapter, i)) {
                 result = i
@@ -484,7 +520,7 @@ open class HoverItemDecoration : androidx.recyclerview.widget.RecyclerView.ItemD
         /**
          * 当前的 位置 是否有 悬浮分割线
          * */
-        var haveOverDecoration: (adapter: androidx.recyclerview.widget.RecyclerView.Adapter<*>, adapterPosition: Int) -> Boolean =
+        var haveOverDecoration: (adapter: RecyclerView.Adapter<*>, adapterPosition: Int) -> Boolean =
             { adapter, adapterPosition ->
                 if (adapter is DslAdapter) {
                     adapter.getItemData(adapterPosition)?.itemIsHover ?: false
@@ -498,7 +534,7 @@ open class HoverItemDecoration : androidx.recyclerview.widget.RecyclerView.ItemD
          *
          * @see RecyclerView.Adapter.getItemViewType
          * */
-        var decorationOverLayoutType: (adapter: androidx.recyclerview.widget.RecyclerView.Adapter<*>, adapterPosition: Int) -> Int =
+        var decorationOverLayoutType: (adapter: RecyclerView.Adapter<*>, adapterPosition: Int) -> Int =
             { adapter, adapterPosition ->
                 if (adapter is DslAdapter) {
                     adapter.getItemViewType(adapterPosition)
@@ -511,7 +547,7 @@ open class HoverItemDecoration : androidx.recyclerview.widget.RecyclerView.ItemD
          * 判断2个分割线是否相同, 不同的分割线, 才会悬停, 相同的分割线只会绘制一条.
          * */
         var isOverDecorationSame: (
-            adapter: androidx.recyclerview.widget.RecyclerView.Adapter<androidx.recyclerview.widget.RecyclerView.ViewHolder>,
+            adapter: RecyclerView.Adapter<RecyclerView.ViewHolder>,
             nowAdapterPosition: Int, nextAdapterPosition: Int
         ) -> Boolean =
             { _, _, _ ->
@@ -522,10 +558,10 @@ open class HoverItemDecoration : androidx.recyclerview.widget.RecyclerView.ItemD
          * 创建 分割线 视图
          * */
         var createDecorationOverView: (
-            recyclerView: androidx.recyclerview.widget.RecyclerView,
-            adapter: androidx.recyclerview.widget.RecyclerView.Adapter<androidx.recyclerview.widget.RecyclerView.ViewHolder>,
+            recyclerView: RecyclerView,
+            adapter: RecyclerView.Adapter<RecyclerView.ViewHolder>,
             overAdapterPosition: Int
-        ) -> androidx.recyclerview.widget.RecyclerView.ViewHolder = { recyclerView, adapter, overAdapterPosition ->
+        ) -> RecyclerView.ViewHolder = { recyclerView, adapter, overAdapterPosition ->
 
             //拿到分割线对应的itemType
             val layoutType = decorationOverLayoutType.invoke(adapter, overAdapterPosition)
@@ -544,15 +580,16 @@ open class HoverItemDecoration : androidx.recyclerview.widget.RecyclerView.ItemD
 
         /**自定义layout的分割线, 不使用 adapter中的xml*/
         val customDecorationOverView: (
-            recyclerView: androidx.recyclerview.widget.RecyclerView,
-            adapter: androidx.recyclerview.widget.RecyclerView.Adapter<androidx.recyclerview.widget.RecyclerView.ViewHolder>,
+            recyclerView: RecyclerView,
+            adapter: RecyclerView.Adapter<RecyclerView.ViewHolder>,
             overAdapterPosition: Int
-        ) -> androidx.recyclerview.widget.RecyclerView.ViewHolder = { recyclerView, adapter, overAdapterPosition ->
+        ) -> RecyclerView.ViewHolder = { recyclerView, adapter, overAdapterPosition ->
 
             //拿到分割线对应的itemType
             val layoutType = decorationOverLayoutType.invoke(adapter, overAdapterPosition)
 
-            val itemView = LayoutInflater.from(recyclerView.context).inflate(layoutType, recyclerView, false)
+            val itemView =
+                LayoutInflater.from(recyclerView.context).inflate(layoutType, recyclerView, false)
 
             val holder = RBaseViewHolder(itemView)
 
@@ -568,48 +605,49 @@ open class HoverItemDecoration : androidx.recyclerview.widget.RecyclerView.ItemD
         /**
          * 测量 View, 确定宽高和绘制坐标
          * */
-        var measureHoverView: (parent: androidx.recyclerview.widget.RecyclerView, hoverView: View) -> Unit = { parent, hoverView ->
-            hoverView.apply {
-                val params = layoutParams
+        var measureHoverView: (parent: RecyclerView, hoverView: View) -> Unit =
+            { parent, hoverView ->
+                hoverView.apply {
+                    val params = layoutParams
 
-                val widthSize: Int
-                val widthMode: Int
-                when (params.width) {
-                    -1 -> {
-                        widthSize = parent.measuredWidth
-                        widthMode = View.MeasureSpec.EXACTLY
+                    val widthSize: Int
+                    val widthMode: Int
+                    when (params.width) {
+                        -1 -> {
+                            widthSize = parent.measuredWidth
+                            widthMode = View.MeasureSpec.EXACTLY
+                        }
+                        else -> {
+                            widthSize = parent.measuredWidth
+                            widthMode = View.MeasureSpec.AT_MOST
+                        }
                     }
-                    else -> {
-                        widthSize = parent.measuredWidth
-                        widthMode = View.MeasureSpec.AT_MOST
+
+                    val heightSize: Int
+                    val heightMode: Int
+                    when (params.height) {
+                        -1 -> {
+                            heightSize = parent.measuredWidth
+                            heightMode = View.MeasureSpec.EXACTLY
+                        }
+                        else -> {
+                            heightSize = parent.measuredWidth
+                            heightMode = View.MeasureSpec.AT_MOST
+                        }
                     }
+
+                    //标准方法1
+                    measure(
+                        View.MeasureSpec.makeMeasureSpec(widthSize, widthMode),
+                        View.MeasureSpec.makeMeasureSpec(heightSize, heightMode)
+                    )
+                    //标准方法2
+                    layout(0, 0, measuredWidth, measuredHeight)
+
+                    //标准方法3
+                    //draw(canvas)
                 }
-
-                val heightSize: Int
-                val heightMode: Int
-                when (params.height) {
-                    -1 -> {
-                        heightSize = parent.measuredWidth
-                        heightMode = View.MeasureSpec.EXACTLY
-                    }
-                    else -> {
-                        heightSize = parent.measuredWidth
-                        heightMode = View.MeasureSpec.AT_MOST
-                    }
-                }
-
-                //标准方法1
-                measure(
-                    View.MeasureSpec.makeMeasureSpec(widthSize, widthMode),
-                    View.MeasureSpec.makeMeasureSpec(heightSize, heightMode)
-                )
-                //标准方法2
-                layout(0, 0, measuredWidth, measuredHeight)
-
-                //标准方法3
-                //draw(canvas)
             }
-        }
 
         /**
          * 绘制分割线, 请不要使用 foreground 属性.
@@ -617,7 +655,7 @@ open class HoverItemDecoration : androidx.recyclerview.widget.RecyclerView.ItemD
         var drawOverDecoration: (
             canvas: Canvas,
             paint: Paint,
-            viewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder,
+            viewHolder: RecyclerView.ViewHolder,
             overRect: Rect
         ) -> Unit =
             { canvas, paint, viewHolder, overRect ->
@@ -643,7 +681,7 @@ open class HoverItemDecoration : androidx.recyclerview.widget.RecyclerView.ItemD
         var drawOverShadowDecoration: (
             canvas: Canvas,
             paint: Paint,
-            viewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder,
+            viewHolder: RecyclerView.ViewHolder,
             overRect: Rect
         ) -> Unit =
             { canvas, paint, viewHolder, overRect ->

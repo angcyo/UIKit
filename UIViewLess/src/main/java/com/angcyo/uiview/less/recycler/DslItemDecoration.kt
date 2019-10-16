@@ -54,7 +54,7 @@ open class DslItemDecoration(
                         item.setItemOffsets(it)
                     }
 
-                    if (state.isPreLayout) {
+                    if (state.isPreLayout || state.willRunSimpleAnimations()) {
                     } else {
                         canvas?.let {
                             if (!isOverDraw) {
