@@ -148,7 +148,7 @@ open class TitleBarBehavior(context: Context? = null, attributeSet: AttributeSet
             dyUnconsumed,
             type
         )
-        contentScrollY = dyConsumedAll
+        contentScrollY = dyConsumedAllSum + currentDyConsumedAll
         dispatchGradient(child)
     }
 

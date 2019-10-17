@@ -119,6 +119,16 @@ open class DslAdapterItem {
      * 当前分组是否 展开
      * */
     var itemGroupExtend = true
+        set(value) {
+            field = value
+            updateItemDepend()
+        }
+
+    var itemHidden = false
+        set(value) {
+            field = value
+            updateItemDepend()
+        }
 
     //</editor-fold>
 
@@ -386,24 +396,50 @@ open class DslAdapterItem {
     //</editor-fold desc="表单 分割线配置">
 
     //<editor-fold desc="Diff 相关">
-    open var thisAreItemsTheSame: (newItem: DslAdapterItem) -> Boolean = { this == it }
-    open var thisAreContentsTheSame: (newItem: DslAdapterItem) -> Boolean = { false }
+
+    /**
+     * 决定
+     * [android.support.v7.widget.RecyclerView.Adapter.notifyItemInserted]
+     * [android.support.v7.widget.RecyclerView.Adapter.notifyItemRemoved]
+     * 的执行
+     * */
+    open var thisAreItemsTheSame: (newItem: DslAdapterItem) -> Boolean =
+        {
+            //this.javaClass.name == it.javaClass.name && this.itemLayoutId == it.itemLayoutId
+            this == it
+        }
+
+    /**
+     * [android.support.v7.widget.RecyclerView.Adapter.notifyItemChanged]
+     * */
+    open var thisAreContentsTheSame: (newItem: DslAdapterItem) -> Boolean = { this == it }
 
     /**
      * [checkItem] 是否需要关联到处理列表
      * [itemIndex] 分组折叠之后数据列表中的index
      *
-     * 返回 true 时, [checkItem] 会受到 [formChildHandleModel] 的影响, 进行 [show] or [hide] 操作
+     * 返回 true 时, [checkItem]  进行 [hide] 操作
      * */
     open var isFormItemInHandleList: (checkItem: DslAdapterItem, itemIndex: Int) -> Boolean =
         { _, _ -> false }
 
     /**
      * [itemIndex] 最终过滤之后数据列表中的index
-     * 返回 true 时, [checkItem] 会收到 来自 [this] 的 [onFormUpdateFrom] 出发的回调
+     * 返回 true 时, [checkItem] 会收到 来自 [this] 的 [onItemUpdateFromInner] 触发的回调
      * */
     open var isFormItemInUpdateList: (checkItem: DslAdapterItem, itemIndex: Int) -> Boolean =
         { _, _ -> false }
+
+    open fun updateItemDepend(notifyUpdate: Boolean = false) {
+        //itemDslAdapter?.updateItemDepend(if (notifyUpdate) this else null)
+    }
+
+    var onItemUpdateFrom: (fromItem: DslAdapterItem) -> Unit = {}
+
+    open fun onItemUpdateFromInner(fromItem: DslAdapterItem) {
+        onItemUpdateFrom(fromItem)
+    }
+
     //</editor-fold desc="Diff 相关">
 
     //<editor-fold desc="单选, 多选相关">

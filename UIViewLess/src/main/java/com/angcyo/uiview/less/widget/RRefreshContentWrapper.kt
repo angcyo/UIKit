@@ -56,6 +56,12 @@ class RRefreshContentWrapper(view: View) : RefreshContentWrapper(view) {
 }
 
 abstract class OnContentViewTranslationListener {
+
+    /**
+     * 纯滚动模式下, 内容偏移距离的回调
+     * @param contentView 被移动的布局
+     * @param translationY 被移动的目标位置. (非差值)
+     * */
     open fun onTranslation(contentView: View, translationY: Float) {
 
     }

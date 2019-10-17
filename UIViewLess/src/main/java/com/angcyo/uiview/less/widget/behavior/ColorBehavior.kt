@@ -125,9 +125,10 @@ class ColorBehavior(
             type
         )
 
-        if (dyConsumedAll >= 0) {
+        val scrollY = dyConsumedAllSum + currentDyConsumedAll
+        if (scrollY >= 0) {
             val topFraction = dependsOffsetRect.top.abs() * 1f / child.measuredHeight
-            val scrollFraction = dyConsumedAll * 1f / child.measuredHeight
+            val scrollFraction = scrollY * 1f / child.measuredHeight
             changeChildView(child, scrollFraction.minValue(topFraction))
         }
     }
@@ -137,7 +138,11 @@ class ColorBehavior(
         child.setBackgroundColor(getEvaluatorColor(fraction, colorFrom, colorTo))
     }
 
-    protected fun getEvaluatorColor(fraction: Float /*[0-1]*/, startValue: Int, endValue: Int): Int {
+    protected fun getEvaluatorColor(
+        fraction: Float /*[0-1]*/,
+        startValue: Int,
+        endValue: Int
+    ): Int {
         return argbEvaluator.evaluate(MathUtils.clamp(fraction, 0f, 1f), startValue, endValue)!!
     }
 }

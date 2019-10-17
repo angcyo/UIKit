@@ -40,8 +40,13 @@ abstract class BaseDependsBehavior<T : View>(
         Rect()
     }
 
-    protected var dyConsumedAll = 0
-    protected var dxConsumedAll = 0
+    /**当前内嵌滚动周期内, 滚动的距离. (非总距离)*/
+    var currentDyConsumedAll = 0
+    var currentDxConsumedAll = 0
+
+    /**当前内嵌滚动的总距离, (不包含正在滚动周期内的距离)*/
+    var dyConsumedAllSum = 0
+    var dxConsumedAllSum = 0
 
     init {
 
@@ -88,6 +93,30 @@ abstract class BaseDependsBehavior<T : View>(
         return super.onDependentViewChanged(parent, child, dependency)
     }
 
+    override fun onNestedScrollAccepted(
+        coordinatorLayout: CoordinatorLayout,
+        child: T,
+        directTargetChild: View,
+        target: View,
+        axes: Int,
+        type: Int
+    ) {
+        super.onNestedScrollAccepted(
+            coordinatorLayout,
+            child,
+            directTargetChild,
+            target,
+            axes,
+            type
+        )
+
+        dxConsumedAllSum += currentDxConsumedAll
+        dyConsumedAllSum += currentDyConsumedAll
+
+        currentDxConsumedAll = 0
+        currentDyConsumedAll = 0
+    }
+
     override fun onNestedScroll(
         coordinatorLayout: CoordinatorLayout,
         child: T,
@@ -108,10 +137,10 @@ abstract class BaseDependsBehavior<T : View>(
             dyUnconsumed,
             type
         )
-        dxConsumedAll += dxConsumed
-        dyConsumedAll += dyConsumed
+        currentDxConsumedAll += dxConsumed
+        currentDyConsumedAll += dyConsumed
 
-        w("this....dxConsumedAll:$dxConsumedAll dyConsumedAll:$dyConsumedAll")
+        w("this....currentDxConsumedAll:$currentDxConsumedAll currentDyConsumedAll:$currentDyConsumedAll")
     }
 
     override fun onLayoutChild(parent: CoordinatorLayout, child: T, layoutDirection: Int): Boolean {

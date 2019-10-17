@@ -1167,6 +1167,10 @@ public fun View.offsetTopTo(newTop: Int) {
     offsetTop(newTop - top)
 }
 
+public fun View.offsetTopTo(newTop: Int, minTop: Int, maxTop: Int) {
+    offsetTop(newTop - top, minTop, maxTop)
+}
+
 public fun View.offsetLeft(offset: Int) {
     ViewCompat.offsetLeftAndRight(this, offset)
 }
@@ -1330,4 +1334,28 @@ public fun View.getLocationInParent(parent: View? = null): Rect {
     }
 
     return result
+}
+
+public fun View.findRecyclerView(): RecyclerView? {
+    return findView {
+        it is RecyclerView
+    } as? RecyclerView
+}
+
+public fun View.findView(isIt: (View) -> Boolean): View? {
+    return when {
+        isIt(this) -> this
+        this is ViewGroup -> {
+            var result: View? = null
+            for (i in 0 until childCount) {
+                val childAt = getChildAt(i)
+                result = childAt.findView(isIt)
+                if (result != null) {
+                    break
+                }
+            }
+            result
+        }
+        else -> null
+    }
 }

@@ -1,19 +1,16 @@
 package com.angcyo.uiview.less.widget.behavior
 
 import android.content.Context
-import android.os.Build
 import android.util.AttributeSet
 import android.view.View
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.ViewCompat
-import androidx.recyclerview.widget.RecyclerView
 import com.angcyo.uiview.less.R
 import com.angcyo.uiview.less.kotlin.*
+import com.angcyo.uiview.less.utils.UI
 import com.angcyo.uiview.less.widget.OnContentViewTranslationListener
 import com.angcyo.uiview.less.widget.RSmartRefreshLayout
-import com.angcyo.uiview.less.widget.behavior.ContentBehavior.Companion.NO_INIT
 import kotlin.math.max
-import kotlin.math.min
 
 /**
  * 背景布局行为控制
@@ -32,36 +29,33 @@ open class BackgroundBehavior(context: Context? = null, attributeSet: AttributeS
             childViewDefaultHeight = value
         }
 
+    /**背景效果处理回调*/
     var onBackgroundBehaviorCallback: OnBackgroundBehaviorCallback = OnBackgroundBehaviorCallback()
 
-    protected val contentViewTranslationListener = object : OnContentViewTranslationListener() {
+    internal var _lastContentTranslationY: Float = 0f
+    private val contentViewTranslationListener = object : OnContentViewTranslationListener() {
         override fun onTranslation(contentView: View, translationY: Float) {
-            if (childView == null) {
+            if (_childView == null) {
                 return
             }
+            _contentView = contentView
+            if (translationY > 0) {
+                //内容往下偏移
+                _notifyScrollTopTo(_childView!!, translationY.toInt())
+            } else {
+                /*min(_lastChildTop, translationY.toInt())*/
+                _notifyScrollTopTo(_childView!!, _lastScrollTop + translationY.toInt())
+            }
 
-            //恢复默认的child高度
-//            if (translationY == 0f && childViewDefaultHeight > 0) {
-//                childViewDefaultHeight = max(childView!!.measuredHeight, childHeight)
-//            }
-
-            //放大or缩小child的高度
-            onBackgroundBehaviorCallback.onContentOverScroll(
-                this@BackgroundBehavior,
-                childView!!,
-                (translationY - lastContentTranslationY).toInt(),
-                translationY,
-                contentView.measuredHeight
-            )
-
-            lastContentTranslationY = translationY
+            _lastContentTranslationY = translationY
         }
     }
 
-    protected var childView: View? = null
+    //背景布局
+    var _childView: View? = null
+    //内容布局, 用来判断是否可以滚动
+    var _contentView: View? = null
     internal var childViewDefaultHeight: Int = -1
-    internal var nestedScrollState: Int = RecyclerView.SCROLL_STATE_IDLE
-    internal var lastContentTranslationY: Float = 0f
 
     init {
         showLog = false
@@ -84,51 +78,84 @@ open class BackgroundBehavior(context: Context? = null, attributeSet: AttributeS
     ): Boolean {
         val result = super.layoutDependsOn(parent, child, dependency)
         if (dependency is RSmartRefreshLayout) {
-            childView = child
+            _childView = child
+            _contentView = dependency
             dependency.addContentTranslationListener(contentViewTranslationListener)
         } else {
             dependency.find<RSmartRefreshLayout>(R.id.base_refresh_layout)?.apply {
-                childView = child
+                _childView = child
+                _contentView = dependency
                 addContentTranslationListener(contentViewTranslationListener)
             }
         }
         return result
     }
 
+    var _lastScrollTop = 0
+    override fun onNestedScroll(
+        coordinatorLayout: CoordinatorLayout,
+        child: View,
+        target: View,
+        dxConsumed: Int,
+        dyConsumed: Int,
+        dxUnconsumed: Int,
+        dyUnconsumed: Int,
+        type: Int
+    ) {
+        super.onNestedScroll(
+            coordinatorLayout,
+            child,
+            target,
+            dxConsumed,
+            dyConsumed,
+            dxUnconsumed,
+            dyUnconsumed,
+            type
+        )
+        _lastScrollTop = -(dyConsumedAllSum + currentDyConsumedAll)
+        _notifyScrollTopTo(child, _lastScrollTop + _lastContentTranslationY.toInt())
+    }
+
+    fun _notifyScrollTopTo(child: View, top: Int) {
+        onBackgroundBehaviorCallback.onScrollTopTo(this, child, top)
+    }
+
+    var _lastChildTop = 0
     override fun onLayoutChild(
         parent: CoordinatorLayout,
         child: View,
         layoutDirection: Int
     ): Boolean {
+        _lastChildTop = child.top
+        return super.onLayoutChild(parent, child, layoutDirection)
+    }
+
+    override fun onLayoutChildAfter(parent: CoordinatorLayout, child: View, layoutDirection: Int) {
+        super.onLayoutChildAfter(parent, child, layoutDirection)
         if (childViewDefaultHeight <= 0) {
             childViewDefaultHeight = child.measuredHeight
         }
 
-        var top = NO_INIT
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            if (child.isLaidOut) {
-                //已经布局过
-                top = child.top
-            }
-        } else {
-            if (child.top < 0) {
-                top = child.top
+        _contentView?.apply {
+            val view = findRecyclerView() ?: this
+            if (UI.canChildScrollDown(view) || UI.canChildScrollUp(view)) {
+                //可以滚动
+            } else {
+                //不可用滚动
+                dyConsumedAllSum = 0
+                if (_lastContentTranslationY < 0) {
+                    _lastChildTop = _lastContentTranslationY.toInt()
+                } else {
+                    _lastContentTranslationY = 0f
+                    _lastChildTop = 0
+                }
             }
         }
 
-        return if (top != NO_INIT) {
-            val lp = child.layoutParams.coordinatorParams()!!
-            val left = lp.leftMargin
-            child.layout(
-                left,
-                top,
-                left + child.measuredWidth,
-                top + child.measuredHeight
-            )
-            true
-        } else {
-            super.onLayoutChild(parent, child, layoutDirection)
-        }
+        val lp = child.layoutParams.coordinatorParams()!!
+        val left = lp.leftMargin
+        child.offsetLeftTo(left)
+        child.offsetTopTo(_lastChildTop)
     }
 
     override fun onStartNestedScroll(
@@ -150,76 +177,6 @@ open class BackgroundBehavior(context: Context? = null, attributeSet: AttributeS
         return axes == ViewCompat.SCROLL_AXIS_VERTICAL
     }
 
-    override fun onNestedScroll(
-        coordinatorLayout: CoordinatorLayout,
-        child: View,
-        target: View,
-        dxConsumed: Int,
-        dyConsumed: Int,
-        dxUnconsumed: Int,
-        dyUnconsumed: Int,
-        type: Int
-    ) {
-        super.onNestedScroll(
-            coordinatorLayout,
-            child,
-            target,
-            dxConsumed,
-            dyConsumed,
-            dxUnconsumed,
-            dyUnconsumed,
-            type
-        )
-        nestedScrollState = (target as? RecyclerView)?.scrollState ?: nestedScrollState
-        childView = child
-        onBackgroundBehaviorCallback.onContentScroll(
-            this,
-            child,
-            dxConsumed,
-            dyConsumed,
-            dxConsumedAll,
-            dyConsumedAll
-        )
-    }
-
-    override fun onNestedFling(
-        coordinatorLayout: CoordinatorLayout,
-        child: View,
-        target: View,
-        velocityX: Float,
-        velocityY: Float,
-        consumed: Boolean
-    ): Boolean {
-        return super.onNestedFling(coordinatorLayout, child, target, velocityX, velocityY, consumed)
-    }
-
-    override fun onNestedScrollAccepted(
-        coordinatorLayout: CoordinatorLayout,
-        child: View,
-        directTargetChild: View,
-        target: View,
-        axes: Int,
-        type: Int
-    ) {
-        super.onNestedScrollAccepted(
-            coordinatorLayout,
-            child,
-            directTargetChild,
-            target,
-            axes,
-            type
-        )
-    }
-
-    override fun onStopNestedScroll(
-        coordinatorLayout: CoordinatorLayout,
-        child: View,
-        target: View,
-        type: Int
-    ) {
-        super.onStopNestedScroll(coordinatorLayout, child, target, type)
-    }
-
     override fun onMeasureChild(
         parent: CoordinatorLayout,
         child: View,
@@ -236,11 +193,11 @@ open class BackgroundBehavior(context: Context? = null, attributeSet: AttributeS
             parentHeightMeasureSpec,
             heightUsed
         )
-        if (childHeight >= 0) {
+        return if (childHeight >= 0) {
             parent.onMeasureChild(child, parentWidthMeasureSpec, 0, exactly(childHeight), 0)
-            return true
+            true
         } else {
-            return false
+            false
         }
     }
 }
@@ -259,8 +216,8 @@ open class OnBackgroundBehaviorCallback {
     /**激活内容越界滚动时, 高度跟随变化*/
     var enableOverScroll = true
 
-    /**当内容边界滚动时, 采用[Translation]的方式,移动[child]而非改变高度*/
-    var enableOverScrollTranslation = true
+    /**当内容边界滚动时, 改变高度*/
+    var enableOverScrollHeightChange = true
 
     /**
      * 当内容边界滚动时, 一同时间内改变view的高度和offset, 会出现BUG.
@@ -268,73 +225,23 @@ open class OnBackgroundBehaviorCallback {
      * 而如果异步修改offset, 就会出现更严重的问题.
      * 尽量避免这种情况的存在.
      * */
-    open fun onContentOverScroll(
-        behavior: BackgroundBehavior,
-        child: View,
-        dy: Int,
-        translationY: Float,
-        translationMax: Int
-    ) {
-        if (enableOverScroll) {
-            if (translationY > 0) {
-                if (child.top != 0) {
-                    //修正一下child
-                    child.offsetTopAndBottom(-child.top)
-                }
-            }
-
-            val scrollState = behavior.nestedScrollState
-
-            if (child.bottom <= 0 || child.top >= translationMax) {
-                //超出屏幕外
-            } else {
-
-                var doDefault = true
-
-                if (translationY >= 0) {
-                    //内容向下偏移
-                } else {
-                    //内容向上偏移
-
-                    if (enableOverScrollTranslation) {
-                        doDefault = false
-
-                        val offset = if (child.top + dy >= 0) {
-                            -child.top
-                        } else {
-                            dy
-                        }
-
-                        child.offsetTop(offset)
-                        //L.e("offsetTop...$offset $dy")
-                    }
-                }
-
-                if (doDefault) {
-                    child.setHeight(
-                        (behavior.childViewDefaultHeight + translationY).toInt(),
-                        child.top != 0 && scrollState == RecyclerView.SCROLL_STATE_IDLE
-                    )
-                    val ratio = translationY / translationMax
-                    if (enableOverScale) {
-                        child.scaleX = max(1f, 1 + ratio)
-                    }
-                }
-            }
+    open fun onScrollTopTo(behavior: BackgroundBehavior, child: View, scrollTop: Int) {
+        if (enableTranslation) {
+            child.offsetTopTo(scrollTop, -child.measuredHeight, 0)
         }
-    }
+        if (enableOverScroll) {
 
-    /**当内容滚动时*/
-    open fun onContentScroll(
-        behavior: BackgroundBehavior,
-        child: View,
-        dx: Int,
-        dy: Int,
-        dxAll: Int,
-        dyAll: Int
-    ) {
-        if (enableTranslation && dy != 0) {
-            child.offsetTop(-dy, -min(child.measuredHeight, dyAll), 0)
+            if (enableOverScrollHeightChange) {
+                if (scrollTop > 0) {
+                    //只有往下覆盖滚动,才改变高度
+                    child.setHeight((behavior.childViewDefaultHeight + scrollTop))
+                }
+            }
+
+            val ratio = scrollTop * 1f / child.measuredHeight
+            if (enableOverScale) {
+                child.scaleX = max(1f, 1 + ratio)
+            }
         }
     }
 }
