@@ -48,6 +48,7 @@ import java.util.List;
  */
 public class FragmentHelper {
     public static final String TAG = "FragmentHelper";
+    public static String LAST_FRAGMENT_LOG;
 
     @Deprecated
     public static Fragment showFragment(@NonNull FragmentManager fragmentManager,
@@ -252,8 +253,6 @@ public class FragmentHelper {
     public static Builder build(FragmentManager fragmentManager) {
         return new Builder(fragmentManager);
     }
-
-    public static String LAST_FRAGMENT_LOG;
 
     public static String logFragments(FragmentManager fragmentManager, boolean log) {
         if (fragmentManager == null) {
@@ -653,13 +652,15 @@ public class FragmentHelper {
         return count;
     }
 
+    public static TransitionBuilder transition(Fragment fragment) {
+        return new TransitionBuilder(fragment);
+    }
 
     public static class Builder {
+        public final static String KEY_JSON_DATA = "key_json_data";
         public static int DEFAULT_EXIT_ANIM = R.anim.base_scale_from_exit;
         public static int DEFAULT_ENTER_ANIM = R.anim.base_scale_to_enter;
         public static int DEFAULT_NO_ANIM = R.anim.base_no_alpha;
-        public final static String KEY_JSON_DATA = "key_json_data";
-
         FragmentManager fragmentManager;
         /**
          * 需要隐藏的Fragment
@@ -747,6 +748,7 @@ public class FragmentHelper {
         boolean loadFragmentFromDex = false;
         private List<Fragment> replaceKeepFragmentList = new ArrayList<>();
         private FragmentTransaction fragmentTransaction;
+        private List<Pair<View, String>> sharedElementList;
 
         public Builder(FragmentManager fragmentManager) {
             this.fragmentManager = fragmentManager;
@@ -754,6 +756,24 @@ public class FragmentHelper {
                 //当调用了onSaveInstanceState,则允许状态丢失
                 allowStateLoss(fragmentManager.isStateSaved());
             }
+        }
+
+        public static Bundle createBundle(Object data) {
+            return createBundle(KEY_JSON_DATA, data);
+        }
+
+        public static Bundle createBundle(String key, Object data) {
+            Bundle bundle = new Bundle();
+
+            if (data instanceof String) {
+                bundle.putString(key, (String) data);
+            } else if (data instanceof Number) {
+                bundle.putString(key, String.valueOf(data));
+            } else {
+                bundle.putString(key, ExKt.toJson(data));
+            }
+
+            return bundle;
         }
 
         public Builder loadFragmentFromDex(boolean loadFragmentFromDex) {
@@ -991,24 +1011,6 @@ public class FragmentHelper {
         public Builder setArgs(Bundle args) {
             this.args = args;
             return this;
-        }
-
-        public static Bundle createBundle(Object data) {
-            return createBundle(KEY_JSON_DATA, data);
-        }
-
-        public static Bundle createBundle(String key, Object data) {
-            Bundle bundle = new Bundle();
-
-            if (data instanceof String) {
-                bundle.putString(key, (String) data);
-            } else if (data instanceof Number) {
-                bundle.putString(key, String.valueOf(data));
-            } else {
-                bundle.putString(key, ExKt.toJson(data));
-            }
-
-            return bundle;
         }
 
         public Builder putData(Object data) {
@@ -1527,8 +1529,6 @@ public class FragmentHelper {
             }
         }
 
-        private List<Pair<View, String>> sharedElementList;
-
         /**
          * Fragment转场动画, 不能用add只能用replace
          */
@@ -1543,18 +1543,13 @@ public class FragmentHelper {
         }
     }
 
-    public static TransitionBuilder transition(Fragment fragment) {
-        return new TransitionBuilder(fragment);
-    }
-
     public static class TransitionBuilder {
         Fragment fragment;
+        private List<Pair<View, String>> sharedElementList;
 
         private TransitionBuilder(Fragment fragment) {
             this.fragment = fragment;
         }
-
-        private List<Pair<View, String>> sharedElementList;
 
         /**
          * Fragment 转场动画支持.(不能用add只能用replace)

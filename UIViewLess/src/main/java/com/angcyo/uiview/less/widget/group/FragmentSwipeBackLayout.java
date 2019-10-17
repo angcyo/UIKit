@@ -671,7 +671,7 @@ public class FragmentSwipeBackLayout extends SwipeBackLayout {
      * 打印堆栈信息
      */
     public String logLayoutInfo() {
-        return FragmentHelper.logFragments(fragmentManager);
+        return FragmentHelper.logFragments(fragmentManager, true);
     }
 
     /**
