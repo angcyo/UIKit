@@ -14,9 +14,11 @@ import com.angcyo.uiview.less.utils.RLogFile
 import com.angcyo.uiview.less.utils.RNetwork
 import com.angcyo.uiview.less.utils.Root
 import okhttp3.*
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.internal.cache.DiskLruCache
 import okhttp3.internal.io.FileSystem
 import okio.*
+import okio.ByteString.Companion.encodeUtf8
 import java.io.File
 import java.io.IOException
 
@@ -61,7 +63,7 @@ open class OfflineCacheAdapter(cacheFolder: String = Root.getAppExternalFolder("
             return false
         }
         if (IGNORE_URL_PATTERNS.isNotEmpty()) {
-            if (request.url().toString().pattern(IGNORE_URL_PATTERNS, false)) {
+            if (request.url.toString().pattern(IGNORE_URL_PATTERNS, false)) {
                 return false
             }
         }
@@ -87,9 +89,9 @@ open class OfflineCacheAdapter(cacheFolder: String = Root.getAppExternalFolder("
                 RLogFile.log("http", this)
             })
 
-            val headers = request.headers()
+            val headers = request.headers
 
-            val contentType = request.body()?.contentType()?.toString() ?: "application/json"
+            val contentType = request.body?.contentType()?.toString() ?: "application/json"
             val contentLength = snapshot.getLength(ENTRY_METADATA)
             val cacheRequest = request.newBuilder()
                 .build()
@@ -150,7 +152,7 @@ open class OfflineCacheAdapter(cacheFolder: String = Root.getAppExternalFolder("
             return
         }
 
-        response.body()?.let {
+        response.body?.let {
 
             val key = cacheAdapterListener.key(request)
             saveCache(key, it.source().buffer.clone(), it.contentLength())
@@ -169,7 +171,7 @@ open class OfflineCacheAdapter(cacheFolder: String = Root.getAppExternalFolder("
 
         val buffer = Buffer().writeString(json, Charsets.UTF_8)
 
-        saveCache(key, buffer, buffer.size())
+        saveCache(key, buffer, buffer.size)
     }
 
     fun saveCache(key: String, buffer: Buffer, byteCount: Long): Boolean {
@@ -199,7 +201,7 @@ open class OfflineCacheAdapter(cacheFolder: String = Root.getAppExternalFolder("
     /**只缓存json请求数据*/
     private fun isJsonType(request: Request): Boolean {
         var isJsonType = false
-        request.body()?.contentType()?.let {
+        request.body?.contentType()?.let {
             if (it.toString().contains("application/json")) {
                 isJsonType = true
             }
@@ -244,17 +246,17 @@ class CacheResponseBody internal constructor(
     init {
 
         val source = snapshot.getSource(ENTRY_BODY)
-        bodySource = Okio.buffer(object : ForwardingSource(source) {
+        bodySource = object : ForwardingSource(source) {
             @Throws(IOException::class)
             override fun close() {
                 snapshot.close()
                 super.close()
             }
-        })
+        }.buffer()
     }
 
     override fun contentType(): MediaType? {
-        return if (contentType != null) MediaType.parse(contentType) else null
+        return contentType?.toMediaTypeOrNull()
     }
 
     override fun contentLength(): Long {
@@ -275,8 +277,8 @@ open class OfflineCacheAdapterListener {
 
     /**请求对应的url地址, body参数会在url?后面*/
     open fun keyUrl(request: Request): String {
-        val url = request.url()
-        val params = request.body()?.readString()
+        val url = request.url
+        val params = request.body?.readString()
         return keyUrl("$url", params ?: "")
     }
 
@@ -290,13 +292,13 @@ open class OfflineCacheAdapterListener {
     }
 
     open fun key(request: Request): String {
-        val url = request.url()
-        val params = request.body()?.readString()
+        val url = request.url
+        val params = request.body?.readString()
         return key("$url", "$params")
     }
 
     /**计算url对应的key值*/
     open fun key(url: String, jsonBody: String? = ""): String {
-        return ByteString.encodeUtf8(keyUrl(url, jsonBody)).md5().hex()
+        return keyUrl(url, jsonBody).encodeUtf8().md5().hex()
     }
 }

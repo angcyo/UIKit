@@ -419,8 +419,8 @@ open class RFrameLayout(context: Context, attributeSet: AttributeSet? = null) : 
 
         constructor(width: Int, height: Int) : super(width, height)
         constructor(width: Int, height: Int, gravity: Int) : super(width, height, gravity)
-        constructor(source: ViewGroup.LayoutParams?) : super(source)
-        constructor(source: MarginLayoutParams?) : super(source)
+        constructor(source: ViewGroup.LayoutParams) : super(source)
+        constructor(source: MarginLayoutParams) : super(source)
     }
 
     fun setRBackgroundDrawable(drawable: Drawable?) {

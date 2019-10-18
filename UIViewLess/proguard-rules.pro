@@ -116,3 +116,93 @@
 -keep class com.**.**MonthView {*;}
 -keep class com.**.**WeekView {*;}
 -keep class com.**.**YearView {*;}
+
+
+#androidx
+-dontwarn kotlinx.coroutines.flow.**
+-dontwarn org.reactivestreams.**
+-dontwarn com.angcyo.uiview.less.component.**
+-dontwarn com.angcyo.uiview.less.recycler.dslitem.**
+
+-keep public class com.google.vending.licensing.ILicensingService
+
+-keep public class com.android.vending.licensing.ILicensingService
+
+-keep public class com.google.android.vending.licensing.ILicensingService
+-keepclasseswithmembers,allowshrinking class * {
+    native <methods>;
+}
+-keepclassmembers public class * extends android.view.View {
+    void set*(***);
+    *** get*();
+}
+-keepclassmembers class * extends android.app.Activity {
+    public void *(android.view.View);
+}
+-keepclassmembers enum  * {
+    public static **[] values();
+    public static ** valueOf(java.lang.String);
+}
+-keepclassmembers class * extends android.os.Parcelable {
+    public static final ** CREATOR;
+}
+
+-keepclassmembers class **.R$* {
+    public static <fields>;
+}
+-keepclassmembers class * {
+    @android.webkit.JavascriptInterface
+    <methods>;
+}
+-keep class android.support.annotation.Keep
+
+-keep class androidx.annotation.Keep
+
+-keep @android.support.annotation.Keep class * {
+    <fields>;
+    <methods>;
+}
+
+-keep @androidx.annotation.Keep class * {
+    <fields>;
+    <methods>;
+}
+
+-keepclasseswithmembers class * {
+    @android.support.annotation.Keep
+    <methods>;
+}
+
+-keepclasseswithmembers class * {
+    @androidx.annotation.Keep
+    <methods>;
+}
+
+-keepclasseswithmembers class * {
+    @android.support.annotation.Keep
+    <fields>;
+}
+
+-keepclasseswithmembers class * {
+    @androidx.annotation.Keep
+    <fields>;
+}
+
+-keepclasseswithmembers class * {
+    @android.support.annotation.Keep
+    <init>(...);
+}
+
+-keepclasseswithmembers class * {
+    @androidx.annotation.Keep
+    <init>(...);
+}
+-keep class androidx.core.app.CoreComponentFactory {
+    <init>();
+}
+-keep class androidx.core.content.FileProvider {
+    <init>();
+}
+-keep class androidx.appcompat.widget.AppCompatCheckBox {
+    <init>(...);
+}

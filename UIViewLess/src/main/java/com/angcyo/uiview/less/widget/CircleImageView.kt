@@ -182,7 +182,7 @@ open class CircleImageView(context: Context, attributeSet: AttributeSet? = null)
         bitmapCanvas = null
         if (w > 0 && h > 0) {
             bitmapSource = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
-            bitmapCanvas = Canvas(bitmapSource)
+            bitmapCanvas = Canvas(bitmapSource!!)
         }
     }
 
@@ -267,7 +267,7 @@ open class CircleImageView(context: Context, attributeSet: AttributeSet? = null)
                             it.clipPath(clipPath)//交集显示
                             super.onDraw(it)
                             it.restore()
-                            canvas.drawBitmap(bitmapSource, 0f, 0f, null)
+                            canvas.drawBitmap(bitmapSource!!, 0f, 0f, null)
                         }
                     }
                     SCHEME_MASK_DRAWABLE -> {

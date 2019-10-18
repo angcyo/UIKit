@@ -135,7 +135,7 @@ open class ClipLayout(context: Context, attributeSet: AttributeSet? = null) : Fr
         if (guidMode) {
             guidBitmap?.recycle()
             guidBitmap = Bitmap.createBitmap(measuredWidth, measuredHeight, Bitmap.Config.ARGB_8888)
-            guidCanvas = Canvas(guidBitmap)
+            guidCanvas = Canvas(guidBitmap!!)
         }
     }
 
@@ -156,7 +156,7 @@ open class ClipLayout(context: Context, attributeSet: AttributeSet? = null) : Fr
             guidCanvas?.drawCircle(cx, cy, clipRadius, paint)
             paint.xfermode = null
 
-            canvas.drawBitmap(guidBitmap, 0f, 0f, null)
+            canvas.drawBitmap(guidBitmap!!, 0f, 0f, null)
         } else {
             rBackgroundDrawable?.draw(canvas)
             clipPath.reset()

@@ -87,7 +87,7 @@ class RAlertTip {
 
         return Dialog(RApplication.getApp()).apply {
             dialog = this
-            window.let {
+            window?.let {
                 it.requestFeature(Window.FEATURE_NO_TITLE) //去掉标题部分
                 it.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
                 it.setContentView(contentView)
@@ -97,7 +97,7 @@ class RAlertTip {
                 it.attributes.let {
                     it.x = offsetX
                     it.y = offsetY
-                    window.attributes = it
+                    window!!.attributes = it
                 }
 
                 /**

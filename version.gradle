@@ -49,33 +49,10 @@ project.configurations.all { defaultConfiguration ->
         }
 
         try {
-            if (versionConfig instanceof Map) {
-                //强制修改指定的版本号
-                versionConfig.each { key, value ->
-                    if (key == packageName) {
-                        def originVersion = requested.toString()
-                        //匹配到目标
-                        if (value == '') {
-                            //未设置版本号
-                            println originVersion
-                        } else if (requested.version != value) {
-
-                            def log = _logVersion.any {
-                                it == packageName
-                            }
-                            if (!log) {
-                                //没有输出过log
-                                println "${originVersion}  ->  ${value}"
-                            }
-
-                            _logVersion += packageName
-
-                            details.useVersion value
-                        }
-                    }
-                }
-            }
+            checkVersion(versionConfig, requested, details)
         } catch (Throwable throwable) {
+            //throwable.printStackTrace()
+
             if (throwable instanceof MissingPropertyException) {
                 if (!_logConfigError) {
                     error "未找到强制版本配置信息[ext.versionConfig]."
@@ -83,6 +60,43 @@ project.configurations.all { defaultConfiguration ->
                 _logConfigError = true
             } else {
                 throwable.printStackTrace()
+            }
+        }
+
+        try {
+            checkVersion(libVersionConfig, requested, details)
+        } catch (Throwable ignored) {
+            //ignored.printStackTrace()
+        }
+    }
+}
+
+def checkVersion(config, requested, details) {
+    if (config instanceof Map) {
+        def packageName = "${requested.group}:${requested.name}"
+
+        //强制修改指定的版本号
+        config.each { key, value ->
+            if (key == packageName) {
+                def originVersion = requested.toString()
+                //匹配到目标
+                if (value == '') {
+                    //未设置版本号
+                    println originVersion
+                } else if (requested.version != value) {
+
+                    def log = _logVersion.any {
+                        it == packageName
+                    }
+                    if (!log) {
+                        //没有输出过log
+                        println "${originVersion}  ->  ${value}"
+                    }
+
+                    _logVersion += packageName
+
+                    details.useVersion value
+                }
             }
         }
     }

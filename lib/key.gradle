@@ -123,8 +123,4 @@ android {
     }
 }
 
-if (rootProject.hasProperty("allGradle")) {
-    apply from: allGradle.app
-} else {
-    apply from: '../lib/app.gradle'
-}
+apply from: allGradle.app

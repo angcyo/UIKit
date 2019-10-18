@@ -1,18 +1,12 @@
-if (rootProject.hasProperty("allGradle")) {
-    apply from: allGradle.lib_base
-} else {
-    apply from: '../lib/lib_base.gradle'
-}
-
-def retrofit_version = "2.6.0"
-def _S_VER = hasProperty("S_VER") ? ext.S_VER : '27.1.1'
-def rxandroid_version = "1.2.1"
+apply from: allGradle.lib_base
 
 dependencies {
-    api fileTree(dir: 'libs', include: ['*.jar'])
-    compileOnly 'com.android.support:appcompat-v7:' + _S_VER
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation androidx.appcompat
 
     //https://github.com/square/retrofit
+    //https://jcenter.bintray.com/com/squareup/retrofit2/retrofit/
+    def retrofit_version = "2.6.2"
     api('com.squareup.retrofit2:retrofit:' + retrofit_version) {
         exclude group: 'com.squareup.okhttp3'
     }
@@ -25,12 +19,11 @@ dependencies {
     }
 
     //http://jcenter.bintray.com/com/google/code/gson/gson/
-    api "com.google.code.gson:gson:2.8.5"
+    api "com.google.code.gson:gson:2.8.6"
 
     //https://github.com/square/okhttp/
     //http://jcenter.bintray.com/com/squareup/okhttp3/okhttp/
-    api 'com.squareup.okhttp3:okhttp:3.14.2'
-
+    api 'com.squareup.okhttp3:okhttp:4.2.2'
 
     //https://github.com/ReactiveX/RxJava/
     //api 'io.reactivex:rxjava:1.3.8'
@@ -44,5 +37,12 @@ dependencies {
 //    +--- com.squareup.retrofit2:retrofit:2.4.0 (*)
 //    \--- com.google.code.gson:gson:2.8.2
 
+    def rxandroid_version = "1.2.1"
     api "io.reactivex:rxandroid:${rxandroid_version}"
+
+    //https://github.com/ReactiveX/RxJava
+    //http://jcenter.bintray.com/io/reactivex/rxjava2/rxjava/
+    api "io.reactivex.rxjava2:rxjava:2.2.13"
+    //http://jcenter.bintray.com/io/reactivex/rxjava2/rxandroid/
+    api "io.reactivex.rxjava2:rxandroid:2.1.1"
 }

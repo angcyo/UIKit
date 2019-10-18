@@ -525,6 +525,10 @@ class ScrollHelper {
     )
 }
 
+fun RecyclerView?.findFirstVisibleItemPosition(): Int {
+    return this?.layoutManager.findFirstVisibleItemPosition()
+}
+
 fun RecyclerView.LayoutManager?.findFirstVisibleItemPosition(): Int {
     var result = RecyclerView.NO_POSITION
     this?.also { layoutManager ->
@@ -540,6 +544,10 @@ fun RecyclerView.LayoutManager?.findFirstVisibleItemPosition(): Int {
     return result
 }
 
+fun RecyclerView?.findLastVisibleItemPosition(): Int {
+    return this?.layoutManager.findLastVisibleItemPosition()
+}
+
 fun RecyclerView.LayoutManager?.findLastVisibleItemPosition(): Int {
     var result = RecyclerView.NO_POSITION
     this?.also { layoutManager ->
@@ -553,6 +561,10 @@ fun RecyclerView.LayoutManager?.findLastVisibleItemPosition(): Int {
         result = lastItemPosition
     }
     return result
+}
+
+fun RecyclerView?.isPositionVisible(position: Int): Boolean {
+    return this?.layoutManager.isPositionVisible(position)
 }
 
 fun RecyclerView.LayoutManager?.isPositionVisible(position: Int): Boolean {

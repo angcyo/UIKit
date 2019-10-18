@@ -58,7 +58,7 @@ open class CacheInterceptor : Interceptor {
         if (request.header(HEADER_NO_CACHE)?.isNotEmpty() == true) {
             //跳过缓存
 
-            LogUtil.i(TAG, "跳过缓存:${request.url()}")
+            LogUtil.i(TAG, "跳过缓存:${request.url}")
 
             return false
         }

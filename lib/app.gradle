@@ -3,11 +3,7 @@ apply plugin: 'kotlin-android'
 //apply plugin: 'com.getkeepsafe.dexcount'
 //apply from: 'build_time.gradle'
 
-if (rootProject.hasProperty("allGradle")) {
-    apply from: allGradle.android
-} else {
-    apply from: '../lib/android.gradle'
-}
+apply from: allGradle.android
 
 static def apkTime() {
     return new Date().format("yyyy-MM-dd", TimeZone.getTimeZone("Asia/Shanghai"))
@@ -191,11 +187,7 @@ android {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
 
-    if (rootProject.hasProperty("allModule")) {
-        implementation project(allModule.UIViewLess)
-    } else {
-        implementation project(':UIViewLess')
-    }
+    implementation project(allModule.UIViewLess)
 
     //implementation project(':RLibrary:imagepicker')
     //implementation 'com.android.support.constraint:constraint-layout:1.0.2'

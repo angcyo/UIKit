@@ -1,10 +1,22 @@
 package com.angcyo.http;
 
 import android.os.Build;
-import androidx.annotation.RequiresApi;
-import okio.*;
 
-import java.io.*;
+import androidx.annotation.RequiresApi;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+
+import okio.Buffer;
+import okio.BufferedSink;
+import okio.BufferedSource;
+import okio.ByteString;
+import okio.Okio;
+import okio.Sink;
+import okio.Source;
 
 /**
  * Copyright (C) 2016,深圳市红鸟网络科技股份有限公司 All rights reserved.
@@ -128,12 +140,16 @@ public class RIo {
     }
 
     private static void decodeChunk(String type, Buffer chunk) {
-        if (type.equals("IHDR")) {
-            int width = chunk.readInt();
-            int height = chunk.readInt();
-            System.out.printf("%08x: %s %d x %d%n", chunk.size(), type, width, height);
-        } else {
-            System.out.printf("%08x: %s%n", chunk.size(), type);
+        try {
+            if (type.equals("IHDR")) {
+                int width = chunk.readInt();
+                int height = chunk.readInt();
+                System.out.printf("%08x: %s %d x %d%n", chunk.size(), type, width, height);
+            } else {
+                System.out.printf("%08x: %s%n", chunk.size(), type);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }
