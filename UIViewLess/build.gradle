@@ -51,12 +51,9 @@ dependencies {
         exclude group: 'org.jetbrains.kotlin'
     }
 
-    api androidx.recyclerview
     api androidx.material
-    api androidx.localbroadcastmanager
     api androidx.constraintlayout
     api androidx.exifinterface
-    api androidx.vectordrawable
 
     /*https://github.com/bumptech/glide*/
     //compile 'com.github.bumptech.glide:glide:3.8.0'
