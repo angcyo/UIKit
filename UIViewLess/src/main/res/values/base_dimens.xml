@@ -29,6 +29,15 @@
     <dimen name="default_text_size50">50dp</dimen>
     <dimen name="base_collapse_text_size">22dp</dimen>
 
+    <!--主要标题-->
+    <dimen name="base_main_title_text_size">18dp</dimen>
+    <!--主要内容-->
+    <dimen name="base_main_content_text_size">16dp</dimen>
+    <!--次要内容-->
+    <dimen name="base_sub_content_text_size">14dp</dimen>
+    <!--次要文本, 占位文本-->
+    <dimen name="base_sub_text_size">12dp</dimen>
+
     <!--默认按钮高度-->
     <dimen name="default_button_height">45dp</dimen>
 

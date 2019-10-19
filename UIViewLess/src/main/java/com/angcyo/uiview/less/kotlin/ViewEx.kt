@@ -1308,8 +1308,10 @@ class RestoreOffsetLayoutListener(val view: View, val offsetTop: Int, val offset
 }
 
 /**获取[View]在指定[parent]中的矩形坐标*/
-public fun View.getLocationInParent(parent: View? = null): Rect {
+public fun View.getLocationInParent(parentView: View? = null): Rect {
     val result: Rect
+
+    val parent: View? = parentView ?: (parent as? View)
 
     if (parent == null) {
         result = getViewRect()
