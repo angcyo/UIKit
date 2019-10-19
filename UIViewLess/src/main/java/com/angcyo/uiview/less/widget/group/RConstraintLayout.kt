@@ -4,9 +4,9 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
+import android.util.AttributeSet
 import androidx.annotation.ColorInt
 import androidx.constraintlayout.widget.ConstraintLayout
-import android.util.AttributeSet
 import com.angcyo.uiview.less.R
 import com.angcyo.uiview.less.draw.RDrawLine
 import com.angcyo.uiview.less.kotlin.exactlyMeasure
@@ -32,12 +32,20 @@ class RConstraintLayout : ConstraintLayout {
 
     constructor(context: Context) : this(context, null)
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    ) {
         val typedArray = context.obtainStyledAttributes(attrs, R.styleable.RConstraintLayout)
         mRBackgroundDrawable = typedArray.getDrawable(R.styleable.RConstraintLayout_r_background)
         equWidth = typedArray.getBoolean(R.styleable.RConstraintLayout_r_equ_width, equWidth)
 
         drawLine = RDrawLine(this, attrs)
+
+        mRBackgroundDrawable?.apply {
+            setRBackgroundDrawable(this)
+        }
 
         typedArray.recycle()
     }
@@ -49,7 +57,7 @@ class RConstraintLayout : ConstraintLayout {
 //
 //        typedArray.recycle()
 
-        setWillNotDraw(false)
+//        setWillNotDraw(false)
 
         //L.e("call: init -> ")
     }
@@ -80,6 +88,7 @@ class RConstraintLayout : ConstraintLayout {
 
     fun setRBackgroundDrawable(drawable: Drawable) {
         mRBackgroundDrawable = drawable
+        setWillNotDraw(false)
         postInvalidate()
     }
 

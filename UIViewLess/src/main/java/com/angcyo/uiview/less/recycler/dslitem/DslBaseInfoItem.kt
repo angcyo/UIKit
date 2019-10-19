@@ -80,7 +80,6 @@ open class DslBaseInfoItem : DslAdapterItem() {
                     inflate(itemExtendLayoutId, true)
                     val view = getChildAt(0)
                     view.setTag(R.id.tag, itemExtendLayoutId)
-                    addView(view)
                 }
             }
         } else {
