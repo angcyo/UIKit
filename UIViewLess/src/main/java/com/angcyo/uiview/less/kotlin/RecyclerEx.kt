@@ -3,7 +3,10 @@ package com.angcyo.uiview.less.kotlin
 import android.graphics.Color
 import android.text.TextUtils
 import android.view.View
+import androidx.recyclerview.widget.DefaultItemAnimator
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.SimpleItemAnimator
 import com.angcyo.uiview.less.R
 import com.angcyo.uiview.less.kotlin.dsl.DslRecyclerScroll
 import com.angcyo.uiview.less.recycler.DslItemDecoration
@@ -20,7 +23,7 @@ import com.angcyo.uiview.less.recycler.adapter.DslAdapterItem
  * Copyright (c) 2019 ShenZhen O&M Cloud Co., Ltd. All rights reserved.
  */
 
-public fun androidx.recyclerview.widget.RecyclerView.dslAdapter(
+public fun RecyclerView.dslAdapter(
     append: Boolean = false, //当已经是adapter时, 是否追加item. 需要先关闭 new
     new: Boolean = true, //始终创建新的adapter, 为true时, 则append无效
     init: DslAdapter.() -> Unit
@@ -57,7 +60,7 @@ public fun androidx.recyclerview.widget.RecyclerView.dslAdapter(
 /**
  * 支持网格布局
  * */
-public fun androidx.recyclerview.widget.RecyclerView.dslAdapter(
+public fun RecyclerView.dslAdapter(
     spanCount: Int = 1,
     append: Boolean = false,
     new: Boolean = true,
@@ -67,7 +70,7 @@ public fun androidx.recyclerview.widget.RecyclerView.dslAdapter(
     val dslAdapter = dslAdapter(append, new, init)
 
     layoutManager = RRecyclerView.GridLayoutManagerWrap(context, spanCount).apply {
-        spanSizeLookup = object : androidx.recyclerview.widget.GridLayoutManager.SpanSizeLookup() {
+        spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
                 return dslAdapter.getItemData(position)?.itemSpanCount ?: 1
             }
@@ -129,12 +132,12 @@ public fun <T> DslAdapter.renderItem(
     }
 }
 
-public fun androidx.recyclerview.widget.RecyclerView.onScroll(init: DslRecyclerScroll.() -> Unit) {
+public fun RecyclerView.onScroll(init: DslRecyclerScroll.() -> Unit) {
     val dslRecyclerView = DslRecyclerScroll()
     dslRecyclerView.init()
-    addOnScrollListener(object : androidx.recyclerview.widget.RecyclerView.OnScrollListener() {
+    addOnScrollListener(object : RecyclerView.OnScrollListener() {
         override fun onScrolled(
-            recyclerView: androidx.recyclerview.widget.RecyclerView,
+            recyclerView: RecyclerView,
             dx: Int,
             dy: Int
         ) {
@@ -148,7 +151,7 @@ public fun androidx.recyclerview.widget.RecyclerView.onScroll(init: DslRecyclerS
         }
 
         override fun onScrollStateChanged(
-            recyclerView: androidx.recyclerview.widget.RecyclerView,
+            recyclerView: RecyclerView,
             newState: Int
         ) {
             super.onScrollStateChanged(recyclerView, newState)
@@ -157,7 +160,7 @@ public fun androidx.recyclerview.widget.RecyclerView.onScroll(init: DslRecyclerS
     })
 }
 
-public fun androidx.recyclerview.widget.RecyclerView.clearItemDecoration(filter: (androidx.recyclerview.widget.RecyclerView.ItemDecoration) -> Boolean = { false }) {
+public fun RecyclerView.clearItemDecoration(filter: (RecyclerView.ItemDecoration) -> Boolean = { false }) {
     for (i in itemDecorationCount - 1 downTo 0) {
         if (filter.invoke(getItemDecorationAt(i))) {
         } else {
@@ -166,7 +169,7 @@ public fun androidx.recyclerview.widget.RecyclerView.clearItemDecoration(filter:
     }
 }
 
-public fun androidx.recyclerview.widget.RecyclerView.dslItemDecoration(init: DslItemDecoration.() -> Unit) {
+public fun RecyclerView.dslItemDecoration(init: DslItemDecoration.() -> Unit) {
     addItemDecoration(DslItemDecoration().apply {
         init()
     })
@@ -175,30 +178,30 @@ public fun androidx.recyclerview.widget.RecyclerView.dslItemDecoration(init: Dsl
 /**
  * 取消RecyclerView的默认动画
  * */
-public fun androidx.recyclerview.widget.RecyclerView.noItemAnim() {
+public fun RecyclerView.noItemAnim() {
     itemAnimator = null
 }
 
 /**
  * 取消默认的change动画
  * */
-public fun androidx.recyclerview.widget.RecyclerView.noItemChangeAnim() {
+public fun RecyclerView.noItemChangeAnim() {
     if (itemAnimator == null) {
-        itemAnimator = androidx.recyclerview.widget.DefaultItemAnimator().apply {
+        itemAnimator = DefaultItemAnimator().apply {
             supportsChangeAnimations = false
         }
-    } else if (itemAnimator is androidx.recyclerview.widget.SimpleItemAnimator) {
-        (itemAnimator as androidx.recyclerview.widget.SimpleItemAnimator).supportsChangeAnimations =
+    } else if (itemAnimator is SimpleItemAnimator) {
+        (itemAnimator as SimpleItemAnimator).supportsChangeAnimations =
             false
     }
 }
 
-public fun androidx.recyclerview.widget.RecyclerView.eachChildViewHolder(
+public fun RecyclerView.eachChildViewHolder(
     targetView: View? = null,/*指定目标, 则只回调目标前后的ViewHolder*/
     callback: (
-        beforeViewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder?,
-        viewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder,
-        afterViewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder?
+        beforeViewHolder: RecyclerView.ViewHolder?,
+        viewHolder: RecyclerView.ViewHolder,
+        afterViewHolder: RecyclerView.ViewHolder?
     ) -> Unit
 ) {
 
@@ -210,9 +213,9 @@ public fun androidx.recyclerview.widget.RecyclerView.eachChildViewHolder(
         childViewHolder?.let {
 
             //前一个child
-            var beforeViewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder? = null
+            var beforeViewHolder: RecyclerView.ViewHolder? = null
             //后一个child
-            var afterViewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder? = null
+            var afterViewHolder: RecyclerView.ViewHolder? = null
 
             if (i >= 1) {
                 beforeViewHolder = findContainingViewHolder(getChildAt(i - 1))
@@ -233,7 +236,7 @@ public fun androidx.recyclerview.widget.RecyclerView.eachChildViewHolder(
     }
 }
 
-public fun androidx.recyclerview.widget.RecyclerView.eachChildRViewHolder(
+public fun RecyclerView.eachChildRViewHolder(
     targetView: View? = null,/*指定目标, 则只回调目标前后的ViewHolder*/
     callback: (
         beforeViewHolder: RBaseViewHolder?,
@@ -276,19 +279,19 @@ public fun androidx.recyclerview.widget.RecyclerView.eachChildRViewHolder(
 /**
  * 第一个item所在的Adapter position
  * */
-public fun androidx.recyclerview.widget.RecyclerView.firstItemAdapterPosition(): Int {
+public fun RecyclerView.firstItemAdapterPosition(): Int {
     if (childCount > 0) {
         return getChildAdapterPosition(getChildAt(0))
     }
-    return androidx.recyclerview.widget.RecyclerView.NO_POSITION
+    return RecyclerView.NO_POSITION
 }
 
 /**
  * 第一个item完全可见所在的Adapter position
  * */
-public fun androidx.recyclerview.widget.RecyclerView.firstItemCompletelyAdapterPosition(): Int {
+public fun RecyclerView.firstItemCompletelyAdapterPosition(): Int {
     val childCount = childCount
-    var result = androidx.recyclerview.widget.RecyclerView.NO_POSITION
+    var result = RecyclerView.NO_POSITION
     for (i in 0 until childCount) {
         val child = getChildAt(i)
         if (child.top >= 0 && child.left >= 0) {
@@ -303,7 +306,7 @@ public fun androidx.recyclerview.widget.RecyclerView.firstItemCompletelyAdapterP
  * 枚举adapter 中的 item
  * @param callback 返回true, 终端for 循环
  * */
-public fun androidx.recyclerview.widget.RecyclerView.eachDslAdapterItem(callback: (index: Int, dslItem: DslAdapterItem?) -> Boolean) {
+public fun RecyclerView.eachDslAdapterItem(callback: (index: Int, dslItem: DslAdapterItem?) -> Boolean) {
     adapter?.apply {
         if (this is DslAdapter) {
             for (i in 0 until itemCount) {
@@ -315,7 +318,7 @@ public fun androidx.recyclerview.widget.RecyclerView.eachDslAdapterItem(callback
     }
 }
 
-public fun androidx.recyclerview.widget.RecyclerView.findViewHolder(position: Int): RBaseViewHolder? {
+public fun RecyclerView.findViewHolder(position: Int): RBaseViewHolder? {
     return findViewHolderForAdapterPosition(position) as? RBaseViewHolder
 }
 

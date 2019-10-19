@@ -3,8 +3,8 @@ package com.angcyo.uiview.less.recycler
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Rect
-import androidx.recyclerview.widget.RecyclerView
 import android.view.View
+import androidx.recyclerview.widget.RecyclerView
 import com.angcyo.uiview.less.kotlin.eachChildRViewHolder
 import com.angcyo.uiview.less.recycler.adapter.DslAdapter
 
@@ -16,11 +16,12 @@ import com.angcyo.uiview.less.recycler.adapter.DslAdapter
  * Copyright (canvas) 2019 ShenZhen O&M Cloud Co., Ltd. All rights reserved.
  */
 open class DslItemDecoration(
+    //回调方法, 可以不实现
     val init: (that: DslItemDecoration) -> Unit = { _ -> },
-    val onDrawOver: (that: DslItemDecoration, canvas: Canvas, parent: androidx.recyclerview.widget.RecyclerView, state: androidx.recyclerview.widget.RecyclerView.State, paint: Paint) -> Unit = { _, _, _, _, _ -> },
-    val onDraw: (that: DslItemDecoration, canvas: Canvas, parent: androidx.recyclerview.widget.RecyclerView, state: androidx.recyclerview.widget.RecyclerView.State, paint: Paint) -> Unit = { _, _, _, _, _ -> },
-    val getItemOffsets: (that: DslItemDecoration, outRect: Rect, view: View, parent: androidx.recyclerview.widget.RecyclerView, state: androidx.recyclerview.widget.RecyclerView.State) -> Unit = { _, _, _, _, _ -> }
-) : androidx.recyclerview.widget.RecyclerView.ItemDecoration() {
+    val onDrawOver: (that: DslItemDecoration, canvas: Canvas, parent: RecyclerView, state: RecyclerView.State, paint: Paint) -> Unit = { _, _, _, _, _ -> },
+    val onDraw: (that: DslItemDecoration, canvas: Canvas, parent: RecyclerView, state: RecyclerView.State, paint: Paint) -> Unit = { _, _, _, _, _ -> },
+    val getItemOffsets: (that: DslItemDecoration, outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) -> Unit = { _, _, _, _, _ -> }
+) : RecyclerView.ItemDecoration() {
 
     val paint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
     val tempDrawRect = Rect()
@@ -35,7 +36,7 @@ open class DslItemDecoration(
      * isOverDraw 控制是否是 onDrawOver
      * */
     open var eachItemDoIt: (
-        canvas: Canvas?, parent: androidx.recyclerview.widget.RecyclerView, state: androidx.recyclerview.widget.RecyclerView.State, outRect: Rect?,
+        canvas: Canvas?, parent: RecyclerView, state: RecyclerView.State, outRect: Rect?,
         beforeViewHolder: RBaseViewHolder?,
         viewHolder: RBaseViewHolder,
         afterViewHolder: RBaseViewHolder?,
@@ -46,7 +47,7 @@ open class DslItemDecoration(
           isOverDraw ->
 
             val adapterPosition = viewHolder.adapterPosition
-            if (parent.adapter is DslAdapter && adapterPosition != androidx.recyclerview.widget.RecyclerView.NO_POSITION) {
+            if (parent.adapter is DslAdapter && adapterPosition != RecyclerView.NO_POSITION) {
                 (parent.adapter as? DslAdapter)?.getItemData(adapterPosition)?.let { item ->
 
                     //设置分割线占坑大小
@@ -81,24 +82,56 @@ open class DslItemDecoration(
         init.invoke(this)
     }
 
-    override fun onDrawOver(canvas: Canvas, parent: androidx.recyclerview.widget.RecyclerView, state: androidx.recyclerview.widget.RecyclerView.State) {
+    override fun onDrawOver(canvas: Canvas, parent: RecyclerView, state: RecyclerView.State) {
         onDrawOver.invoke(this, canvas, parent, state, paint)
         parent.eachChildRViewHolder { beforeViewHolder, viewHolder, afterViewHolder ->
-            eachItemDoIt.invoke(canvas, parent, state, null, beforeViewHolder, viewHolder, afterViewHolder, true)
+            eachItemDoIt.invoke(
+                canvas,
+                parent,
+                state,
+                null,
+                beforeViewHolder,
+                viewHolder,
+                afterViewHolder,
+                true
+            )
         }
     }
 
-    override fun onDraw(canvas: Canvas, parent: androidx.recyclerview.widget.RecyclerView, state: androidx.recyclerview.widget.RecyclerView.State) {
+    override fun onDraw(canvas: Canvas, parent: RecyclerView, state: RecyclerView.State) {
         onDraw.invoke(this, canvas, parent, state, paint)
         parent.eachChildRViewHolder { beforeViewHolder, viewHolder, afterViewHolder ->
-            eachItemDoIt.invoke(canvas, parent, state, null, beforeViewHolder, viewHolder, afterViewHolder, false)
+            eachItemDoIt.invoke(
+                canvas,
+                parent,
+                state,
+                null,
+                beforeViewHolder,
+                viewHolder,
+                afterViewHolder,
+                false
+            )
         }
     }
 
-    override fun getItemOffsets(outRect: Rect, view: View, parent: androidx.recyclerview.widget.RecyclerView, state: androidx.recyclerview.widget.RecyclerView.State) {
+    override fun getItemOffsets(
+        outRect: Rect,
+        view: View,
+        parent: RecyclerView,
+        state: RecyclerView.State
+    ) {
         getItemOffsets.invoke(this, outRect, view, parent, state)
         parent.eachChildRViewHolder(view) { beforeViewHolder, viewHolder, afterViewHolder ->
-            eachItemDoIt.invoke(null, parent, state, outRect, beforeViewHolder, viewHolder, afterViewHolder, false)
+            eachItemDoIt.invoke(
+                null,
+                parent,
+                state,
+                outRect,
+                beforeViewHolder,
+                viewHolder,
+                afterViewHolder,
+                false
+            )
         }
     }
 }
