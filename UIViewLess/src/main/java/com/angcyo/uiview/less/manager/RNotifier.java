@@ -110,6 +110,10 @@ public class RNotifier {
         }
     }
 
+    public void vibrate(long duration) {
+        vibrate(new long[]{0, duration}, false);
+    }
+
     public void vibrate() {
         vibrate(new long[]{800, 1000, 800, 1000, 800, 1000}, true);
     }

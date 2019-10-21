@@ -385,7 +385,10 @@ public class FragmentHelper {
         return string;
     }
 
-    public static int getFragmentContainerId(@NonNull FragmentManager fragmentManager) {
+    public static int getFragmentContainerId(FragmentManager fragmentManager) {
+        if (fragmentManager == null) {
+            return -1;
+        }
         List<Fragment> fragments = fragmentManager.getFragments();
         if (fragments.isEmpty()) {
             return -1;
@@ -454,11 +457,19 @@ public class FragmentHelper {
         return targetViewGroup;
     }
 
+    public static List<Fragment> getFragmentList(FragmentManager fragmentManager) {
+        return getFragmentList(fragmentManager, getFragmentContainerId(fragmentManager));
+    }
+
     /**
      * 从指定的ViewGroup中, 获取排好序的Fragment
      */
-    public static List<Fragment> getFragmentList(@NonNull FragmentManager fragmentManager,
+    public static List<Fragment> getFragmentList(FragmentManager fragmentManager,
                                                  @IdRes int fragmentContainerId) {
+        if (fragmentManager == null) {
+            return new ArrayList<>();
+        }
+
         List<Fragment> fragments = fragmentManager.getFragments();
         List<Fragment> fragmentsResult = new ArrayList<>();
         ViewGroup targetViewGroup = getFragmentViewGroup(fragmentManager, fragmentContainerId);

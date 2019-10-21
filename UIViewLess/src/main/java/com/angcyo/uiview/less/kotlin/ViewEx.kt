@@ -211,6 +211,14 @@ public fun TextView.setLeftIco(drawable: Drawable?) {
     RExTextView.setLeftIco(this, drawable)
 }
 
+public fun TextView.setTopIco(id: Int) {
+    RExTextView.setTopIco(this, id)
+}
+
+public fun TextView.setTopIco(drawable: Drawable?) {
+    RExTextView.setTopIco(this, drawable)
+}
+
 public fun View.getColor(id: Int): Int = ContextCompat.getColor(context, id)
 
 public fun View.getColorList(id: Int): ColorStateList? =
