@@ -4,6 +4,7 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Rect
+import android.graphics.drawable.Drawable
 import android.view.View
 import androidx.annotation.LayoutRes
 import androidx.recyclerview.widget.RecyclerView
@@ -30,13 +31,13 @@ open class DslAdapterItem {
         itemDslAdapter?.notifyItemChanged(this, useFilterList)
     }
 
-    /**[notifyItemRemoved]*/
-    open fun deleteAdapterItem(useFilterList: Boolean = true) {
-        if (itemDslAdapter == null) {
-            L.e("updateAdapterItem需要[itemDslAdapter], 请赋值.")
-        }
-        itemDslAdapter?.deleteAdapterItem(this, useFilterList)
-    }
+//    /**[notifyItemRemoved]*/
+//    open fun deleteAdapterItem(useFilterList: Boolean = true) {
+//        if (itemDslAdapter == null) {
+//            L.e("updateAdapterItem需要[itemDslAdapter], 请赋值.")
+//        }
+//        itemDslAdapter?.deleteAdapterItem(this, useFilterList)
+//    }
 
     //<editor-fold desc="Grid相关属性">
 
@@ -151,12 +152,15 @@ open class DslAdapterItem {
     var itemRightInsert = 0
     var itemBottomInsert = 0
 
-    var itemDecorationColor = Color.WHITE
+    var itemDecorationColor = Color.TRANSPARENT
+
+    /**更强大的分割线自定义, 在color绘制后绘制*/
+    var itemDecorationDrawable: Drawable? = null
 
     /**
      * 仅绘制offset的区域
      * */
-    var onlyDrawOffsetArea = true
+    var onlyDrawOffsetArea = false
 
     /**
      * 分割线绘制时的偏移
@@ -165,6 +169,14 @@ open class DslAdapterItem {
     var itemLeftOffset = 0
     var itemRightOffset = 0
     var itemBottomOffset = 0
+
+    /**可以覆盖设置分割线的边距*/
+    var onSetItemOffset: (rect: Rect) -> Unit = {}
+
+    fun setItemOffsets(rect: Rect) {
+        rect.set(itemLeftInsert, itemTopInsert, itemRightInsert, itemBottomInsert)
+        onSetItemOffset(rect)
+    }
 
     fun setTopInsert(insert: Int, leftOffset: Int = 0, rightOffset: Int = 0) {
         itemTopInsert = insert
@@ -188,10 +200,6 @@ open class DslAdapterItem {
         itemRightInsert = insert
         itemBottomOffset = bottomOffset
         itemTopOffset = topOffset
-    }
-
-    fun setItemOffsets(rect: Rect) {
-        rect.set(itemLeftInsert, itemTopInsert, itemRightInsert, itemBottomInsert)
     }
 
     fun marginVertical(top: Int, bottom: Int = 0, color: Int = Color.TRANSPARENT) {
@@ -265,6 +273,7 @@ open class DslAdapterItem {
                         itemView.top
                     )
                     canvas.drawRect(drawRect, paint)
+                    onDrawItemDecorationDrawable(canvas, drawRect)
                 }
                 if (itemRightOffset > 0) {
                     drawRect.set(
@@ -274,6 +283,7 @@ open class DslAdapterItem {
                         itemView.top
                     )
                     canvas.drawRect(drawRect, paint)
+                    onDrawItemDecorationDrawable(canvas, drawRect)
                 }
             } else {
                 drawRect.set(
@@ -283,6 +293,7 @@ open class DslAdapterItem {
                     itemView.top
                 )
                 canvas.drawRect(drawRect, paint)
+                onDrawItemDecorationDrawable(canvas, drawRect)
             }
         }
 
@@ -300,6 +311,7 @@ open class DslAdapterItem {
                         itemView.bottom + offsetRect.bottom
                     )
                     canvas.drawRect(drawRect, paint)
+                    onDrawItemDecorationDrawable(canvas, drawRect)
                 }
                 if (itemRightOffset > 0) {
                     drawRect.set(
@@ -309,6 +321,7 @@ open class DslAdapterItem {
                         itemView.bottom + offsetRect.bottom
                     )
                     canvas.drawRect(drawRect, paint)
+                    onDrawItemDecorationDrawable(canvas, drawRect)
                 }
             } else {
                 drawRect.set(
@@ -318,6 +331,7 @@ open class DslAdapterItem {
                     itemView.bottom + offsetRect.bottom
                 )
                 canvas.drawRect(drawRect, paint)
+                onDrawItemDecorationDrawable(canvas, drawRect)
             }
         }
 
@@ -335,6 +349,7 @@ open class DslAdapterItem {
                         itemTopOffset
                     )
                     canvas.drawRect(drawRect, paint)
+                    onDrawItemDecorationDrawable(canvas, drawRect)
                 }
                 if (itemBottomOffset < 0) {
                     drawRect.set(
@@ -344,6 +359,7 @@ open class DslAdapterItem {
                         itemView.bottom
                     )
                     canvas.drawRect(drawRect, paint)
+                    onDrawItemDecorationDrawable(canvas, drawRect)
                 }
             } else {
                 drawRect.set(
@@ -353,6 +369,7 @@ open class DslAdapterItem {
                     itemView.bottom
                 )
                 canvas.drawRect(drawRect, paint)
+                onDrawItemDecorationDrawable(canvas, drawRect)
             }
         }
 
@@ -370,6 +387,7 @@ open class DslAdapterItem {
                         itemTopOffset
                     )
                     canvas.drawRect(drawRect, paint)
+                    onDrawItemDecorationDrawable(canvas, drawRect)
                 }
                 if (itemBottomOffset < 0) {
                     drawRect.set(
@@ -379,6 +397,7 @@ open class DslAdapterItem {
                         itemView.bottom
                     )
                     canvas.drawRect(drawRect, paint)
+                    onDrawItemDecorationDrawable(canvas, drawRect)
                 }
             } else {
                 drawRect.set(
@@ -388,9 +407,17 @@ open class DslAdapterItem {
                     itemView.bottom
                 )
                 canvas.drawRect(drawRect, paint)
+                onDrawItemDecorationDrawable(canvas, drawRect)
             }
         }
         onlyDrawOffsetArea = drawOffsetArea
+    }
+
+    var onDrawItemDecorationDrawable: (canvas: Canvas, rect: Rect) -> Unit = { canvas, rect ->
+        itemDecorationDrawable?.let {
+            it.setBounds(rect.left, rect.top, rect.right, rect.bottom)
+            it.draw(canvas)
+        }
     }
 
     //</editor-fold desc="表单 分割线配置">
@@ -399,20 +426,24 @@ open class DslAdapterItem {
 
     /**
      * 决定
-     * [android.support.v7.widget.RecyclerView.Adapter.notifyItemInserted]
-     * [android.support.v7.widget.RecyclerView.Adapter.notifyItemRemoved]
+     * [RecyclerView.Adapter.notifyItemInserted]
+     * [RecyclerView.Adapter.notifyItemRemoved]
      * 的执行
      * */
-    open var thisAreItemsTheSame: (newItem: DslAdapterItem) -> Boolean =
-        {
-            //this.javaClass.name == it.javaClass.name && this.itemLayoutId == it.itemLayoutId
-            this == it
-        }
+    open var thisAreItemsTheSame: (fromItem: DslAdapterItem?, newItem: DslAdapterItem) -> Boolean =
+        { _, newItem -> this == newItem }
 
     /**
-     * [android.support.v7.widget.RecyclerView.Adapter.notifyItemChanged]
+     * [RecyclerView.Adapter.notifyItemChanged]
      * */
-    open var thisAreContentsTheSame: (newItem: DslAdapterItem) -> Boolean = { this == it }
+    open var thisAreContentsTheSame: (fromItem: DslAdapterItem?, newItem: DslAdapterItem) -> Boolean =
+        { fromItem, newItem ->
+            if (fromItem == null) {
+                this == newItem
+            } else {
+                this != fromItem && this == newItem
+            }
+        }
 
     /**
      * [checkItem] 是否需要关联到处理列表
@@ -420,18 +451,46 @@ open class DslAdapterItem {
      *
      * 返回 true 时, [checkItem]  进行 [hide] 操作
      * */
-    open var isFormItemInHandleList: (checkItem: DslAdapterItem, itemIndex: Int) -> Boolean =
+    open var isItemInHiddenList: (checkItem: DslAdapterItem, itemIndex: Int) -> Boolean =
         { _, _ -> false }
 
     /**
      * [itemIndex] 最终过滤之后数据列表中的index
      * 返回 true 时, [checkItem] 会收到 来自 [this] 的 [onItemUpdateFromInner] 触发的回调
      * */
-    open var isFormItemInUpdateList: (checkItem: DslAdapterItem, itemIndex: Int) -> Boolean =
+    open var isItemInUpdateList: (checkItem: DslAdapterItem, itemIndex: Int) -> Boolean =
         { _, _ -> false }
 
-    open fun updateItemDepend(notifyUpdate: Boolean = false) {
-        //itemDslAdapter?.updateItemDepend(if (notifyUpdate) this else null)
+    /**
+     * 通过diff更新
+     * @param notifyUpdate 是否需要触发 [Depend] 关系链.
+     * */
+    open fun updateItemDepend(
+        filterParams: FilterParams = FilterParams(
+            this,
+            updateDependItemWithEmpty = false
+        )
+    ) {
+        if (itemDslAdapter == null) {
+            L.e("updateItemDepend需要[itemDslAdapter], 请赋值.")
+        }
+        itemDslAdapter?.updateItemDepend(filterParams)
+    }
+
+    /**更新选项*/
+    open fun updateItemSelector(select: Boolean, notifyUpdate: Boolean = false) {
+        if (itemDslAdapter == null) {
+            L.e("updateItemSelector需要[itemDslAdapter], 请赋值.")
+        }
+        itemDslAdapter?.itemSelectorHelper?.selector(
+            SelectorParams(
+                this,
+                select.toSelectOption(),
+                notify = true,
+                notifyItemChange = true,
+                updateItemDepend = notifyUpdate
+            )
+        )
     }
 
     var onItemUpdateFrom: (fromItem: DslAdapterItem) -> Unit = {}
@@ -444,22 +503,57 @@ open class DslAdapterItem {
 
     //<editor-fold desc="单选, 多选相关">
 
-    /**是否选中, 需要 [DslAdapter.selectorModel] 的支持. */
-    var itemIsSelectInner = false
-    var itemIsSelect
-        set(value) {
-            itemDslAdapter?.updateSelector(this, value)
-        }
-        get() = itemIsSelectInner
+    /**是否选中, 需要 [dsladapter.ItemSelectorHelper.selectorModel] 的支持. */
+    var itemIsSelected = false
 
     /**是否 允许被选中*/
-    var isItemCanSelect: (from: Boolean, to: Boolean) -> Boolean =
-        { _, _ -> true }
+    var isItemCanSelected: (fromSelector: Boolean, toSelector: Boolean) -> Boolean =
+        { from, to -> from != to }
+
+    var onItemSelectorChange: (selectorParams: SelectorParams) -> Unit = {
+        if (it.updateItemDepend) {
+            updateItemDepend()
+        }
+    }
+
+    /**选中变化后触发*/
+    open fun _itemSelectorChange(selectorParams: SelectorParams) {
+        onItemSelectorChange(selectorParams)
+    }
 
     val itemIndexPosition
         get() = itemDslAdapter?.getValidFilterDataList()?.indexOf(this) ?: RecyclerView.NO_POSITION
 
     //</editor-fold desc="单选, 多选相关">
+
+    //<editor-fold desc="群组相关">
+
+    /**动态计算的属性*/
+    val itemGroupParams: ItemGroupParams
+        get() =
+            itemDslAdapter?.findItemGroupParams(this) ?: ItemGroupParams(
+                0,
+                this,
+                mutableListOf(this)
+            )
+
+    /**所在的分组名, 只用来做快捷变量存储*/
+    var itemGroups = mutableListOf<String>()
+
+    /**核心群组判断的方法*/
+    var isItemInGroups: (newItem: DslAdapterItem) -> Boolean = {
+        var result = false
+        for (group in it.itemGroups) {
+            result = result || itemGroups.contains(group)
+
+            if (result) {
+                break
+            }
+        }
+        result
+    }
+
+    //</editor-fold>
 
 }
 

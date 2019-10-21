@@ -1,12 +1,11 @@
 package com.angcyo.uiview.less.recycler.adapter
 
 import android.content.Context
-import android.text.TextUtils
-import android.view.View
-import com.angcyo.lib.L
-import com.angcyo.uiview.less.kotlin.findViewHolder
+import androidx.recyclerview.widget.RecyclerView
 import com.angcyo.uiview.less.recycler.RBaseViewHolder
-import com.angcyo.uiview.less.recycler.adapter.RModelAdapter.*
+import com.angcyo.uiview.less.recycler.dslitem.DslAdapterStatusItem
+import com.angcyo.uiview.less.recycler.dslitem.DslLoadMoreItem
+import kotlin.math.min
 
 /**
  *
@@ -17,129 +16,252 @@ import com.angcyo.uiview.less.recycler.adapter.RModelAdapter.*
  */
 open class DslAdapter : RBaseAdapter<DslAdapterItem> {
 
-    var dslDateFilter: DslDateFilter? = null
+    /*为了简单起见, 这里写死套路, 理论上应该用状态器管理的.*/
+    var dslAdapterStatusItem = DslAdapterStatusItem()
+    var dslLoadMoreItem = DslLoadMoreItem()
+
+    /**包含所有[DslAdapterItem], 包括 [headerItems] [dataItems] [footerItems]的数据源*/
+    val adapterItems = mutableListOf<DslAdapterItem>()
+
+    /**底部数据, 用来存放 [DslLoadMoreItem] */
+    val footerItems = mutableListOf<DslAdapterItem>()
+    /**头部数据*/
+    val headerItems = mutableListOf<DslAdapterItem>()
+    /**列表数据*/
+    val dataItems = mutableListOf<DslAdapterItem>()
+
+    /**数据过滤规则*/
+    var dslDateFilter: DslDateFilter? = DslDateFilter(this)
         set(value) {
             field = value
-            updateFilterDataList()
+            updateItemDepend()
         }
 
-    /**
-     * 缓存过滤后的数据源, 防止每次都计算
-     * */
-    val filterDataList = mutableListOf<DslAdapterItem>()
+    /**单/多选助手*/
+    val itemSelectorHelper = ItemSelectorHelper(this)
 
     constructor() : super()
-    constructor(context: Context?) : super(context)
-    constructor(context: Context?, datas: MutableList<DslAdapterItem>?) : super(context, datas) {
-        updateFilterDataList()
-    }
 
-    /**
-     * 没有过滤过的数据集合
-     * */
-    override fun getAllDatas(): MutableList<DslAdapterItem> {
-        return super.getAllDatas()
-    }
+    constructor(dataItems: List<DslAdapterItem>?) : this(null, dataItems)
 
-    override fun getAllDataCount(): Int {
-        return getValidFilterDataList().size
-    }
-
-    /**获取有效过滤后的数据集合*/
-    fun getValidFilterDataList(): MutableList<DslAdapterItem> {
-        return if (dslDateFilter == null && filterDataList.isEmpty()) {
-            allDatas
-        } else {
-            filterDataList
+    constructor(context: Context?, dataItems: List<DslAdapterItem>?) : super(context, dataItems) {
+        dataItems?.let {
+            this.dataItems.clear()
+            this.dataItems.addAll(dataItems)
+            _updateAdapterItems()
+            updateItemDepend(FilterParams(async = false, just = true))
         }
     }
 
-    /**
-     * 过滤后的数据集合
-     * */
-    fun updateFilterDataList() {
-        filterDataList.clear()
-        dslDateFilter?.let {
-            filterDataList.addAll(it.filterDataList)
+    init {
+        if (dslLoadMoreItem.itemEnableLoadMore) {
+            setLoadMoreEnable(true)
         }
     }
 
-    /**
-     * 布局的type, 就是布局对应的 layout id
-     * */
-    override fun getItemLayoutId(viewType: Int): Int {
-        return viewType
+    //<editor-fold desc="生命周期方法">
+
+    var _recyclerView: RecyclerView? = null
+
+    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+        super.onAttachedToRecyclerView(recyclerView)
+        _recyclerView = recyclerView
+    }
+
+    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
+        super.onDetachedFromRecyclerView(recyclerView)
+        _recyclerView = null
     }
 
     override fun getItemType(position: Int): Int {
-        return getItemData(position)?.itemLayoutId ?: -1
+        return if (isAdapterStatus()) {
+            dslAdapterStatusItem.itemLayoutId
+        } else {
+            getItemData(position)?.itemLayoutId ?: 0
+        }
     }
 
-    override fun onBindView(holder: RBaseViewHolder, position: Int, bean: DslAdapterItem?) {
-        getItemData(position)?.let {
-            it.itemDslAdapter = this
-            it.itemBind.invoke(holder, position, it)
-        }
+    override fun getItemLayoutId(viewType: Int): Int = viewType
+
+    override fun getAllDatas(): MutableList<DslAdapterItem> {
+        return adapterItems
     }
 
     override fun getItemCount(): Int {
-        if (isStateLayout) {
-            return 1
+        return if (isAdapterStatus()) {
+            1
+        } else {
+            //兼容旧的加载更多
+            getValidFilterDataList().size + if (mEnableLoadMore) 1 else 0
         }
-        if (dslDateFilter != null) {
-            return filterDataList.size + if (isEnableLoadMore) 1 else 0
-        }
-        return super.getItemCount()
     }
 
-    override fun getItemData(position: Int): DslAdapterItem? {
-        if (dslDateFilter != null) {
-            if (position in 0 until filterDataList.size) {
-                return filterDataList[position]
+    //兼容[RBaseAdapter]
+    override fun onBindView(holder: RBaseViewHolder, position: Int, bean: DslAdapterItem?) {
+        val dslItem = getAdapterItem(position)
+        dslItem.itemDslAdapter = this
+        dslItem.itemBind.invoke(holder, position, dslItem)
+    }
+
+    override fun onViewAttachedToWindow(holder: RBaseViewHolder) {
+        super.onViewAttachedToWindow(holder)
+        if (holder.adapterPosition in 0 until itemCount) {
+            getAdapterItem(holder.adapterPosition).onItemViewAttachedToWindow.invoke(holder)
+        }
+    }
+
+    override fun onViewDetachedFromWindow(holder: RBaseViewHolder) {
+        super.onViewDetachedFromWindow(holder)
+        if (holder.adapterPosition in 0 until itemCount) {
+            getAdapterItem(holder.adapterPosition).onItemViewDetachedToWindow.invoke(holder)
+        }
+    }
+
+    //</editor-fold desc="生命周期方法">
+
+    //<editor-fold desc="辅助方法">
+
+    /**
+     * 适配器当前是情感图状态
+     * */
+    fun isAdapterStatus(): Boolean {
+        return !dslAdapterStatusItem.isNoStatus() || isStateLayout
+    }
+
+    fun getAdapterItem(position: Int): DslAdapterItem {
+        return if (isAdapterStatus()) {
+            dslAdapterStatusItem
+        } else {
+            getItemData(position)!!
+        }
+    }
+
+    fun _updateAdapterItems() {
+        //整理数据
+        adapterItems.clear()
+        adapterItems.addAll(headerItems)
+        adapterItems.addAll(dataItems)
+        adapterItems.addAll(footerItems)
+    }
+
+    //</editor-fold desc="辅助方法">
+
+    //<editor-fold desc="操作方法">
+
+    /**设置[Adapter]需要显示情感图的状态*/
+    fun setAdapterStatus(status: Int) {
+        if (dslAdapterStatusItem.itemState == status) {
+            return
+        }
+        dslAdapterStatusItem.itemState = status
+        notifyDataSetChanged()
+    }
+
+    fun setLoadMoreEnable(enable: Boolean = true) {
+        if (dslLoadMoreItem.itemEnableLoadMore == enable &&
+            getValidFilterDataList().indexOf(dslLoadMoreItem) != -1
+        ) {
+            return
+        }
+        dslLoadMoreItem.itemEnableLoadMore = enable
+
+        changeFooterItems {
+            if (enable) {
+                it.add(dslLoadMoreItem)
+            } else {
+                it.remove(dslLoadMoreItem)
             }
-            return null
         }
-        return super.getItemData(position)
     }
 
-    override fun appendData(datas: MutableList<DslAdapterItem>) {
-        super.appendData(datas)
-        updateFilterDataList()
-    }
-
-    override fun resetData(datas: MutableList<DslAdapterItem>) {
-        super.resetData(datas)
-        updateFilterDataList()
-    }
-
-    override fun addLastItem(bean: DslAdapterItem?) {
-        super.addLastItem(bean)
-        updateFilterDataList()
-    }
-
-    override fun addLastItemSafe(bean: DslAdapterItem?) {
-        super.addLastItemSafe(bean)
-        updateFilterDataList()
-    }
-
-    override fun insertItem(position: Int, bean: DslAdapterItem?) {
-        super.insertItem(position, bean)
-        updateFilterDataList()
+    fun setLoadMore(status: Int) {
+        if (dslLoadMoreItem.itemState == status) {
+            return
+        }
+        dslLoadMoreItem.itemState = status
+        if (dslLoadMoreItem.itemEnableLoadMore) {
+            notifyItemChanged(dslLoadMoreItem)
+        }
     }
 
     /**
-     * 折叠这个分组
-     * */
-    fun foldItem(item: DslAdapterItem, folder: Boolean = true) {
-        dslDateFilter?.filterItem(item, folder)
+     * 在最后的位置插入数据
+     */
+    override fun addLastItem(bean: DslAdapterItem) {
+        insertItem(-1, bean)
     }
 
-    override fun notifyItemChanged(item: DslAdapterItem?) {
-        if (dslDateFilter == null) {
-            super.notifyItemChanged(item)
+    fun addLastItem(bean: List<DslAdapterItem>) {
+        insertItem(-1, bean)
+    }
+
+    //修正index
+    fun _validIndex(list: List<*>, index: Int): Int {
+        return if (index < 0) {
+            list.size
         } else {
-            notifyItemChanged(item, filterDataList.size != allDatas.size)
+            min(index, list.size)
         }
+    }
+
+    /**插入数据列表*/
+    fun insertItem(index: Int, bean: List<DslAdapterItem>) {
+        dataItems.addAll(_validIndex(dataItems, index), bean)
+        _updateAdapterItems()
+        updateItemDepend()
+    }
+
+    /**插入数据列表*/
+    override fun insertItem(index: Int, bean: DslAdapterItem) {
+        dataItems.add(_validIndex(dataItems, index), bean)
+        _updateAdapterItems()
+        updateItemDepend()
+    }
+
+    /**重置数据列表*/
+    fun resetItem(bean: List<DslAdapterItem>) {
+        dataItems.clear()
+        dataItems.addAll(bean)
+        _updateAdapterItems()
+        updateItemDepend()
+    }
+
+    /**清理数据列表, 但不刷新界面*/
+    fun clearItems() {
+        dataItems.clear()
+        _updateAdapterItems()
+    }
+
+    /**可以在回调中改变数据, 并且会自动刷新界面*/
+    fun changeItems(change: () -> Unit) {
+        change()
+        _updateAdapterItems()
+        updateItemDepend()
+    }
+
+    fun changeDataItems(change: (dataItems: MutableList<DslAdapterItem>) -> Unit) {
+        changeItems {
+            change(dataItems)
+        }
+    }
+
+    fun changeHeaderItems(change: (headerItems: MutableList<DslAdapterItem>) -> Unit) {
+        changeItems {
+            change(headerItems)
+        }
+    }
+
+    fun changeFooterItems(change: (footerItems: MutableList<DslAdapterItem>) -> Unit) {
+        changeItems {
+            change(footerItems)
+        }
+    }
+
+    /**
+     * 刷新某一个item
+     */
+    override fun notifyItemChanged(item: DslAdapterItem?) {
+        notifyItemChanged(item, true)
     }
 
     /**支持过滤数据源*/
@@ -154,309 +276,61 @@ open class DslAdapter : RBaseAdapter<DslAdapterItem> {
         }
     }
 
-    /**支持过滤数据源*/
-    fun deleteAdapterItem(item: DslAdapterItem?, useFilterList: Boolean = true) {
-        if (item == null) {
-            return
+    override fun getItemData(position: Int): DslAdapterItem? {
+        val list = getDataList(true)
+        return if (position in list.indices) {
+            list[position]
+        } else {
+            null
         }
-
-        val dataList = getDataList(useFilterList)
-
-        val indexOf = dataList.indexOf(item)
-
-        val size = itemCount
-        if (indexOf != -1 && size > indexOf) {
-            if (onDeleteItem(indexOf)) {
-
-                dataList.removeAt(indexOf)
-
-                if (dataList != allDatas) {
-                    //非全部数据源时, 总数据源的数据也要删除
-                    allDatas.remove(item)
-                }
-
-                notifyItemRemoved(indexOf)
-                notifyItemRangeChanged(indexOf, size - indexOf)
-
-                onDeleteItemEnd(indexOf)
-            }
-        }
-    }
-
-    override fun deleteItem(position: Int) {
-        super.deleteItem(position)
     }
 
     /**获取数据列表*/
-    fun getDataList(useFilterList: Boolean): MutableList<DslAdapterItem> {
-        return if (useFilterList) getValidFilterDataList() else allDatas
+    fun getDataList(useFilterList: Boolean = true): List<DslAdapterItem> {
+        return if (useFilterList) getValidFilterDataList() else adapterItems
     }
 
-    override fun onViewAttachedToWindow(holder: RBaseViewHolder) {
-        super.onViewAttachedToWindow(holder)
-        if (holder.adapterPosition in 0 until itemCount) {
-            getItemData(holder.adapterPosition)?.onItemViewAttachedToWindow?.invoke(holder)
-        }
-    }
-
-    override fun onViewDetachedFromWindow(holder: RBaseViewHolder) {
-        super.onViewDetachedFromWindow(holder)
-        if (holder.adapterPosition in 0 until itemCount) {
-            getItemData(holder.adapterPosition)?.onItemViewDetachedToWindow?.invoke(holder)
-        }
-    }
-
-    override fun onChildViewAttachedToWindow(
-        view: View,
-        adapterPosition: Int,
-        layoutPosition: Int
+    /**调用[DiffUtil]更新界面*/
+    fun updateItemDepend(
+        filterParams: FilterParams = FilterParams(
+            just = dataItems.isEmpty(),
+            async = dataItems.isNotEmpty()
+        )
     ) {
-        super.onChildViewAttachedToWindow(view, adapterPosition, layoutPosition)
-        if (adapterPosition in 0 until itemCount) {
-            recyclerView?.findViewHolder(adapterPosition)?.let {
-                getItemData(adapterPosition)?.onItemChildViewAttachedToWindow?.invoke(
-                    it,
-                    adapterPosition
-                )
-            }
+        dslDateFilter?.let {
+            it.updateFilterItemDepend(filterParams.apply {
+                justFilter = isAdapterStatus()
+            })
         }
     }
 
-    override fun onChildViewDetachedFromWindow(
-        view: View,
-        adapterPosition: Int,
-        layoutPosition: Int
-    ) {
-        super.onChildViewDetachedFromWindow(view, adapterPosition, layoutPosition)
-        if (adapterPosition in 0 until itemCount) {
-            recyclerView?.findViewHolder(adapterPosition)?.let {
-                getItemData(adapterPosition)?.onItemChildViewDetachedFromWindow?.invoke(
-                    it,
-                    adapterPosition
-                )
-            }
-        }
+    /**获取有效过滤后的数据集合*/
+    fun getValidFilterDataList(): List<DslAdapterItem> {
+        return dslDateFilter?.filterDataList ?: adapterItems
     }
 
-    /**查找相邻相同类型的[item]*/
-    fun findItemGroup(
-        item: DslAdapterItem,
-        callback: (items: MutableList<DslAdapterItem>, index: Int /*在分组当中的位置*/) -> Unit = { _, _ -> }
-    ) {
-        val groupItems = mutableListOf<DslAdapterItem>()
-        var prevClassName: String? = null
+    //</editor-fold desc="操作方法">
 
-        //目标的位置
-        var targetIndex = -1
-
-        val dataList = getDataList(true)
-        for (index in 0 until dataList.size) {
-            val dslAdapterItem = dataList[index]
-
-            if (prevClassName == null) {
-                prevClassName = dslAdapterItem.javaClass.simpleName
-            }
-
-            if (TextUtils.equals(dslAdapterItem.javaClass.simpleName, prevClassName)) {
-                //相同类型
-                if (item == dslAdapterItem) {
-                    targetIndex = index
-                }
-            } else {
-                if (targetIndex != -1) {
-                    //找到了目标
-                    break
-                }
-                if (item == dslAdapterItem) {
-                    targetIndex = index
-                }
-                groupItems.clear()
-            }
-            groupItems.add(dslAdapterItem)
-
-            prevClassName = dslAdapterItem.javaClass.simpleName
-        }
-
-        if (targetIndex != -1) {
-            targetIndex = groupItems.indexOf(item)
-        }
-
-        callback.invoke(groupItems, targetIndex)
+    override fun appendData(datas: MutableList<DslAdapterItem>?) {
+        addLastItem(datas ?: emptyList())
     }
 
-    //<editor-fold desc="单选, 多选相关">
-
-    @RModelAdapter.Model
-    var selectorModel = MODEL_NORMAL
-
-    /**最小选中数量*/
-    var selectorMinLimit = 1
-
-    private val selectorModelListeners = mutableSetOf<SelectModelListener>()
-
-    fun addOnSelectorModelListener(listener: SelectModelListener) {
-        selectorModelListeners.add(listener)
+    override fun resetData(datas: MutableList<DslAdapterItem>?) {
+        resetItem(datas ?: emptyList())
     }
 
-    fun removeOnSelectorModelListener(listener: SelectModelListener) {
-        selectorModelListeners.remove(listener)
+    override fun addFirstItem(bean: DslAdapterItem) {
+        insertItem(0, bean)
     }
 
-    /**更新选中状态*/
-    fun updateSelector(dslAdapterItem: DslAdapterItem, select: Boolean) {
-        if (dslAdapterItem.itemIsSelect == select) {
-            return
-        }
+    //</editor-fold desc="兼容的操作">
 
-        if (selectorModel == MODEL_SINGLE || selectorModel == MODEL_MULTI) {
+    //<editor-fold desc="不支持的操作">
 
-            val thisList = mutableListOf(dslAdapterItem)
-            val selectItemList = getSelectItemList(true, thisList)
-
-            val fromItem = selectItemList.firstOrNull()
-            val toItem = dslAdapterItem
-
-            if (select) {
-                if (toItem.isItemCanSelect(toItem.itemIsSelectInner, true)) {
-                    toItem.itemIsSelectInner = true
-                } else {
-                    return
-                }
-
-                if (selectorModel == MODEL_SINGLE) {
-                    //单选, 互斥操作
-
-                    getSelectItemList(false, thisList).forEach {
-                        //取消所有选中状态
-                        it.itemIsSelectInner = false
-                    }
-
-                    //先通知事件
-                    selectorModelListeners.forEach {
-                        it.onSingleSelectChange(fromItem, toItem)
-
-                        it.onSelectChange(
-                            toItem,
-                            thisList,
-                            mutableListOf(dslAdapterItem.itemIndexPosition)
-                        )
-                    }
-
-                    //再更新UI
-                    fromItem?.updateAdapterItem(true)
-                } else {
-                    //多选
-
-                    selectItemList.add(toItem)
-
-                    val indexList = mutableListOf<Int>()
-                    selectItemList.forEach {
-                        indexList.add(it.itemIndexPosition)
-                    }
-
-                    selectorModelListeners.forEach {
-                        it.onSelectChange(
-                            toItem,
-                            selectItemList,
-                            indexList
-                        )
-                    }
-                }
-
-                toItem.updateAdapterItem(true)
-            } else {
-                //取消选择
-                if (selectorModel == MODEL_SINGLE && toItem.itemIsSelect) {
-                    selectItemList.add(toItem)
-                }
-
-                if (selectItemList.size > selectorMinLimit) {
-
-                    if (toItem.isItemCanSelect(toItem.itemIsSelectInner, false)) {
-                        toItem.itemIsSelectInner = false
-                    } else {
-                        return
-                    }
-
-                    if (selectorModel == MODEL_SINGLE) {
-                        selectorModelListeners.forEach {
-                            it.onSingleSelectChange(toItem, toItem)
-
-                            it.onSelectChange(
-                                toItem,
-                                thisList,
-                                mutableListOf(dslAdapterItem.itemIndexPosition)
-                            )
-                        }
-                    } else {
-                        val indexList = mutableListOf<Int>()
-                        selectItemList.forEach {
-                            indexList.add(it.itemIndexPosition)
-                        }
-
-                        selectorModelListeners.forEach {
-                            it.onSelectChange(
-                                toItem,
-                                selectItemList,
-                                indexList
-                            )
-                        }
-                    }
-
-                    toItem.updateAdapterItem(true)
-                } else {
-                    selectorModelListeners.forEach {
-                        it.onSelectMinLimitNotice(selectorMinLimit)
-                    }
-                }
-            }
-        } else {
-            L.w("当前选择模式$selectorModel 不支持操作.")
-        }
+    override fun addLastItemSafe(bean: DslAdapterItem?) {
+        //no op
     }
 
-    /**主动调用, 通知事件*/
-    fun notifySelectListener(fromItem: DslAdapterItem? = null) {
-        if (selectorModel == MODEL_SINGLE || selectorModel == MODEL_MULTI) {
-
-            val selectItemList = getSelectItemList(true)
-
-            val indexList = mutableListOf<Int>()
-            selectItemList.forEach {
-                indexList.add(it.itemIndexPosition)
-            }
-
-            selectorModelListeners.forEach {
-                it.onSingleSelectChange(null, selectItemList.firstOrNull())
-
-                it.onSelectChange(
-                    fromItem,
-                    selectItemList,
-                    indexList
-                )
-            }
-
-        } else {
-            L.w("当前选择模式$selectorModel 不支持操作.")
-        }
-    }
-
-    /**获取所有选中的[DslAdapterItem]*/
-    fun getSelectItemList(
-        useFilterList: Boolean = true,
-        excludeItemList: List<DslAdapterItem> = listOf()
-    ): MutableList<DslAdapterItem> {
-        val result = mutableListOf<DslAdapterItem>()
-        getDataList(useFilterList).filterTo(result) {
-            if (excludeItemList.contains(it)) {
-                false
-            } else {
-                it.itemIsSelect
-            }
-        }
-        return result
-    }
-
-    //</editor-fold desc="单选, 多选相关">
+    //</editor-fold desc="不支持的操作">
 
 }

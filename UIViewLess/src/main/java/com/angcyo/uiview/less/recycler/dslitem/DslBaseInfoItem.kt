@@ -49,6 +49,7 @@ open class DslBaseInfoItem : DslAdapterItem() {
         itemPosition: Int,
         adapterItem: DslAdapterItem
     ) {
+        itemHolder.clear()
 
         (itemHolder.itemView as? RLinearLayout)?.setRBackgroundDrawable(itemBackgroundDrawable)
 

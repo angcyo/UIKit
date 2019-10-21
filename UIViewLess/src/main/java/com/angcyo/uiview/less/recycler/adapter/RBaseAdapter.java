@@ -219,7 +219,7 @@ public abstract class RBaseAdapter<T> extends RecyclerView.Adapter<RBaseViewHold
             return 1;
         }
 
-        int size = mAllDatas == null ? 0 : mAllDatas.size();
+        int size = getAllDatas().size();
         if (mEnableLoadMore) {
             size += 1;
         }

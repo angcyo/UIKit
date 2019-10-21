@@ -13,10 +13,15 @@ import com.angcyo.uiview.less.R;
 import com.angcyo.uiview.less.base.helper.TitleItemHelper;
 import com.angcyo.uiview.less.iview.AffectUI;
 import com.angcyo.uiview.less.recycler.RBaseViewHolder;
+import com.angcyo.uiview.less.recycler.dslitem.BaseDslStateItem;
+import com.angcyo.uiview.less.recycler.dslitem.DslAdapterStatusItem;
+import com.angcyo.uiview.less.recycler.dslitem.DslLoadMoreItem;
 import com.angcyo.uiview.less.recycler.adapter.RBaseAdapter;
 import com.angcyo.uiview.less.recycler.widget.ItemLoadMoreLayout;
 import com.angcyo.uiview.less.recycler.widget.ItemShowStateLayout;
 import com.angcyo.uiview.less.widget.ImageTextView;
+
+import java.util.Map;
 
 /**
  * Email:angcyo@126.com
@@ -29,13 +34,14 @@ public class BaseUI {
     public static UIFragment uiFragment;
     public static UIAdapterShowStatus uiAdapterShowStatus;
     public static UIAdapterLoadMore uiAdapterLoadMore;
+    public static UIDslAdapterStatus uiDslAdapterStatus;
 
     static {
         uiFragment = new DefaultUIFragment();
         uiAdapterShowStatus = new DefaultUIAdapterShowStatus();
         uiAdapterLoadMore = new DefaultUIAdapterLoadMore();
+        uiDslAdapterStatus = new DefaultUIDslAdapterStatus();
     }
-
 
     /**
      * UIFragment 界面定制
@@ -50,6 +56,12 @@ public class BaseUI {
         AffectUI.Builder createAffectUI(@NonNull BaseTitleFragment titleFragment);
 
         AffectUI.Builder createAffectUI(@NonNull ViewGroup parent, AffectUI.OnAffectListener affectChangeListener);
+    }
+
+    public interface UIDslAdapterStatus {
+        void initStateLayoutMap(@NonNull BaseDslStateItem stateItem, @NonNull Map<Integer, Integer> stateLayoutMap);
+
+        void onBindStateLayout(@NonNull BaseDslStateItem stateItem, @NonNull RBaseViewHolder itemHolder, int state);
     }
 
     /**
@@ -174,6 +186,29 @@ public class BaseUI {
                     }
                 });
             }
+        }
+    }
+
+    public static class DefaultUIDslAdapterStatus implements UIDslAdapterStatus {
+
+        @Override
+        public void initStateLayoutMap(@NonNull BaseDslStateItem stateItem, @NonNull Map<Integer, Integer> stateLayoutMap) {
+            if (stateItem instanceof DslAdapterStatusItem) {
+                stateLayoutMap.put(DslAdapterStatusItem.ADAPTER_STATUS_LOADING, R.layout.base_affect_loading);
+                stateLayoutMap.put(DslAdapterStatusItem.ADAPTER_STATUS_ERROR, R.layout.base_affect_error);
+                stateLayoutMap.put(DslAdapterStatusItem.ADAPTER_STATUS_EMPTY, R.layout.base_empty_layout);
+            } else if (stateItem instanceof DslLoadMoreItem) {
+                stateLayoutMap.put(DslLoadMoreItem.ADAPTER_LOAD_NORMAL, R.layout.base_load_more_layout);
+                stateLayoutMap.put(DslLoadMoreItem.ADAPTER_LOAD_LOADING, R.layout.base_load_more_layout);
+                stateLayoutMap.put(DslLoadMoreItem.ADAPTER_LOAD_NO_MORE, R.layout.base_load_no_more_layout);
+                stateLayoutMap.put(DslLoadMoreItem.ADAPTER_LOAD_ERROR, R.layout.base_load_error_layout);
+                stateLayoutMap.put(DslLoadMoreItem.ADAPTER_LOAD_RETRY, R.layout.base_load_error_layout);
+            }
+        }
+
+        @Override
+        public void onBindStateLayout(@NonNull BaseDslStateItem stateItem, @NonNull RBaseViewHolder itemHolder, int state) {
+
         }
     }
 
