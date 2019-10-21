@@ -34,9 +34,20 @@
     </style>
 
     <style name="BaseSplashTheme" parent="BaseTranStatusTheme">
+
     </style>
 
     <style name="BaseTranStatusTheme" parent="BaseWhiteAppTheme">
+
+    </style>
+
+    <style name="BaseNoDisplay" parent="BaseWhiteAppTheme">
+        <item name="android:windowBackground">@null</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowAnimationStyle">@null</item>
+        <item name="android:windowDisablePreview">true</item>
+        <item name="android:windowNoDisplay">true</item>
     </style>
 
     <!--透明主题, 透明主题 在overridePendingTransition 执行动画的时候, exitAnim 不会执行.-->
@@ -53,7 +64,7 @@
         <item name="android:windowAnimationStyle">@null</item>
     </style>
 
-    <style name="WindowNoAnim" parent="android:Animation" mce_bogus="1">
+    <style name="WindowNoAnim" mce_bogus="1" parent="android:Animation">
         <item name="android:windowEnterAnimation">@null</item>
         <item name="android:windowExitAnimation">@null</item>
         <item name="android:windowHideAnimation">@null</item>

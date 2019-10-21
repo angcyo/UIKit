@@ -320,6 +320,10 @@ public class ActivityHelper {
         return new Builder(context);
     }
 
+    public static TransitionBuilder transition(Activity activity) {
+        return new TransitionBuilder(activity);
+    }
+
     public static class Builder {
         Context context;
         Intent intent;
@@ -331,11 +335,24 @@ public class ActivityHelper {
         Intent resultData = null;
 
         String bundleKey = KEY_EXTRA;
-
+        /**
+         * 关闭调用者,如果是Activity
+         */
+        boolean finishSelf = false;
         private Bundle transitionOptions = null;
+        private List<Pair<View, String>> sharedElementList;
 
         public Builder(@NonNull Context context) {
             this.context = context;
+        }
+
+        public Builder finishSelf(boolean finish) {
+            finishSelf = finish;
+            return this;
+        }
+
+        public Builder finishSelf() {
+            return finishSelf(true);
         }
 
         /**
@@ -376,7 +393,11 @@ public class ActivityHelper {
             }
 
             if (bundle != null) {
-                intent.putExtra(bundleKey, bundle);
+                if (bundleKey == null) {
+                    intent.putExtras(bundle);
+                } else {
+                    intent.putExtra(bundleKey, bundle);
+                }
             }
         }
 
@@ -393,7 +414,7 @@ public class ActivityHelper {
             return this;
         }
 
-        public Builder setBundle(@NonNull String key, Bundle bundle) {
+        public Builder setBundle(@Nullable String key, Bundle bundle) {
             bundleKey = key;
             setBundle(bundle);
             return this;
@@ -402,11 +423,18 @@ public class ActivityHelper {
         /**
          * 扩展设置
          */
-        public Builder extra(@NonNull Function<Bundle, Void> function) {
+        public Builder extra(@NonNull Function<Bundle, Object> function) {
             if (bundle == null) {
                 this.bundle = new Bundle();
             }
             function.apply(bundle);
+            return this;
+        }
+
+        public Builder configIntent(@NonNull Function<Intent, Object> function) {
+            if (intent != null) {
+                function.apply(intent);
+            }
             return this;
         }
 
@@ -472,6 +500,10 @@ public class ActivityHelper {
                 if (enterAnim != -1 || exitAnim != -1) {
                     ((Activity) context).overridePendingTransition(enterAnim, exitAnim);
                 }
+
+                if (finishSelf) {
+                    ((Activity) context).onBackPressed();
+                }
             }
             return intent;
         }
@@ -529,8 +561,6 @@ public class ActivityHelper {
             }
         }
 
-        private List<Pair<View, String>> sharedElementList;
-
         /**
          * 转场动画支持.
          * 步骤1: 获取共享元素属性值
@@ -570,18 +600,13 @@ public class ActivityHelper {
         }
     }
 
-    public static TransitionBuilder transition(Activity activity) {
-        return new TransitionBuilder(activity);
-    }
-
     public static class TransitionBuilder {
         Activity activity;
+        private List<Pair<View, String>> sharedElementList;
 
         private TransitionBuilder(Activity activity) {
             this.activity = activity;
         }
-
-        private List<Pair<View, String>> sharedElementList;
 
         /**
          * 转场动画支持.
