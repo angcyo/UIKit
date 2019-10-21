@@ -105,15 +105,23 @@ open class DslAdapter : RBaseAdapter<DslAdapterItem> {
 
     override fun onViewAttachedToWindow(holder: RBaseViewHolder) {
         super.onViewAttachedToWindow(holder)
-        if (holder.adapterPosition in 0 until itemCount) {
-            getAdapterItem(holder.adapterPosition).onItemViewAttachedToWindow.invoke(holder)
+        if (isAdapterStatus()) {
+            dslAdapterStatusItem.onItemViewAttachedToWindow.invoke(holder)
+        } else {
+            if (holder.adapterPosition in getValidFilterDataList().indices) {
+                getAdapterItem(holder.adapterPosition).onItemViewAttachedToWindow.invoke(holder)
+            }
         }
     }
 
     override fun onViewDetachedFromWindow(holder: RBaseViewHolder) {
         super.onViewDetachedFromWindow(holder)
-        if (holder.adapterPosition in 0 until itemCount) {
-            getAdapterItem(holder.adapterPosition).onItemViewDetachedToWindow.invoke(holder)
+        if (isAdapterStatus()) {
+            dslAdapterStatusItem.onItemViewDetachedToWindow.invoke(holder)
+        } else {
+            if (holder.adapterPosition in getValidFilterDataList().indices) {
+                getAdapterItem(holder.adapterPosition).onItemViewDetachedToWindow.invoke(holder)
+            }
         }
     }
 
@@ -311,18 +319,36 @@ open class DslAdapter : RBaseAdapter<DslAdapterItem> {
 
     //</editor-fold desc="操作方法">
 
+    //<editor-fold desc="兼容的操作">
+
     override fun appendData(datas: MutableList<DslAdapterItem>?) {
-        addLastItem(datas ?: emptyList())
+        val list: List<DslAdapterItem> = datas ?: emptyList()
+        if (list.isNotEmpty()) {
+            dataItems.addAll(_validIndex(dataItems, -1), list)
+            _updateAdapterItems()
+            updateItemDepend(FilterParams(async = false, just = true))
+        }
     }
 
     override fun resetData(datas: MutableList<DslAdapterItem>?) {
-        resetItem(datas ?: emptyList())
+        val list: List<DslAdapterItem> = datas ?: emptyList()
+        dataItems.clear()
+        dataItems.addAll(list)
+        _updateAdapterItems()
+        updateItemDepend(FilterParams(async = false, just = true))
     }
 
     override fun addFirstItem(bean: DslAdapterItem) {
-        insertItem(0, bean)
+        dataItems.add(_validIndex(dataItems, 0), bean)
+        _updateAdapterItems()
+        updateItemDepend(FilterParams(async = false, just = true))
     }
 
+    override fun setNoMore(refresh: Boolean) {
+        super.setNoMore(refresh)
+        //由于diff, 只会更新布局item, 所以这里兼容一下, 强制更新最后一项.
+        updateLoadMoreView()
+    }
     //</editor-fold desc="兼容的操作">
 
     //<editor-fold desc="不支持的操作">

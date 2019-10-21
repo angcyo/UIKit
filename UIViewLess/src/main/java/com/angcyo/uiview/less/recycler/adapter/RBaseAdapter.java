@@ -443,7 +443,7 @@ public abstract class RBaseAdapter<T> extends RecyclerView.Adapter<RBaseViewHold
         getUiAdapterLoadMore().onBindLoadMoreView(this, holder, loadState, position);
     }
 
-    private void updateLoadMoreView() {
+    protected void updateLoadMoreView() {
         if (mLoadMoreView != null) {
             mLoadMoreView.setLoadState(mLoadState);
 
