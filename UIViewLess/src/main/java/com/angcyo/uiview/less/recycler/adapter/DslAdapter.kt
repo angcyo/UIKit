@@ -322,38 +322,26 @@ open class DslAdapter : RBaseAdapter<DslAdapterItem> {
     //<editor-fold desc="兼容的操作">
 
     override fun appendData(datas: MutableList<DslAdapterItem>?) {
-        if (mEnableLoadMore) {
-            val list: List<DslAdapterItem> = datas ?: emptyList()
-            if (list.isNotEmpty()) {
-                dataItems.addAll(_validIndex(dataItems, -1), list)
-                _updateAdapterItems()
-                updateItemDepend(FilterParams(async = false, just = true))
-            }
-        } else {
-            addLastItem(datas ?: emptyList())
+        val list: List<DslAdapterItem> = datas ?: emptyList()
+        if (list.isNotEmpty()) {
+            dataItems.addAll(_validIndex(dataItems, -1), list)
+            _updateAdapterItems()
+            updateItemDepend(FilterParams(async = false, just = true))
         }
     }
 
     override fun resetData(datas: MutableList<DslAdapterItem>?) {
-        if (mEnableLoadMore) {
-            val list: List<DslAdapterItem> = datas ?: emptyList()
-            dataItems.clear()
-            dataItems.addAll(list)
-            _updateAdapterItems()
-            updateItemDepend(FilterParams(async = false, just = true))
-        } else {
-            resetItem(datas ?: emptyList())
-        }
+        val list: List<DslAdapterItem> = datas ?: emptyList()
+        dataItems.clear()
+        dataItems.addAll(list)
+        _updateAdapterItems()
+        updateItemDepend(FilterParams(async = false, just = true))
     }
 
     override fun addFirstItem(bean: DslAdapterItem) {
-        if (mEnableLoadMore) {
-            dataItems.add(_validIndex(dataItems, 0), bean)
-            _updateAdapterItems()
-            updateItemDepend(FilterParams(async = false, just = true))
-        } else {
-            insertItem(0, bean)
-        }
+        dataItems.add(_validIndex(dataItems, 0), bean)
+        _updateAdapterItems()
+        updateItemDepend(FilterParams(async = false, just = true))
     }
 
     override fun setNoMore(refresh: Boolean) {
