@@ -92,6 +92,8 @@ public abstract class AbsLifeCycleFragment extends AbsFragment implements IFragm
     @Override
     public void onDestroy() {
         super.onDestroy();
+        firstShowEnd = false;
+        fragmentShowCount = 0;
     }
 
     @Override
