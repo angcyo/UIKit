@@ -9,9 +9,9 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
-import androidx.core.content.ContextCompat
 import android.text.TextUtils
 import android.util.AttributeSet
+import androidx.core.content.ContextCompat
 import com.angcyo.http.Ok
 import com.angcyo.lib.L
 import com.angcyo.uiview.less.R
@@ -26,6 +26,7 @@ import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.Transformation
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.load.model.GlideUrl
 import com.bumptech.glide.load.resource.gif.GifDrawable
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
@@ -46,14 +47,22 @@ import java.io.File
  * 修改备注：
  * Version: 1.0.0
  */
-open class GlideImageView(context: Context, attributeSet: AttributeSet? = null) : RImageView(context, attributeSet) {
+open class GlideImageView(context: Context, attributeSet: AttributeSet? = null) :
+    RImageView(context, attributeSet) {
 
     protected var defaultPlaceholderDrawable: Drawable? = null
     protected var defaultPlaceholderDrawableRes = R.drawable.base_image_placeholder_shape
 
     companion object {
         var DEBUG_SHOW = false
-        /**文件名需要包含扩展名*/
+
+        /**全局配置*/
+        var glideHeaderConfig: ((url: String, header: HashMap<String, String>) -> Unit)? = null
+
+        /**
+         * 从assets中,加载gifDrawable
+         * @param assertName 文件名需要包含扩展名
+         * */
         fun gifDrawable(context: Context, assertName: String) =
             GifDrawableBuilder().from(context.assets.open(assertName)).build()
     }
@@ -80,6 +89,9 @@ open class GlideImageView(context: Context, attributeSet: AttributeSet? = null) 
 
     var override = true
 
+    /**请求头*/
+    var glideHeader = hashMapOf<String, String>()
+
     /**
      * 使用原始大小 进行override
      * */
@@ -104,10 +116,15 @@ open class GlideImageView(context: Context, attributeSet: AttributeSet? = null) 
 
     init {
         val typedArray = context.obtainStyledAttributes(attributeSet, R.styleable.GlideImageView)
-        defaultPlaceholderDrawable = typedArray.getDrawable(R.styleable.GlideImageView_r_placeholder_drawable)
+        defaultPlaceholderDrawable =
+            typedArray.getDrawable(R.styleable.GlideImageView_r_placeholder_drawable)
         noPlaceholderDrawable =
-            typedArray.getBoolean(R.styleable.GlideImageView_r_no_placeholder_drawable, noPlaceholderDrawable)
-        originalSize = typedArray.getBoolean(R.styleable.GlideImageView_r_load_original_size, originalSize)
+            typedArray.getBoolean(
+                R.styleable.GlideImageView_r_no_placeholder_drawable,
+                noPlaceholderDrawable
+            )
+        originalSize =
+            typedArray.getBoolean(R.styleable.GlideImageView_r_load_original_size, originalSize)
 
         if (defaultPlaceholderDrawable != null) {
             placeholderDrawable = defaultPlaceholderDrawable
@@ -313,7 +330,10 @@ open class GlideImageView(context: Context, attributeSet: AttributeSet? = null) 
                 request.into(object : SimpleTarget<File>() {
                     override fun onResourceReady(resource: File, transition: Transition<in File>?) {
                         if (placeholderDrawable != null) {
-                            setImageDrawable(placeholderDrawable!!, BitmapDrawable(resources, resource.absolutePath))
+                            setImageDrawable(
+                                placeholderDrawable!!,
+                                BitmapDrawable(resources, resource.absolutePath)
+                            )
                         }
                     }
                 })
@@ -324,14 +344,20 @@ open class GlideImageView(context: Context, attributeSet: AttributeSet? = null) 
     }
 
     @SuppressLint("CheckResult")
-    private fun intoConfigGifDrawable(request: RequestBuilder<GifDrawable>, requestOptions: RequestOptions) {
+    private fun intoConfigGifDrawable(
+        request: RequestBuilder<GifDrawable>,
+        requestOptions: RequestOptions
+    ) {
         initListener(request)
 
         intoConfig(requestOptions) {
             request.apply(requestOptions)
             if (animType == AnimType.TRANSITION) {
                 request.into(object : SimpleTarget<GifDrawable>() {
-                    override fun onResourceReady(resource: GifDrawable, transition: Transition<in GifDrawable>?) {
+                    override fun onResourceReady(
+                        resource: GifDrawable,
+                        transition: Transition<in GifDrawable>?
+                    ) {
                         if (placeholderDrawable != null) {
                             setImageDrawable(placeholderDrawable!!, resource)
                             resource.start()
@@ -345,14 +371,20 @@ open class GlideImageView(context: Context, attributeSet: AttributeSet? = null) 
     }
 
     @SuppressLint("CheckResult")
-    private fun intoConfigDrawable(request: RequestBuilder<Drawable>, requestOptions: RequestOptions) {
+    private fun intoConfigDrawable(
+        request: RequestBuilder<Drawable>,
+        requestOptions: RequestOptions
+    ) {
         initListener(request)
 
         intoConfig(requestOptions) {
             request.apply(requestOptions)
             if (animType == AnimType.TRANSITION) {
                 request.into(object : SimpleTarget<Drawable>() {
-                    override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) {
+                    override fun onResourceReady(
+                        resource: Drawable,
+                        transition: Transition<in Drawable>?
+                    ) {
                         if (placeholderDrawable != null) {
                             setImageDrawable(placeholderDrawable!!, resource)
                         }
@@ -372,9 +404,15 @@ open class GlideImageView(context: Context, attributeSet: AttributeSet? = null) 
             request.apply(requestOptions)
             if (animType == AnimType.TRANSITION) {
                 request.into(object : SimpleTarget<Bitmap>() {
-                    override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                    override fun onResourceReady(
+                        resource: Bitmap,
+                        transition: Transition<in Bitmap>?
+                    ) {
                         if (placeholderDrawable != null) {
-                            setImageDrawable(placeholderDrawable!!, BitmapDrawable(resources, resource))
+                            setImageDrawable(
+                                placeholderDrawable!!,
+                                BitmapDrawable(resources, resource)
+                            )
                         }
                     }
                 })
@@ -516,7 +554,12 @@ open class GlideImageView(context: Context, attributeSet: AttributeSet? = null) 
                             val gifDrawable = GifDrawableBuilder().from(resource).build()
                             this@GlideImageView.setImageDrawable(gifDrawable)
                         } catch (e: Exception) {
-                            this@GlideImageView.setImageDrawable(BitmapDrawable(resources, resource.absolutePath))
+                            this@GlideImageView.setImageDrawable(
+                                BitmapDrawable(
+                                    resources,
+                                    resource.absolutePath
+                                )
+                            )
                             L.e("call: 加载Gif ${resource.absolutePath} 失败.")
                         }
                     }
@@ -603,7 +646,10 @@ open class GlideImageView(context: Context, attributeSet: AttributeSet? = null) 
         }
 
         val request = Glide.with(context)
-            .load(url)
+            .load(GlideUrl(url) {
+                glideHeaderConfig?.invoke(url, glideHeader)
+                glideHeader
+            })
 
         intoConfigDrawable(request, defaultConfig(false))
     }
@@ -656,7 +702,12 @@ open class GlideImageView(context: Context, attributeSet: AttributeSet? = null) 
                             val gifDrawable = GifDrawableBuilder().from(resource).build()
                             this@GlideImageView.setImageDrawable(gifDrawable)
                         } catch (e: Exception) {
-                            this@GlideImageView.setImageDrawable(BitmapDrawable(resources, resource.absolutePath))
+                            this@GlideImageView.setImageDrawable(
+                                BitmapDrawable(
+                                    resources,
+                                    resource.absolutePath
+                                )
+                            )
                             L.i("call: 加载Gif ${resource.absolutePath} 失败.")
                         }
                     }
