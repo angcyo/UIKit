@@ -316,6 +316,19 @@ public class RUtils {
         context.startActivity(intent);
     }
 
+    /**
+     * 拨打电话
+     * <p>需添加权限 {@code <uses-permission android:name="android.permission.CALL_PHONE"/>}</p>
+     *
+     * @param phoneNumber 电话号码
+     */
+    @SuppressLint("MissingPermission")
+    public static void call(Context context, String phoneNumber) {
+        Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + phoneNumber));
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(intent);
+    }
+
     public static void emailTo(Activity activity, String email) {
         Intent intent = new Intent(Intent.ACTION_SENDTO);
         intent.setData(Uri.parse("mailto:" + email));
