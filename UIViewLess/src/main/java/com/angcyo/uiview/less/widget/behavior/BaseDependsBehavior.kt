@@ -93,6 +93,9 @@ abstract class BaseDependsBehavior<T : View>(
         return super.onDependentViewChanged(parent, child, dependency)
     }
 
+    /**是否处于内嵌滚动中*/
+    var _isNestedScrollAccepted = false
+
     override fun onNestedScrollAccepted(
         coordinatorLayout: CoordinatorLayout,
         child: T,
@@ -110,11 +113,23 @@ abstract class BaseDependsBehavior<T : View>(
             type
         )
 
+        _isNestedScrollAccepted = true
+
         dxConsumedAllSum += currentDxConsumedAll
         dyConsumedAllSum += currentDyConsumedAll
 
         currentDxConsumedAll = 0
         currentDyConsumedAll = 0
+    }
+
+    override fun onStopNestedScroll(
+        coordinatorLayout: CoordinatorLayout,
+        child: T,
+        target: View,
+        type: Int
+    ) {
+        super.onStopNestedScroll(coordinatorLayout, child, target, type)
+        _isNestedScrollAccepted = false
     }
 
     override fun onNestedScroll(

@@ -136,18 +136,20 @@ open class BackgroundBehavior(context: Context? = null, attributeSet: AttributeS
             childViewDefaultHeight = child.measuredHeight
         }
 
-        _contentView?.apply {
-            val view = findRecyclerView() ?: this
-            if (UI.canChildScrollDown(view) || UI.canChildScrollUp(view)) {
-                //可以滚动
-            } else {
-                //不可用滚动
-                dyConsumedAllSum = 0
-                if (_lastContentTranslationY < 0) {
-                    _lastChildTop = _lastContentTranslationY.toInt()
+        if (!_isNestedScrollAccepted) {
+            _contentView?.apply {
+                val view = findRecyclerView() ?: this
+                if (UI.canChildScrollDown(view) || UI.canChildScrollUp(view)) {
+                    //可以滚动
                 } else {
-                    _lastContentTranslationY = 0f
-                    _lastChildTop = 0
+                    //不可用滚动
+                    dyConsumedAllSum = 0
+                    if (_lastContentTranslationY < 0) {
+                        _lastChildTop = _lastContentTranslationY.toInt()
+                    } else {
+                        _lastContentTranslationY = 0f
+                        _lastChildTop = 0
+                    }
                 }
             }
         }
