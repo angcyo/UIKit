@@ -395,18 +395,38 @@ public fun EditText.onEmptyText(listener: (Boolean) -> Unit) {
 /**只要文本改变就通知*/
 public fun EditText.onTextChange(
     defaultText: CharSequence? = null,
+    shakeDelay: Long = -1L,//去频限制, 负数表示不开启
     listener: (CharSequence) -> Unit
 ) {
+
     this.addTextChangedListener(object : SingleTextWatcher() {
+        var mainHandle: Handler? = null
+
+        val callback: Runnable = Runnable {
+            listener.invoke(lastText ?: "")
+        }
+
+        init {
+            if (shakeDelay >= 0) {
+                mainHandle = Handler(Looper.getMainLooper())
+            }
+        }
+
         var lastText: CharSequence? = defaultText
 
         override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
             super.onTextChanged(s, start, before, count)
+            mainHandle?.removeCallbacks(callback)
+
             val text = s?.toString() ?: ""
             if (TextUtils.equals(lastText, text)) {
             } else {
-                listener.invoke(text)
                 lastText = text
+                if (mainHandle == null) {
+                    callback.run()
+                } else {
+                    mainHandle?.postDelayed(callback, shakeDelay)
+                }
             }
         }
     })
