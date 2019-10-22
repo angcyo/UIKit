@@ -9,6 +9,7 @@ import com.angcyo.uiview.less.base.BaseUI
 import com.angcyo.uiview.less.iview.AffectUI
 import com.angcyo.uiview.less.kotlin.find
 import com.angcyo.uiview.less.kotlin.getColor
+import com.angcyo.uiview.less.kotlin.setHeight
 import com.angcyo.uiview.less.recycler.RBaseViewHolder
 import com.angcyo.uiview.less.recycler.adapter.RBaseAdapter
 import com.angcyo.uiview.less.widget.group.RTabLayout
@@ -36,6 +37,9 @@ open class OptionDialogConfig : BaseDialogConfig() {
 
     internal lateinit var affectUI: AffectUI
     internal lateinit var adapter: RBaseAdapter<Any>
+
+    /**简单选择项, 用来控制RV的高度为[wrap_content]*/
+    var singleOption = false
 
     override fun onDialogInit(dialog: Dialog, dialogViewHolder: RBaseViewHolder) {
         super.onDialogInit(dialog, dialogViewHolder)
@@ -141,6 +145,9 @@ open class OptionDialogConfig : BaseDialogConfig() {
             }
         }
         dialogViewHolder.rv(R.id.recycler_view).adapter = adapter
+        if (singleOption) {
+            dialogViewHolder.group(R.id.content_wrap_layout).setHeight(-2)
+        }
 
         val defaultLevel = optionList.size
         val requestLevel = if (onCheckOptionEnd(optionList, defaultLevel)) {

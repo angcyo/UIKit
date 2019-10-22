@@ -1,40 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:layout_width="match_parent"
-        android:background="@drawable/base_white_top_round_bg"
-        android:orientation="vertical"
-        android:layout_height="wrap_content">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/base_white_top_round_bg"
+    android:orientation="vertical">
 
-    <include android:id="@+id/title_layout"
-             layout="@layout/dialog_base_title_layout"/>
+    <include
+        android:id="@+id/title_layout"
+        layout="@layout/dialog_base_title_layout" />
 
     <View
-            android:layout_width="match_parent"
-            android:layout_height="1px"
-            android:background="@color/line_color"/>
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="@color/line_color" />
 
     <com.angcyo.uiview.less.widget.group.RTabLayout
-            android:id="@+id/tab_layout"
-            android:layout_width="match_parent"
-            android:minHeight="@dimen/dialog_item_height"
-            tools:background="@color/transparent_dark20"
-            app:r_indicator_offset_y="8dp"
-            app:r_indicator_type="INDICATOR_TYPE_BOTTOM_GRADIENT_LINE"
-            app:r_indicator_width="40dp"
-            android:layout_height="wrap_content"/>
+        android:id="@+id/tab_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="@dimen/dialog_item_height"
+        app:r_indicator_offset_y="8dp"
+        app:r_indicator_type="INDICATOR_TYPE_BOTTOM_GRADIENT_LINE"
+        app:r_indicator_width="40dp"
+        tools:background="@color/transparent_dark20" />
 
     <FrameLayout
-            android:id="@+id/content_wrap_layout"
-            android:layout_width="match_parent"
-            android:layout_height="280dp">
+        android:id="@+id/content_wrap_layout"
+        android:layout_width="match_parent"
+        android:layout_height="280dp">
 
         <com.angcyo.uiview.less.recycler.RRecyclerView
-                android:id="@+id/recycler_view"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
+            android:id="@+id/recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:overScrollMode="never" />
 
     </FrameLayout>
 
