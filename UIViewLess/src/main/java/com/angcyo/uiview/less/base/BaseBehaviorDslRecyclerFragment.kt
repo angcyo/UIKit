@@ -5,7 +5,6 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import com.angcyo.uiview.less.R
 import com.angcyo.uiview.less.base.helper.ViewGroupHelper
 import com.angcyo.uiview.less.kotlin.coordinatorParams
-import com.angcyo.uiview.less.kotlin.dp
 import com.angcyo.uiview.less.kotlin.getDimen
 import com.angcyo.uiview.less.kotlin.inflate
 import com.angcyo.uiview.less.recycler.RBaseViewHolder
@@ -26,6 +25,11 @@ open class BaseBehaviorDslRecyclerFragment : BaseDslRecyclerFragment() {
 
     /**坍塌标题的一些配置参数*/
     var titleBarCollapseCallback: TitleBarCollapseCallback = TitleBarCollapseCallback()
+
+    init {
+        //Behavior界面, 默认关闭软键盘.否则会出事!
+        contentNeedSoftInputLayout = false
+    }
 
     override fun getLayoutId(): Int {
         return R.layout.base_behavior_fragment_layout
@@ -124,7 +128,8 @@ open class BaseBehaviorDslRecyclerFragment : BaseDslRecyclerFragment() {
                         this@BaseBehaviorDslRecyclerFragment.titleBarCollapseCallback
 
                     //设置倒塌前的字体大小
-                    gradientStartConfig.titleTextSize = getDimen(R.dimen.base_collapse_text_size).toFloat()
+                    gradientStartConfig.titleTextSize =
+                        getDimen(R.dimen.base_collapse_text_size).toFloat()
                     gradientStartConfig.titleTextColor = viewResConfig.titleTextColor
                     ViewGroupHelper.build(baseViewHolder.view(R.id.base_collapse_title_view))
                         .selector()

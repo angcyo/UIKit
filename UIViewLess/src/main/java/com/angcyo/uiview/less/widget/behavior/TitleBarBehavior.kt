@@ -182,6 +182,14 @@ open class OnTitleBarBehaviorCallback {
     /**滑动到多少比例时, 显示标题配合[alwaysShowTitle]使用*/
     var titleShowThreshold = 0.8f
 
+    /**关闭所有特效*/
+    fun disable() {
+        alwaysShowTitle = true
+        titleBarItemGradient = false
+        titleBackgroundGradient = false
+        titleTextGradient = false
+    }
+
     open fun onChildLayout(behavior: TitleBarBehavior, child: View) {
 
     }

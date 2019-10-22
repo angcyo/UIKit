@@ -22,6 +22,26 @@ import com.angcyo.uiview.less.utils.Tip
  */
 
 /**通过[itemTag]查找指定的[DslAdapterItem]*/
+
+public fun DslAdapter.findItemByTag(
+    items: List<DslAdapterItem>,
+    itemTag: String?
+): DslAdapterItem? {
+    if (TextUtils.isEmpty(itemTag)) {
+        return null
+    }
+
+    var result: DslAdapterItem? = null
+    items.forEach {
+        if (it.itemTag == itemTag) {
+            result = it
+            return result
+        }
+    }
+
+    return result
+}
+
 public fun DslAdapter.findItemByTag(itemTag: String?): DslAdapterItem? {
     if (TextUtils.isEmpty(itemTag)) {
         return null
@@ -31,7 +51,7 @@ public fun DslAdapter.findItemByTag(itemTag: String?): DslAdapterItem? {
     getValidFilterDataList().forEach {
         if (it.itemTag == itemTag) {
             result = it
-            return@forEach
+            return result
         }
     }
 

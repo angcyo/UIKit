@@ -22,12 +22,22 @@ import kotlin.math.max
 open class BackgroundBehavior(context: Context? = null, attributeSet: AttributeSet? = null) :
     BaseDependsBehavior<View>(context, attributeSet) {
 
+    companion object {
+        /**背景布局, 顶部填充一个依赖view的高度*/
+        const val LAYOUT_FLAG_PADDING_TOP_DEPEND_HEIGHT = 0x00000001
+    }
+
     /**强制指定child的高度*/
     var childHeight: Int = -1
         set(value) {
             field = value
             childViewDefaultHeight = value
         }
+
+    var backgroundLayoutState = 0b00
+
+    //[LAYOUT_FLAG_PADDING_TOP_DEPEND_HEIGHT]
+    var _backgroundPaddingTopHeight = 0
 
     /**背景效果处理回调*/
     var onBackgroundBehaviorCallback: OnBackgroundBehaviorCallback = OnBackgroundBehaviorCallback()
@@ -87,6 +97,10 @@ open class BackgroundBehavior(context: Context? = null, attributeSet: AttributeS
                 _contentView = dependency
                 addContentTranslationListener(contentViewTranslationListener)
             }
+        }
+
+        if (backgroundLayoutState.have(LAYOUT_FLAG_PADDING_TOP_DEPEND_HEIGHT)) {
+            _backgroundPaddingTopHeight = dependsLayout?.measuredHeight ?: 0
         }
         return result
     }
@@ -196,7 +210,40 @@ open class BackgroundBehavior(context: Context? = null, attributeSet: AttributeS
             heightUsed
         )
         return if (childHeight >= 0) {
-            parent.onMeasureChild(child, parentWidthMeasureSpec, 0, exactly(childHeight), 0)
+            //强制child的高度
+            if (backgroundLayoutState.have(LAYOUT_FLAG_PADDING_TOP_DEPEND_HEIGHT)) {
+                //child需要padding
+                child.padding {
+                    top = _backgroundPaddingTopHeight
+                }
+                parent.onMeasureChild(
+                    child,
+                    parentWidthMeasureSpec,
+                    0,
+                    exactly(childHeight + _backgroundPaddingTopHeight),
+                    0
+                )
+            } else {
+                parent.onMeasureChild(child, parentWidthMeasureSpec, 0, exactly(childHeight), 0)
+            }
+            true
+        } else if (backgroundLayoutState.have(LAYOUT_FLAG_PADDING_TOP_DEPEND_HEIGHT)) {
+            //child需要padding
+            child.padding {
+                top = _backgroundPaddingTopHeight
+            }
+            if (child.layoutParams.height > 0) {
+                //设置了指定高度, 比如100dp
+                parent.onMeasureChild(
+                    child,
+                    parentWidthMeasureSpec,
+                    0,
+                    exactly(childHeight + _backgroundPaddingTopHeight),
+                    0
+                )
+            } else {
+                parent.onMeasureChild(child, parentWidthMeasureSpec, 0, exactly(childHeight), 0)
+            }
             true
         } else {
             false
@@ -236,7 +283,13 @@ open class OnBackgroundBehaviorCallback {
             if (enableOverScrollHeightChange) {
                 if (scrollTop > 0) {
                     //只有往下覆盖滚动,才改变高度
-                    child.setHeight((behavior.childViewDefaultHeight + scrollTop))
+                    val paddingTop =
+                        if (behavior.backgroundLayoutState.have(BackgroundBehavior.LAYOUT_FLAG_PADDING_TOP_DEPEND_HEIGHT)) {
+                            behavior._backgroundPaddingTopHeight
+                        } else {
+                            0
+                        }
+                    child.setHeight((behavior.childViewDefaultHeight + scrollTop + paddingTop))
                 }
             }
 

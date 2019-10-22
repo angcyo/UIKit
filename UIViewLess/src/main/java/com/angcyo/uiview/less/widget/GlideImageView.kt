@@ -667,7 +667,10 @@ open class GlideImageView(context: Context, attributeSet: AttributeSet? = null) 
 
         val request = Glide.with(context)
             .asBitmap()
-            .load(url)
+            .load(GlideUrl(url) {
+                glideHeaderConfig?.invoke(url, glideHeader)
+                glideHeader
+            })
 
         intoConfigBitmap(request, defaultConfig(false))
     }
@@ -686,7 +689,10 @@ open class GlideImageView(context: Context, attributeSet: AttributeSet? = null) 
 
         val request = Glide.with(context)
             .downloadOnly()
-            .load(url)
+            .load(GlideUrl(url) {
+                glideHeaderConfig?.invoke(url, glideHeader)
+                glideHeader
+            })
 
         initListener(request)
 
