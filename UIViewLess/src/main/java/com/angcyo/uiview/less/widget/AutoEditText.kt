@@ -67,7 +67,7 @@ open class AutoEditText : REditText {
 
     /**单独开一个方法, 是因为 [initEditText] 是在 [super] 里面触发的, 这个时候, 此类的成员变量都还没有初始化...*/
     private fun initAutoEditText(context: Context, attrs: AttributeSet?) {
-        resetAutoCompleteTextAdatper()
+        resetAutoCompleteTextAdapter()
     }
 
     /**
@@ -85,7 +85,7 @@ open class AutoEditText : REditText {
         return super.enoughToFilter()
     }
 
-    fun resetAutoCompleteTextAdatper() {
+    fun resetAutoCompleteTextAdapter() {
         if (!TextUtils.isEmpty(autoCompleteText)) {
             setDataList(
                 RUtils.split(autoCompleteText, autoCompleteTextSeparator, false),

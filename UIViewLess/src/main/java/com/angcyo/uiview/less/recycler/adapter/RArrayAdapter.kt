@@ -24,7 +24,11 @@ open class RArrayAdapter<T> : ArrayAdapter<T> {
 
     constructor(context: Context) : this(context, mutableListOf())
 
-    constructor(context: Context, datas: List<T>) : this(context, R.layout.base_item_single_drop_down_layout, datas)
+    constructor(context: Context, datas: List<T>) : this(
+        context,
+        R.layout.base_item_single_drop_down_layout,
+        datas
+    )
 
     constructor(context: Context, resource: Int) : this(context, resource, mutableListOf())
 
@@ -68,11 +72,7 @@ open class RArrayAdapter<T> : ArrayAdapter<T> {
         //super.getView(position, convertView, parent)
         val itemView = createView(convertView, parent, thisResource)
 
-        onBindItemView(
-            itemView.tag as RBaseViewHolder,
-            position,
-            if (thisDataList.size > position) thisDataList[position] else null
-        )
+        onBindItemView(itemView.tag as RBaseViewHolder, position, getItem(position))
 
         return itemView
     }
@@ -82,11 +82,7 @@ open class RArrayAdapter<T> : ArrayAdapter<T> {
 
         val itemView = createView(convertView, parent, thisDropDownResource)
 
-        onBindDropDownItemView(
-            itemView.tag as RBaseViewHolder,
-            position,
-            if (thisDataList.size > position) thisDataList[position] else null
-        )
+        onBindDropDownItemView(itemView.tag as RBaseViewHolder, position, getItem(position))
 
         return itemView
     }
@@ -101,7 +97,11 @@ open class RArrayAdapter<T> : ArrayAdapter<T> {
     /**
      * 下拉弹窗item,布局绑定
      * */
-    open fun onBindDropDownItemView(itemViewHolder: RBaseViewHolder, position: Int, itemBean: T? = null) {
+    open fun onBindDropDownItemView(
+        itemViewHolder: RBaseViewHolder,
+        position: Int,
+        itemBean: T? = null
+    ) {
         if (itemBean is CharSequence) {
             itemViewHolder.tv(R.id.text_view).text = itemBean
         }
