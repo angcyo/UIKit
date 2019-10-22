@@ -226,7 +226,7 @@ open class OptionDialogConfig : BaseDialogConfig() {
      * */
     var onLoadOptionList: (
         options: MutableList<Any>, level: Int,
-        itemsCallback: (MutableList<Any>) -> Unit,
+        itemsCallback: (MutableList<out Any>) -> Unit,
         errorCallback: (Throwable?) -> Unit
     ) -> Unit =
         { options, level, itemsCallback, errorCallback ->
