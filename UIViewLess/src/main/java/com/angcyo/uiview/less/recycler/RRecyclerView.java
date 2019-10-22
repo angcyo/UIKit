@@ -31,6 +31,8 @@ import com.angcyo.lib.L;
 import com.angcyo.uiview.less.R;
 import com.angcyo.uiview.less.draw.RDrawIndicator;
 import com.angcyo.uiview.less.kotlin.ViewExKt;
+import com.angcyo.uiview.less.recycler.adapter.DslAdapter;
+import com.angcyo.uiview.less.recycler.adapter.DslAdapterItem;
 import com.angcyo.uiview.less.recycler.adapter.RBaseAdapter;
 import com.angcyo.uiview.less.resources.AnimUtil;
 import com.angcyo.uiview.less.skin.SkinHelper;
@@ -69,31 +71,6 @@ public class RRecyclerView extends RecyclerView implements CanScrollUpCallBack {
      * 滚动时间间隔(毫秒)
      */
     protected long autoScrollTimeInterval = AUTO_SCROLL_TIME;
-    protected Runnable autoScrollRunnable = new Runnable() {
-        @Override
-        public void run() {
-            curScrollPosition++;
-            if (getAdapter() != null) {
-                int maxItemCount = getAdapter().getItemCount();
-                if (curScrollPosition >= maxItemCount) {
-                    curScrollPosition = 0;
-                    scrollTo(0, false);
-                } else {
-                    int firstVisibleItemPosition = curScrollPosition;
-                    LayoutManager layoutManager = getLayoutManager();
-                    if (layoutManager instanceof LinearLayoutManager) {
-                        firstVisibleItemPosition = ((LinearLayoutManager) layoutManager).findFirstVisibleItemPosition();
-                    }
-                    //L.e("call: run([])-> " + curScrollPosition + " " + firstVisibleItemPosition);
-                    scrollTo(curScrollPosition, Math.abs(firstVisibleItemPosition - curScrollPosition) < 2);
-                }
-            }
-
-            if (enableScroll) {
-                postDelayed(autoScrollRunnable, autoScrollTimeInterval);
-            }
-        }
-    };
     /**
      * 无限循环
      */
@@ -175,7 +152,6 @@ public class RRecyclerView extends RecyclerView implements CanScrollUpCallBack {
     });
     private OnSizeChangedListener mOnSizeChangedListener;
     private OnTouchScrollListener mOnTouchScrollListener;
-
     /**
      * 允许的最大高度, 如果为-2px,那么就是屏幕高度的一半, 如果是-3px,那么就是屏幕高度的三分之, 以此内推, 0不处理
      * 如果是负数,就是屏幕的倍数.
@@ -186,8 +162,32 @@ public class RRecyclerView extends RecyclerView implements CanScrollUpCallBack {
      * 最大高度参考值, 是否是相对于 parent的高度, 默认是相对于屏幕的高度
      */
     private boolean isMaxHeightRelativeParent = false;
-
     private ScrollHelper scrollHelper = new ScrollHelper();
+    protected Runnable autoScrollRunnable = new Runnable() {
+        @Override
+        public void run() {
+            curScrollPosition++;
+            if (getAdapter() != null) {
+                int maxItemCount = getAdapter().getItemCount();
+                if (curScrollPosition >= maxItemCount) {
+                    curScrollPosition = 0;
+                    scrollTo(0, false);
+                } else {
+                    int firstVisibleItemPosition = curScrollPosition;
+                    LayoutManager layoutManager = getLayoutManager();
+                    if (layoutManager instanceof LinearLayoutManager) {
+                        firstVisibleItemPosition = ((LinearLayoutManager) layoutManager).findFirstVisibleItemPosition();
+                    }
+                    //L.e("call: run([])-> " + curScrollPosition + " " + firstVisibleItemPosition);
+                    scrollTo(curScrollPosition, Math.abs(firstVisibleItemPosition - curScrollPosition) < 2);
+                }
+            }
+
+            if (enableScroll) {
+                postDelayed(autoScrollRunnable, autoScrollTimeInterval);
+            }
+        }
+    };
 
     public RRecyclerView(Context context) {
         this(context, null);
@@ -321,19 +321,7 @@ public class RRecyclerView extends RecyclerView implements CanScrollUpCallBack {
         }
         if (mBaseLayoutManager instanceof GridLayoutManager) {
             final GridLayoutManager gridLayoutManager = (GridLayoutManager) mBaseLayoutManager;
-            gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
-                @Override
-                public int getSpanSize(int position) {
-                    Adapter baseAdapter = getAdapter();
-                    if (baseAdapter != null &&
-                            (baseAdapter.getItemViewType(position) & RBaseAdapter.ITEM_SINGLE_LINE)
-                                    == RBaseAdapter.ITEM_SINGLE_LINE) {
-                        //占满正行
-                        return gridLayoutManager.getSpanCount();
-                    }
-                    return 1;
-                }
-            });
+            gridLayoutManager.setSpanSizeLookup(new RSpanSizeLookup(this));
         } else if (mBaseLayoutManager instanceof LinearLayoutManager) {
             ((LinearLayoutManager) mBaseLayoutManager).setRecycleChildrenOnDetach(true);
         }
@@ -1128,6 +1116,47 @@ public class RRecyclerView extends RecyclerView implements CanScrollUpCallBack {
             } catch (Exception e) {
                 L.e("StaggeredGridLayoutManagerWrap onLayoutChildren异常-> " + e.getMessage());
                 e.printStackTrace();
+            }
+        }
+    }
+
+    public static class RSpanSizeLookup extends GridLayoutManager.SpanSizeLookup {
+
+        @NonNull
+        RecyclerView recyclerView;
+
+        public RSpanSizeLookup(@NonNull RecyclerView recyclerView) {
+            this.recyclerView = recyclerView;
+        }
+
+        @Override
+        public int getSpanSize(int position) {
+            LayoutManager layoutManager = recyclerView.getLayoutManager();
+            if (layoutManager instanceof GridLayoutManager) {
+
+                GridLayoutManager gridLayoutManager = (GridLayoutManager) layoutManager;
+                Adapter baseAdapter = recyclerView.getAdapter();
+
+                if (baseAdapter != null &&
+                        (baseAdapter.getItemViewType(position) & RBaseAdapter.ITEM_SINGLE_LINE)
+                                == RBaseAdapter.ITEM_SINGLE_LINE) {
+                    //占满正行
+                    return gridLayoutManager.getSpanCount();
+                }
+                if (baseAdapter instanceof DslAdapter) {
+                    DslAdapterItem itemData = ((DslAdapter) baseAdapter).getItemData(position);
+                    if (itemData != null) {
+                        int itemSpanCount = itemData.getItemSpanCount();
+                        if (itemSpanCount > 0) {
+                            return itemSpanCount;
+                        } else {
+                            return gridLayoutManager.getSpanCount();
+                        }
+                    }
+                }
+                return 1;
+            } else {
+                return 1;
             }
         }
     }

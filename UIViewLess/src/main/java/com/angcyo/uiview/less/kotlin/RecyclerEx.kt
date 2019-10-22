@@ -23,6 +23,34 @@ import com.angcyo.uiview.less.recycler.adapter.DslAdapterItem
  * Copyright (c) 2019 ShenZhen O&M Cloud Co., Ltd. All rights reserved.
  */
 
+public fun RecyclerView?.grid(spanCount: Int, orientation: Int = GridLayoutManager.VERTICAL) {
+    this?.apply {
+        var create = false
+
+        if (layoutManager !is GridLayoutManager) {
+            create = true
+        } else {
+            if ((layoutManager as GridLayoutManager).spanCount != spanCount) {
+                create = true
+            } else if ((layoutManager as GridLayoutManager).orientation != orientation) {
+                create = true
+            }
+        }
+
+        if (create) {
+            layoutManager =
+                RRecyclerView.GridLayoutManagerWrap(context, spanCount, orientation, false)
+        }
+
+        if (layoutManager is GridLayoutManager) {
+            if ((layoutManager as GridLayoutManager).spanSizeLookup !is RRecyclerView.RSpanSizeLookup) {
+                (layoutManager as GridLayoutManager).spanSizeLookup =
+                    RRecyclerView.RSpanSizeLookup(this)
+            }
+        }
+    }
+}
+
 public fun RecyclerView.dslAdapter(
     append: Boolean = false, //当已经是adapter时, 是否追加item. 需要先关闭 new
     new: Boolean = true, //始终创建新的adapter, 为true时, 则append无效
@@ -69,13 +97,8 @@ public fun RecyclerView.dslAdapter(
 
     val dslAdapter = dslAdapter(append, new, init)
 
-    layoutManager = RRecyclerView.GridLayoutManagerWrap(context, spanCount).apply {
-        spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
-            override fun getSpanSize(position: Int): Int {
-                return dslAdapter.getItemData(position)?.itemSpanCount ?: 1
-            }
-        }
-    }
+    grid(spanCount)
+
     return dslAdapter
 }
 

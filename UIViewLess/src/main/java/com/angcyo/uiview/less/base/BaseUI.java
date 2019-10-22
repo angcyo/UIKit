@@ -8,15 +8,16 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import com.angcyo.uiview.less.R;
 import com.angcyo.uiview.less.base.helper.TitleItemHelper;
 import com.angcyo.uiview.less.iview.AffectUI;
 import com.angcyo.uiview.less.recycler.RBaseViewHolder;
+import com.angcyo.uiview.less.recycler.adapter.RBaseAdapter;
 import com.angcyo.uiview.less.recycler.dslitem.BaseDslStateItem;
 import com.angcyo.uiview.less.recycler.dslitem.DslAdapterStatusItem;
 import com.angcyo.uiview.less.recycler.dslitem.DslLoadMoreItem;
-import com.angcyo.uiview.less.recycler.adapter.RBaseAdapter;
 import com.angcyo.uiview.less.recycler.widget.ItemLoadMoreLayout;
 import com.angcyo.uiview.less.recycler.widget.ItemShowStateLayout;
 import com.angcyo.uiview.less.widget.ImageTextView;
@@ -41,6 +42,16 @@ public class BaseUI {
         uiAdapterShowStatus = new DefaultUIAdapterShowStatus();
         uiAdapterLoadMore = new DefaultUIAdapterLoadMore();
         uiDslAdapterStatus = new DefaultUIDslAdapterStatus();
+    }
+
+    public static void fullSpan(@NonNull RBaseViewHolder holder) {
+        ViewGroup.LayoutParams layoutParams = holder.itemView.getLayoutParams();
+        if (layoutParams instanceof StaggeredGridLayoutManager.LayoutParams) {
+            if (!((StaggeredGridLayoutManager.LayoutParams) layoutParams).isFullSpan()) {
+                ((StaggeredGridLayoutManager.LayoutParams) layoutParams).setFullSpan(true);
+                holder.itemView.setLayoutParams(layoutParams);
+            }
+        }
     }
 
     /**
@@ -150,6 +161,7 @@ public class BaseUI {
 
         @Override
         public void onBindShowStateView(@NonNull RBaseAdapter baseAdapter, @NonNull RBaseViewHolder holder, int showState, int position) {
+            fullSpan(holder);
             if (holder.itemView instanceof ItemShowStateLayout) {
 
             }
@@ -168,6 +180,8 @@ public class BaseUI {
 
         @Override
         public void onBindLoadMoreView(@NonNull final RBaseAdapter baseAdapter, @NonNull RBaseViewHolder holder, int loadState, int position) {
+            fullSpan(holder);
+
             //holder.tv(R.id.base_load_tip_view).setText();
             //holder.tv(R.id.base_error_tip_view).setText();
             //holder.tv(R.id.base_no_more_tip_view).setText("");

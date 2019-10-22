@@ -18,8 +18,8 @@ open class DslAdapterStatusItem : BaseDslStateItem() {
 
     init {
         BaseUI.uiDslAdapterStatus.initStateLayoutMap(this, itemStateLayoutMap)
-        itemState =
-            ADAPTER_STATUS_NONE
+        itemState = ADAPTER_STATUS_NONE
+        itemSpanCount = -1
     }
 
     companion object {

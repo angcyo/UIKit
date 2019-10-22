@@ -17,7 +17,6 @@ open class DslLoadMoreItem : BaseDslStateItem() {
 
     init {
         BaseUI.uiDslAdapterStatus.initStateLayoutMap(this, itemStateLayoutMap)
-
         onItemViewDetachedToWindow = {
             if (itemEnableLoadMore) {
                 //加载失败时, 下次是否还需要加载更多?
@@ -27,6 +26,7 @@ open class DslLoadMoreItem : BaseDslStateItem() {
                 }
             }
         }
+        itemSpanCount = -1
     }
 
     companion object {

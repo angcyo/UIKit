@@ -42,7 +42,7 @@ open class DslAdapterItem {
     //<editor-fold desc="Grid相关属性">
 
     /**
-     * 在 GridLayoutManager 中, 需要占多少个 span
+     * 在 GridLayoutManager 中, 需要占多少个 span. -1表示满屏
      * */
     var itemSpanCount = 1
 
