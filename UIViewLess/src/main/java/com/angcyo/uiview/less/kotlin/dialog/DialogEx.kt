@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.PopupWindow
+import androidx.fragment.app.Fragment
 import com.angcyo.uiview.less.base.helper.TitleItemHelper.NO_NUM
 import com.angcyo.uiview.less.iview.ChoiceIView
 import com.angcyo.uiview.less.kotlin.dpi
@@ -330,73 +331,73 @@ fun <T : BaseDialogConfig> Context.customBottomDialog(
 
 // Fragment
 
-fun androidx.fragment.app.Fragment.normalDialog(config: NormalDialogConfig.() -> Unit): Dialog {
+fun Fragment.normalDialog(config: NormalDialogConfig.() -> Unit): Dialog {
     return context!!.normalDialog(config)
 }
 
-fun androidx.fragment.app.Fragment.normalIosDialog(config: IosDialogConfig.() -> Unit): Dialog {
+fun Fragment.normalIosDialog(config: IosDialogConfig.() -> Unit): Dialog {
     return context!!.normalIosDialog(config)
 }
 
-fun androidx.fragment.app.Fragment.itemsDialog(config: ItemDialogConfig.() -> Unit): Dialog {
+fun Fragment.itemsDialog(config: ItemDialogConfig.() -> Unit): Dialog {
     return context!!.itemsDialog(config)
 }
 
-fun androidx.fragment.app.Fragment.menuDialog(config: MenuDialogConfig.() -> Unit): Dialog {
+fun Fragment.menuDialog(config: MenuDialogConfig.() -> Unit): Dialog {
     return context!!.menuDialog(config)
 }
 
-fun androidx.fragment.app.Fragment.singleChoiceDialog(config: MenuDialogConfig.() -> Unit): Dialog {
+fun Fragment.singleChoiceDialog(config: MenuDialogConfig.() -> Unit): Dialog {
     return context!!.singleChoiceDialog(config)
 }
 
-fun androidx.fragment.app.Fragment.multiChoiceDialog(config: MenuDialogConfig.() -> Unit): Dialog {
+fun Fragment.multiChoiceDialog(config: MenuDialogConfig.() -> Unit): Dialog {
     return context!!.multiChoiceDialog(config)
 }
 
-fun androidx.fragment.app.Fragment.wheelDialog(config: WheelDialogConfig.() -> Unit): Dialog {
+fun Fragment.wheelDialog(config: WheelDialogConfig.() -> Unit): Dialog {
     return context!!.wheelDialog(config)
 }
 
-fun androidx.fragment.app.Fragment.inputDialog(config: InputDialogConfig.() -> Unit): Dialog {
+fun Fragment.inputDialog(config: InputDialogConfig.() -> Unit): Dialog {
     return context!!.inputDialog(config)
 }
 
-fun androidx.fragment.app.Fragment.inputMultiDialog(config: InputMultiDialogConfig.() -> Unit): Dialog {
+fun Fragment.inputMultiDialog(config: InputMultiDialogConfig.() -> Unit): Dialog {
     return context!!.inputMultiDialog(config)
 }
 
-fun androidx.fragment.app.Fragment.multiInputDialog(config: InputDialogConfig.() -> Unit): Dialog {
+fun Fragment.multiInputDialog(config: InputDialogConfig.() -> Unit): Dialog {
     return context!!.multiInputDialog(config)
 }
 
-fun androidx.fragment.app.Fragment.gridDialog(config: GridDialogConfig.() -> Unit): Dialog {
+fun Fragment.gridDialog(config: GridDialogConfig.() -> Unit): Dialog {
     return context!!.gridDialog(config)
 }
 
-fun androidx.fragment.app.Fragment.popupWindow(
+fun Fragment.popupWindow(
     anchor: View? = null,
     config: PopupConfig.() -> Unit
 ): PopupWindow {
     return context!!.popupWindow(anchor, config)
 }
 
-fun androidx.fragment.app.Fragment.dateDialog(config: DateDialogConfig.() -> Unit): Dialog {
+fun Fragment.dateDialog(config: DateDialogConfig.() -> Unit): Dialog {
     return context!!.dateDialog(config)
 }
 
-fun androidx.fragment.app.Fragment.optionDialog(config: OptionDialogConfig.() -> Unit): Dialog {
+fun Fragment.optionDialog(config: OptionDialogConfig.() -> Unit): Dialog {
     return context!!.optionDialog(config)
 }
 
-fun <T : BaseDialogConfig> androidx.fragment.app.Fragment.customBottomDialog(
+fun <T : BaseDialogConfig> Fragment.customBottomDialog(
     customConfig: T,
     config: T.() -> Unit
 ): Dialog {
     return context!!.customBottomDialog(customConfig, config)
 }
 
-fun androidx.fragment.app.Fragment.calendarDialog(config: CalendarDialogConfig.() -> Unit): Dialog {
+fun Fragment.calendarDialog(config: CalendarDialogConfig.() -> Unit): Dialog {
     return context!!.calendarDialog(config)
 }
 

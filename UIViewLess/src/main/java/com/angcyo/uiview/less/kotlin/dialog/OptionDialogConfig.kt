@@ -12,6 +12,7 @@ import com.angcyo.uiview.less.kotlin.getColor
 import com.angcyo.uiview.less.recycler.RBaseViewHolder
 import com.angcyo.uiview.less.recycler.adapter.RBaseAdapter
 import com.angcyo.uiview.less.widget.group.RTabLayout
+import kotlin.math.max
 
 /**
  *
@@ -40,30 +41,40 @@ open class OptionDialogConfig : BaseDialogConfig() {
         super.onDialogInit(dialog, dialogViewHolder)
 
         affectUI = BaseUI.uiFragment
-            .createAffectUI(dialogViewHolder.group(R.id.content_wrap_layout), object : AffectUI.OnAffectListener {
-                override fun onAffectChangeBefore(affectUI: AffectUI, fromAffect: Int, toAffect: Int) {
-                }
+            .createAffectUI(
+                dialogViewHolder.group(R.id.content_wrap_layout),
+                object : AffectUI.OnAffectListener {
+                    override fun onAffectChangeBefore(
+                        affectUI: AffectUI,
+                        fromAffect: Int,
+                        toAffect: Int
+                    ) {
+                    }
 
-                override fun onAffectChange(
-                    affectUI: AffectUI,
-                    fromAffect: Int,
-                    toAffect: Int,
-                    fromView: View?,
-                    toView: View?
-                ) {
-                    toView?.isClickable = true
-                    if (toAffect == AffectUI.AFFECT_ERROR) {
-                        toView?.find<View>(R.id.base_retry_button)?.setOnClickListener {
-                            loadOptionList(dialogViewHolder, selectorLevel)
+                    override fun onAffectChange(
+                        affectUI: AffectUI,
+                        fromAffect: Int,
+                        toAffect: Int,
+                        fromView: View?,
+                        toView: View?
+                    ) {
+                        toView?.isClickable = true
+                        if (toAffect == AffectUI.AFFECT_ERROR) {
+                            toView?.find<View>(R.id.base_retry_button)?.setOnClickListener {
+                                loadOptionList(dialogViewHolder, selectorLevel)
+                            }
                         }
                     }
-                }
 
-                override fun onAffectInitLayout(affectUI: AffectUI, affect: Int, rootView: View) {
+                    override fun onAffectInitLayout(
+                        affectUI: AffectUI,
+                        affect: Int,
+                        rootView: View
+                    ) {
 
-                }
+                    }
 
-            })
+                })
             .setContentAffect(AffectUI.CONTENT_AFFECT_NONE).create()
 
         //确定按钮状态
@@ -72,8 +83,16 @@ open class OptionDialogConfig : BaseDialogConfig() {
         //tab
         dialogViewHolder.tab(R.id.tab_layout).apply {
             onTabLayoutListener =
-                object : RTabLayout.DefaultColorListener(getColor(R.color.base_text_color), Color.BLACK, true) {
-                    override fun onTabSelector(tabLayout: RTabLayout, fromIndex: Int, toIndex: Int) {
+                object : RTabLayout.DefaultColorListener(
+                    getColor(R.color.base_text_color),
+                    Color.BLACK,
+                    true
+                ) {
+                    override fun onTabSelector(
+                        tabLayout: RTabLayout,
+                        fromIndex: Int,
+                        toIndex: Int
+                    ) {
                         super.onTabSelector(tabLayout, fromIndex, toIndex)
                         if (fromIndex != toIndex) {
                             loadOptionList(dialogViewHolder, toIndex)
@@ -92,7 +111,10 @@ open class OptionDialogConfig : BaseDialogConfig() {
                 holder.tv(R.id.text_view).text = optionItemToString(bean!!)
                 holder.visible(
                     R.id.image_view,
-                    optionList.size > selectorLevel && isOptionEquItem(optionList[selectorLevel], bean)
+                    optionList.size > selectorLevel && isOptionEquItem(
+                        optionList[selectorLevel],
+                        bean
+                    )
                 )
 
                 holder.clickItem {
@@ -123,9 +145,9 @@ open class OptionDialogConfig : BaseDialogConfig() {
         val defaultLevel = optionList.size
         val requestLevel = if (onCheckOptionEnd(optionList, defaultLevel)) {
             //已经是最后一项
-            resetTabToLevel(dialogViewHolder, defaultLevel - 1)
-
-            defaultLevel - 1
+            val level = max(0, defaultLevel - 1)
+            resetTabToLevel(dialogViewHolder, level)
+            level
         } else {
             defaultLevel
         }
@@ -179,7 +201,7 @@ open class OptionDialogConfig : BaseDialogConfig() {
         val tabItems = mutableListOf<Any>()
         tabItems.addAll(optionList)
 
-        if (onCheckOptionEnd(optionList, level)) {
+        if (onCheckOptionEnd(optionList, level) && optionList.size > 0) {
             dialogViewHolder.enable(R.id.positive_button, true)
         } else {
             dialogViewHolder.enable(R.id.positive_button, false)

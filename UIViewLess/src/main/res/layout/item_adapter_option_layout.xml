@@ -17,7 +17,7 @@
             android:id="@+id/image_view"
             app:srcCompat="@drawable/ic_selector"
             app:tint="@color/colorPrimary"
-            android:layout_marginRight="@dimen/base_hdpi"
+            android:layout_marginRight="@dimen/base_ldpi"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 
