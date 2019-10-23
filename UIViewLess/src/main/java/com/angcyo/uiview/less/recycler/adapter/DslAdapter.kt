@@ -302,7 +302,7 @@ open class DslAdapter : RBaseAdapter<DslAdapterItem> {
     fun updateItemDepend(
         filterParams: FilterParams = FilterParams(
             just = dataItems.isEmpty(),
-            async = dataItems.isNotEmpty()
+            async = getDataList().isNotEmpty()
         )
     ) {
         dslDateFilter?.let {

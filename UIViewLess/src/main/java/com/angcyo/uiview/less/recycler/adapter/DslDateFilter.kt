@@ -350,11 +350,11 @@ data class FilterParams(
      * */
     val formDslAdapterItem: DslAdapterItem? = null,
     /**
-     * 异步执行
+     * 异步计算Diff
      * */
     var async: Boolean = true,
     /**
-     * 立即执行
+     * 立即执行, 不检查抖动
      * */
     var just: Boolean = false,
     /**
