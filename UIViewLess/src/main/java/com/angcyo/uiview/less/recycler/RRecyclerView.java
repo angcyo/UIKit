@@ -11,6 +11,7 @@ import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.EdgeEffect;
 import android.widget.LinearLayout;
 import android.widget.OverScroller;
 
@@ -261,6 +262,11 @@ public class RRecyclerView extends RecyclerView implements CanScrollUpCallBack {
     }
 
     public static void setEdgeEffect(Object edgeEffectCompat, @ColorInt int color) {
+        if (edgeEffectCompat instanceof EdgeEffect && RUtils.isLollipop()) {
+            ((EdgeEffect) edgeEffectCompat).setColor(color);
+            return;
+        }
+
         Object mEdgeEffect = Reflect.getMember(edgeEffectCompat, "mEdgeEffect");
         Object mPaint;
         if (mEdgeEffect != null) {

@@ -2,17 +2,20 @@ package com.angcyo.uiview.less.widget.pager;
 
 import android.content.Context;
 import android.graphics.Paint;
+import android.util.AttributeSet;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
+import android.view.View;
+import android.widget.EdgeEffect;
+import android.widget.HorizontalScrollView;
+import android.widget.LinearLayout;
+
 import androidx.annotation.ColorInt;
 import androidx.annotation.Nullable;
 import androidx.core.view.GestureDetectorCompat;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
-import android.util.AttributeSet;
-import android.view.GestureDetector;
-import android.view.MotionEvent;
-import android.view.View;
-import android.widget.HorizontalScrollView;
-import android.widget.LinearLayout;
+
 import com.angcyo.lib.L;
 import com.angcyo.uiview.less.skin.SkinHelper;
 import com.angcyo.uiview.less.utils.RUtils;
@@ -114,6 +117,11 @@ public class RViewPager extends ViewPager {
     }
 
     public static void setEdgeEffect(Object edgeEffectCompat, @ColorInt int color) {
+        if (edgeEffectCompat instanceof EdgeEffect && RUtils.isLollipop()) {
+            ((EdgeEffect) edgeEffectCompat).setColor(color);
+            return;
+        }
+
         Object mEdgeEffect = Reflect.getMember(edgeEffectCompat, "mEdgeEffect");
         Object mPaint;
 
