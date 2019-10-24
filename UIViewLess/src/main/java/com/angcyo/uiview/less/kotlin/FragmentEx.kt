@@ -2,6 +2,7 @@ package com.angcyo.uiview.less.kotlin
 
 import android.app.Activity
 import android.graphics.Color
+import android.os.Bundle
 import android.text.TextUtils
 import android.view.View
 import androidx.fragment.app.Fragment
@@ -233,7 +234,7 @@ public fun BaseRecyclerFragment<DslAdapterItem>.onBaseLoadEnd(
     if (error == null) {
         dslAdapter.dataList()
     }
-    onBaseLoadEnd(dslAdapter.getValidFilterDataList(), pageSize, error)
+    onBaseLoadEnd(dslAdapter.dataItems, pageSize, error)
 }
 
 /**RxBus*/
@@ -337,6 +338,7 @@ public fun <T> BaseFragment.load(loader: suspend CoroutineScope.() -> T): Job {
 //    return result
 //}
 
+
 public fun Fragment.putData(data: Any) {
     putData(KEY_JSON_DATA, data)
 }
@@ -349,8 +351,16 @@ public fun <T> Fragment.getData(cls: Class<T>): T? {
     return getData(KEY_JSON_DATA, cls)
 }
 
+/**
+ * 如果是从[ActivityHelper]启动[Activity], 跳过来的.
+ * 那么参数默认在[ActivityHelper.KEY_EXTRA]中
+ * */
+public fun Fragment.getBundle(): Bundle? {
+    return arguments?.getBundle(ActivityHelper.KEY_EXTRA) ?: arguments
+}
+
 public fun <T> Fragment.getData(key: String, cls: Class<T>): T? {
-    return arguments?.getString(key)?.run {
+    return getBundle()?.getString(key)?.run {
         when {
             cls.isAssignableFrom(String::class.java) -> this as? T
             cls.isAssignableFrom(Number::class.java) -> this.toFloat() as? T

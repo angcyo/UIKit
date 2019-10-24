@@ -50,6 +50,11 @@ public class ActivityHelper {
     public static final String KEY_EXTRA = "key_extra";
 
     /**
+     * 容器Activity, 需要启动的 Fragment 的 key
+     */
+    public static final String KEY_TARGET_FRAGMENT_EXTRA = "key_target_fragment_extra";
+
+    /**
      * 设置状态栏背景颜色
      */
     public static void setStatusBarColor(Activity activity, @ColorInt int color) {
@@ -246,7 +251,7 @@ public class ActivityHelper {
 
     /**
      * 请在 {@link Activity#setContentView(View)} 之前调用
-     * 低版本系统, 可能需要在 {@link Activity#onCreate(Bundle)} 之前调用
+     * 低版本系统, 可能需要在 {@link Activity#onCreate(android.os.Bundle, android.os.PersistableBundle)} 之前调用
      */
     public static void setNoTitleNoActionBar(Activity activity) {
         if (activity == null) {
@@ -283,6 +288,7 @@ public class ActivityHelper {
     /**
      * 恢复已存在的
      */
+    @Deprecated
     public static List<Fragment> restore(@NonNull Context context,
                                          @NonNull FragmentManager fragmentManager,
                                          Class<? extends Fragment>... cls) {
@@ -292,6 +298,7 @@ public class ActivityHelper {
     /**
      * 恢复/添加 所有
      */
+    @Deprecated
     public static List<Fragment> restoreShow(@NonNull Context context,
                                              @NonNull FragmentManager fragmentManager,
                                              @IdRes int layoutId,
@@ -302,6 +309,7 @@ public class ActivityHelper {
     /**
      * 重新创建所有
      */
+    @Deprecated
     public static List<Fragment> recreate(@NonNull Context context,
                                           @NonNull FragmentManager fragmentManager,
                                           @IdRes int layoutId,
@@ -322,6 +330,37 @@ public class ActivityHelper {
 
     public static TransitionBuilder transition(Activity activity) {
         return new TransitionBuilder(activity);
+    }
+
+    @Nullable
+    public static Class<Fragment> getTargetFragment(@NonNull ClassLoader classLoader, @Nullable Intent intent) {
+        if (intent == null) {
+            return null;
+        }
+        Bundle bundleExtra = intent.getBundleExtra(KEY_EXTRA);
+        if (bundleExtra == null) {
+            bundleExtra = intent.getExtras();
+        }
+
+        String cls = null;
+
+        if (bundleExtra != null) {
+            cls = bundleExtra.getString(KEY_TARGET_FRAGMENT_EXTRA);
+        }
+
+        if (TextUtils.isEmpty(cls)) {
+            cls = intent.getStringExtra(KEY_TARGET_FRAGMENT_EXTRA);
+        }
+
+        if (TextUtils.isEmpty(cls)) {
+            return null;
+        }
+        try {
+            return (Class<Fragment>) classLoader.loadClass(cls);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public static class Builder {
@@ -402,10 +441,17 @@ public class ActivityHelper {
         }
 
         /**
-         * 设置传输的参数
+         * 设置传输的参数, 默认会放在 [KEY_EXTRA] 对应的key中,
+         * 可以将bundleKey设置为null, 使得bundle, 作为root
+         *
+         * @see #configIntent()
          */
         public Builder setBundle(Bundle bundle) {
-            this.bundle = bundle;
+            if (this.bundle != null) {
+                this.bundle.putAll(bundle);
+            } else {
+                this.bundle = bundle;
+            }
             return this;
         }
 
@@ -414,8 +460,26 @@ public class ActivityHelper {
             return this;
         }
 
-        public Builder setBundle(@Nullable String key, Bundle bundle) {
-            bundleKey = key;
+        public Builder putData(String key, Object data) {
+            setBundle(FragmentHelper.Builder.createBundle(key, data));
+            return this;
+        }
+
+        public Builder setTargetFragment(Class<? extends Fragment> fragmentClass) {
+            if (fragmentClass != null) {
+                putData(KEY_TARGET_FRAGMENT_EXTRA, fragmentClass.getName());
+            }
+            return this;
+        }
+
+        /**
+         * 设置传输的参数
+         *
+         * @param bundleKey 替换默认的 [KEY_EXTRA]
+         * @see #configIntent()
+         */
+        public Builder setBundle(@Nullable String bundleKey, Bundle bundle) {
+            this.bundleKey = bundleKey;
             setBundle(bundle);
             return this;
         }
@@ -548,7 +612,11 @@ public class ActivityHelper {
                 ((Activity) context).setResult(resultCode, resultData);
 
                 if (withBackPress) {
-                    ((Activity) context).onBackPressed();
+                    if (context instanceof BaseAppCompatActivity) {
+                        ((BaseAppCompatActivity) context).onBackPressedInner(true);
+                    } else {
+                        ((Activity) context).onBackPressed();
+                    }
                 } else {
                     ((Activity) context).finish();
                 }

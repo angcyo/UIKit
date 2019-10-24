@@ -54,14 +54,17 @@ import rx.functions.Func2;
  */
 public abstract class BaseAppCompatActivity extends AppCompatActivity {
 
+    /**
+     * 画中画状态判断
+     */
+    public boolean isActivityResume = false;
     protected RBaseViewHolder viewHolder;
-
     protected RxPermissions mRxPermissions;
-
     protected FragmentSwipeBackLayout fragmentSwipeBackLayout;
-
     protected int fragmentParentLayoutId = -1;
+    protected RecyclerView.RecycledViewPool recycledViewPool;
 
+    //<editor-fold desc="生命周期, 系统的方法">
     long lastBackTime = 0L;
 
     @NonNull
@@ -74,8 +77,6 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
         }
         return builder.toString();
     }
-
-    //<editor-fold desc="生命周期, 系统的方法">
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -181,11 +182,24 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
         } else {
             if (needCheckBackPressed()) {
                 if (checkBackPressed()) {
-                    super.onBackPressed();
+                    onBackPressedInner(false);
                 }
             } else {
-                super.onBackPressed();
+                onBackPressedInner(false);
             }
+        }
+    }
+
+    /**
+     * 关闭activity
+     */
+    public void onBackPressedInner(boolean just) {
+        if (just) {
+            super.onBackPressed();
+        } else {
+            ActivityHelper.build(this)
+                    .defaultExitAnim()
+                    .finish(true);
         }
     }
 
@@ -211,7 +225,7 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
      * Fragment所在的ViewGroup id
      */
     @IdRes
-    protected int getFragmentParentLayoutId() {
+    public int getFragmentParentLayoutId() {
         if (fragmentParentLayoutId == -1) {
             fragmentParentLayoutId = FragmentHelper.getFragmentContainerId(getSupportFragmentManager());
         }
@@ -248,6 +262,9 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
         moveTaskToBack(true);
     }
 
+    //</editor-fold desc="生命周期, 系统的方法">
+
+    //<editor-fold desc="权限相关方法">
 
     /**
      * 激活沉浸式, 5.0以下不支持.
@@ -276,10 +293,6 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
             }
         }
     }
-
-    //</editor-fold desc="生命周期, 系统的方法">
-
-    //<editor-fold desc="权限相关方法">
 
     protected String[] needPermissions() {
         return new String[]{
@@ -400,6 +413,10 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
         return ContextCompat.getDrawable(this, res);
     }
 
+    //</editor-fold desc="权限相关方法">
+
+    //<editor-fold desc="其他方法">
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -418,10 +435,6 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
             lastFragment.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
-
-    //</editor-fold desc="权限相关方法">
-
-    //<editor-fold desc="其他方法">
 
     public void setFragmentSwipeBackLayout(FragmentSwipeBackLayout fragmentSwipeBackLayout) {
         this.fragmentSwipeBackLayout = fragmentSwipeBackLayout;
@@ -472,6 +485,10 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
         }
     }
 
+    //</editor-fold desc="其他方法">
+
+    //<editor-fold desc="画中画支持">
+
     protected void onOrientationToLandscape() {
 
     }
@@ -480,32 +497,21 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
 
     }
 
-    //</editor-fold desc="其他方法">
-
-    //<editor-fold desc="画中画支持">
-
-    /**
-     * 画中画状态判断
-     */
-    public boolean isActivityResume = false;
-
     @Override
     protected void onResume() {
         super.onResume();
         isActivityResume = true;
     }
 
+    //</editor-fold desc="画中画支持">
+
+    //<editor-fold desc="RecyclerView共享二级缓存池">
+
     @Override
     public void startActivityForResult(Intent intent, int requestCode, @Nullable Bundle options) {
         super.startActivityForResult(intent, requestCode, options);
         isActivityResume = false;
     }
-
-    //</editor-fold desc="画中画支持">
-
-    //<editor-fold desc="RecyclerView共享二级缓存池">
-
-    protected RecyclerView.RecycledViewPool recycledViewPool;
 
     public RecyclerView.RecycledViewPool getRecycledViewPool() {
         if (recycledViewPool == null) {

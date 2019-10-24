@@ -13,6 +13,7 @@ import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.angcyo.uiview.less.ContainerActivity;
 import com.angcyo.uiview.less.R;
 import com.angcyo.uiview.less.base.helper.ViewGroupHelper;
 import com.angcyo.uiview.less.iview.AffectUI;
@@ -143,6 +144,9 @@ public abstract class BaseTitleFragment extends BaseFragment implements AffectUI
      * 是否需要返回按钮
      */
     protected boolean needBackItem() {
+        if (mAttachContext instanceof ContainerActivity) {
+            return true;
+        }
         return getParentFragment() == null &&
                 getFragmentManager() != null &&
                 getFragmentManager().getFragments().size() > 1;

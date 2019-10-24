@@ -740,6 +740,7 @@ public class FragmentHelper {
 
         /**
          * Fragment的参数
+         * resultFragment.setArguments(args)
          */
         Bundle args;
 
@@ -1019,8 +1020,16 @@ public class FragmentHelper {
             return this;
         }
 
+        /**
+         * 将直接设置到Fragment中
+         * resultFragment.setArguments(args)
+         */
         public Builder setArgs(Bundle args) {
-            this.args = args;
+            if (this.args != null) {
+                this.args.putAll(args);
+            } else {
+                this.args = args;
+            }
             return this;
         }
 

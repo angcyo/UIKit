@@ -2,16 +2,14 @@ package com.angcyo.uiview.less.kotlin
 
 import android.app.Activity
 import android.app.PictureInPictureParams
+import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Rect
 import android.graphics.drawable.Drawable
 import android.os.Build
 import android.util.Rational
 import android.view.ViewGroup
 import android.view.Window
 import androidx.annotation.ColorInt
-import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.RecyclerView
 import com.angcyo.lib.L
 import com.angcyo.uiview.less.base.BaseAppCompatActivity
 import com.angcyo.uiview.less.base.helper.ActivityHelper
@@ -69,7 +67,10 @@ public fun BaseAppCompatActivity.supportPictureInPicture(): Boolean {
  * @param numerator 分子
  * @param denominator 分母
  * */
-public fun BaseAppCompatActivity.enterPictureInPictureModeEx(numerator: Int = 3, denominator: Int = 4) {
+public fun BaseAppCompatActivity.enterPictureInPictureModeEx(
+    numerator: Int = 3,
+    denominator: Int = 4
+) {
     if (supportPictureInPicture()) {
         if (isActivityResume) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -86,5 +87,20 @@ public fun BaseAppCompatActivity.enterPictureInPictureModeEx(numerator: Int = 3,
         }
     } else {
         L.w("设备不支持画中画.")
+    }
+}
+
+/**检查是否需要启动目标[Fragment]*/
+public fun BaseAppCompatActivity.handleTargetFragment(intent: Intent?) {
+    ActivityHelper.getTargetFragment(classLoader, intent)?.let { targetFragment ->
+        //需要跳转Fragment
+        get(supportFragmentManager)
+            .parentLayoutId(fragmentParentLayoutId)
+            .defaultEnterAnim()
+            //启动目标
+            .showFragment(targetFragment)
+            //转发参数
+            .setArgs(intent?.extras)
+            .doIt()
     }
 }
