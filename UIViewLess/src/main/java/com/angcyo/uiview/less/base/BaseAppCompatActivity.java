@@ -67,6 +67,8 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
     //<editor-fold desc="生命周期, 系统的方法">
     long lastBackTime = 0L;
 
+    protected ActivityInfo mActivityInfo;
+
     @NonNull
     public static String logActivityInfo(ActivityInfo activityInfo) {
         StringBuilder builder = new StringBuilder();
@@ -96,7 +98,7 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
         Intent parentActivityIntent = getParentActivityIntent();
         Intent supportParentActivityIntent = getSupportParentActivityIntent();
 
-        ActivityInfo mActivityInfo = (ActivityInfo) Reflect.getFieldValue(this, Activity.class, "mActivityInfo");
+        mActivityInfo = (ActivityInfo) Reflect.getFieldValue(this, Activity.class, "mActivityInfo");
         logActivityInfo(mActivityInfo);
         if (mActivityInfo != null) {
             L.v(className +

@@ -3,6 +3,7 @@ package com.angcyo.uiview.less.kotlin
 import android.app.Activity
 import android.app.PictureInPictureParams
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
 import android.os.Build
@@ -10,9 +11,11 @@ import android.util.Rational
 import android.view.ViewGroup
 import android.view.Window
 import androidx.annotation.ColorInt
+import androidx.fragment.app.Fragment
 import com.angcyo.lib.L
 import com.angcyo.uiview.less.base.BaseAppCompatActivity
 import com.angcyo.uiview.less.base.helper.ActivityHelper
+import com.angcyo.uiview.less.base.helper.FragmentHelper
 
 /**
  * Copyright (C) 2016,深圳市红鸟网络科技股份有限公司 All rights reserved.
@@ -91,14 +94,50 @@ public fun BaseAppCompatActivity.enterPictureInPictureModeEx(
 }
 
 /**检查是否需要启动目标[Fragment]*/
-public fun BaseAppCompatActivity.handleTargetFragment(intent: Intent?) {
+public fun BaseAppCompatActivity.handleTargetFragment(
+    intent: Intent?,
+    launchMode: Int = ActivityInfo.LAUNCH_MULTIPLE
+) {
     ActivityHelper.getTargetFragment(classLoader, intent)?.let { targetFragment ->
+
+        var isOnly = false
+        if (launchMode == ActivityInfo.LAUNCH_SINGLE_INSTANCE ||
+            launchMode == ActivityInfo.LAUNCH_SINGLE_TASK
+        ) {
+            isOnly = true
+        }
+
+        var isFromCreate = false
+        if (launchMode == ActivityInfo.LAUNCH_SINGLE_TOP) {
+            isFromCreate = true
+        }
+
+        val keepList = mutableListOf<Fragment>()
+        FragmentHelper.find(supportFragmentManager, targetFragment)?.apply {
+            if (launchMode == ActivityInfo.LAUNCH_SINGLE_TOP ||
+                launchMode == ActivityInfo.LAUNCH_SINGLE_INSTANCE ||
+                launchMode == ActivityInfo.LAUNCH_SINGLE_TASK
+            ) {
+                lastOrNull()?.let {
+                    keepList.add(it)
+                }
+            }
+        }
+
         //需要跳转Fragment
         get(supportFragmentManager)
             .parentLayoutId(fragmentParentLayoutId)
             .defaultEnterAnim()
             //启动目标
             .showFragment(targetFragment)
+            .apply {
+                if (isFromCreate || isOnly) {
+                    setFromCreate(true)
+                }
+                if (isOnly) {
+                    keepFragment(keepList)
+                }
+            }
             //转发参数
             .setArgs(intent?.extras)
             .doIt()
