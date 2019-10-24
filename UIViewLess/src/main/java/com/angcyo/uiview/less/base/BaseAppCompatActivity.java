@@ -114,6 +114,20 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
 
         //ActivityHelper.setStatusBarColor(this, Color.YELLOW);
         //ActivityHelper.setStatusBarDrawable(this, getDrawableCompat(R.drawable.base_nav_shadow));
+        handleIntent(getIntent());
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        handleIntent(intent);
+    }
+
+    /**
+     * 统一处理Intent的地方
+     */
+    public void handleIntent(@Nullable Intent intent) {
+
     }
 
     @Override
