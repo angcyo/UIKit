@@ -321,6 +321,10 @@ open class DslAdapter : RBaseAdapter<DslAdapterItem> {
 
     //<editor-fold desc="兼容的操作">
 
+    override fun getAllDataCount(): Int {
+        return itemCount
+    }
+
     override fun appendData(datas: MutableList<DslAdapterItem>?) {
         val list: List<DslAdapterItem> = datas ?: emptyList()
         if (list.isNotEmpty()) {
