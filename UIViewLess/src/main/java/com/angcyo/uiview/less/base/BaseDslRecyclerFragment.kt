@@ -8,7 +8,7 @@ import com.angcyo.uiview.less.recycler.RBaseViewHolder
 import com.angcyo.uiview.less.recycler.RRecyclerView
 import com.angcyo.uiview.less.recycler.adapter.DslAdapter
 import com.angcyo.uiview.less.recycler.adapter.DslAdapterItem
-import com.angcyo.uiview.less.recycler.adapter.DslDateFilter
+import com.angcyo.uiview.less.recycler.adapter.DslDataFilter
 import com.angcyo.uiview.less.recycler.adapter.RBaseAdapter
 
 /**
@@ -27,7 +27,7 @@ open class BaseDslRecyclerFragment : BaseRecyclerFragment<DslAdapterItem>() {
     override fun onCreateAdapter(datas: MutableList<DslAdapterItem>?): RBaseAdapter<DslAdapterItem> {
         return object : DslAdapter() {
             init {
-                dslDateFilter = DslDateFilter(this)
+                dslDataFilter = DslDataFilter(this)
             }
 
             override fun onScrollStateChanged(recyclerView: RRecyclerView, newState: Int) {

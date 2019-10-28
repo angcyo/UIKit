@@ -48,7 +48,7 @@ open class DslAdapter : RBaseAdapter<DslAdapterItem> {
     val dataItems = mutableListOf<DslAdapterItem>()
 
     /**数据过滤规则*/
-    var dslDateFilter: DslDateFilter? = DslDateFilter(this)
+    var dslDataFilter: DslDataFilter? = DslDataFilter(this)
         set(value) {
             field = value
             updateItemDepend()
@@ -342,7 +342,7 @@ open class DslAdapter : RBaseAdapter<DslAdapterItem> {
 
     /**调用[DiffUtil]更新界面*/
     fun updateItemDepend(filterParams: FilterParams = defaultFilterParams()) {
-        dslDateFilter?.let {
+        dslDataFilter?.let {
             it.updateFilterItemDepend(filterParams.apply {
                 justFilter = isAdapterStatus()
             })
@@ -351,7 +351,7 @@ open class DslAdapter : RBaseAdapter<DslAdapterItem> {
 
     /**获取有效过滤后的数据集合*/
     fun getValidFilterDataList(): List<DslAdapterItem> {
-        return dslDateFilter?.filterDataList ?: adapterItems
+        return dslDataFilter?.filterDataList ?: adapterItems
     }
 
     //</editor-fold desc="操作方法">
