@@ -17,8 +17,23 @@ import kotlin.math.min
 open class DslAdapter : RBaseAdapter<DslAdapterItem> {
 
     /*为了简单起见, 这里写死套路, 理论上应该用状态器管理的.*/
-    var dslAdapterStatusItem = DslAdapterStatusItem()
-    var dslLoadMoreItem = DslLoadMoreItem()
+    var dslAdapterStatusItem = DslAdapterStatusItem().apply {
+        //回调
+        onRefresh = {
+            if (mLoadMoreListener != null) {
+                mLoadMoreListener.onAdapterRefresh(this@DslAdapter)
+            }
+        }
+    }
+
+    var dslLoadMoreItem = DslLoadMoreItem().apply {
+        //回调
+        onLoadMore = {
+            if (mLoadMoreListener != null) {
+                mLoadMoreListener.onAdapterLodeMore(this@DslAdapter)
+            }
+        }
+    }
 
     /**包含所有[DslAdapterItem], 包括 [headerItems] [dataItems] [footerItems]的数据源*/
     val adapterItems = mutableListOf<DslAdapterItem>()
@@ -133,7 +148,7 @@ open class DslAdapter : RBaseAdapter<DslAdapterItem> {
      * 适配器当前是情感图状态
      * */
     fun isAdapterStatus(): Boolean {
-        return !dslAdapterStatusItem.isNoStatus() || isStateLayout
+        return dslAdapterStatusItem.isInAdapterStatus() || isStateLayout
     }
 
     fun getAdapterItem(position: Int): DslAdapterItem {
@@ -156,7 +171,13 @@ open class DslAdapter : RBaseAdapter<DslAdapterItem> {
 
     //<editor-fold desc="操作方法">
 
-    /**设置[Adapter]需要显示情感图的状态*/
+    /**
+     * 设置[Adapter]需要显示情感图的状态
+     * [DslAdapterStatusItem.ADAPTER_STATUS_NONE]
+     * [DslAdapterStatusItem.ADAPTER_STATUS_EMPTY]
+     * [DslAdapterStatusItem.ADAPTER_STATUS_LOADING]
+     * [DslAdapterStatusItem.ADAPTER_STATUS_ERROR]
+     * */
     fun setAdapterStatus(status: Int) {
         if (dslAdapterStatusItem.itemState == status) {
             return
@@ -166,9 +187,7 @@ open class DslAdapter : RBaseAdapter<DslAdapterItem> {
     }
 
     fun setLoadMoreEnable(enable: Boolean = true) {
-        if (dslLoadMoreItem.itemEnableLoadMore == enable &&
-            getValidFilterDataList().indexOf(dslLoadMoreItem) != -1
-        ) {
+        if (dslLoadMoreItem.itemEnableLoadMore == enable) {
             return
         }
         dslLoadMoreItem.itemEnableLoadMore = enable
@@ -182,12 +201,17 @@ open class DslAdapter : RBaseAdapter<DslAdapterItem> {
         }
     }
 
-    fun setLoadMore(status: Int) {
-        if (dslLoadMoreItem.itemState == status) {
+    /**
+     * [DslLoadMoreItem.ADAPTER_LOAD_NORMAL]
+     * [DslLoadMoreItem.ADAPTER_LOAD_NO_MORE]
+     * [DslLoadMoreItem.ADAPTER_LOAD_ERROR]
+     * */
+    fun setLoadMore(status: Int, notify: Boolean = true) {
+        if (dslLoadMoreItem.itemEnableLoadMore && dslLoadMoreItem.itemState == status) {
             return
         }
         dslLoadMoreItem.itemState = status
-        if (dslLoadMoreItem.itemEnableLoadMore) {
+        if (notify) {
             notifyItemChanged(dslLoadMoreItem)
         }
     }
@@ -241,26 +265,35 @@ open class DslAdapter : RBaseAdapter<DslAdapterItem> {
     }
 
     /**可以在回调中改变数据, 并且会自动刷新界面*/
-    fun changeItems(change: () -> Unit) {
+    fun changeItems(filterParams: FilterParams = defaultFilterParams(), change: () -> Unit) {
         change()
         _updateAdapterItems()
-        updateItemDepend()
+        updateItemDepend(filterParams)
     }
 
-    fun changeDataItems(change: (dataItems: MutableList<DslAdapterItem>) -> Unit) {
-        changeItems {
+    fun changeDataItems(
+        filterParams: FilterParams = defaultFilterParams(),
+        change: (dataItems: MutableList<DslAdapterItem>) -> Unit
+    ) {
+        changeItems(filterParams) {
             change(dataItems)
         }
     }
 
-    fun changeHeaderItems(change: (headerItems: MutableList<DslAdapterItem>) -> Unit) {
-        changeItems {
+    fun changeHeaderItems(
+        filterParams: FilterParams = defaultFilterParams(),
+        change: (headerItems: MutableList<DslAdapterItem>) -> Unit
+    ) {
+        changeItems(filterParams) {
             change(headerItems)
         }
     }
 
-    fun changeFooterItems(change: (footerItems: MutableList<DslAdapterItem>) -> Unit) {
-        changeItems {
+    fun changeFooterItems(
+        filterParams: FilterParams = defaultFilterParams(),
+        change: (footerItems: MutableList<DslAdapterItem>) -> Unit
+    ) {
+        changeItems(filterParams) {
             change(footerItems)
         }
     }
@@ -298,13 +331,15 @@ open class DslAdapter : RBaseAdapter<DslAdapterItem> {
         return if (useFilterList) getValidFilterDataList() else adapterItems
     }
 
-    /**调用[DiffUtil]更新界面*/
-    fun updateItemDepend(
-        filterParams: FilterParams = FilterParams(
+    fun defaultFilterParams(): FilterParams {
+        return FilterParams(
             just = dataItems.isEmpty(),
             async = getDataList().isNotEmpty()
         )
-    ) {
+    }
+
+    /**调用[DiffUtil]更新界面*/
+    fun updateItemDepend(filterParams: FilterParams = defaultFilterParams()) {
         dslDateFilter?.let {
             it.updateFilterItemDepend(filterParams.apply {
                 justFilter = isAdapterStatus()
@@ -325,7 +360,7 @@ open class DslAdapter : RBaseAdapter<DslAdapterItem> {
         return itemCount
     }
 
-    override fun appendData(datas: MutableList<DslAdapterItem>?) {
+    override fun appendData(datas: List<DslAdapterItem>?) {
         val list: List<DslAdapterItem> = datas ?: emptyList()
         if (list.isNotEmpty()) {
             dataItems.addAll(_validIndex(dataItems, -1), list)
@@ -334,7 +369,7 @@ open class DslAdapter : RBaseAdapter<DslAdapterItem> {
         }
     }
 
-    override fun resetData(datas: MutableList<DslAdapterItem>?) {
+    override fun resetData(datas: List<DslAdapterItem>?) {
         val list: List<DslAdapterItem> = datas ?: emptyList()
         dataItems.clear()
         dataItems.addAll(list)
@@ -353,6 +388,75 @@ open class DslAdapter : RBaseAdapter<DslAdapterItem> {
         //由于diff, 只会更新布局item, 所以这里兼容一下, 强制更新最后一项.
         updateLoadMoreView()
     }
+
+    override fun isEnableLoadMore(): Boolean {
+        return super.isEnableLoadMore() || dslLoadMoreItem.itemEnableLoadMore
+    }
+
+    override fun isEnableShowState(): Boolean {
+        return super.isEnableShowState() || isAdapterStatus()
+    }
+
+    override fun setLoadMoreEnd() {
+        //super.setLoadMoreEnd()
+        //替换load more的实现方式
+        setLoadMore(DslLoadMoreItem.ADAPTER_LOAD_NORMAL)
+    }
+
+    override fun setShowState(showState: Int) {
+        //super.setShowState(showState)
+        setAdapterStatus(
+            when (showState) {
+                IShowState.NORMAL -> DslAdapterStatusItem.ADAPTER_STATUS_NONE
+                IShowState.EMPTY -> DslAdapterStatusItem.ADAPTER_STATUS_EMPTY
+                IShowState.LOADING -> DslAdapterStatusItem.ADAPTER_STATUS_LOADING
+                IShowState.ERROR -> DslAdapterStatusItem.ADAPTER_STATUS_ERROR
+                IShowState.NONET -> DslAdapterStatusItem.ADAPTER_STATUS_ERROR
+                else -> DslAdapterStatusItem.ADAPTER_STATUS_ERROR
+            }
+        )
+    }
+
+    override fun setLoadError() {
+        //super.setLoadError()
+        setLoadMore(DslLoadMoreItem.ADAPTER_LOAD_ERROR, true)
+    }
+
+    override fun loadMoreEnd(datas: List<DslAdapterItem>?, currentPage: Int, pageSize: Int) {
+        //super.loadMoreEnd(datas, currentPage, pageSize)
+        val listSize = RUtils.listSize(datas)
+        if (currentPage <= 1) {
+            //首页
+            if (listSize < pageSize) {
+                //数据不够, 关闭加载更多功能
+                if (listSize <= 0) {
+                    setAdapterStatus(DslAdapterStatusItem.ADAPTER_STATUS_EMPTY)
+                } else {
+                    setAdapterStatus(DslAdapterStatusItem.ADAPTER_STATUS_NONE)
+                }
+                resetItem(datas ?: emptyList())
+                setLoadMoreEnable(false)
+            } else {
+                setAdapterStatus(DslAdapterStatusItem.ADAPTER_STATUS_NONE)
+                resetItem(datas ?: emptyList())
+                dslLoadMoreItem.itemState = DslLoadMoreItem.ADAPTER_LOAD_NORMAL
+                setLoadMoreEnable(true)
+            }
+        } else {
+            //其他页
+            setAdapterStatus(DslAdapterStatusItem.ADAPTER_STATUS_NONE)
+
+            if (listSize < pageSize) {
+                //数据不够, 关闭加载更多功能
+                setLoadMore(DslLoadMoreItem.ADAPTER_LOAD_NO_MORE, false)
+            } else {
+                setLoadMore(DslLoadMoreItem.ADAPTER_LOAD_NORMAL, false)
+            }
+
+            addLastItem(datas ?: emptyList())
+        }
+    }
+
     //</editor-fold desc="兼容的操作">
 
     //<editor-fold desc="不支持的操作">

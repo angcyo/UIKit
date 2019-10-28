@@ -27,6 +27,10 @@ open class DslLoadMoreItem : BaseDslStateItem() {
             }
         }
         itemSpanCount = -1
+
+        thisAreContentsTheSame = { _, _ ->
+            false
+        }
     }
 
     companion object {
@@ -46,8 +50,7 @@ open class DslLoadMoreItem : BaseDslStateItem() {
     var itemEnableLoadMore = false
         set(value) {
             field = value
-            itemState =
-                ADAPTER_LOAD_NORMAL
+            itemState = ADAPTER_LOAD_NORMAL
         }
 
     /**加载更多回调*/
@@ -87,8 +90,7 @@ open class DslLoadMoreItem : BaseDslStateItem() {
     }
 
     open fun _notifyLoadMore(itemHolder: RBaseViewHolder) {
-        itemState =
-            ADAPTER_LOAD_LOADING
+        itemState = ADAPTER_LOAD_LOADING
         if (!_isLoadMore) {
             _isLoadMore = true
             itemHolder.post { onLoadMore(itemHolder) }
