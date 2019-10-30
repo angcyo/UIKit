@@ -361,6 +361,11 @@ open class DslAdapter : RBaseAdapter<DslAdapterItem> {
         return dslDataFilter?.filterDataList ?: adapterItems
     }
 
+    operator fun <T : DslAdapterItem> T.invoke(config: T.() -> Unit) {
+        this.config()
+        addLastItem(this)
+    }
+
     //</editor-fold desc="操作方法">
 
     //<editor-fold desc="兼容的操作">
