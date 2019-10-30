@@ -11,6 +11,8 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.angcyo.lib.L
 import com.angcyo.uiview.less.recycler.RBaseViewHolder
+import kotlin.properties.ReadWriteProperty
+import kotlin.reflect.KProperty
 
 /**
  *
@@ -137,17 +139,10 @@ open class DslAdapterItem {
     /**
      * 当前分组是否 展开
      * */
-    var itemGroupExtend = true
-        set(value) {
-            field = value
-            updateItemDepend()
-        }
+    var itemGroupExtend: Boolean by UpdateDependProperty(true)
 
-    var itemHidden = false
-        set(value) {
-            field = value
-            updateItemDepend()
-        }
+    /**是否需要隐藏item*/
+    var itemHidden: Boolean by UpdateDependProperty(false)
 
     //</editor-fold>
 
@@ -573,6 +568,18 @@ open class DslAdapterItem {
 
     //</editor-fold>
 
+}
+
+class UpdateDependProperty<T>(var value: T) : ReadWriteProperty<DslAdapterItem, T> {
+    override fun getValue(thisRef: DslAdapterItem, property: KProperty<*>): T = value
+
+    override fun setValue(thisRef: DslAdapterItem, property: KProperty<*>, value: T) {
+        val old = value
+        this.value = value
+        if (old != value) {
+            thisRef.updateItemDepend()
+        }
+    }
 }
 
 /**
