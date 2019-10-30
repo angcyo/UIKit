@@ -227,7 +227,9 @@ open class DslDataFilter(val dslAdapter: DslAdapter) {
                 } else {
                     _diffResult?.dispatchUpdatesTo(dslAdapter)
 
-                    _dispatchUpdatesSet.forEach {
+                    val updatesSet = mutableSetOf<OnDispatchUpdatesListener>()
+                    updatesSet.addAll(_dispatchUpdatesSet)
+                    updatesSet.forEach {
                         it.onDispatchUpdatesAfter(dslAdapter)
                     }
                 }

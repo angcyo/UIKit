@@ -2,7 +2,6 @@ package com.angcyo.uiview.less.recycler.dslitem
 
 import android.view.View
 import com.angcyo.uiview.less.R
-import com.angcyo.uiview.less.base.BaseUI
 import com.angcyo.uiview.less.kotlin.inflate
 import com.angcyo.uiview.less.recycler.RBaseViewHolder
 import com.angcyo.uiview.less.recycler.adapter.DslAdapterItem
@@ -17,6 +16,7 @@ import com.angcyo.uiview.less.recycler.adapter.DslAdapterItem
 abstract class BaseDslStateItem : DslAdapterItem() {
     init {
         itemLayoutId = R.layout.item_base_state
+        itemSpanCount = -1
     }
 
     /**
@@ -43,8 +43,6 @@ abstract class BaseDslStateItem : DslAdapterItem() {
         adapterItem: DslAdapterItem
     ) {
         super.onItemBind(itemHolder, itemPosition, adapterItem)
-
-        BaseUI.fullSpan(itemHolder)
 
         itemHolder.clear()
 

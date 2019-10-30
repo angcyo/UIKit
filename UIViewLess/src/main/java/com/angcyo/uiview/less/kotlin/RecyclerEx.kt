@@ -367,3 +367,22 @@ public fun RecyclerView.LayoutManager.recycleScrapList(recycle: RecyclerView.Rec
         removeAndRecycleView(recycle.scrapList[i].itemView, recycle)
     }
 }
+
+/**SpanSizeLookup*/
+public fun GridLayoutManager.dslSpanSizeLookup(dslAdapter: DslAdapter): GridLayoutManager.SpanSizeLookup {
+    //设置span size
+    val spanCount = spanCount
+    val spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+        override fun getSpanSize(position: Int): Int {
+            return if (dslAdapter.isAdapterStatus() ||
+                dslAdapter.getItemData(position)?.itemIsGroupHead == true
+            ) {
+                spanCount
+            } else {
+                dslAdapter.getItemData(position)?.itemSpanCount ?: 1
+            }
+        }
+    }
+    this.spanSizeLookup = spanSizeLookup
+    return spanSizeLookup
+}

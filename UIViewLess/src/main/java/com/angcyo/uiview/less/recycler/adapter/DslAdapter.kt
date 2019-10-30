@@ -186,6 +186,9 @@ open class DslAdapter : RBaseAdapter<DslAdapterItem> {
         }
         dslAdapterStatusItem.itemState = status
         notifyDataSetChanged()
+        if (status == DslAdapterStatusItem.ADAPTER_STATUS_NONE) {
+            updateItemDepend(defaultFilterParams())
+        }
     }
 
     fun setLoadMoreEnable(enable: Boolean = true) {
@@ -336,16 +339,20 @@ open class DslAdapter : RBaseAdapter<DslAdapterItem> {
     fun defaultFilterParams(): FilterParams {
         return FilterParams(
             just = dataItems.isEmpty(),
-            async = getDataList().isNotEmpty()
+            async = getDataList().isNotEmpty(),
+            justFilter = isAdapterStatus()
         )
     }
 
     /**调用[DiffUtil]更新界面*/
     fun updateItemDepend(filterParams: FilterParams = defaultFilterParams()) {
+        if (isAdapterStatus()) {
+            //如果是情感图状态, 更新数据源没有意义
+            return
+        }
+
         dslDataFilter?.let {
-            it.updateFilterItemDepend(filterParams.apply {
-                justFilter = isAdapterStatus()
-            })
+            it.updateFilterItemDepend(filterParams)
         }
     }
 

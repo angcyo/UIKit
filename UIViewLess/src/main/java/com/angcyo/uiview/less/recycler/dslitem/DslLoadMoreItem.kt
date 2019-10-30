@@ -26,8 +26,6 @@ open class DslLoadMoreItem : BaseDslStateItem() {
                 }
             }
         }
-        itemSpanCount = -1
-
         thisAreContentsTheSame = { _, _ ->
             false
         }
