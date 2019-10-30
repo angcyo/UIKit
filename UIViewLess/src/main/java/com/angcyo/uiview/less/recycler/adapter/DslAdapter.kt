@@ -351,6 +351,11 @@ open class DslAdapter : RBaseAdapter<DslAdapterItem> {
             return
         }
 
+        if (adapterItems.isEmpty() && getValidFilterDataList().isEmpty()) {
+            //都是空数据
+            return
+        }
+
         dslDataFilter?.let {
             it.updateFilterItemDepend(filterParams)
         }
