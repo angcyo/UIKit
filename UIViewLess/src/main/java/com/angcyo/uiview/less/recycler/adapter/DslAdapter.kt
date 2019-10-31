@@ -5,6 +5,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.angcyo.uiview.less.recycler.RBaseViewHolder
 import com.angcyo.uiview.less.recycler.dslitem.DslAdapterStatusItem
 import com.angcyo.uiview.less.recycler.dslitem.DslLoadMoreItem
+import com.angcyo.uiview.less.recycler.dslitem.DslTextInfoItem
 import com.angcyo.uiview.less.recycler.widget.IShowState
 import com.angcyo.uiview.less.utils.RUtils
 import kotlin.math.min
@@ -242,8 +243,11 @@ open class DslAdapter : RBaseAdapter<DslAdapterItem> {
     }
 
     /**插入数据列表*/
-    fun insertItem(index: Int, bean: List<DslAdapterItem>) {
-        dataItems.addAll(_validIndex(dataItems, index), bean)
+    fun insertItem(index: Int, list: List<DslAdapterItem>) {
+        if (list.isEmpty()) {
+            return
+        }
+        dataItems.addAll(_validIndex(dataItems, index), list)
         _updateAdapterItems()
         updateItemDepend()
     }
@@ -253,6 +257,28 @@ open class DslAdapter : RBaseAdapter<DslAdapterItem> {
         dataItems.add(_validIndex(dataItems, index), bean)
         _updateAdapterItems()
         updateItemDepend()
+    }
+
+    /**移除一组数据*/
+    fun removeItem(list: List<DslAdapterItem>) {
+        val listInclude = mutableListOf<DslAdapterItem>()
+
+        list.filterTo(listInclude) {
+            dataItems.contains(it)
+        }
+
+        if (dataItems.removeAll(listInclude)) {
+            _updateAdapterItems()
+            updateItemDepend()
+        }
+    }
+
+    /**移除数据*/
+    fun removeItem(bean: DslAdapterItem) {
+        if (dataItems.remove(bean)) {
+            _updateAdapterItems()
+            updateItemDepend()
+        }
     }
 
     /**重置数据列表*/
@@ -366,9 +392,44 @@ open class DslAdapter : RBaseAdapter<DslAdapterItem> {
         return dslDataFilter?.filterDataList ?: adapterItems
     }
 
+    /**
+     * <pre>
+     *  DslDemoItem()(){}
+     * </pre>
+     * */
     operator fun <T : DslAdapterItem> T.invoke(config: T.() -> Unit) {
         this.config()
         addLastItem(this)
+    }
+
+    /**
+     * <pre>
+     * this + DslAdapterItem()
+     * </pre>
+     * */
+    operator fun <T : DslAdapterItem> plus(item: T): DslAdapter {
+        addLastItem(item)
+        return this
+    }
+
+    operator fun <T : DslAdapterItem> plus(list: List<T>): DslAdapter {
+        addLastItem(list)
+        return this
+    }
+
+    /**
+     * <pre>
+     * this - DslAdapterItem()
+     * </pre>
+     * */
+    operator fun <T : DslAdapterItem> minus(item: T): DslAdapter {
+        removeItem(item)
+        return this
+    }
+
+    operator fun <T : DslAdapterItem> minus(list: List<T>): DslAdapter {
+        removeItem(list)
+        return this
     }
 
     //</editor-fold desc="操作方法">
@@ -376,6 +437,8 @@ open class DslAdapter : RBaseAdapter<DslAdapterItem> {
     //<editor-fold desc="兼容的操作">
 
     override fun getAllDataCount(): Int {
+        this + DslAdapterItem() + DslTextInfoItem() + DslTextInfoItem() + DslAdapterItem() + DslAdapterItem()
+
         return itemCount
     }
 
@@ -474,6 +537,16 @@ open class DslAdapter : RBaseAdapter<DslAdapterItem> {
 
             addLastItem(datas ?: emptyList())
         }
+    }
+
+    override fun removeFirstItem() {
+        //super.removeFirstItem()
+        dataItems.firstOrNull()?.let { removeItem(it) }
+    }
+
+    override fun removeLastItem() {
+        //super.removeLastItem()
+        dataItems.lastOrNull()?.let { removeItem(it) }
     }
 
     //</editor-fold desc="兼容的操作">
