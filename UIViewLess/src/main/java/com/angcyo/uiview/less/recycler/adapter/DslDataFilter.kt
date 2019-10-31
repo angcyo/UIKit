@@ -74,6 +74,7 @@ open class DslDataFilter(val dslAdapter: DslAdapter) {
         }
 
         if (params.just) {
+            handle.clear()
             updateDependRunnable.run()
         } else {
             //确保多次触发, 只有一次被执行

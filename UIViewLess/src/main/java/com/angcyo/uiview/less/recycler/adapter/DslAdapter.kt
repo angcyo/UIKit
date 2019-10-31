@@ -5,7 +5,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.angcyo.uiview.less.recycler.RBaseViewHolder
 import com.angcyo.uiview.less.recycler.dslitem.DslAdapterStatusItem
 import com.angcyo.uiview.less.recycler.dslitem.DslLoadMoreItem
-import com.angcyo.uiview.less.recycler.dslitem.DslTextInfoItem
 import com.angcyo.uiview.less.recycler.widget.IShowState
 import com.angcyo.uiview.less.utils.RUtils
 import kotlin.math.min
@@ -57,6 +56,17 @@ open class DslAdapter : RBaseAdapter<DslAdapterItem> {
 
     /**单/多选助手*/
     val itemSelectorHelper = ItemSelectorHelper(this)
+
+    /**
+     * 一次性的[FilterParams], 使用完之后会被置空,调用无参[updateItemDepend]方法时使用.
+     * */
+    var onceFilterParams: FilterParams? = null
+
+    /**默认的[FilterParams]*/
+    var defaultFilterParams: FilterParams? = null
+        get() {
+            return onceFilterParams ?: (field ?: _defaultFilterParams())
+        }
 
     constructor() : super()
 
@@ -188,7 +198,7 @@ open class DslAdapter : RBaseAdapter<DslAdapterItem> {
         dslAdapterStatusItem.itemState = status
         notifyDataSetChanged()
         if (status == DslAdapterStatusItem.ADAPTER_STATUS_NONE) {
-            updateItemDepend(defaultFilterParams())
+            updateItemDepend(defaultFilterParams ?: _defaultFilterParams())
         }
     }
 
@@ -296,14 +306,17 @@ open class DslAdapter : RBaseAdapter<DslAdapterItem> {
     }
 
     /**可以在回调中改变数据, 并且会自动刷新界面*/
-    fun changeItems(filterParams: FilterParams = defaultFilterParams(), change: () -> Unit) {
+    fun changeItems(
+        filterParams: FilterParams = defaultFilterParams ?: _defaultFilterParams(),
+        change: () -> Unit
+    ) {
         change()
         _updateAdapterItems()
         updateItemDepend(filterParams)
     }
 
     fun changeDataItems(
-        filterParams: FilterParams = defaultFilterParams(),
+        filterParams: FilterParams = defaultFilterParams ?: _defaultFilterParams(),
         change: (dataItems: MutableList<DslAdapterItem>) -> Unit
     ) {
         changeItems(filterParams) {
@@ -312,7 +325,7 @@ open class DslAdapter : RBaseAdapter<DslAdapterItem> {
     }
 
     fun changeHeaderItems(
-        filterParams: FilterParams = defaultFilterParams(),
+        filterParams: FilterParams = defaultFilterParams ?: _defaultFilterParams(),
         change: (headerItems: MutableList<DslAdapterItem>) -> Unit
     ) {
         changeItems(filterParams) {
@@ -321,7 +334,7 @@ open class DslAdapter : RBaseAdapter<DslAdapterItem> {
     }
 
     fun changeFooterItems(
-        filterParams: FilterParams = defaultFilterParams(),
+        filterParams: FilterParams = defaultFilterParams ?: _defaultFilterParams(),
         change: (footerItems: MutableList<DslAdapterItem>) -> Unit
     ) {
         changeItems(filterParams) {
@@ -362,7 +375,8 @@ open class DslAdapter : RBaseAdapter<DslAdapterItem> {
         return if (useFilterList) getValidFilterDataList() else adapterItems
     }
 
-    fun defaultFilterParams(): FilterParams {
+    /**创建默认的[FilterParams]*/
+    fun _defaultFilterParams(): FilterParams {
         return FilterParams(
             just = dataItems.isEmpty(),
             async = getDataList().isNotEmpty(),
@@ -371,7 +385,9 @@ open class DslAdapter : RBaseAdapter<DslAdapterItem> {
     }
 
     /**调用[DiffUtil]更新界面*/
-    fun updateItemDepend(filterParams: FilterParams = defaultFilterParams()) {
+    fun updateItemDepend(
+        filterParams: FilterParams = defaultFilterParams ?: _defaultFilterParams()
+    ) {
         if (isAdapterStatus()) {
             //如果是情感图状态, 更新数据源没有意义
             return
@@ -384,6 +400,10 @@ open class DslAdapter : RBaseAdapter<DslAdapterItem> {
 
         dslDataFilter?.let {
             it.updateFilterItemDepend(filterParams)
+
+            if (filterParams == onceFilterParams) {
+                onceFilterParams = null
+            }
         }
     }
 
@@ -391,6 +411,10 @@ open class DslAdapter : RBaseAdapter<DslAdapterItem> {
     fun getValidFilterDataList(): List<DslAdapterItem> {
         return dslDataFilter?.filterDataList ?: adapterItems
     }
+
+    //</editor-fold desc="操作方法">
+
+    //<editor-fold desc="操作符重载">
 
     /**
      * <pre>
@@ -432,7 +456,7 @@ open class DslAdapter : RBaseAdapter<DslAdapterItem> {
         return this
     }
 
-    //</editor-fold desc="操作方法">
+    //</editor-fold desc="操作符重载">
 
     //<editor-fold desc="兼容的操作">
 
