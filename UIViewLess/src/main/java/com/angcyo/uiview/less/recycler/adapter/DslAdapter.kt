@@ -437,8 +437,6 @@ open class DslAdapter : RBaseAdapter<DslAdapterItem> {
     //<editor-fold desc="兼容的操作">
 
     override fun getAllDataCount(): Int {
-        this + DslAdapterItem() + DslTextInfoItem() + DslTextInfoItem() + DslAdapterItem() + DslAdapterItem()
-
         return itemCount
     }
 
