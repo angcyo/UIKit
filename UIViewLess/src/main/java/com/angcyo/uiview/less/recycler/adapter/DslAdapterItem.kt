@@ -574,7 +574,7 @@ class UpdateDependProperty<T>(var value: T) : ReadWriteProperty<DslAdapterItem, 
     override fun getValue(thisRef: DslAdapterItem, property: KProperty<*>): T = value
 
     override fun setValue(thisRef: DslAdapterItem, property: KProperty<*>, value: T) {
-        val old = value
+        val old = this.value
         this.value = value
         if (old != value) {
             thisRef.updateItemDepend()
