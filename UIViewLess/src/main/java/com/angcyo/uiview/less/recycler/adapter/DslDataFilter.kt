@@ -59,21 +59,22 @@ open class DslDataFilter(val dslAdapter: DslAdapter) {
         OnceHandler()
     }
 
-    /**更新过滤后的数据源, 采用的是[android.support.v7.util.DiffUtil]*/
+    /**更新过滤后的数据源, 采用的是[DiffUtil]*/
     fun updateFilterItemDepend(params: FilterParams) {
         if (handle.hasCallbacks()) {
             diffRunnable.notifyUpdateDependItem()
         }
 
-        diffRunnable._params = params
-        updateDependRunnable._params = params
+        var filterParams = params
 
         if (params.justFilter) {
-            params.just = true
-            params.async = false
+            filterParams = params.copy(just = true, async = false)
         }
 
-        if (params.just) {
+        diffRunnable._params = filterParams
+        updateDependRunnable._params = filterParams
+
+        if (filterParams.just) {
             handle.clear()
             updateDependRunnable.run()
         } else {
