@@ -1,7 +1,9 @@
 package com.angcyo.uiview.less.recycler.adapter
 
 import android.content.Context
+import android.view.View
 import androidx.recyclerview.widget.RecyclerView
+import com.angcyo.uiview.less.kotlin.fullSpan
 import com.angcyo.uiview.less.recycler.RBaseViewHolder
 import com.angcyo.uiview.less.recycler.dslitem.DslAdapterStatusItem
 import com.angcyo.uiview.less.recycler.dslitem.DslLoadMoreItem
@@ -133,23 +135,30 @@ open class DslAdapter : RBaseAdapter<DslAdapterItem> {
 
     override fun onViewAttachedToWindow(holder: RBaseViewHolder) {
         super.onViewAttachedToWindow(holder)
-        if (isAdapterStatus()) {
-            dslAdapterStatusItem.onItemViewAttachedToWindow.invoke(holder)
-        } else {
-            if (holder.adapterPosition in getValidFilterDataList().indices) {
-                getAdapterItem(holder.adapterPosition).onItemViewAttachedToWindow.invoke(holder)
-            }
+
+        val dslAdapterItem = when {
+            isAdapterStatus() -> dslAdapterStatusItem
+            holder.adapterPosition in getValidFilterDataList().indices -> getAdapterItem(holder.adapterPosition)
+            else -> null
+        }
+
+        dslAdapterItem?.apply {
+            holder.itemView.fullSpan(itemSpanCount == -1)
+            onItemViewAttachedToWindow.invoke(holder)
         }
     }
 
     override fun onViewDetachedFromWindow(holder: RBaseViewHolder) {
         super.onViewDetachedFromWindow(holder)
-        if (isAdapterStatus()) {
-            dslAdapterStatusItem.onItemViewDetachedToWindow.invoke(holder)
-        } else {
-            if (holder.adapterPosition in getValidFilterDataList().indices) {
-                getAdapterItem(holder.adapterPosition).onItemViewDetachedToWindow.invoke(holder)
-            }
+
+        val dslAdapterItem = when {
+            isAdapterStatus() -> dslAdapterStatusItem
+            holder.adapterPosition in getValidFilterDataList().indices -> getAdapterItem(holder.adapterPosition)
+            else -> null
+        }
+
+        dslAdapterItem?.apply {
+            onItemViewDetachedToWindow.invoke(holder)
         }
     }
 

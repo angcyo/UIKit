@@ -27,6 +27,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.GestureDetectorCompat
 import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.angcyo.uiview.less.draw.RDrawNoRead
 import com.angcyo.uiview.less.recycler.RBaseViewHolder
 import com.angcyo.uiview.less.recycler.RRecyclerView
@@ -1389,5 +1390,15 @@ public fun View.findView(isIt: (View) -> Boolean): View? {
             result
         }
         else -> null
+    }
+}
+
+public fun View.fullSpan(full: Boolean = true) {
+    val layoutParams = layoutParams
+    if (layoutParams is StaggeredGridLayoutManager.LayoutParams) {
+        if (full != layoutParams.isFullSpan) {
+            layoutParams.isFullSpan = true
+            this.layoutParams = layoutParams
+        }
     }
 }
