@@ -128,7 +128,7 @@ public fun DslAdapter.dslDeviceInfoItem(
 ) {
     //设备信息
     dslItem(R.layout.base_single_text_layout) {
-        itemBind = { itemHolder, _, _ ->
+        onItemBindOverride = { itemHolder, _, _ ->
             itemHolder.tv(R.id.base_text_view).apply {
                 text = span {
                     append(RUtils.getIP(fragment.requireContext()))

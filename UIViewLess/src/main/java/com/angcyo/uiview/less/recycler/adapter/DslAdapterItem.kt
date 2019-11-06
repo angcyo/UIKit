@@ -37,6 +37,7 @@ open class DslAdapterItem {
 
     /**
      * 在 GridLayoutManager 中, 需要占多少个 span. -1表示满屏
+     * [itemIsGroupHead]
      * */
     var itemSpanCount = 1
 
@@ -106,12 +107,13 @@ open class DslAdapterItem {
             field = value
             if (value) {
                 itemIsHover = true
+                itemDragEnable = false
                 itemSpanCount = -1
             }
         }
 
     /**
-     * 当前分组是否 展开
+     * 当前分组是否[展开]
      * */
     var itemGroupExtend: Boolean by UpdateDependProperty(true)
 
@@ -123,7 +125,8 @@ open class DslAdapterItem {
     //<editor-fold desc="悬停相关属性">
 
     /**
-     * 是否需要悬停, 在使用了 [HoverItemDecoration] 时, 有效
+     * 是否需要悬停, 在使用了 [HoverItemDecoration] 时, 有效.
+     * [itemIsGroupHead]
      * */
     var itemIsHover = itemIsGroupHead
 
@@ -542,6 +545,26 @@ open class DslAdapterItem {
 
     //</editor-fold>
 
+    //<editor-fold desc="拖拽相关">
+
+    /**
+     * 当前[DslAdapterItem]是否可以被拖拽
+     * [itemIsGroupHead]
+     * [DragCallbackHelper.getMovementFlags]
+     * */
+    var itemDragEnable = true
+
+    /**
+     * 当前[DslAdapterItem]是否可以被侧滑删除
+     * */
+    var itemSwipeEnable = true
+
+    /**[dragItem]是否可以在此位置[this]放下*/
+    var isItemCanDropOver: (dragItem: DslAdapterItem) -> Boolean = {
+        itemDragEnable
+    }
+
+    //</editor-fold>
 }
 
 class UpdateDependProperty<T>(var value: T) : ReadWriteProperty<DslAdapterItem, T> {

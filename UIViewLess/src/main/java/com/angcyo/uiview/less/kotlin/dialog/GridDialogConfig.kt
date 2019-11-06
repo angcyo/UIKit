@@ -50,7 +50,7 @@ open class GridDialogConfig : BaseDialogConfig() {
                 renderItem {
                     itemLayoutId = gridItemLayoutId
 
-                    itemBind = { itemHolder, itemPosition, adapterItem ->
+                    onItemBindOverride = { itemHolder, itemPosition, adapterItem ->
                         itemHolder.imgV(R.id.image_view)?.apply {
 
                             //图标

@@ -6,6 +6,8 @@ import android.view.GestureDetector
 import android.view.MotionEvent
 import androidx.core.view.GestureDetectorCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.angcyo.uiview.less.kotlin.dp
+import com.angcyo.uiview.less.kotlin.dpi
 import kotlin.math.max
 
 /**
@@ -22,10 +24,10 @@ class SlidingSelectorHelper(val context: Context, val dslAdapter: DslAdapter) :
     var enableSliding = true
 
     /**当手指距离[RecyclerView]顶部or顶部多少距离时, 触发滚动*/
-    var scrollThresholdValue = 80 * context.resources.displayMetrics.density
+    var scrollThresholdValue = 80 * dp
 
     /**滚动的步进长度, 会根据离边界的距离 自动放大补偿.*/
-    var scrollStepValue: Int = (3 * context.resources.displayMetrics.density).toInt()
+    var scrollStepValue: Int = 3 * dpi
 
     /**补偿算法*/
     var scrollStepValueInterpolator: TimeInterpolator = TimeInterpolator { ratio ->

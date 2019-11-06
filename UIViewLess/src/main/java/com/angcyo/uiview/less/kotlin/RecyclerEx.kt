@@ -1,12 +1,10 @@
 package com.angcyo.uiview.less.kotlin
 
+import android.content.Context
 import android.graphics.Color
 import android.text.TextUtils
 import android.view.View
-import androidx.recyclerview.widget.DefaultItemAnimator
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.SimpleItemAnimator
+import androidx.recyclerview.widget.*
 import com.angcyo.uiview.less.R
 import com.angcyo.uiview.less.kotlin.dsl.DslRecyclerScroll
 import com.angcyo.uiview.less.recycler.DslItemDecoration
@@ -136,7 +134,7 @@ public fun <T> DslAdapter.renderItem(data: T, init: DslAdapterItem.() -> Unit) {
 public fun DslAdapter.renderEmptyItem(height: Int = 120 * dpi, color: Int = Color.TRANSPARENT) {
     val adapterItem = DslAdapterItem()
     adapterItem.itemLayoutId = R.layout.base_empty_item
-    adapterItem.itemBind = { itemHolder, _, _ ->
+    adapterItem.onItemBindOverride = { itemHolder, _, _ ->
         itemHolder.itemView.setBackgroundColor(color)
         itemHolder.itemView.setHeight(height)
     }
@@ -368,21 +366,52 @@ public fun RecyclerView.LayoutManager.recycleScrapList(recycle: RecyclerView.Rec
     }
 }
 
+/**快速创建网格布局*/
+/**快速创建网格布局*/
+public fun gridLayout(
+    context: Context,
+    dslAdapter: DslAdapter,
+    spanCount: Int = 4,
+    orientation: Int = RecyclerView.VERTICAL,
+    reverseLayout: Boolean = false
+): GridLayoutManager {
+    return GridLayoutManager(context, spanCount, orientation, reverseLayout).apply {
+        dslSpanSizeLookup(dslAdapter)
+    }
+}
+
 /**SpanSizeLookup*/
 public fun GridLayoutManager.dslSpanSizeLookup(dslAdapter: DslAdapter): GridLayoutManager.SpanSizeLookup {
     //设置span size
     val spanCount = spanCount
     val spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
         override fun getSpanSize(position: Int): Int {
-            return if (dslAdapter.isAdapterStatus() ||
-                dslAdapter.getItemData(position)?.itemIsGroupHead == true
-            ) {
-                spanCount
-            } else {
-                dslAdapter.getItemData(position)?.itemSpanCount ?: 1
+            return when {
+                dslAdapter.isAdapterStatus() -> spanCount
+                else -> dslAdapter.getItemData(position)?.run {
+                    if (itemSpanCount == -1) {
+                        spanCount
+                    } else {
+                        itemSpanCount
+                    }
+                } ?: 1
             }
         }
     }
     this.spanSizeLookup = spanSizeLookup
     return spanSizeLookup
 }
+
+
+public val FLAG_NO_INIT = -1
+
+public val FLAG_NONE = 0
+
+public val FLAG_ALL = ItemTouchHelper.LEFT or
+        ItemTouchHelper.RIGHT or
+        ItemTouchHelper.DOWN or
+        ItemTouchHelper.UP
+
+public val FLAG_VERTICAL = ItemTouchHelper.DOWN or ItemTouchHelper.UP
+
+public val FLAG_HORIZONTAL = ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT

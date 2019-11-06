@@ -1,7 +1,6 @@
 package com.angcyo.uiview.less.recycler.adapter
 
 import android.content.Context
-import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import com.angcyo.uiview.less.kotlin.fullSpan
 import com.angcyo.uiview.less.recycler.RBaseViewHolder
@@ -419,6 +418,11 @@ open class DslAdapter : RBaseAdapter<DslAdapterItem> {
     /**获取有效过滤后的数据集合*/
     fun getValidFilterDataList(): List<DslAdapterItem> {
         return dslDataFilter?.filterDataList ?: adapterItems
+    }
+
+    /**更新界面上所有[DslAdapterItem]*/
+    override fun updateAllItem() {
+        notifyItemRangeChanged(0, itemCount)
     }
 
     //</editor-fold desc="操作方法">
