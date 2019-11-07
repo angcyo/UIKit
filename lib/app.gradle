@@ -201,3 +201,4 @@ dependencies {
 }
 
 apply from: allGradle.version
+apply from: allGradle.collectMR
