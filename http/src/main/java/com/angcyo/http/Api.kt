@@ -114,12 +114,6 @@ fun Class<*>.typeOf(type: Class<*>): Type = type(this, type)
  * Bean<Data>;
  */
 fun type(raw: Class<*>, type: Class<*>): Type {
-    type(Map::class.java) {
-        addTypeParam(String::class.java)
-        beginSubType(List::class.java)
-        addTypeParam(String::class.java)
-        endSubType()
-    }
     return TypeBuilder.build(raw, type)
 }
 
