@@ -1,26 +1,17 @@
 package com.angcyo.http;
 
+import android.text.TextUtils;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import android.text.TextUtils;
+
 import com.angcyo.http.log.HttpLoggingInterceptorM;
 import com.angcyo.http.log.LogInterceptor;
 import com.angcyo.http.log.LogUtil;
 import com.angcyo.http.progress.ProgressIntercept;
 import com.angcyo.http.type.TypeBuilder;
 import com.google.gson.JsonElement;
-import okhttp3.*;
-import retrofit2.Retrofit;
-import retrofit2.RetrofitServiceMapping;
-import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
-import retrofit2.converter.gson.GsonConverterFactory;
-import rx.Observable;
-import rx.Observer;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
-import rx.schedulers.Schedulers;
 
-import javax.net.ssl.*;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -30,6 +21,31 @@ import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
+import retrofit2.Retrofit;
+import retrofit2.RetrofitServiceMapping;
+import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
+import rx.Observable;
+import rx.Observer;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Func1;
+import rx.schedulers.Schedulers;
 
 /**
  * Email:angcyo@126.com
@@ -374,7 +390,7 @@ public class Http {
         return Http.getJsonBody(mapJson(args));
     }
 
-    public static HashMap<String, String> map(String... args) {
+    public static HashMap<String, Object> map(String... args) {
         return mapParam(args);
     }
 
