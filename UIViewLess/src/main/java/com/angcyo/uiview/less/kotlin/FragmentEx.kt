@@ -344,7 +344,12 @@ public fun Fragment.putData(data: Any) {
 }
 
 public fun Fragment.putData(key: String, data: Any) {
-    arguments = FragmentHelper.Builder.createBundle(key, data)
+    val bundle = FragmentHelper.Builder.createBundle(key, data)
+    if (arguments == null) {
+        arguments = bundle
+    } else {
+        arguments!!.putAll(bundle)
+    }
 }
 
 public fun <T> Fragment.getData(cls: Class<T>): T? {
