@@ -123,14 +123,7 @@ fun <T> Observable<Response<JsonElement>>.fetchBean(
 ): Subscription {
     return compose(Http.defaultTransformer())
         .map {
-            if (it.isSuccessful) {
-                when (val bodyJson = Json.to(it.body())) {
-                    null -> null
-                    else -> Json.from<T>(bodyJson, type)
-                }
-            } else {
-                null
-            }
+            it.toBean<T>(type)
         }
         .subscribe(object : HttpSubscriber<T>() {
             override fun onEnd(data: T?, error: Throwable?) {
@@ -138,6 +131,17 @@ fun <T> Observable<Response<JsonElement>>.fetchBean(
                 onEnd(data, error)
             }
         })
+}
+
+fun <T> Response<JsonElement>.toBean(type: Type): T? {
+    return if (isSuccessful && body() != null) {
+        when (val bodyJson = Json.to(body())) {
+            null -> null
+            else -> Json.from<T>(bodyJson, type)
+        }
+    } else {
+        null
+    }
 }
 
 /**网络状态异常信息*/
