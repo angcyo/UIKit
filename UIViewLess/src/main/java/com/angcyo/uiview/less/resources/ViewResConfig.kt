@@ -29,8 +29,21 @@ class ViewResConfig {
     var fragmentBackgroundColor: Int = getColor(R.color.line_color)
     var titleBarBackgroundColor: Int = SkinHelper.getSkin().themeSubColor
 
-    var fragmentBackgroundDrawable: Drawable? = ColorDrawable(getColor(R.color.line_color))
-    var titleBarBackgroundDrawable: Drawable? = ColorDrawable(SkinHelper.getSkin().themeSubColor)
+    var fragmentBackgroundDrawable: Drawable? = null
+        get() {
+            if (field == null) {
+                return ColorDrawable(fragmentBackgroundColor)
+            }
+            return field
+        }
+
+    var titleBarBackgroundDrawable: Drawable? = null
+        get() {
+            if (field == null) {
+                return ColorDrawable(titleBarBackgroundColor)
+            }
+            return field
+        }
 
     /**
      * [com.angcyo.uiview.less.widget.behavior.BackgroundBehavior.childHeight]
@@ -61,4 +74,10 @@ public fun ViewResConfig.copyFrom(config: ViewResConfig): ViewResConfig {
 
 public fun ViewResConfig.copyTo(config: ViewResConfig): ViewResConfig {
     return this.copy(config)
+}
+
+public fun ViewResConfig.setTitleBarBgColor(color: Int): ViewResConfig {
+    this.titleBarBackgroundColor = color
+    this.titleBarBackgroundDrawable = ColorDrawable(color)
+    return this
 }
