@@ -69,19 +69,33 @@ class ScrollHelper {
         return (recyclerView?.layoutManager?.itemCount ?: 0) - 1
     }
 
-    fun scrollToLast() {
-        scroll(lastItemPosition())
+    fun scrollToLast(scrollParams: ScrollParams = _defaultScrollParams()) {
+        startScroll(lastItemPosition(), scrollParams)
+    }
+
+    fun _defaultScrollParams(): ScrollParams {
+        return ScrollParams(-1, scrollType, isScrollAnim, scrollOffset, isFromAddItem)
+    }
+
+    fun startScroll(scrollParams: ScrollParams = _defaultScrollParams()) {
+        startScroll(scrollParams.scrollPosition, scrollParams)
     }
 
     fun scroll(position: Int) {
+        startScroll(position, _defaultScrollParams())
+    }
+
+    fun startScroll(position: Int, scrollParams: ScrollParams = _defaultScrollParams()) {
         if (check(position)) {
+            scrollParams.scrollPosition = position
+
             recyclerView?.stopScroll()
 
             if (isPositionVisible(position)) {
-                scrollWithVisible(ScrollParams(position, scrollType, isScrollAnim, scrollOffset))
+                scrollWithVisible(scrollParams)
             } else {
-                if (isScrollAnim) {
-                    if (isFromAddItem) {
+                if (scrollParams.scrollAnim) {
+                    if (scrollParams.isFromAddItem) {
                         if (recyclerView?.itemAnimator is SimpleItemAnimator) {
                             //itemAnimator 自带动画
                             recyclerView?.scrollToPosition(position)
@@ -92,7 +106,7 @@ class ScrollHelper {
                         recyclerView?.smoothScrollToPosition(position)
                     }
                 } else {
-                    if (isFromAddItem) {
+                    if (scrollParams.isFromAddItem) {
                         val itemAnimator = recyclerView?.itemAnimator
                         if (itemAnimator != null) {
                             //有默认的动画
@@ -102,16 +116,9 @@ class ScrollHelper {
                     }
                     recyclerView?.scrollToPosition(position)
                 }
-                if (scrollType != SCROLL_TYPE_NORMAL) {
+                if (scrollParams.scrollType != SCROLL_TYPE_NORMAL) {
                     //不可见时, 需要现滚动到可见位置, 再进行微调
-                    OnScrollIdleListener(
-                        ScrollParams(
-                            position,
-                            scrollType,
-                            isScrollAnim,
-                            scrollOffset
-                        )
-                    ).attach(recyclerView!!)
+                    OnScrollIdleListener(scrollParams).attach(recyclerView!!)
                 }
             }
             resetValue()
@@ -515,15 +522,16 @@ class ScrollHelper {
 
         fun detach()
     }
-
-    //滚动参数
-    internal data class ScrollParams(
-        var scrollPosition: Int = RecyclerView.NO_POSITION,
-        var scrollType: Int = SCROLL_TYPE_NORMAL,
-        var scrollAnim: Boolean = true,
-        var scrollOffset: Int = 0
-    )
 }
+
+//滚动参数
+data class ScrollParams(
+    var scrollPosition: Int = RecyclerView.NO_POSITION,
+    var scrollType: Int = ScrollHelper.SCROLL_TYPE_NORMAL,
+    var scrollAnim: Boolean = true,
+    var scrollOffset: Int = 0,
+    var isFromAddItem: Boolean = false
+)
 
 fun RecyclerView?.findFirstVisibleItemPosition(): Int {
     return this?.layoutManager.findFirstVisibleItemPosition()

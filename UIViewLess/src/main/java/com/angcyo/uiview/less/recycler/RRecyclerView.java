@@ -786,7 +786,7 @@ public class RRecyclerView extends RecyclerView implements CanScrollUpCallBack {
 
         scrollHelper.setScrollAnim(anim);
         scrollHelper.setScrollType(ScrollHelper.SCROLL_TYPE_BOTTOM);
-        scrollHelper.scrollToLast();
+        scrollHelper.scrollToLast(scrollHelper._defaultScrollParams());
     }
 
     @Override
