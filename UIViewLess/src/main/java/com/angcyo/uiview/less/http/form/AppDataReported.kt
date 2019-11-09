@@ -3,6 +3,7 @@ package com.angcyo.uiview.less.http.form
 import com.angcyo.http.HttpSubscriber
 import com.angcyo.http.Rx
 import com.angcyo.lib.L
+import com.angcyo.uiview.less.kotlin.*
 import com.angcyo.uiview.less.utils.RConcurrentTask
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.CopyOnWriteArraySet
@@ -208,9 +209,7 @@ class DefaultFormDataAdapter : DataReportAdapter() {
     }
 
     override fun getFormDataCount(formData: FormData): Int {
-        return 1 + FormAttachManager.parseAttachJson(
-            formData.formAttachJson
-        ).second.size
+        return 1 + FormAttachManager.parseAttachJson(formData.formAttachJson).second.size
     }
 
     override fun dataReport(
@@ -224,12 +223,22 @@ class DefaultFormDataAdapter : DataReportAdapter() {
             }
         })
             .upload(formData)
-            .load { _, error ->
-                if (error == null) {
-                    onProgress(1)
-                }
+            .load { body, error ->
+                onProgress(1)
 
-                onEnd(error == null, error)
+                if (error == null) {
+                    val json = body.readString().json()
+                    val code = json?.getInt("code") ?: 0
+                    val msg = json?.getString("msg").orDefault().toString()
+
+                    if (code == 200) {
+                        onEnd(true, null)
+                    } else {
+                        onEnd(false, IllegalArgumentException(msg))
+                    }
+                } else {
+                    onEnd(false, error)
+                }
             }
     }
 }
