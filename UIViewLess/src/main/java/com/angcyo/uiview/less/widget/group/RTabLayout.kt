@@ -189,7 +189,7 @@ class RTabLayout(context: Context, attributeSet: AttributeSet? = null) : ViewGro
             }
         } else {
             if (notify && isClickScrollPager) {
-                onTabLayoutListener?.onPageScrollStateChanged(androidx.viewpager.widget.ViewPager.SCROLL_STATE_SETTLING)
+                onTabLayoutListener?.onPageScrollStateChanged(ViewPager.SCROLL_STATE_SETTLING)
             }
             if (oldIndex in 0 until childCount) {
                 onTabLayoutListener?.onUnSelectorItemView(this, getChildAt(oldIndex), oldIndex)
@@ -218,8 +218,8 @@ class RTabLayout(context: Context, attributeSet: AttributeSet? = null) : ViewGro
     private var isViewPagerDragging = false
 
     /**自动关联ViewPager*/
-    fun setupViewPager(viewPager: androidx.viewpager.widget.ViewPager) {
-        viewPager.addOnPageChangeListener(object : androidx.viewpager.widget.ViewPager.SimpleOnPageChangeListener() {
+    fun setupViewPager(viewPager: ViewPager) {
+        viewPager.addOnPageChangeListener(object : ViewPager.SimpleOnPageChangeListener() {
             override fun onPageScrollStateChanged(state: Int) {
                 super.onPageScrollStateChanged(state)
                 this@RTabLayout.onPageScrollStateChanged(state)
@@ -268,9 +268,9 @@ class RTabLayout(context: Context, attributeSet: AttributeSet? = null) : ViewGro
         //L.e("call: onPageScrollStateChanged -> $state")
         val isClickScrollPagerOld = isClickScrollPager
 
-        if (state == androidx.viewpager.widget.ViewPager.SCROLL_STATE_DRAGGING) {
+        if (state == ViewPager.SCROLL_STATE_DRAGGING) {
             isViewPagerDragging = true
-        } else if (state == androidx.viewpager.widget.ViewPager.SCROLL_STATE_IDLE) {
+        } else if (state == ViewPager.SCROLL_STATE_IDLE) {
             isViewPagerDragging = false
             isClickScrollPager = false
         }
@@ -318,7 +318,7 @@ class RTabLayout(context: Context, attributeSet: AttributeSet? = null) : ViewGro
         if (!isViewPagerDragging) {
             isClickScrollPager = false
             onTabLayoutListener?.let {
-                it.onPageScrollStateChanged(androidx.viewpager.widget.ViewPager.SCROLL_STATE_IDLE)
+                it.onPageScrollStateChanged(ViewPager.SCROLL_STATE_IDLE)
                 if (childCount > position) {
                     it.onSelectorItemView(this@RTabLayout, getChildAt(position), position)
                 }
@@ -676,9 +676,9 @@ class RTabLayout(context: Context, attributeSet: AttributeSet? = null) : ViewGro
     /**事件监听*/
     open class OnTabLayoutListener {
 
-        protected var pagerScrollState = androidx.viewpager.widget.ViewPager.SCROLL_STATE_IDLE
+        protected var pagerScrollState = ViewPager.SCROLL_STATE_IDLE
 
-        open fun isScrollEnd() = pagerScrollState == androidx.viewpager.widget.ViewPager.SCROLL_STATE_IDLE
+        open fun isScrollEnd() = pagerScrollState == ViewPager.SCROLL_STATE_IDLE
 
         open fun onPageScrollStateChanged(state: Int) {
             pagerScrollState = state
@@ -743,7 +743,7 @@ class RTabLayout(context: Context, attributeSet: AttributeSet? = null) : ViewGro
     }
 
     /**改变Tab字体大小的实现*/
-    open class DefaultTabLayoutListener(viewPager: androidx.viewpager.widget.ViewPager? = null) :
+    open class DefaultTabLayoutListener(viewPager: ViewPager? = null) :
         DefaultViewPagerListener(viewPager) {
         var maxTextSize: Float = getDimen(R.dimen.default_text_size16).toFloat()
         var minTextSize: Float = getDimen(R.dimen.default_text_size9).toFloat()
@@ -822,7 +822,7 @@ class RTabLayout(context: Context, attributeSet: AttributeSet? = null) : ViewGro
     /**
      * 默认实现方式, 简单的切换ViewPager
      * */
-    open class DefaultViewPagerListener(val viewPager: androidx.viewpager.widget.ViewPager? = null) :
+    open class DefaultViewPagerListener(val viewPager: ViewPager? = null) :
         OnTabLayoutListener() {
         override fun onTabSelector(tabLayout: RTabLayout, fromIndex: Int, toIndex: Int) {
             super.onTabSelector(tabLayout, fromIndex, toIndex)
@@ -840,7 +840,7 @@ class RTabLayout(context: Context, attributeSet: AttributeSet? = null) : ViewGro
     open class DefaultColorListener(
         val normalColor: Int, val selectedColor: Int,
         val useBold: Boolean = false,
-        viewPager: androidx.viewpager.widget.ViewPager? = null
+        viewPager: ViewPager? = null
     ) : DefaultViewPagerListener(viewPager) {
 
         fun setViewColor(view: View?, color: Int) {
