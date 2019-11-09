@@ -170,7 +170,7 @@ class AppDataReported {
 
 abstract class DataReportAdapter {
 
-    internal var formData: FormData? = null
+    var formData: FormData? = null
 
     /**表单数据是否有效*/
     open fun checkFormDataValid(formData: FormData): Boolean {
