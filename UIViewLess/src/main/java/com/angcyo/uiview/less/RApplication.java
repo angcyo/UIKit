@@ -534,4 +534,8 @@ public class RApplication extends Application {
         }
         return list;
     }
+
+    public String getBaseUrl(){
+        return "";
+    }
 }
