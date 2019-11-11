@@ -35,6 +35,7 @@ import java.net.URLEncoder
 import java.nio.charset.Charset
 import java.util.*
 import java.util.regex.Pattern
+import kotlin.math.min
 import kotlin.random.Random
 
 /**
@@ -874,4 +875,28 @@ public fun evaluate(startValue: Int, endValue: Int, fraction: Float): Float {
 
 public fun evaluate(startValue: Float, endValue: Float, fraction: Float): Float {
     return startValue + fraction * (endValue - startValue)
+}
+
+public fun notNull(vararg anys: Any?, doIt: (Array<Any>) -> Unit) {
+    var haveNull = false
+
+    for (any in anys) {
+        if (any == null) {
+            haveNull = true
+            break
+        }
+    }
+
+    if (!haveNull) {
+        doIt(anys as Array<Any>)
+    }
+}
+
+public fun <L1, L2> each(list1: List<L1>?, list2: List<L2>?, run: (item1: L1, item2: L2) -> Unit) {
+    val size1 = list1?.size ?: 0
+    val size2 = list2?.size ?: 0
+
+    for (i in 0 until min(size1, size2)) {
+        run(list1!![i], list2!![i])
+    }
 }
