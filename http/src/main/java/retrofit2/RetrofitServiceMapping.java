@@ -15,7 +15,22 @@ import java.util.Map;
  * @date 2018/11/06
  */
 public class RetrofitServiceMapping {
+
+    /**
+     * 功能总开关
+     */
     public static boolean enableMapping = BuildConfig.DEBUG;
+
+    /**
+     * 当方法名匹配不到url时, 是否使用声明的url匹配映射的url.
+     * <p>
+     * 关闭之后, 将只匹配方法名对应的url
+     */
+    public static boolean enableUrlMap = true;
+
+    /**
+     * 映射关系表, key 可以是方法名, 也是部分url字符串
+     */
     public static Map<String, String> defaultMap = new ArrayMap<>();
 
     public static void init(boolean enableMapping, Map<String, String> methodMapping) {
@@ -55,18 +70,30 @@ public class RetrofitServiceMapping {
         for (Method method : service.getDeclaredMethods()) {
             try {
                 String mapUrl = map.get(method.getName());
-                if (!TextUtils.isEmpty(mapUrl)) {
-                    //retrofit 2.5
-                    ServiceMethod serviceMethod = ServiceMethod.parseAnnotations(retrofit, method);
-                    if (serviceMethod instanceof HttpServiceMethod) {
-                        RequestFactory requestFactory = (RequestFactory) Reflect.getMember(HttpServiceMethod.class, serviceMethod, "requestFactory");
-                        Reflect.setFieldValue(requestFactory, "relativeUrl", mapUrl);
 
-                        Map<Method, ServiceMethod> serviceMethodCache = (Map<Method, ServiceMethod>) Reflect.getMember(retrofit, "serviceMethodCache");
-                        serviceMethodCache.put(method, serviceMethod);
+                ServiceMethod serviceMethod = ServiceMethod.parseAnnotations(retrofit, method);
+
+                RequestFactory requestFactory = null;
+                if (serviceMethod instanceof HttpServiceMethod) {
+                    requestFactory = (RequestFactory) Reflect.getMember(HttpServiceMethod.class, serviceMethod, "requestFactory");
+                }
+
+                if (TextUtils.isEmpty(mapUrl) && enableUrlMap) {
+                    //通过方法, 拿不到映射的url时, 则匹配url映射
+                    if (requestFactory != null) {
+                        String relativeUrl = (String) Reflect.getFieldValue(requestFactory, "relativeUrl");
+
+                        if (!TextUtils.isEmpty(relativeUrl)) {
+                            for (String key : map.keySet()) {
+                                String url = map.get(key);
+                                if (relativeUrl.contains(key)) {
+                                    mapUrl = url;
+                                    break;
+                                }
+                            }
+                        }
                     }
-                    //end
-
+                } else {
                     //retrofit 2.4
                     //ServiceMethod.Builder methodBuilder = new ServiceMethod.Builder(retrofit, method);
                     //ServiceMethod serviceMethod = methodBuilder.build();
@@ -77,10 +104,16 @@ public class RetrofitServiceMapping {
 
                     //Log.i("angcyo", "succeed");
                 }
+
+                if (requestFactory != null && !TextUtils.isEmpty(mapUrl)) {
+                    Reflect.setFieldValue(requestFactory, "relativeUrl", mapUrl);
+
+                    Map<Method, ServiceMethod> serviceMethodCache = (Map<Method, ServiceMethod>) Reflect.getMember(retrofit, "serviceMethodCache");
+                    serviceMethodCache.put(method, serviceMethod);
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
     }
-
 }
