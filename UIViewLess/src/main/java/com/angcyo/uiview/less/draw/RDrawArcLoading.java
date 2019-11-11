@@ -5,9 +5,11 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import androidx.annotation.NonNull;
 import android.util.AttributeSet;
 import android.view.View;
+
+import androidx.annotation.NonNull;
+
 import com.angcyo.uiview.less.R;
 import com.angcyo.uiview.less.resources.AnimUtil;
 import com.angcyo.uiview.less.skin.SkinHelper;
@@ -49,6 +51,7 @@ public class RDrawArcLoading extends RSectionDraw {
      * 动画时长
      */
     long duration = 2000;
+    ValueAnimator valueAnimator;
 
     public RDrawArcLoading(@NonNull View view) {
         super(view);
@@ -179,11 +182,12 @@ public class RDrawArcLoading extends RSectionDraw {
 
     }
 
-    ValueAnimator valueAnimator;
-
     @Override
     public void onAttachedToWindow() {
         super.onAttachedToWindow();
+        if (mView != null && mView.getVisibility() == VISIBLE) {
+            onVisibilityChanged(mView, VISIBLE);
+        }
     }
 
     @Override
