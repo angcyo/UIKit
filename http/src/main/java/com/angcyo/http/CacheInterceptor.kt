@@ -1,6 +1,5 @@
 package com.angcyo.http
 
-import com.angcyo.http.log.LogUtil
 import okhttp3.Interceptor
 import okhttp3.Interceptor.Chain
 import okhttp3.Request
@@ -8,7 +7,7 @@ import okhttp3.Response
 import java.util.concurrent.CopyOnWriteArraySet
 
 /**
- * 为每一个接口, 在无网络的情况下, 提供缓存功能
+ * 为每一个接口, 在无网络的情况下, 提供缓存功能.
  * Email:angcyo@126.com
  * @author angcyo
  * @date 2019/07/24
@@ -18,8 +17,15 @@ import java.util.concurrent.CopyOnWriteArraySet
 open class CacheInterceptor : Interceptor {
     companion object {
         const val TAG = "CacheInterceptor"
+
+        @Deprecated("已废弃, 默认就是无缓存")
         const val HEADER_NO_CACHE = "offline-no-cache"
-        const val HEADER_FORCE_CACHE = "offline-force-cache"
+
+        /**配置在url参数中, 开启离线缓存*/
+        const val OFFLINE_CACHE = "offline-cache"
+
+        /**配置在请求头中, 开启离线缓存*/
+        const val HEADER_FORCE_CACHE = OFFLINE_CACHE
     }
 
     var enableCache = true
@@ -29,10 +35,6 @@ open class CacheInterceptor : Interceptor {
     override fun intercept(chain: Chain): Response {
         val originRequest = chain.request()
         if (enableCache && cacheAdapter.isNotEmpty()) {
-            if (checkCache(originRequest)) {
-                return loadCache(originRequest) ?: chain.proceed(originRequest)
-            }
-
             val response: Response
             try {
                 response = chain.proceed(originRequest)
@@ -40,7 +42,7 @@ open class CacheInterceptor : Interceptor {
             } catch (e: Exception) {
                 if (HttpSubscriber.isNetworkException(e)) {
                     if (checkCache(originRequest)) {
-                        return loadCache(originRequest) ?: chain.proceed(originRequest)
+                        return loadCache(originRequest) ?: throw e
                     } else {
                         throw e
                     }
@@ -55,14 +57,6 @@ open class CacheInterceptor : Interceptor {
     }
 
     private fun checkCache(request: Request): Boolean {
-        if (request.header(HEADER_NO_CACHE)?.isNotEmpty() == true) {
-            //跳过缓存
-
-            LogUtil.i(TAG, "跳过缓存:${request.url}")
-
-            return false
-        }
-
         for (adapter in cacheAdapter) {
             if (adapter.checkNeedCache(request)) {
                 return true

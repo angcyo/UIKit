@@ -70,8 +70,8 @@ open class OfflineCacheAdapter(cacheFolder: String = Root.getAppExternalFolder("
         if (isForceCache(request)) {
             return true
         }
-        //无网络需要缓存
-        return isJsonType(request)
+        //默认不开启缓存
+        return false//isJsonType(request)
     }
 
     /**读取缓存*/
@@ -211,6 +211,17 @@ open class OfflineCacheAdapter(cacheFolder: String = Root.getAppExternalFolder("
 
     /**强制使用缓存*/
     private fun isForceCache(request: Request): Boolean {
+
+        //此请求, 是否需要缓存
+        var cache = false
+
+        //Url中, 包含了离线缓存参数
+        cache = request.url.queryParameter(CacheInterceptor.OFFLINE_CACHE) != null
+
+        if (cache) {
+            return true
+        }
+
         return request.header(CacheInterceptor.HEADER_FORCE_CACHE)?.isNotEmpty() == true
     }
 }
