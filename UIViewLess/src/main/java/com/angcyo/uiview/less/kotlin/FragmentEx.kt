@@ -364,25 +364,24 @@ public fun Fragment.getBundle(): Bundle? {
     return arguments?.getBundle(ActivityHelper.KEY_EXTRA) ?: arguments
 }
 
-public fun <T> Fragment.getData(key: String, cls: Class<T>): T? {
-    return getBundle()?.getString(key)?.run {
-        when {
-            cls.isAssignableFrom(String::class.java) -> this as? T
-            cls.isAssignableFrom(Number::class.java) -> this.toFloat() as? T
-            else -> this.fromJson(cls)
-        }
+public fun <T> String.covert(cls: Class<T>): T? {
+    return when {
+        cls.isAssignableFrom(String::class.java) -> this as? T
+        cls.isAssignableFrom(Int::class.java) -> this.toInt() as? T
+        cls.isAssignableFrom(Long::class.java) -> this.toLong() as? T
+        cls.isAssignableFrom(Float::class.java) -> this.toFloat() as? T
+        cls.isAssignableFrom(Double::class.java) -> this.toDouble() as? T
+        else -> this.fromJson(cls)
     }
+}
+
+public fun <T> Fragment.getData(key: String, cls: Class<T>): T? {
+    return getBundle()?.getString(key)?.covert(cls)
 }
 
 public fun <T> Activity.getData(cls: Class<T>): T? {
     return intent?.getBundleExtra(ActivityHelper.KEY_EXTRA)
-        ?.getString(KEY_JSON_DATA)?.run {
-            when {
-                cls.isAssignableFrom(String::class.java) -> this as? T
-                cls.isAssignableFrom(Number::class.java) -> this.toFloat() as? T
-                else -> this.fromJson(cls)
-            }
-        }
+        ?.getString(KEY_JSON_DATA)?.covert(cls)
 }
 
 /**core 头像设置*/

@@ -4,11 +4,13 @@ import com.angcyo.http.type.TypeBuilder
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import okhttp3.OkHttpClient
+import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.*
 import rx.Observable
 import rx.Subscription
 import java.lang.reflect.Type
+import java.nio.charset.Charset
 
 /**
  *
@@ -140,8 +142,23 @@ fun <T> Response<JsonElement>.toBean(type: Type): T? {
             else -> Json.from<T>(bodyJson, type)
         }
     } else {
-        null
+        when (val bodyJson = errorBody()?.readString()) {
+            null -> null
+            else -> Json.from<T>(bodyJson, type)
+        }
     }
+}
+
+/**读取ResponseBody中的字符串*/
+private fun ResponseBody?.readString(charsetName: String = "UTF-8"): String {
+    if (this == null) {
+        return ""
+    }
+    val source = source()
+    source.request(Long.MAX_VALUE)
+    val buffer = source.buffer
+    val charset: Charset = Charset.forName(charsetName)
+    return buffer.clone().readString(charset)
 }
 
 /**网络状态异常信息*/
