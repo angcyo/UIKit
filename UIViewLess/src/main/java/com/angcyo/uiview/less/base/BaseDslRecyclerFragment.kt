@@ -9,6 +9,7 @@ import com.angcyo.uiview.less.recycler.RRecyclerView
 import com.angcyo.uiview.less.recycler.adapter.DslAdapter
 import com.angcyo.uiview.less.recycler.adapter.DslAdapterItem
 import com.angcyo.uiview.less.recycler.adapter.RBaseAdapter
+import rx.Subscription
 
 /**
  *
@@ -84,5 +85,10 @@ open class BaseDslRecyclerFragment : BaseRecyclerFragment<DslAdapterItem>() {
      */
     open fun notifyItemChangedByTag(tag: String?) {
         baseDslAdapter?.notifyItemChangedByTag(tag)
+    }
+
+    /**管理Rx订阅者*/
+    fun Subscription.attach(checkToken: Boolean = false) {
+        addSubscription(this, checkToken)
     }
 }
