@@ -190,13 +190,13 @@ public abstract class BaseRecyclerFragment<T> extends BaseLoadFragment
     }
 
     @Override
-    public void switchToError() {
+    public void switchToError(Object extraObj) {
         if (baseAdapter != null) {
             if (baseAdapter.getAllDataCount() <= 0) {
-                super.switchToError();
+                super.switchToError(extraObj);
             }
         } else {
-            super.switchToError();
+            super.switchToError(extraObj);
         }
     }
 
@@ -344,7 +344,6 @@ public abstract class BaseRecyclerFragment<T> extends BaseLoadFragment
      */
     public void onBaseLoadEnd(@Nullable List<T> datas, int pageSize) {
         onBaseLoadEnd(datas, pageSize, null);
-
     }
 
     public void onBaseLoadEnd(@Nullable List<T> datas, int pageSize, @Nullable Throwable error) {

@@ -41,7 +41,11 @@ public class BaseLoadFragment extends BaseTitleFragment {
      * 如果没有数据展示, 才切换到错误情感图
      */
     public void switchToError() {
-        switchAffectUI(AffectUI.AFFECT_ERROR);
+        switchToError(null);
+    }
+
+    public void switchToError(Object extraObj) {
+        switchAffectUI(AffectUI.AFFECT_ERROR, extraObj);
     }
 
     /**
