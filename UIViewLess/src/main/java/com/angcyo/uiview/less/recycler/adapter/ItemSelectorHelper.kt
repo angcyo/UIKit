@@ -32,7 +32,6 @@ class ItemSelectorHelper(val dslAdapter: DslAdapter) {
                     )
                 )
             }
-
         }
 
     /**设置的选择模式*/
