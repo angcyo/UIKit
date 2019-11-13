@@ -27,6 +27,7 @@ import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
+import okhttp3.ResponseBody.Companion.asResponseBody
 import okio.Buffer
 import java.io.*
 import java.lang.ref.WeakReference
@@ -671,6 +672,12 @@ public fun String?.decode(): String? {
     }
 
     return decode
+}
+
+fun ResponseBody.buffer(): ResponseBody {
+    val buffer = Buffer()
+    source().readAll(buffer)
+    return buffer.asResponseBody(contentType(), contentLength())
 }
 
 /**读取ResponseBody中的字符串*/

@@ -3,6 +3,7 @@ package com.angcyo.http
 import com.angcyo.http.type.TypeBuilder
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
+import com.google.gson.JsonPrimitive
 import okhttp3.OkHttpClient
 import okhttp3.ResponseBody
 import retrofit2.Response
@@ -83,6 +84,35 @@ fun Observable<Response<JsonElement>>.fetch(onEnd: (data: Response<JsonElement>?
         })
 }
 
+/**读取ResponseBody中的字符串*/
+private fun ResponseBody?.readString(charsetName: String = "UTF-8"): String {
+    if (this == null) {
+        return ""
+    }
+    val source = source()
+    source.request(Long.MAX_VALUE)
+    val buffer = source.buffer
+    val charset: Charset = Charset.forName(charsetName)
+    return buffer.clone().readString(charset)
+}
+
+private fun JsonElement.getInt(key: String): Int {
+    if (this is JsonObject) {
+        return this.getInt(key)
+    }
+    return 0
+}
+
+private fun JsonObject.getString(key: String): String? {
+    val element = get(key)
+    if (element is JsonPrimitive) {
+        if (element.isString) {
+            return element.asString
+        }
+    }
+    return null
+}
+
 /**
  * Map<String, List<String>>
  * <pre>
@@ -149,16 +179,52 @@ fun <T> Response<JsonElement>.toBean(type: Type): T? {
     }
 }
 
-/**读取ResponseBody中的字符串*/
-private fun ResponseBody?.readString(charsetName: String = "UTF-8"): String {
-    if (this == null) {
-        return ""
+/**http 状态成功, 并且逻辑code也是成功的*/
+fun Response<JsonElement>?.isSuccess(): Pair<Boolean, String?> {
+    var code = 0
+    var msg: String? = null
+
+    this?.apply {
+        if (isSuccessful && this.body()?.getInt("code") ?: 0 in 200..299) {
+            code = 200
+        } else {
+            msg = (this.body() as? JsonObject)?.getString("msg")
+        }
     }
-    val source = source()
-    source.request(Long.MAX_VALUE)
-    val buffer = source.buffer
-    val charset: Charset = Charset.forName(charsetName)
-    return buffer.clone().readString(charset)
+
+    return Pair(code in 200..299, msg)
+}
+
+fun okhttp3.Response?.isSuccess(): Pair<Boolean, String?> {
+    val code = 0
+    var msg: String? = null
+
+    this?.apply {
+        if (isSuccessful) {
+            return body.isSuccess()
+        } else {
+            msg = message
+        }
+    }
+
+    return Pair(code in 200..299, msg)
+}
+
+fun ResponseBody?.isSuccess(): Pair<Boolean, String?> {
+    var code = 0
+    var msg: String? = null
+
+    this?.apply {
+        val jsonObject = Json.from(readString(), JsonObject::class.java)
+
+        if (jsonObject.getInt("code") in 200..299) {
+            code = 200
+        } else {
+            msg = jsonObject.getString("msg")
+        }
+    }
+
+    return Pair(code in 200..299, msg)
 }
 
 /**网络状态异常信息*/
