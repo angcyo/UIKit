@@ -5,6 +5,7 @@ import android.graphics.Rect
 import android.os.Parcelable
 import android.util.AttributeSet
 import android.view.MotionEvent
+import android.view.MotionEvent.*
 import android.view.View
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.ViewCompat
@@ -240,7 +241,7 @@ open class LogBehavior<T : View>(context: Context? = null, attrs: AttributeSet? 
         child: T,
         ev: MotionEvent
     ): Boolean {
-        w("this...${child.javaClass.simpleName}...${MotionEvent.actionToString(ev.actionMasked)}")
+        w("this...${child.javaClass.simpleName}...${ev.actionToString()}")
         return super.onTouchEvent(parent, child, ev)
     }
 
@@ -249,7 +250,7 @@ open class LogBehavior<T : View>(context: Context? = null, attrs: AttributeSet? 
         child: T,
         ev: MotionEvent
     ): Boolean {
-        w("this...${child.javaClass.simpleName}...${MotionEvent.actionToString(ev.actionMasked)}")
+        w("this...${child.javaClass.simpleName}...${ev.actionToString()}")
         return super.onInterceptTouchEvent(parent, child, ev)
     }
 
@@ -317,5 +318,28 @@ open class LogBehavior<T : View>(context: Context? = null, attrs: AttributeSet? 
         if (showLog) {
             L.d(msg ?: "")
         }
+    }
+}
+
+fun MotionEvent.actionToString(): String {
+    val action = this.actionMasked
+    when (action) {
+        ACTION_DOWN -> return "ACTION_DOWN"
+        ACTION_UP -> return "ACTION_UP"
+        ACTION_CANCEL -> return "ACTION_CANCEL"
+        ACTION_OUTSIDE -> return "ACTION_OUTSIDE"
+        ACTION_MOVE -> return "ACTION_MOVE"
+        ACTION_HOVER_MOVE -> return "ACTION_HOVER_MOVE"
+        ACTION_SCROLL -> return "ACTION_SCROLL"
+        ACTION_HOVER_ENTER -> return "ACTION_HOVER_ENTER"
+        ACTION_HOVER_EXIT -> return "ACTION_HOVER_EXIT"
+        11 -> return "ACTION_BUTTON_PRESS"
+        12 -> return "ACTION_BUTTON_RELEASE"
+    }
+    val index = action and ACTION_POINTER_INDEX_MASK shr ACTION_POINTER_INDEX_SHIFT
+    return when (action and ACTION_MASK) {
+        ACTION_POINTER_DOWN -> "ACTION_POINTER_DOWN($index)"
+        ACTION_POINTER_UP -> "ACTION_POINTER_UP($index)"
+        else -> action.toString()
     }
 }

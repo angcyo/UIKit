@@ -67,6 +67,7 @@ public class RDrawArcLoading extends RSectionDraw {
 
         if (isInEditMode()) {
             arcColor = Color.RED;
+            progress = 50;
         } else {
             arcColor = SkinHelper.getSkin().getThemeColorAccent();
             arcColor = array.getColor(R.styleable.RDrawArcLoading_r_arc_color, arcColor);
