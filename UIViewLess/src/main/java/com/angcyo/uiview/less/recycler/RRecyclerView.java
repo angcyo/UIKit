@@ -1150,6 +1150,11 @@ public class RRecyclerView extends RecyclerView implements CanScrollUpCallBack {
                     return gridLayoutManager.getSpanCount();
                 }
                 if (baseAdapter instanceof DslAdapter) {
+                    if (((DslAdapter) baseAdapter).isAdapterStatus()) {
+                        //占满正行
+                        return gridLayoutManager.getSpanCount();
+                    }
+
                     DslAdapterItem itemData = ((DslAdapter) baseAdapter).getItemData(position);
                     if (itemData != null) {
                         int itemSpanCount = itemData.getItemSpanCount();
