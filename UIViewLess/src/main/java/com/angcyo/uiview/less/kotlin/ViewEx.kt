@@ -1372,7 +1372,7 @@ public fun View.getLocationInParent(parentView: View? = null): Rect {
 
 public fun View.findRecyclerView(): RecyclerView? {
     return findView {
-        it is RecyclerView
+        it is RecyclerView && it.measuredWidth > this.measuredWidth / 2
     } as? RecyclerView
 }
 
