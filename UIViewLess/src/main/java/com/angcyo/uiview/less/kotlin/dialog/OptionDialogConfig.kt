@@ -41,6 +41,9 @@ open class OptionDialogConfig : BaseDialogConfig() {
     /**简单选择项, 用来控制RV的高度为[wrap_content]*/
     var singleOption = false
 
+    /**任意选择, 不强制要求选择到最后一级*/
+    var anySelector = false
+
     override fun onDialogInit(dialog: Dialog, dialogViewHolder: RBaseViewHolder) {
         super.onDialogInit(dialog, dialogViewHolder)
 
@@ -213,6 +216,10 @@ open class OptionDialogConfig : BaseDialogConfig() {
         } else {
             dialogViewHolder.enable(R.id.positive_button, false)
             tabItems.add("请选择")
+        }
+
+        if (anySelector) {
+            dialogViewHolder.enable(R.id.positive_button, true)
         }
 
         dialogViewHolder.tab(R.id.tab_layout).apply {
