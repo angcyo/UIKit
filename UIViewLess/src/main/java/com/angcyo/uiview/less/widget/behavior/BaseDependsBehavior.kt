@@ -170,6 +170,13 @@ abstract class BaseDependsBehavior<T : View>(
 
     }
 
+    /**
+     * 所有[child]布局结束之后回调
+     * */
+    open fun onLayoutAfter(parent: CoordinatorLayout, child: T, layoutDirection: Int) {
+
+    }
+
     override fun onMeasureChild(
         parent: CoordinatorLayout,
         child: T,

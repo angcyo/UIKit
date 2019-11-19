@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.view.ViewCompat
 import com.angcyo.uiview.less.widget.behavior.BaseDependsBehavior
 
 /**
@@ -59,6 +60,28 @@ open class RCoordinatorLayout : CoordinatorLayout {
             parentHeightMeasureSpec,
             heightUsed
         )
+    }
+
+    override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
+        super.onLayout(changed, l, t, r, b)
+
+        val layoutDirection = ViewCompat.getLayoutDirection(this)
+
+        for (i in 0 until childCount) {
+            val child = getChildAt(i)
+            if (child.visibility == View.GONE) {
+                // If the child is GONE, skip...
+                continue
+            }
+
+            val lp = child.layoutParams as LayoutParams
+            (lp.behavior as? BaseDependsBehavior)?.onLayoutAfter(
+                this,
+                child,
+                layoutDirection
+            )
+
+        }
     }
 
     override fun onLayoutChild(child: View, layoutDirection: Int) {

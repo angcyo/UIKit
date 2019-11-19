@@ -28,6 +28,7 @@ import androidx.core.view.GestureDetectorCompat
 import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import androidx.viewpager.widget.ViewPager
 import com.angcyo.uiview.less.draw.RDrawNoRead
 import com.angcyo.uiview.less.recycler.RBaseViewHolder
 import com.angcyo.uiview.less.recycler.RRecyclerView
@@ -1378,6 +1379,29 @@ public fun View.findRecyclerView(): RecyclerView? {
 public fun View.findView(isIt: (View) -> Boolean): View? {
     return when {
         isIt(this) -> this
+        this is ViewPager -> {
+            var result: View? = null
+            for (i in 0 until childCount) {
+                val child = getChildAt(i)
+                if (child.left >= scrollX &&
+                    child.top >= scrollY &&
+                    child.right <= scrollX + measuredWidth &&
+                    child.bottom <= scrollY + measuredHeight
+                ) {
+                    result = child
+                }
+            }
+
+            if (result != null) {
+                result.findView(isIt)
+            } else {
+                if (isIt(this)) {
+                    this
+                } else {
+                    null
+                }
+            }
+        }
         this is ViewGroup -> {
             var result: View? = null
             for (i in 0 until childCount) {

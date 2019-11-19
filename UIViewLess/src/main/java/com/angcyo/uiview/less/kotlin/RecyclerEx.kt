@@ -4,6 +4,8 @@ import android.content.Context
 import android.graphics.Color
 import android.text.TextUtils
 import android.view.View
+import android.widget.OverScroller
+import androidx.core.widget.ScrollerCompat
 import androidx.recyclerview.widget.*
 import com.angcyo.uiview.less.R
 import com.angcyo.uiview.less.kotlin.dsl.DslRecyclerScroll
@@ -12,6 +14,7 @@ import com.angcyo.uiview.less.recycler.RBaseViewHolder
 import com.angcyo.uiview.less.recycler.RRecyclerView
 import com.angcyo.uiview.less.recycler.adapter.DslAdapter
 import com.angcyo.uiview.less.recycler.adapter.DslAdapterItem
+import com.angcyo.uiview.less.utils.Reflect
 
 /**
  *
@@ -415,3 +418,24 @@ public val FLAG_ALL = ItemTouchHelper.LEFT or
 public val FLAG_VERTICAL = ItemTouchHelper.DOWN or ItemTouchHelper.UP
 
 public val FLAG_HORIZONTAL = ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
+
+/**
+ * 获取[RecyclerView] [Fling] 时的速率
+ * */
+public fun RecyclerView.getLastVelocity(): Float {
+    var currVelocity = 0f
+    try {
+        val mViewFlinger = Reflect.getMember(RecyclerView::class.java, this, "mViewFlinger")
+        val mScroller = Reflect.getMember(mViewFlinger, "mScroller")
+        if (mScroller is OverScroller) {
+            currVelocity = mScroller.currVelocity
+        } else if (mScroller is ScrollerCompat) {
+            currVelocity = mScroller.currVelocity
+        } else {
+            //throw new IllegalArgumentException("未兼容的mScroller类型:" + mScroller.getClass().getSimpleName());
+        }
+    } catch (e: Exception) {
+        e.printStackTrace()
+    }
+    return currVelocity
+}
