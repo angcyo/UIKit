@@ -54,6 +54,7 @@ dependencies {
     api androidx.material
     api androidx.constraintlayout
     api androidx.exifinterface
+    api androidx.multidex
 
     /*https://github.com/bumptech/glide*/
     //compile 'com.github.bumptech.glide:glide:3.8.0'
@@ -61,8 +62,6 @@ dependencies {
     kapt "com.github.bumptech.glide:compiler:${glide_version}"
     //https://github.com/koral--/android-gif-drawable
     api 'pl.droidsonroids.gif:android-gif-drawable:1.2.16'
-
-    api 'androidx.multidex:multidex:2.0.0'
 
     /*https://github.com/orhanobut/hawk*/
     api('com.orhanobut:hawk:2.0.1') {

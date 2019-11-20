@@ -22,6 +22,9 @@ ext.androidx = [
         "core"                  : "androidx.core:core:1.1.0",
         "corektx"               : "androidx.core:core-ktx:1.1.0",
 
+        //com.android.support:multidex
+        "multidex"              : 'androidx.multidex:multidex:2.0.1',
+
         //com.android.support:support-fragment
         "fragment"              : "androidx.fragment:fragment:1.1.0",
 
