@@ -49,6 +49,8 @@ object ApiConfig {
     var onGetHttpBaseUrl: (() -> String)? = null
 }
 
+//<editor-fold desc="快速请求">
+
 /**
  * 通用接口请求
  * */
@@ -74,15 +76,52 @@ fun api(): Api {
 /**别名函数*/
 fun http(): Api = api()
 
-fun Observable<Response<JsonElement>>.fetch(onEnd: (data: Response<JsonElement>?, error: Throwable?) -> Unit = { _, _ -> }): Subscription {
-    return compose(Http.defaultTransformer())
-        .subscribe(object : HttpSubscriber<Response<JsonElement>>() {
-            override fun onEnd(data: Response<JsonElement>?, error: Throwable?) {
-                super.onEnd(data, error)
-                onEnd(data, error)
-            }
-        })
+fun connectUrl(host: String?, url: String?): String {
+    val h = host?.trimEnd('/') ?: ""
+    val u = url?.trimStart('/') ?: ""
+    return "$h/$u"
 }
+
+fun http(config: RequestConfig.() -> Unit): Observable<Response<JsonElement>> {
+    val requestConfig = RequestConfig(GET)
+    requestConfig.config()
+
+    if (!requestConfig.url.startsWith("http")) {
+        requestConfig.url =
+            connectUrl(ApiConfig.onGetHttpBaseUrl?.invoke(), requestConfig.url)
+    }
+
+    return if (requestConfig.method == POST) {
+        http().post(requestConfig.url, requestConfig.body, requestConfig.query)
+    } else {
+        http().get(requestConfig.url, requestConfig.query)
+    }
+}
+
+fun get(config: RequestConfig.() -> Unit): Observable<Response<JsonElement>> {
+    return http(config)
+}
+
+fun post(config: RequestConfig.() -> Unit): Observable<Response<JsonElement>> {
+    return http {
+        method = POST
+        this.config()
+    }
+}
+
+const val GET = 1
+const val POST = 2
+
+data class RequestConfig(
+    var method: Int = GET,
+    var url: String = "",
+    var body: JsonElement = JsonObject(),
+    var query: HashMap<String, Any> = hashMapOf()
+)
+
+//</editor-fold>
+
+//<editor-fold desc="拉取扩展方法">
 
 /**读取ResponseBody中的字符串*/
 private fun ResponseBody?.readString(charsetName: String = "UTF-8"): String {
@@ -149,6 +188,18 @@ fun type(raw: Class<*>, type: Class<*>): Type {
     return TypeBuilder.build(raw, type)
 }
 
+fun Observable<Response<JsonElement>>.fetch(
+    onEnd: (data: Response<JsonElement>?, error: Throwable?) -> Unit = { _, _ -> }
+): Subscription {
+    return compose(Http.defaultTransformer())
+        .subscribe(object : HttpSubscriber<Response<JsonElement>>() {
+            override fun onEnd(data: Response<JsonElement>?, error: Throwable?) {
+                super.onEnd(data, error)
+                onEnd(data, error)
+            }
+        })
+}
+
 fun <T> Observable<Response<JsonElement>>.fetchBean(
     type: Type,
     onEnd: (data: T?, error: Throwable?) -> Unit = { _, _ -> }
@@ -178,6 +229,10 @@ fun <T> Response<JsonElement>.toBean(type: Type): T? {
         }
     }
 }
+
+//</editor-fold>
+
+//<editor-fold desc="请求是否成功扩展方法">
 
 /**http 状态成功, 并且逻辑code也是成功的*/
 fun Response<JsonElement>?.isSuccess(): Pair<Boolean, String?> {
@@ -231,3 +286,5 @@ fun ResponseBody?.isSuccess(): Pair<Boolean, String?> {
 fun Throwable?.isNetworkException() = this?.run {
     HttpSubscriber.isNetworkException(this)
 } ?: false
+
+//</editor-fold>
