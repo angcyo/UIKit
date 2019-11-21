@@ -595,7 +595,6 @@ class RTabLayout(context: Context, attributeSet: AttributeSet? = null) : ViewGro
         return childMaxWidth + paddingLeft + paddingRight > measuredWidth
     }
 
-    @Override
     override fun computeScroll() {
         if (overScroller.computeScrollOffset()) {
             scrollTo(overScroller.currX, overScroller.currY)

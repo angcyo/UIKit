@@ -606,6 +606,26 @@ open class DslAdapterItem {
     }
 
     //</editor-fold>
+
+    //<editor-fold desc="Tree 树结构相关">
+
+    /**
+     * 折叠/展开 依旧使用[itemGroupExtend]控制
+     *
+     * 子项列表
+     * */
+    var itemSubList = mutableListOf<DslAdapterItem>()
+
+    /**
+     * 在控制[itemSubList]之前, 都会回调此方法.
+     * 相当于hook了[itemSubList], 可以在[itemSubList]为空时, 展示[加载中Item]等
+     * */
+    var onItemLoadSubList: () -> Unit = {}
+
+    /**父级列表, 会自动赋值*/
+    var itemParentList = mutableListOf<DslAdapterItem>()
+
+    //</editor-fold>
 }
 
 class UpdateDependProperty<T>(var value: T) : ReadWriteProperty<DslAdapterItem, T> {

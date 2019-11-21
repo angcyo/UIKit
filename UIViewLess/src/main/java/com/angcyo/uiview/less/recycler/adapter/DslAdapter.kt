@@ -316,7 +316,8 @@ open class DslAdapter : RBaseAdapter<DslAdapterItem>, OnDispatchUpdatesListener 
 
     /**移除数据*/
     fun removeItem(bean: DslAdapterItem) {
-        if (dataItems.remove(bean)) {
+        if (onDeleteItem(getValidFilterDataList().indexOf(bean))) {
+            dataItems.remove(bean)
             _updateAdapterItems()
             updateItemDepend()
         }
@@ -607,6 +608,17 @@ open class DslAdapter : RBaseAdapter<DslAdapterItem>, OnDispatchUpdatesListener 
         dataItems.lastOrNull()?.let { removeItem(it) }
     }
 
+    override fun deleteItem(bean: DslAdapterItem?) {
+        //super.deleteItem(bean)
+        bean?.let {
+            removeItem(it)
+        }
+    }
+
+    override fun deleteItem(position: Int) {
+        //super.deleteItem(position)
+        deleteItem(getValidFilterDataList().getOrNull(position))
+    }
     //</editor-fold desc="兼容的操作">
 
     //<editor-fold desc="不支持的操作">
