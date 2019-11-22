@@ -4,6 +4,7 @@ import android.app.Dialog
 import android.graphics.Color
 import android.view.View
 import android.widget.TextView
+import androidx.collection.ArrayMap
 import com.angcyo.uiview.less.R
 import com.angcyo.uiview.less.base.BaseUI
 import com.angcyo.uiview.less.iview.AffectUI
@@ -132,6 +133,7 @@ open class OptionDialogConfig : BaseDialogConfig() {
                     } else {
                         //清除之后的选项
                         for (i in optionList.size - 1 downTo selectorLevel) {
+                            _cacheMap.remove(i)
                             optionList.removeAt(i)
                         }
                         optionList.add(bean)
@@ -164,36 +166,47 @@ open class OptionDialogConfig : BaseDialogConfig() {
         loadOptionList(dialogViewHolder, requestLevel)
     }
 
+    //level 对应的 缓存
+    var _cacheMap = ArrayMap<Int, MutableList<out Any>>()
+
     /**加载选项数据, 并且重置Tab*/
     internal fun loadOptionList(dialogViewHolder: RBaseViewHolder, level: Int) {
-        if (needAsyncLoad) {
-            affectUI.showAffect(AffectUI.AFFECT_LOADING)
-        }
-        onLoadOptionList(optionList, level, {
-            if (needAsyncLoad) {
+        //获取数据后的回调处理
+        val onItemListCallback: (MutableList<out Any>?) -> Unit = {
+            if (it?.isEmpty() == true) {
+                affectUI.showAffect(AffectUI.AFFECT_EMPTY)
+            } else {
                 affectUI.showAffect(AffectUI.AFFECT_CONTENT)
             }
 
             selectorLevel = level
             adapter.resetData(it)
 
-            //滚动到目标位置
-            var scrollPosition = 0
-            if (selectorLevel in 0 until it.size && selectorLevel in 0 until optionList.size) {
-                for (i in 0 until it.size) {
-                    if (isOptionEquItem(optionList[selectorLevel], it[i])) {
-                        scrollPosition = i
-                        break
+            it?.let {
+                //缓存
+                _cacheMap[selectorLevel] = it
+
+                //滚动到目标位置
+                var scrollPosition = 0
+                if (selectorLevel in 0 until it.size && selectorLevel in 0 until optionList.size) {
+                    for (i in 0 until it.size) {
+                        if (isOptionEquItem(optionList[selectorLevel], it[i])) {
+                            scrollPosition = i
+                            break
+                        }
                     }
                 }
+                dialogViewHolder.rv(R.id.recycler_view).smoothScrollToPosition(scrollPosition)
             }
-            dialogViewHolder.rv(R.id.recycler_view).smoothScrollToPosition(scrollPosition)
 
             //重置Tab Items (主要是添加 "请选择" tab)
             if (selectorLevel >= optionList.size) {
                 resetTabToLevel(dialogViewHolder, selectorLevel)
             }
-        }) {
+        }
+
+        //错误回调的处理
+        val onErrorCallback: (Throwable?) -> Unit = {
             selectorLevel = level
             adapter.resetData(emptyList())
 
@@ -203,6 +216,18 @@ open class OptionDialogConfig : BaseDialogConfig() {
             if (needAsyncLoad) {
                 affectUI.showAffect(AffectUI.AFFECT_ERROR)
             }
+        }
+
+        val cacheList = _cacheMap[level]
+        if (cacheList?.isNotEmpty() == true) {
+            //有缓存
+            onItemListCallback(cacheList)
+        } else {
+            //无缓存
+            if (needAsyncLoad) {
+                affectUI.showAffect(AffectUI.AFFECT_LOADING)
+            }
+            onLoadOptionList(optionList, level, onItemListCallback, onErrorCallback)
         }
     }
 
@@ -262,7 +287,7 @@ open class OptionDialogConfig : BaseDialogConfig() {
      * */
     var onLoadOptionList: (
         options: MutableList<Any>, level: Int,
-        itemsCallback: (MutableList<out Any>) -> Unit,
+        itemsCallback: (MutableList<out Any>?) -> Unit,
         errorCallback: (Throwable?) -> Unit
     ) -> Unit =
         { options, level, itemsCallback, errorCallback ->

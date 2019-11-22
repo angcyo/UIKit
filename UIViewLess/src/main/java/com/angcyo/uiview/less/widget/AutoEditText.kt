@@ -117,6 +117,10 @@ open class AutoEditText : REditText {
         if (adapter == null || adapter.count <= 0) {
             return
         }
-        super.showDropDown()
+        try {
+            super.showDropDown()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 }
