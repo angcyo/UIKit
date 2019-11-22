@@ -74,20 +74,20 @@ public fun Int.toPercent(bitNum: Int = 0, halfUp: Boolean = false): String =
 
 public fun Float.toPercent(): String = "${this * 100}%"
 
-public inline fun <T> T.isLollipop() = RUtils.isLollipop()
+public fun isLollipop() = RUtils.isLollipop()
 
-public inline fun <T> T.nextInt(until: Int) = Random.nextInt(until)
-public inline fun <T> T.nextInt(from: Int /*包含*/, to: Int /*不包含*/) = Random.nextInt(from, to)
+public fun nextInt(until: Int) = Random.nextInt(until)
+public fun nextInt(from: Int /*包含*/, to: Int /*不包含*/) = Random.nextInt(from, to)
 
-public inline fun <T> T.toJson() = Json.to(this)
+public fun <T> T.toJson() = Json.to(this)
 
-public inline fun <T> String.fromJson(type: Class<T>) = Json.from<T>(this, type)
-public inline fun <T> String.fromJsonList(type: Class<T>) = Json.fromList<T>(this, type)
+public fun <T> String.fromJson(type: Class<T>) = Json.from<T>(this, type)
+public fun <T> String.fromJsonList(type: Class<T>) = Json.fromList<T>(this, type)
 
 public inline fun <reified T> String.fromJson(): T = Json.from<T>(this, T::class.java)
 public inline fun <reified T> String.fromJsonList(): List<T> = Json.fromList<T>(this, T::class.java)
 
-public inline fun <T> T.toBody() = Http.getJsonBody(toJson())
+public fun <T> T.toBody() = Http.getJsonBody(toJson())
 
 /**文本的高度*/
 public fun Paint.textHeight(): Float = descent() - ascent()
