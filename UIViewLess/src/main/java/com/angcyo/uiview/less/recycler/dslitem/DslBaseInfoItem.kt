@@ -3,7 +3,6 @@ package com.angcyo.uiview.less.recycler.dslitem
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
-import android.view.View
 import androidx.annotation.DrawableRes
 import androidx.annotation.LayoutRes
 import com.angcyo.uiview.less.R
@@ -42,13 +41,13 @@ open class DslBaseInfoItem : DslAdapterItem() {
     @LayoutRes
     var itemExtendLayoutId: Int = -1
 
-    var itemClickListener: ((View) -> Unit)? = null
-
     override fun onItemBind(
         itemHolder: RBaseViewHolder,
         itemPosition: Int,
         adapterItem: DslAdapterItem
     ) {
+        super.onItemBind(itemHolder, itemPosition, adapterItem)
+
         itemHolder.clear()
 
         (itemHolder.itemView as? RLinearLayout)?.setRBackgroundDrawable(itemBackgroundDrawable)
@@ -85,15 +84,6 @@ open class DslBaseInfoItem : DslAdapterItem() {
             }
         } else {
             itemHolder.group(R.id.wrap_layout)?.removeAllViews()
-        }
-
-        //事件
-        if (itemClickListener == null) {
-            itemHolder.itemView.isClickable = false
-        } else {
-            itemHolder.clickItem {
-                itemClickListener?.invoke(it)
-            }
         }
     }
 }

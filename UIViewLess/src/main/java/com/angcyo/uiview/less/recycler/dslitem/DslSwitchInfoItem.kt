@@ -33,16 +33,20 @@ open class DslSwitchInfoItem : DslBaseInfoItem() {
         super.onItemBind(itemHolder, itemPosition, adapterItem)
 
         itemHolder.v<SwitchButton>(R.id.switch_view)?.apply {
+
+            setOnCheckedChangeListener { _, isChecked ->
+                val old = itemSwitchChecked
+                itemSwitchChecked = isChecked
+                if (old != itemSwitchChecked) {
+                    onItemSwitchChanged(itemSwitchChecked)
+                }
+            }
+
+            //刷新界面的时候, 不执行动画
             val old = isEnableEffect
             isEnableEffect = false
             isChecked = itemSwitchChecked
             isEnableEffect = old
-
-            setOnClickListener {
-                itemSwitchChecked = !itemSwitchChecked
-
-                onItemSwitchChanged(itemSwitchChecked)
-            }
         }
     }
 }

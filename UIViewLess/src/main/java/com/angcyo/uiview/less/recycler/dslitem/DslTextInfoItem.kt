@@ -4,6 +4,8 @@ import androidx.annotation.DrawableRes
 import com.angcyo.uiview.less.R
 import com.angcyo.uiview.less.draw.view.RDrawNoReadNumView
 import com.angcyo.uiview.less.kotlin.color
+import com.angcyo.uiview.less.kotlin.dpi
+import com.angcyo.uiview.less.kotlin.marginLayoutParams
 import com.angcyo.uiview.less.kotlin.setRightIco
 import com.angcyo.uiview.less.recycler.RBaseViewHolder
 import com.angcyo.uiview.less.recycler.adapter.DslAdapterItem
@@ -54,7 +56,15 @@ open class DslTextInfoItem : DslBaseInfoItem() {
         }
 
         //未读数
-        itemHolder.v<RDrawNoReadNumView>(R.id.read_num_view)?.getDrawReadNum()?.readNumString =
-            itemNoReadNumString
+        itemHolder.v<RDrawNoReadNumView>(R.id.read_num_view)?.apply {
+            marginLayoutParams {
+                rightMargin = if (itemDarkIcon > 0) {
+                    40 * dpi
+                } else {
+                    16 * dpi
+                }
+            }
+            getDrawReadNum().readNumString = itemNoReadNumString
+        }
     }
 }

@@ -53,7 +53,7 @@ class RTabIndicator(view: View, attributeSet: AttributeSet? = null) : BaseDraw(v
 
     /**如果未指定指示器的宽度, 那么就用对应child的宽度*/
     var indicatorWidth = 0
-    var indicatorHeight: Int = (4 * density()).toInt()
+    var indicatorHeight: Int = (2 * density()).toInt()
 
     /**偏移距离, 不能用paddingBottom*/
     var indicatorOffsetY: Int = (2 * density()).toInt()
