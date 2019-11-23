@@ -2,13 +2,15 @@ package com.angcyo.uiview.less.base;
 
 import android.graphics.Canvas;
 import android.graphics.Rect;
+import android.text.TextPaint;
+import android.text.TextUtils;
+import android.view.View;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import android.text.TextPaint;
-import android.text.TextUtils;
-import android.view.View;
+
 import com.angcyo.uiview.less.recycler.RBaseViewHolder;
 import com.angcyo.uiview.less.recycler.RExItemDecoration;
 import com.angcyo.uiview.less.recycler.RRecyclerView;
@@ -27,6 +29,7 @@ import java.util.List;
  * @author angcyo
  * @date 2018/12/08
  */
+@Deprecated
 public abstract class BaseItemFragment extends BaseRecyclerFragment<SingleItem> {
     /**
      * 每次调用{@link #refreshLayout()}, 如果item类型有改变, 左移此条目, 必须是高四位开始

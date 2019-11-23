@@ -310,7 +310,7 @@ public fun View.calcLayoutWidthHeight(
     )
 }
 
-public fun View.calcLayoutWidthHeight(
+public fun calcLayoutWidthHeight(
     rLayoutWidth: String?, rLayoutHeight: String?,
     parentWidth: Int, parentHeight: Int,
     rLayoutWidthExclude: Int = 0, rLayoutHeightExclude: Int = 0

@@ -21,6 +21,7 @@ import java.util.List;
  * @author angcyo
  * @date 2018/12/08
  */
+@Deprecated
 public abstract class BaseExItemFragment extends BaseRecyclerFragment<IExStringDataType> {
     @Override
     protected RBaseAdapter<IExStringDataType> onCreateAdapter(@Nullable List<IExStringDataType> datas) {

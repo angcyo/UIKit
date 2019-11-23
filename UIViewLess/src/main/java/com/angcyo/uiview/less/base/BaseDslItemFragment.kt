@@ -11,7 +11,7 @@ import com.angcyo.uiview.less.recycler.item.SingleItemKt
  * @date 2019/05/17
  * Copyright (c) 2019 ShenZhen O&M Cloud Co., Ltd. All rights reserved.
  */
-
+@Deprecated("使用[BaseDslRecyclerFragment]")
 abstract class BaseDslItemFragment : BaseItemFragment() {
 
     open fun dslCreateItem(items: ArrayList<SingleItem> = singleItems, init: SingleItemKt.() -> Unit) {

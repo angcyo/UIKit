@@ -11,7 +11,7 @@ import com.angcyo.uiview.less.utils.RUtils
 import kotlin.math.min
 
 /**
- *
+ * https://github.com/angcyo/DslAdapter
  * Email:angcyo@126.com
  * @author angcyo
  * @date 2019/05/07
