@@ -13,7 +13,7 @@ ext.androidx = [
         "v4"                    : "androidx.legacy:legacy-support-v4:1.0.0",
 
         //com.android.support:exifinterface
-        "exifinterface"         : "androidx.exifinterface:exifinterface:1.0.0",
+        "exifinterface"         : "androidx.exifinterface:exifinterface:1.1.0",
         "vectordrawable"        : "androidx.vectordrawable:vectordrawable:1.1.0",
 
         //com.android.support:appcompat-v7
@@ -29,7 +29,7 @@ ext.androidx = [
         "fragment"              : "androidx.fragment:fragment:1.1.0",
 
         //com.android.support:recyclerview-v7
-        "recyclerview"          : "androidx.recyclerview:recyclerview:1.0.0",
+        "recyclerview"          : "androidx.recyclerview:recyclerview:1.1.0",
 
         //com.android.support:support-annotations
 //        "annotation"            : "androidx.annotation:annotation:${versionConfig["androidx.annotation:annotation"]}",
