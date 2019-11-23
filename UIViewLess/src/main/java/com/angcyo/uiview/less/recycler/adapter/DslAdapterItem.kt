@@ -240,6 +240,11 @@ open class DslAdapterItem {
         itemDecorationColor = color
     }
 
+    fun margin(margin: Int, color: Int = Color.TRANSPARENT) {
+        marginVertical(margin, color)
+        marginHorizontal(margin, color)
+    }
+
     /**
      * 绘制不同方向的分割线时, 触发的回调, 可以用来设置不同方向分割线的颜色
      * */
