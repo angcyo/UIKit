@@ -13,17 +13,18 @@
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/text_view"
         style="@style/BaseMainTextStyle"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
         android:drawablePadding="@dimen/base_hdpi"
         android:paddingLeft="@dimen/base_padding_left"
+        android:paddingRight="@dimen/base_padding_left"
         tools:drawableLeft="@drawable/base_tip_ok"
         tools:text="关于我们" />
 
     <FrameLayout
         android:id="@+id/wrap_layout"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent" />
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1" />
 
 </com.angcyo.uiview.less.widget.group.RLinearLayout>
