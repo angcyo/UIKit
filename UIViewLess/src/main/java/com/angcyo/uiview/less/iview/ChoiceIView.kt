@@ -9,6 +9,7 @@ import com.angcyo.uiview.less.kotlin.childs
  * ViewGroup中, 选中某个View
  */
 
+@Deprecated("请使用[DslSelector]")
 open class ChoiceIView(val viewGroup: ViewGroup, val choiceMode: Int = CHOICE_MODE_SINGLE) {
 
     companion object {

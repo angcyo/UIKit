@@ -9,6 +9,7 @@ import com.angcyo.uiview.less.kotlin.childs
  * 导航栏控制
  */
 
+@Deprecated("请使用[DslSelector]")
 class NavIView(val viewGroup: ViewGroup) {
 
     companion object {
