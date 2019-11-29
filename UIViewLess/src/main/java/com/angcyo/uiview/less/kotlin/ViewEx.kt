@@ -100,11 +100,15 @@ public val <T> T.dpi: Int by lazy {
     Resources.getSystem()?.displayMetrics?.density?.toInt() ?: 0
 }
 
+@Deprecated("[viewDrawWidth]")
 public val View.viewDrawWith: Int
-    get() = measuredWidth - paddingLeft - paddingRight
+    get() = viewDrawWidth
 
 public val View.viewDrawHeight: Int
     get() = measuredHeight - paddingTop - paddingBottom
+
+internal val View.viewDrawWidth: Int
+    get() = measuredWidth - paddingLeft - paddingRight
 
 public val View.debugPaint: Paint by lazy {
     Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -1423,6 +1427,21 @@ public fun View.fullSpan(full: Boolean = true) {
         if (full != layoutParams.isFullSpan) {
             layoutParams.isFullSpan = true
             this.layoutParams = layoutParams
+        }
+    }
+}
+
+fun View?.tintDrawableColor(color: Int) {
+    when (this) {
+        is TextView -> {
+            val drawables = arrayOfNulls<Drawable?>(4)
+            compoundDrawables.forEachIndexed { index, drawable ->
+                drawables[index] = drawable?.tintDrawableColor(color)
+            }
+            setCompoundDrawables(drawables[0], drawables[1], drawables[2], drawables[3])
+        }
+        is ImageView -> {
+            setImageDrawable(drawable?.tintDrawableColor(color))
         }
     }
 }

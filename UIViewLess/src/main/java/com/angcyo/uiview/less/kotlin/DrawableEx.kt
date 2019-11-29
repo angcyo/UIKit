@@ -2,8 +2,11 @@ package com.angcyo.uiview.less.kotlin
 
 import android.content.res.Resources
 import android.graphics.Point
+import android.graphics.PorterDuff
 import android.graphics.Rect
 import android.graphics.drawable.Drawable
+import android.os.Build
+import androidx.core.graphics.drawable.DrawableCompat
 import com.angcyo.uiview.less.resources.ResUtil
 
 /**
@@ -25,3 +28,22 @@ public fun Drawable?.color(filterColor: Int) =
 
 public fun Drawable?.copy(res: Resources? = null) =
     this?.mutate()?.constantState?.newDrawable(res)
+
+
+fun Drawable?.tintDrawableColor(color: Int): Drawable? {
+
+    if (this == null) {
+        return this
+    }
+
+    val wrappedDrawable =
+        DrawableCompat.wrap(this).mutate()
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        DrawableCompat.setTint(wrappedDrawable, color)
+    } else {
+        wrappedDrawable.setColorFilter(color, PorterDuff.Mode.SRC_ATOP)
+    }
+
+    return wrappedDrawable
+}
