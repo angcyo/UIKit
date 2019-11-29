@@ -48,60 +48,60 @@ public fun jsonArray(config: Json.Builder.() -> Unit = {}): JsonElement {
 
 //<editor-fold desc="JsonObject 扩展">
 
-public fun JsonObject.getInt(key: String): Int {
+public fun JsonObject.getInt(key: String, default: Int = -1): Int {
     val element = get(key)
     if (element is JsonPrimitive) {
         if (element.isNumber) {
             return element.asInt
         }
     }
-    return -1
+    return default
 }
 
-public fun JsonObject.getString(key: String): String? {
+public fun JsonObject.getString(key: String, default: String? = null): String? {
     val element = get(key)
     if (element is JsonPrimitive) {
         if (element.isString) {
             return element.asString
         }
     }
-    return null
+    return default
 }
 
-public fun JsonObject.getJson(key: String): JsonObject? {
+public fun JsonObject.getJson(key: String, default: JsonObject? = null): JsonObject? {
     val element = get(key)
     if (element is JsonObject) {
         return element
     }
-    return null
+    return default
 }
 
-public fun JsonObject.getArray(key: String): JsonArray? {
+public fun JsonObject.getArray(key: String, default: JsonArray? = null): JsonArray? {
     val element = get(key)
     if (element is JsonArray) {
         return element
     }
-    return null
+    return default
 }
 
-public fun JsonObject.getLong(key: String): Long {
+public fun JsonObject.getLong(key: String, default: Long = -1): Long {
     val element = get(key)
     if (element is JsonPrimitive) {
         if (element.isNumber) {
             return element.asLong
         }
     }
-    return -1
+    return default
 }
 
-public fun JsonObject.getDouble(key: String): Double {
+public fun JsonObject.getDouble(key: String, default: Double = -1.0): Double {
     val element = get(key)
     if (element is JsonPrimitive) {
         if (element.isNumber) {
             return element.asDouble
         }
     }
-    return (-1).toDouble()
+    return default
 }
 
 //</editor-fold desc="JsonObject">
