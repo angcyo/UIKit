@@ -110,7 +110,11 @@ public abstract class BaseTitleFragment extends BaseFragment implements AffectUI
      * 初始化标题部分
      */
     protected void initBaseTitleLayout(@Nullable Bundle arguments) {
-        if (titleBarLayout == null || topFragment() != this) {
+        if (titleBarLayout == null) {
+            return;
+        }
+        if (topFragment() != this) {
+            hideTitleBar();
             return;
         }
         LayoutInflater.from(mAttachContext).inflate(getTitleBarLayoutId(), titleBarLayout);
