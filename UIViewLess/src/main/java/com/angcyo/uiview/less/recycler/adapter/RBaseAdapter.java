@@ -366,7 +366,7 @@ public abstract class RBaseAdapter<T> extends RecyclerView.Adapter<RBaseViewHold
     }
 
     //是否该显示状态布局
-    protected boolean isStateLayout() {
+    public boolean isStateLayout() {
         return mEnableShowState && mShowState != IShowState.NORMAL;
     }
 

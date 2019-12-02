@@ -59,6 +59,15 @@ open class DslAdapterStatusItem : BaseDslStateItem() {
             itemHolder.click(R.id.base_retry_button) {
                 itemHolder.clickView(itemHolder.itemView)
             }
+
+            if (itemData != null) {
+                itemHolder.tv(R.id.base_error_tip_view)?.text = when {
+                    itemData is String -> itemData as String
+                    itemData is Throwable -> (itemData as Throwable).message
+                    itemData != null -> itemData.toString()
+                    else -> "加载失败"
+                }
+            }
         } else if (itemState == ADAPTER_STATUS_LOADING) {
             _notifyRefresh(itemHolder)
         } else {

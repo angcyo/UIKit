@@ -1,6 +1,7 @@
 package com.angcyo.uiview.less.recycler.dslitem
 
 import com.angcyo.lib.L
+import com.angcyo.uiview.less.R
 import com.angcyo.uiview.less.base.BaseUI
 import com.angcyo.uiview.less.kotlin.setWidthHeight
 import com.angcyo.uiview.less.recycler.RBaseViewHolder
@@ -77,6 +78,15 @@ open class DslLoadMoreItem : BaseDslStateItem() {
                         //失败的情况下, 点击触发重新加载
                         _notifyLoadMore(itemHolder)
                         updateAdapterItem()
+                    }
+                }
+
+                if (itemData != null) {
+                    itemHolder.tv(R.id.base_error_tip_view)?.text = when {
+                        itemData is String -> itemData as String
+                        itemData is Throwable -> (itemData as Throwable).message
+                        itemData != null -> itemData.toString()
+                        else -> "加载失败, 点击重试"
                     }
                 }
             } else {

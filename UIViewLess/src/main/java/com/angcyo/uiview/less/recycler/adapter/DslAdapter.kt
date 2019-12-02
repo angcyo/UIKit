@@ -222,10 +222,11 @@ open class DslAdapter : RBaseAdapter<DslAdapterItem>, OnDispatchUpdatesListener 
      * [DslAdapterStatusItem.ADAPTER_STATUS_LOADING]
      * [DslAdapterStatusItem.ADAPTER_STATUS_ERROR]
      * */
-    fun setAdapterStatus(status: Int) {
+    fun setAdapterStatus(status: Int, data: Any? = null) {
         if (dslAdapterStatusItem.itemState == status) {
             return
         }
+        dslAdapterStatusItem.itemData = data
         dslAdapterStatusItem.itemState = status
         notifyDataSetChanged()
         if (status == DslAdapterStatusItem.ADAPTER_STATUS_NONE) {
@@ -253,10 +254,11 @@ open class DslAdapter : RBaseAdapter<DslAdapterItem>, OnDispatchUpdatesListener 
      * [DslLoadMoreItem.ADAPTER_LOAD_NO_MORE]
      * [DslLoadMoreItem.ADAPTER_LOAD_ERROR]
      * */
-    fun setLoadMore(status: Int, notify: Boolean = true) {
+    fun setLoadMore(status: Int, notify: Boolean = true, data: Any? = null) {
         if (dslLoadMoreItem.itemEnableLoadMore && dslLoadMoreItem.itemState == status) {
             return
         }
+        dslLoadMoreItem.itemData = data
         dslLoadMoreItem.itemState = status
         if (notify) {
             notifyItemChanged(dslLoadMoreItem)

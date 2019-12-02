@@ -11,6 +11,7 @@ import com.angcyo.uiview.less.recycler.RBaseViewHolder;
 import com.angcyo.uiview.less.recycler.RRecyclerView;
 import com.angcyo.uiview.less.recycler.adapter.DslAdapter;
 import com.angcyo.uiview.less.recycler.adapter.RBaseAdapter;
+import com.angcyo.uiview.less.recycler.dslitem.DslAdapterStatusItem;
 import com.angcyo.uiview.less.recycler.widget.IShowState;
 import com.angcyo.uiview.less.smart.MaterialHeader;
 import com.angcyo.uiview.less.widget.RSmartRefreshLayout;
@@ -371,7 +372,12 @@ public abstract class BaseRecyclerFragment<T> extends BaseLoadFragment
             if (affectUI != null) {
                 affectUI.showAffect(AffectUI.AFFECT_CONTENT);
             }
-            if (baseAdapter.getAllDataCount() <= 0) {
+
+            if (baseAdapter instanceof DslAdapter &&
+                    ((((DslAdapter) baseAdapter).isAdapterStatus()) ||
+                            baseAdapter.getAllDataCount() <= 0)) {
+                ((DslAdapter) baseAdapter).setAdapterStatus(DslAdapterStatusItem.ADAPTER_STATUS_ERROR, error);
+            } else if (baseAdapter.isStateLayout() || baseAdapter.getAllDataCount() <= 0) {
                 baseAdapter.setShowState(IShowState.ERROR);
             } else {
                 if (baseAdapter.isEnableLoadMore()) {
