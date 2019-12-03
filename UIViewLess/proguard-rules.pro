@@ -57,6 +57,7 @@
 
 #Fragment不需要在AndroidManifest.xml中注册，需要额外保护下
 -keep class * extends android.support.v4.app.Fragment
+-keep class * extends androidx.fragment.app.Fragment
 -keep class * extends android.app.Fragment
 
 # 保持测试相关的代码
@@ -93,6 +94,8 @@
 -keep,allowobfuscation @interface android.support.annotation.Keep
 
 -keep @android.support.annotation.Keep class *
+-keep @androidx.annotation.Keep class *
+
 -keepclassmembers class * {
     @android.support.annotation.Keep *;
 }
@@ -111,6 +114,10 @@
 -keep class android.support.v7.widget.RecyclerView {*;}
 -keep class android.support.v4.view.ViewPager {*;}
 -keep class android.widget.ArrayAdapter {*;}
+-keep class androidx.recyclerview.widget.RecyclerView {*;}
+-keep class androidx.recyclerview.widget.RecyclerView$ViewFlinger {*;}
+-keep class androidx.viewpager.widget.ViewPager {*;}
+-keep class androidx.viewpager2.widget.ViewPager2 {*;}
 
 -keep class com.**.**WeekBar {*;}
 -keep class com.**.**MonthView {*;}
@@ -150,10 +157,7 @@
 -keepclassmembers class **.R$* {
     public static <fields>;
 }
--keepclassmembers class * {
-    @android.webkit.JavascriptInterface
-    <methods>;
-}
+
 -keep class android.support.annotation.Keep
 
 -keep class androidx.annotation.Keep
@@ -168,35 +172,6 @@
     <methods>;
 }
 
--keepclasseswithmembers class * {
-    @android.support.annotation.Keep
-    <methods>;
-}
-
--keepclasseswithmembers class * {
-    @androidx.annotation.Keep
-    <methods>;
-}
-
--keepclasseswithmembers class * {
-    @android.support.annotation.Keep
-    <fields>;
-}
-
--keepclasseswithmembers class * {
-    @androidx.annotation.Keep
-    <fields>;
-}
-
--keepclasseswithmembers class * {
-    @android.support.annotation.Keep
-    <init>(...);
-}
-
--keepclasseswithmembers class * {
-    @androidx.annotation.Keep
-    <init>(...);
-}
 -keep class androidx.core.app.CoreComponentFactory {
     <init>();
 }
