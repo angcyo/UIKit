@@ -3,6 +3,7 @@ package com.angcyo.uiview.less.widget.behavior
 import android.content.Context
 import android.graphics.Rect
 import android.util.AttributeSet
+import android.view.MotionEvent
 import android.view.View
 import androidx.annotation.CallSuper
 import androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -96,6 +97,8 @@ abstract class BaseDependsBehavior<T : View>(
     /**是否处于内嵌滚动中*/
     var _isNestedScrollAccepted = false
 
+    var _nestedScrollView: View? = null
+
     override fun onNestedScrollAccepted(
         coordinatorLayout: CoordinatorLayout,
         child: T,
@@ -114,6 +117,7 @@ abstract class BaseDependsBehavior<T : View>(
         )
 
         _isNestedScrollAccepted = true
+        _nestedScrollView = target
 
         dxConsumedAllSum += currentDxConsumedAll
         dyConsumedAllSum += currentDyConsumedAll
@@ -130,6 +134,20 @@ abstract class BaseDependsBehavior<T : View>(
     ) {
         super.onStopNestedScroll(coordinatorLayout, child, target, type)
         _isNestedScrollAccepted = false
+        _nestedScrollView = null
+    }
+
+    override fun onNestedPreScroll(
+        coordinatorLayout: CoordinatorLayout,
+        child: T,
+        target: View,
+        dx: Int,
+        dy: Int,
+        consumed: IntArray,
+        type: Int
+    ) {
+        super.onNestedPreScroll(coordinatorLayout, child, target, dx, dy, consumed, type)
+        _nestedScrollView = target
     }
 
     override fun onNestedScroll(
@@ -152,10 +170,33 @@ abstract class BaseDependsBehavior<T : View>(
             dyUnconsumed,
             type
         )
+        _nestedScrollView = target
         currentDxConsumedAll += dxConsumed
         currentDyConsumedAll += dyConsumed
 
         w("this....currentDxConsumedAll:$currentDxConsumedAll currentDyConsumedAll:$currentDyConsumedAll")
+    }
+
+    fun MotionEvent.isDown(): Boolean {
+        return actionMasked == MotionEvent.ACTION_DOWN
+    }
+
+    fun MotionEvent.isUp(): Boolean {
+        return actionMasked == MotionEvent.ACTION_CANCEL ||
+                actionMasked == MotionEvent.ACTION_UP
+    }
+
+    override fun onInterceptTouchEvent(
+        parent: CoordinatorLayout,
+        child: T,
+        ev: MotionEvent
+    ): Boolean {
+
+        if (ev.isDown()) {
+            _nestedScrollView = null
+        }
+
+        return super.onInterceptTouchEvent(parent, child, ev)
     }
 
     override fun onLayoutChild(parent: CoordinatorLayout, child: T, layoutDirection: Int): Boolean {

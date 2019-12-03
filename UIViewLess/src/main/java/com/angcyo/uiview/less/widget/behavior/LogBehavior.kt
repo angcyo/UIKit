@@ -12,6 +12,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.angcyo.lib.L
 import com.angcyo.uiview.less.BuildConfig
+import com.angcyo.uiview.less.kotlin.simpleHash
 
 /**
  * 打印相应方法日志
@@ -44,7 +45,7 @@ open class LogBehavior<T : View>(context: Context? = null, attrs: AttributeSet? 
         type: Int
     ) {
         super.onNestedPreScroll(coordinatorLayout, child, target, dx, dy, consumed, type)
-        i("this....dx:$dx dy:$dy")
+        d("${target.simpleHash()}....dx:$dx dy:$dy")
     }
 
     override fun onNestedScroll(
@@ -67,14 +68,14 @@ open class LogBehavior<T : View>(context: Context? = null, attrs: AttributeSet? 
             dyUnconsumed,
             type
         )
-        w("this....dxC:$dxConsumed dyC:$dyConsumed dxUC:$dxUnconsumed dyUC:$dyUnconsumed")
+        d("${target.simpleHash()}....dxC:$dxConsumed dyC:$dyConsumed dxUC:$dxUnconsumed dyUC:$dyUnconsumed")
     }
 
     override fun onSaveInstanceState(
         parent: CoordinatorLayout,
         child: T
     ): Parcelable? {
-        w("this....")
+        w("${child.simpleHash()}....")
         return super.onSaveInstanceState(parent, child)
     }
 
@@ -94,7 +95,41 @@ open class LogBehavior<T : View>(context: Context? = null, attrs: AttributeSet? 
             axes,
             type
         )
-        i("this....")
+        i("${target.simpleHash()}...axes:$axes type:$type")
+    }
+
+    /**
+     * @param axes 事件的方向:  1:[ViewCompat.SCROLL_AXIS_HORIZONTAL] 2:[ViewCompat.SCROLL_AXIS_VERTICAL]
+     * @param type 滚动事件类型: 0:scroll 1:fling
+     * @return true 接收内嵌滚动事件
+     * */
+    override fun onStartNestedScroll(
+        coordinatorLayout: CoordinatorLayout,
+        child: T,
+        directTargetChild: View,
+        target: View,
+        axes: Int,
+        type: Int
+    ): Boolean {
+        i("this...${target.simpleHash()} axes:$axes type:$type")
+        return super.onStartNestedScroll(
+            coordinatorLayout,
+            child,
+            directTargetChild,
+            target,
+            axes,
+            type
+        )
+    }
+
+    override fun onStopNestedScroll(
+        coordinatorLayout: CoordinatorLayout,
+        child: T,
+        target: View,
+        type: Int
+    ) {
+        super.onStopNestedScroll(coordinatorLayout, child, target, type)
+        i("${target.simpleHash()}....")
     }
 
     override fun getScrimColor(
@@ -113,7 +148,7 @@ open class LogBehavior<T : View>(context: Context? = null, attrs: AttributeSet? 
         velocityY: Float,
         consumed: Boolean
     ): Boolean {
-        d("this....onNestedFling")
+        d("${target.simpleHash()}....onNestedFling")
         return super.onNestedFling(coordinatorLayout, child, target, velocityX, velocityY, consumed)
     }
 
@@ -122,7 +157,7 @@ open class LogBehavior<T : View>(context: Context? = null, attrs: AttributeSet? 
         child: T,
         layoutDirection: Int
     ): Boolean {
-        w("this...${child.javaClass.simpleName}...ld:$layoutDirection")
+        w("this...${child.simpleHash()}...ld:$layoutDirection")
         return super.onLayoutChild(parent, child, layoutDirection)
     }
 
@@ -133,7 +168,7 @@ open class LogBehavior<T : View>(context: Context? = null, attrs: AttributeSet? 
         velocityX: Float,
         velocityY: Float
     ): Boolean {
-        d("this....onNestedPreFling")
+        d("${target.simpleHash()}....onNestedPreFling")
         return super.onNestedPreFling(coordinatorLayout, child, target, velocityX, velocityY)
     }
 
@@ -160,23 +195,12 @@ open class LogBehavior<T : View>(context: Context? = null, attrs: AttributeSet? 
         w("this....")
     }
 
-
-    override fun onStopNestedScroll(
-        coordinatorLayout: CoordinatorLayout,
-        child: T,
-        target: View,
-        type: Int
-    ) {
-        super.onStopNestedScroll(coordinatorLayout, child, target, type)
-        i("this....")
-    }
-
     override fun layoutDependsOn(
         parent: CoordinatorLayout,
         child: T,
         dependency: View
     ): Boolean {
-        w("this....${child.javaClass.simpleName}...${dependency.javaClass.simpleName}")
+        w("this....${child.simpleHash()}...${dependency.simpleHash()}")
         return super.layoutDependsOn(parent, child, dependency)
     }
 
@@ -222,7 +246,7 @@ open class LogBehavior<T : View>(context: Context? = null, attrs: AttributeSet? 
         parent: CoordinatorLayout,
         child: T
     ): Boolean {
-        w("this....")
+        i("this....")
         return super.blocksInteractionBelow(parent, child)
     }
 
@@ -241,7 +265,7 @@ open class LogBehavior<T : View>(context: Context? = null, attrs: AttributeSet? 
         child: T,
         ev: MotionEvent
     ): Boolean {
-        w("this...${child.javaClass.simpleName}...${ev.actionToString()}")
+        i("this...${child.simpleHash()}...${ev.actionToString()}")
         return super.onTouchEvent(parent, child, ev)
     }
 
@@ -250,37 +274,13 @@ open class LogBehavior<T : View>(context: Context? = null, attrs: AttributeSet? 
         child: T,
         ev: MotionEvent
     ): Boolean {
-        w("this...${child.javaClass.simpleName}...${ev.actionToString()}")
+        i("this...${child.simpleHash()}...${ev.actionToString()}")
         return super.onInterceptTouchEvent(parent, child, ev)
     }
 
     override fun onAttachedToLayoutParams(params: CoordinatorLayout.LayoutParams) {
         super.onAttachedToLayoutParams(params)
         w("this...")
-    }
-
-    /**
-     * @param axes 事件的方向:  1:[ViewCompat.SCROLL_AXIS_HORIZONTAL] 2:[ViewCompat.SCROLL_AXIS_VERTICAL]
-     * @param type 滚动事件类型: 0:scroll 1:fling
-     * @return true 接收内嵌滚动事件
-     * */
-    override fun onStartNestedScroll(
-        coordinatorLayout: CoordinatorLayout,
-        child: T,
-        directTargetChild: View,
-        target: View,
-        axes: Int,
-        type: Int
-    ): Boolean {
-        i("this...${target.javaClass.simpleName} axes:$axes type:$type")
-        return super.onStartNestedScroll(
-            coordinatorLayout,
-            child,
-            directTargetChild,
-            target,
-            axes,
-            type
-        )
     }
 
     override fun onMeasureChild(

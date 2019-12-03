@@ -908,3 +908,15 @@ public fun <L1, L2> each(list1: List<L1>?, list2: List<L2>?, run: (item1: L1, it
         run(list1!![i], list2!![i])
     }
 }
+
+public fun Any.simpleHash(): String {
+    return "${this.javaClass.simpleName}(${this.hashCode()})"
+}
+
+public fun Any.simpleName(): String {
+    return this.javaClass.simpleName
+}
+
+public fun Any.name(): String {
+    return this.javaClass.name
+}
