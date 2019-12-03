@@ -426,7 +426,10 @@ public fun RecyclerView.getLastVelocity(): Float {
     var currVelocity = 0f
     try {
         val mViewFlinger = Reflect.getMember(RecyclerView::class.java, this, "mViewFlinger")
-        val mScroller = Reflect.getMember(mViewFlinger, "mScroller")
+        var mScroller = Reflect.getMember(mViewFlinger, "mScroller")
+        if (mScroller == null) {
+            mScroller = Reflect.getMember(mViewFlinger, "mOverScroller")
+        }
         if (mScroller is OverScroller) {
             currVelocity = mScroller.currVelocity
         } else if (mScroller is ScrollerCompat) {

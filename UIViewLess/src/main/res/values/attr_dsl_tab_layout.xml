@@ -77,8 +77,11 @@
         <attr name="tab_indicator_dash_gap" format="dimension" />
         <attr name="tab_indicator_radius" format="dimension" />
         <attr name="tab_indicator_radii" format="string" />
+        <!--指示器颜色渐变数组,多个色值用`,`号隔开. 格式:#FF0000,#00FF00,#FF0000-->
         <attr name="tab_indicator_gradient_colors" format="string" />
+        <!--指示器渐变start的颜色, 优先响应colors属性-->
         <attr name="tab_indicator_gradient_start_color" format="color" />
+        <!--指示器渐变end的颜色, 优先响应colors属性-->
         <attr name="tab_indicator_gradient_end_color" format="color" />
         <!--end...-->
 
