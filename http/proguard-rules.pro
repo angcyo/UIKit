@@ -68,4 +68,8 @@
 
 -ignorewarnings -keep class * { public private *; }
 
+#org.conscrypt
+-dontwarn org.conscrypt.**
+-keep class org.conscrypt.** { *; }
+-keep interface org.conscrypt.** { *; }
 # -ignorewarnings
