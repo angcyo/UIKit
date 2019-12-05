@@ -92,7 +92,7 @@ dependencies {
     api fileTree(dir: 'libs', include: ['*.jar'])
 
     api "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$_kotlin_version"
-    api "org.jetbrains.kotlin:kotlin-reflect:$_kotlin_version"
+    //api "org.jetbrains.kotlin:kotlin-reflect:$_kotlin_version"
     //https://jcenter.bintray.com/org/jetbrains/kotlinx/kotlinx-coroutines-core/
     api "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"
     //https://github.com/hltj/kotlinx.coroutines-cn/blob/master/ui/coroutines-guide-ui.md
