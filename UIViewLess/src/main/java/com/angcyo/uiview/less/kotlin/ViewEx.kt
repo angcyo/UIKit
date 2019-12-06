@@ -1376,7 +1376,9 @@ public fun View.getLocationInParent(parentView: View? = null): Rect {
 
 public fun View.findRecyclerView(): RecyclerView? {
     return findView {
-        it is RecyclerView && it.measuredWidth > this.measuredWidth / 2
+        it is RecyclerView &&
+                it.measuredWidth > this.measuredWidth / 2 &&
+                it.measuredHeight > this.measuredHeight / 2
     } as? RecyclerView
 }
 
