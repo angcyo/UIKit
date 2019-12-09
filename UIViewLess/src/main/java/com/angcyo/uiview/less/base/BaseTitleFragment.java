@@ -106,6 +106,10 @@ public abstract class BaseTitleFragment extends BaseFragment implements AffectUI
         affectUI = createAffectUI();
     }
 
+    protected boolean needTitleBar() {
+        return topFragment() == this;
+    }
+
     /**
      * 初始化标题部分
      */
@@ -113,7 +117,7 @@ public abstract class BaseTitleFragment extends BaseFragment implements AffectUI
         if (titleBarLayout == null) {
             return;
         }
-        if (topFragment() != this) {
+        if (!needTitleBar()) {
             hideTitleBar();
             return;
         }
