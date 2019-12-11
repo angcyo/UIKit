@@ -15,7 +15,7 @@ dependencies {
     // core
     //https://github.com/lingochamp/okdownload
     //https://jcenter.bintray.com/com/liulishuo/okdownload/okdownload/
-    def okdownload_version = '1.0.5'
+    def okdownload_version = '1.0.6'
     api('com.liulishuo.okdownload:okdownload:' + okdownload_version)
 
     // provide sqlite to store breakpoints
