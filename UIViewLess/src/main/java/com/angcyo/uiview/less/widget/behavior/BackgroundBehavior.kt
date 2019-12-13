@@ -126,7 +126,8 @@ open class BackgroundBehavior(context: Context? = null, attributeSet: AttributeS
             dyUnconsumed,
             type
         )
-        _lastScrollTop = -(dyConsumedAllSum + currentDyConsumedAll)
+        _lastScrollTop = -(target.findRecyclerView()?.computeVerticalScrollOffset()
+            ?: 0) //-(dyConsumedAllSum + currentDyConsumedAll)
         _notifyScrollTopTo(child, _lastScrollTop + _lastContentTranslationY.toInt())
     }
 

@@ -11,6 +11,7 @@ import com.angcyo.uiview.less.R
 import com.angcyo.uiview.less.base.helper.ViewGroupHelper
 import com.angcyo.uiview.less.kotlin.color
 import com.angcyo.uiview.less.kotlin.find
+import com.angcyo.uiview.less.kotlin.findRecyclerView
 import com.angcyo.uiview.less.kotlin.have
 import com.angcyo.uiview.less.resources.AnimUtil
 import com.angcyo.uiview.less.resources.ViewResConfig
@@ -148,7 +149,8 @@ open class TitleBarBehavior(context: Context? = null, attributeSet: AttributeSet
             dyUnconsumed,
             type
         )
-        contentScrollY = dyConsumedAllSum + currentDyConsumedAll
+        contentScrollY = target.findRecyclerView()?.computeVerticalScrollOffset()
+            ?: 0  //dyConsumedAllSum + currentDyConsumedAll
         dispatchGradient(child)
     }
 
