@@ -44,7 +44,7 @@ project.configurations.all { defaultConfiguration ->
 
             if (versionArray.size > 1) {
                 //同一个库, 具有多个版本信息
-                error "${packageName} -> ${versionArray}"
+                error "多版本: ${packageName} -> ${versionArray}"
             }
         }
 
