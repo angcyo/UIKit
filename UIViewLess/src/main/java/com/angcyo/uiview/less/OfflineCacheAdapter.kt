@@ -52,13 +52,13 @@ open class OfflineCacheAdapter(cacheFolder: String = Root.getAppExternalFolder("
     var cacheAdapterListener = OfflineCacheAdapterListener()
 
     init {
-        cache.initialize()
-
         RCacheManager.instance()
             .addCachePath(cacheFolder)
     }
 
     override fun checkNeedCache(request: Request): Boolean {
+        cache.initialize()
+
         if (RNetwork.isConnect(app())) {
             return false
         }
