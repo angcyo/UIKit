@@ -16,6 +16,7 @@ import com.google.gson.JsonPrimitive
  */
 
 public fun json(): Json.Builder = Json.json()
+public fun array(): Json.Builder = Json.array()
 
 public fun jsonString(config: Json.Builder.() -> Unit = {}): String {
     return json().run {
@@ -25,7 +26,7 @@ public fun jsonString(config: Json.Builder.() -> Unit = {}): String {
 }
 
 public fun arrayString(config: Json.Builder.() -> Unit = {}): String {
-    return json().run {
+    return array().run {
         config()
         get()
     }
@@ -39,7 +40,7 @@ public fun jsonObject(config: Json.Builder.() -> Unit = {}): JsonElement {
 }
 
 public fun jsonArray(config: Json.Builder.() -> Unit = {}): JsonElement {
-    return json().run {
+    return array().run {
         config()
         build()
     }
